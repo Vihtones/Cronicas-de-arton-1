@@ -1,0 +1,1026 @@
+{
+ "schema_version": 1,
+ "status": "ORIGINAL_DO_JOGO",
+ "tile_px": 32,
+ "size": [
+  96,
+  64
+ ],
+ "grid": [
+  "..............................................~~..T,,T,,,,TT,,,T,T,,,T,T,T,,TT,T,,,T,,,,,,T,T,T,",
+  "..............................................~~..T,TTT,,,,,,,T,,TTT,T,,,T,TTTT,,T,T,,TT,,T,T,,T",
+  "..............................................~~..T,T,,T,T,T,T,,,,,,,,,TTTT,T,,TTT,TT,,,,,,,T,T,",
+  "..............................................~~..,,TT,,T,,,TT,T,,,,,,,,,T,,T,,,TT,,,T,TT,,,,,,,",
+  "..............................................~~..,,,,,,,,,,TT,,,TTT,T,,T,,,,,,,###__#%###%##,,T",
+  "..............................................~~..,TTT,,,,TT,TTTTT,,,,,,T,,,,TTT#___________#,,,",
+  "..............................................~~..,,T,,,,TT,TT,,,TT,,TTT,T,TT,,,#%_____%____#T,,",
+  "..............................................~~..,,,T,,T,TT,T,,,,,,TT,T,,,,T,,,#__%_%_____%#T,,",
+  ".....................==.......................~~..,,,,,TT,T,,T,,T,T,,,,T,,,,T,,,#___________#T,T",
+  ".....................==..##########...........~~..,,,,,,,,T,,TT,,,,,,,,T,,,,,,T,#%____S____%#,TT",
+  "......##########.....==..#________#..######...~~..TT,,T,,,,T,,T,TTT,,TT,T,,,,T,,#_____%__%%%#,,,",
+  "......#________#.....==..#________#..#____#...~~..,T,,,T,,,,T,,,,,,T,,TT,TT,TTTT#___________#,,,",
+  "......#________#.....==..#________#..#____#...~~..TT,,T,,T,T,TT,,T,,,TT,T,,,,,T,#%%%______%__TTT",
+  "......#________#.....==..#________#..#____#...~~..,,T,,T,,T,,TTT,,,,,,,,T,TT,,,,#_____%_____#,TT",
+  "......#________#.....==..#________#..###D##...~~..TTTT,,T,,TT,,,,,T,T,,,,T,,TT,,#__%##_######,T,",
+  "......#________#.....==..#________#...........~~..TT,,T,,TT,,T,TTTTT,TT,T,,TTT,,,,,,,,:,,TT,,,,,",
+  "......#####D####.....==..#####D####...........~~..,,,TT,T,,,T,,TT,T,,,,,,,,,:::::::::::,T,,,TTTT",
+  ".....................==.......................~~..,,,,,T,,T,,,,,,TT,,T,,T,,:::::::::::,T,,,TT,TT",
+  ".....................==.......................~~..T,,,,,T,,TTT,,,,,,,,,T,,::T,,,T,T,TTT,,T,T,,T,",
+  "......########.......==..######.######........~~..,,,,,,,,,,,,,,,,,,,,T,,T::,,TTTT,,,,,,T,T,TT,,",
+  "......#______#.......==..#____#.#____#........~~..,,,,,T,,,TTTT,,T,,,,,,,::,,T,,,,,,,TTT,T,,,,,T",
+  "......#______#.......==..#____#.#____#........~~..TT,,T,TT,T,T,T,,T,T,,,T::T,,TTT,T,T,,,TTT,,,,,",
+  "......#______#.......==..#____#.#____#........~~..,,,TT,TTTTT,,,T,,,,,,T::,,T,,,,,TTT,,TTT,,T,T,",
+  "......####D###.......==..###D##.###D##........~~..,,,,,,,,T,,,,T,,T,,T,::,,T,,,T,,,,TT,,,,T,,,,T",
+  ".....................==o......................~~..,TTTT,,,T,,,T,,,,,,,::,,TT,,,T,T,TT,,,,,,,,,T,",
+  "..==============================================================================================",
+  "..==============================================================================================",
+  ".....................==.......................~~..,,,,T,T,,,,,:T,,,,,,,T,T,T,,,,,,,T,,T,,,,,,T,T",
+  ".....................==.......::::::::::::::..~~..,,,TTTTT,T,T:,,T,TT,,T,,T,,,,T,,,,TT,T,,,T,T,,",
+  "......####D###.###D##==.......................~~..TT,T,T,T,,,T:TTT,,,,,,,T,T,,,TT,TT,TT,,,T,T,,,",
+  "......#______#.#____#==..###D##......###D###..~~..,,,,,,TTTT,,:,,,,T,TTT,,,,,,,TTT,,,T,,,T,,,,TT",
+  "......#______#.#____#==..#____#......#_____#..~~..,,,,T,,T,,T,:T,TT,T,T,T,,,TT,,,,T,,,,T,,T,T,,T",
+  "......#______#.#____#==..#____#......#_____#..~~..,,TT,,TT,TTT:,,,,T,,,TT,T,,T,,,,,,,,T,T,T,T,TT",
+  "......#______#.######==..#____#......#_____#..~~..,T,T,T,T,T,T:,TTT,,,,,,TT,T,,,,T,,,,,T,,,T,,,,",
+  "......########.......==..######......#_____#..~~..,,,T,,,,,T,T:T,,,,,T,T,TT,T,,T,,,,,,,,,,,T,,,,",
+  ".....................==..............#_____#..~~..T,,,,,T,,,,,:T,T,,,,,,,TTT,T,,T,,,,T,,TT,,T,T,",
+  ".....................==..............#######..~~..,T,TT,,,T,,T:T,,,,,T,,T,,,,,,TTT,,,,,,,,,T,,,,",
+  "...............###D##==.......................~~..,,,T,,T,,,,,:TTT,T,,T,,TT,,,T,TT,,,,TTTT,,,T,T",
+  "...............#____#==...cccccccccccccccccc..~~..,T,,,,TTT,,,:,,TT,,,,T,T,,,,T,,,,,,,,T,,,,,,,,",
+  "...............#____#==...cccccccccccccccccc..~~..,,T,,,,,TTTT:,,T,,,,T,,T,TT,T,,,TTT,TT,,,T,,,T",
+  "...............#____#==...cccccccccccccccccc..~~..,T,,T,,T,T##D###,,TTT,,,,,T,,,,T,,,,,,,,TTT,TT",
+  "...............######==...cccccccccccccccccc..~~..,TT,,,,,,,#____#TT,,,,,,TTT,TT,,,T,T,,,,,,,,,,",
+  ".....................==...cccccccccccccccccc..~~..T,,,,T,,,T#____#,T,,T,,,,T,,T,T,,,TTT,,,T,,,,,",
+  ".....................==...cccccccccccccccccc..~~..T,,,T,,T,,#____#,TTTT,,T,,,,,,T,TT,T,,,,T,,,,T",
+  ".....................==...cccccccccccccccccc..~~..T,TTT,TT,T######,,,,T,,,T,,,,,,T,T,,T,,,,T,,,T",
+  ".....................==...cccccccccccccccccc..~~..,,T,,T,TT,,,T,,T,,T,,T,TT,,,T,TT,,,,,,,T,TT,,,",
+  "..............................................~~..T,,T,,T,,,,T,,,T,TTTT,,TT,,,T,,,,,,T,T,,,,,,,T",
+  "..............................................~~..,,T,TT,,TT,T,,T,,T,,,,,,,,T,TT,,,,,,,TTT,,T,,T",
+  "..............................................~~..,,,,TT,T,,,,,T,,,,,,T,,,T,T,,,,,,,,,,,,,,,,,TT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX######################__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_________############__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_________############__%_______#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_________############__________#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_______________________________D______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_U_______________________%_____#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_______________________________#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_________############_______%__##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX#_________############__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX######################__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ ],
+ "legend": {
+  ".": {
+   "name": "grama",
+   "walk": true
+  },
+  "=": {
+   "name": "estrada",
+   "walk": true
+  },
+  ":": {
+   "name": "trilha",
+   "walk": true
+  },
+  ",": {
+   "name": "chão de floresta",
+   "walk": true
+  },
+  "c": {
+   "name": "plantação",
+   "walk": true,
+   "difficult": true
+  },
+  "T": {
+   "name": "árvore",
+   "walk": false,
+   "cover": true
+  },
+  "~": {
+   "name": "rio",
+   "walk": false
+  },
+  "#": {
+   "name": "parede",
+   "walk": false
+  },
+  "_": {
+   "name": "piso",
+   "walk": true
+  },
+  "%": {
+   "name": "entulho",
+   "walk": true,
+   "difficult": true
+  },
+  "D": {
+   "name": "porta",
+   "walk": true,
+   "object": true
+  },
+  "S": {
+   "name": "escada",
+   "walk": true
+  },
+  "U": {
+   "name": "escada",
+   "walk": true
+  },
+  "o": {
+   "name": "poço",
+   "walk": false
+  },
+  "X": {
+   "name": "vazio",
+   "walk": false
+  }
+ },
+ "zones": [
+  {
+   "id": "vila",
+   "rect": [
+    2,
+    6,
+    44,
+    42
+   ]
+  },
+  {
+   "id": "estrada",
+   "rect": [
+    44,
+    22,
+    52,
+    6
+   ]
+  },
+  {
+   "id": "floresta",
+   "rect": [
+    48,
+    0,
+    48,
+    50
+   ]
+  },
+  {
+   "id": "ruina",
+   "rect": [
+    80,
+    4,
+    13,
+    11
+   ]
+  },
+  {
+   "id": "cripta",
+   "rect": [
+    3,
+    50,
+    42,
+    13
+   ]
+  }
+ ],
+ "player_start": [
+  23,
+  27
+ ],
+ "locations": [
+  {
+   "id": "taverna",
+   "name": "Taverna do Galo Rubro",
+   "zone": "vila",
+   "rect": [
+    7,
+    11,
+    8,
+    5
+   ],
+   "spot": [
+    11,
+    13
+   ],
+   "indoor": true
+  },
+  {
+   "id": "templo",
+   "name": "Templo de Lena",
+   "zone": "vila",
+   "rect": [
+    26,
+    10,
+    8,
+    6
+   ],
+   "spot": [
+    30,
+    13
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_brandt",
+   "name": "Casa dos Brandt",
+   "zone": "vila",
+   "rect": [
+    38,
+    11,
+    4,
+    3
+   ],
+   "spot": [
+    40,
+    12
+   ],
+   "indoor": true
+  },
+  {
+   "id": "quartel",
+   "name": "Posto da Guarda",
+   "zone": "vila",
+   "rect": [
+    7,
+    20,
+    6,
+    3
+   ],
+   "spot": [
+    10,
+    21
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_ferro",
+   "name": "Casa dos Ferro",
+   "zone": "vila",
+   "rect": [
+    26,
+    20,
+    4,
+    3
+   ],
+   "spot": [
+    28,
+    21
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_vasquel",
+   "name": "Casa dos Vasquel",
+   "zone": "vila",
+   "rect": [
+    33,
+    20,
+    4,
+    3
+   ],
+   "spot": [
+    35,
+    21
+   ],
+   "indoor": true
+  },
+  {
+   "id": "ferraria",
+   "name": "Ferraria",
+   "zone": "vila",
+   "rect": [
+    7,
+    30,
+    6,
+    4
+   ],
+   "spot": [
+    10,
+    32
+   ],
+   "indoor": true
+  },
+  {
+   "id": "prefeitura",
+   "name": "Casa do Alcaide",
+   "zone": "vila",
+   "rect": [
+    16,
+    30,
+    4,
+    3
+   ],
+   "spot": [
+    18,
+    31
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_aldren",
+   "name": "Casa dos Aldren",
+   "zone": "vila",
+   "rect": [
+    26,
+    31,
+    4,
+    3
+   ],
+   "spot": [
+    28,
+    32
+   ],
+   "indoor": true
+  },
+  {
+   "id": "moinho",
+   "name": "Moinho",
+   "zone": "vila",
+   "rect": [
+    38,
+    31,
+    5,
+    5
+   ],
+   "spot": [
+    40,
+    33
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_corvo",
+   "name": "Casa dos Corvo",
+   "zone": "vila",
+   "rect": [
+    16,
+    38,
+    4,
+    3
+   ],
+   "spot": [
+    18,
+    39
+   ],
+   "indoor": true
+  },
+  {
+   "id": "cabana_quill",
+   "name": "Cabana do Caçador",
+   "zone": "floresta",
+   "rect": [
+    61,
+    41,
+    4,
+    3
+   ],
+   "spot": [
+    62,
+    42
+   ],
+   "indoor": true
+  },
+  {
+   "id": "praca",
+   "name": "Praça do Poço",
+   "zone": "vila",
+   "rect": [
+    18,
+    22,
+    8,
+    7
+   ],
+   "spot": [
+    23,
+    27
+   ],
+   "indoor": false
+  },
+  {
+   "id": "mercado",
+   "name": "Mercado",
+   "zone": "vila",
+   "rect": [
+    14,
+    19,
+    6,
+    4
+   ],
+   "spot": [
+    17,
+    21
+   ],
+   "indoor": false
+  },
+  {
+   "id": "campos",
+   "name": "Campos dos Aldren",
+   "zone": "vila",
+   "rect": [
+    26,
+    38,
+    18,
+    8
+   ],
+   "spot": [
+    34,
+    41
+   ],
+   "indoor": false
+  },
+  {
+   "id": "ponte",
+   "name": "Ponte do Rio",
+   "zone": "estrada",
+   "rect": [
+    44,
+    24,
+    6,
+    4
+   ],
+   "spot": [
+    45,
+    27
+   ],
+   "indoor": false
+  },
+  {
+   "id": "estrada_leste",
+   "name": "Estrada Leste",
+   "zone": "estrada",
+   "rect": [
+    48,
+    24,
+    22,
+    4
+   ],
+   "spot": [
+    60,
+    27
+   ],
+   "indoor": false
+  },
+  {
+   "id": "floresta",
+   "name": "Bosque Sombrio",
+   "zone": "floresta",
+   "rect": [
+    50,
+    28,
+    45,
+    20
+   ],
+   "spot": [
+    70,
+    34
+   ],
+   "indoor": false
+  },
+  {
+   "id": "trilha_floresta",
+   "name": "Trilha Antiga",
+   "zone": "floresta",
+   "rect": [
+    68,
+    16,
+    20,
+    10
+   ],
+   "spot": [
+    72,
+    20
+   ],
+   "indoor": false
+  },
+  {
+   "id": "ruina",
+   "name": "Ruína da Torre Partida",
+   "zone": "ruina",
+   "rect": [
+    80,
+    4,
+    13,
+    11
+   ],
+   "spot": [
+    86,
+    12
+   ],
+   "indoor": false
+  },
+  {
+   "id": "valkaria",
+   "name": "Valkaria (distante)",
+   "zone": "valkaria",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spot": [
+    0,
+    0
+   ],
+   "indoor": false
+  },
+  {
+   "id": "cripta_antecamara",
+   "name": "Antecâmara",
+   "zone": "cripta",
+   "rect": [
+    4,
+    52,
+    9,
+    8
+   ],
+   "spot": [
+    8,
+    55
+   ],
+   "indoor": true
+  },
+  {
+   "id": "cripta_corredor",
+   "name": "Corredor",
+   "zone": "cripta",
+   "rect": [
+    13,
+    55,
+    12,
+    3
+   ],
+   "spot": [
+    18,
+    56
+   ],
+   "indoor": true
+  },
+  {
+   "id": "cripta_salao",
+   "name": "Salão dos Bandidos",
+   "zone": "cripta",
+   "rect": [
+    25,
+    51,
+    10,
+    10
+   ],
+   "spot": [
+    29,
+    55
+   ],
+   "indoor": true
+  },
+  {
+   "id": "cripta_cela",
+   "name": "Cela",
+   "zone": "cripta",
+   "rect": [
+    36,
+    53,
+    6,
+    5
+   ],
+   "spot": [
+    39,
+    55
+   ],
+   "indoor": true
+  }
+ ],
+ "objects": [
+  {
+   "id": "porta_taverna",
+   "type": "door",
+   "tile": [
+    11,
+    16
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Taverna do Galo Rubro)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_templo",
+   "type": "door",
+   "tile": [
+    30,
+    16
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Templo de Lena)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_casa_brandt",
+   "type": "door",
+   "tile": [
+    40,
+    14
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa dos Brandt)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_quartel",
+   "type": "door",
+   "tile": [
+    10,
+    23
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Posto da Guarda)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_casa_ferro",
+   "type": "door",
+   "tile": [
+    28,
+    23
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa dos Ferro)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_casa_vasquel",
+   "type": "door",
+   "tile": [
+    35,
+    23
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa dos Vasquel)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_ferraria",
+   "type": "door",
+   "tile": [
+    10,
+    29
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Ferraria)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_prefeitura",
+   "type": "door",
+   "tile": [
+    18,
+    29
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa do Alcaide)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_casa_aldren",
+   "type": "door",
+   "tile": [
+    28,
+    30
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa dos Aldren)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_moinho",
+   "type": "door",
+   "tile": [
+    40,
+    30
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Moinho)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_casa_corvo",
+   "type": "door",
+   "tile": [
+    18,
+    37
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa dos Corvo)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "porta_cabana",
+   "type": "door",
+   "tile": [
+    62,
+    40
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Cabana do Caçador)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239"
+   }
+  },
+  {
+   "id": "poco",
+   "type": "prop",
+   "tile": [
+    23,
+    24
+   ],
+   "name": "Poço"
+  },
+  {
+   "id": "escada_ruina",
+   "type": "stairs",
+   "tile": [
+    86,
+    9
+   ],
+   "to": [
+    7,
+    56
+   ],
+   "name": "Escada para a cripta"
+  },
+  {
+   "id": "escada_cripta",
+   "type": "stairs",
+   "tile": [
+    5,
+    56
+   ],
+   "to": [
+    86,
+    10
+   ],
+   "name": "Escada para a superfície"
+  },
+  {
+   "id": "porta_cela",
+   "type": "door",
+   "tile": [
+    35,
+    55
+   ],
+   "open": false,
+   "locked": true,
+   "key": "chave_cela",
+   "name": "Porta da cela",
+   "lock_cd": 20,
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira"
+   }
+  },
+  {
+   "id": "bau_dizimo",
+   "type": "chest",
+   "tile": [
+    33,
+    52
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Baú com selo do templo",
+   "contents": [
+    "dizimo_lena"
+   ]
+  }
+ ],
+ "targets": [
+  {
+   "id": "placa_pressao",
+   "tile": [
+    16,
+    56
+   ],
+   "name": "Laje solta",
+   "signal": "Uma laje do corredor está mais limpa que as outras.",
+   "actions": {
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 15,
+     "reveals": [],
+     "flag": "armadilha_corredor_vista",
+     "ok": "Há um mecanismo sob a laje: uma armadilha de dardos. Você pode contorná-la.",
+     "fail": "Parece só uma laje gasta."
+    }
+   }
+  },
+  {
+   "id": "bau_tomas",
+   "tile": [
+    38,
+    11
+   ],
+   "name": "Baú de Tomas",
+   "requires_location": "casa_brandt",
+   "signal": "Um baú de rapaz, a tampa entreaberta.",
+   "actions": {
+    "investigar": {
+     "skill": "investigacao",
+     "cd": 15,
+     "reveals": [
+      "f_tomas_viu_carga"
+     ],
+     "ok": "Sob as roupas, um bilhete com a letra de Tomas: \"luzes na torre partida de novo. carroça sem lanterna. vou ver.\"",
+     "fail": "Roupas, uma funda, pedrinhas. Nada que pareça importante."
+    },
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 20,
+     "reveals": [
+      "f_tomas_viu_carga"
+     ],
+     "ok": "Um papel dobrado escapa do forro. É um bilhete sobre luzes na torre partida.",
+     "fail": "À primeira vista, só roupas."
+    }
+   }
+  },
+  {
+   "id": "rastros_moinho",
+   "tile": [
+    42,
+    29
+   ],
+   "name": "Terra revolvida atrás do moinho",
+   "signal": "A lama atrás do moinho está marcada, como se algo tivesse sido arrastado.",
+   "actions": {
+    "rastrear": {
+     "skill": "sobrevivencia",
+     "cd": 15,
+     "reveals": [
+      "f_tomas_levado"
+     ],
+     "ok": "Duas pessoas de botas pesadas e um terceiro, mais leve, sendo arrastado. Seguem para a estrada leste.",
+     "fail": "Pegadas demais. Você não consegue separar umas das outras."
+    },
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 20,
+     "reveals": [
+      "f_tomas_levado"
+     ],
+     "ok": "Marcas de calcanhares arrastados, e um botão de osso caído.",
+     "fail": "Lama, muita lama."
+    }
+   }
+  },
+  {
+   "id": "arbusto_estrada",
+   "tile": [
+    56,
+    24
+   ],
+   "name": "Espinheiro à beira da estrada",
+   "signal": "Algo claro está preso no espinheiro.",
+   "actions": {
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 10,
+     "reveals": [
+      "f_tomas_levado"
+     ],
+     "ok": "Um retalho de linho com bordado azul. A mãe de Tomas reconheceria.",
+     "fail": "Só folhas e espinhos."
+    }
+   }
+  },
+  {
+   "id": "trilha_marcas",
+   "tile": [
+    72,
+    22
+   ],
+   "name": "Trilha antiga",
+   "signal": "A trilha antiga, quase tomada pelo mato, tem galhos recém-quebrados.",
+   "actions": {
+    "rastrear": {
+     "skill": "sobrevivencia",
+     "cd": 15,
+     "reveals": [
+      "f_bandidos_na_ruina"
+     ],
+     "ok": "Sulcos de rodas estreitas e muitas botas, indo e voltando da torre partida.",
+     "fail": "Animais passam por aqui. Ou não."
+    },
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 15,
+     "reveals": [
+      "f_bandidos_na_ruina"
+     ],
+     "ok": "Cera de vela pingada nas pedras. Alguém anda aqui à noite.",
+     "fail": "Galhos quebrados, mas por quem?"
+    }
+   }
+  },
+  {
+   "id": "entrada_ruina",
+   "tile": [
+    86,
+    11
+   ],
+   "name": "Escada da torre",
+   "signal": "Fuligem fresca na parede ao lado da escada que desce.",
+   "actions": {
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 10,
+     "reveals": [
+      "f_bandidos_na_ruina"
+     ],
+     "ok": "Tochas foram acesas aqui nesta semana. E há cheiro de ensopado subindo da escada.",
+     "fail": "Pedra antiga, preta de fumaça."
+    },
+    "escutar": {
+     "skill": "percepcao",
+     "cd": 15,
+     "reveals": [
+      "f_bandidos_na_ruina"
+     ],
+     "ok": "Vozes abafadas lá embaixo. Alguém ri. Alguém tosse.",
+     "fail": "Só o vento nas pedras."
+    }
+   }
+  }
+ ]
+}

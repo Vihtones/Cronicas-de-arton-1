@@ -9,6 +9,13 @@ const SUITES := [
 	"res://tests/unit/test_rng.gd",
 	"res://tests/unit/test_world_state.gd",
 	"res://tests/unit/test_save_repository.gd",
+	"res://tests/unit/test_smoke_world.gd",
+	"res://tests/unit/test_rules.gd",
+	"res://tests/unit/test_combat.gd",
+	"res://tests/unit/test_exploration.gd",
+	"res://tests/unit/test_social.gd",
+	"res://tests/unit/test_systems.gd",
+	"res://tests/unit/test_vertical_slice.gd",
 ]
 
 
@@ -16,7 +23,12 @@ func _init() -> void:
 	var passed := 0
 	var failed := 0
 	for path in SUITES:
-		var suite = load(path).new()
+		var script = load(path)
+		if script == null or not script.can_instantiate():
+			failed += 1
+			print("  FAIL %s (não compilou)" % path.get_file())
+			continue
+		var suite = script.new()
 		for m in suite.get_method_list():
 			var n: String = m.name
 			if not n.begins_with("test_"):

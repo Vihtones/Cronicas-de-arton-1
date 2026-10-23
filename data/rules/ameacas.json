@@ -1,0 +1,149 @@
+{
+ "schema_version": 1,
+ "rules": [
+  {
+   "id": "criatura.bandido_comum",
+   "valor": {
+    "nome": "Bandido",
+    "nd": "1/4",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 1,
+    "defesa": 13,
+    "fort": 1,
+    "ref": 3,
+    "von": -1,
+    "pv": 6,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Clava",
+      "bonus": 7,
+      "dano": "1d6+3",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1
+     }
+    ],
+    "atributos": {
+     "for": 1,
+     "des": 2,
+     "con": 1,
+     "int": 0,
+     "sab": -1,
+     "car": 0
+    },
+    "pericias": {
+     "furtividade": 5
+    }
+   },
+   "fonte": "Bestiário Tormenta20 (Ameaças de Arton — arquivo 'Bestiario_tormenta.pdf')",
+   "pagina": 43,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "criatura.bandido_ligeiro",
+   "valor": {
+    "nome": "Bandido Ligeiro",
+    "nd": "1/2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 1,
+    "defesa": 15,
+    "fort": 3,
+    "ref": 5,
+    "von": 0,
+    "pv": 9,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Clava",
+      "bonus": 9,
+      "dano": "1d6+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1
+     },
+     {
+      "nome": "Funda",
+      "bonus": 9,
+      "dano": "1d6+1",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 1,
+     "des": 2,
+     "con": 1,
+     "int": 0,
+     "sab": -1,
+     "car": 0
+    },
+    "pericias": {
+     "furtividade": 6
+    }
+   },
+   "fonte": "Bestiário Tormenta20 (Ameaças de Arton — arquivo 'Bestiario_tormenta.pdf')",
+   "pagina": 43,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "criatura.hiena",
+   "valor": {
+    "nome": "Hiena",
+    "nd": "1",
+    "tipo": "animal",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 6,
+    "defesa": 14,
+    "fort": 9,
+    "ref": 6,
+    "von": 1,
+    "pv": 17,
+    "deslocamento_m": 15,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 9,
+      "dano": "1d6+7",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 3,
+     "con": 3,
+     "int": -4,
+     "sab": 2,
+     "car": -2
+    },
+    "pericias": {
+     "furtividade": 5,
+     "sobrevivencia": 6
+    },
+    "sentidos": [
+     "faro",
+     "visao_penumbra"
+    ],
+    "habilidades": [
+     "oportunista: +2 dano contra quem sofreu dano nesta rodada"
+    ]
+   },
+   "fonte": "Bestiário Tormenta20 (Ameaças de Arton — arquivo 'Bestiario_tormenta.pdf')",
+   "pagina": 120,
+   "pdf_page": 122,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Bloco extraído de layout em colunas; conferir valores."
+  }
+ ]
+}

@@ -4,7 +4,7 @@ extends RefCounted
 ## backup do save anterior e recuperação automática se o principal estiver corrompido.
 
 const FORMAT := "cronicas_de_arton_save"
-const CURRENT_SCHEMA := 1
+const CURRENT_SCHEMA := 2
 
 var base_dir: String
 ## Migrações N -> N+1: schema_version (int) -> Callable(Dictionary) -> Dictionary
@@ -14,6 +14,21 @@ var migrations: Dictionary = {}
 func _init(p_base_dir: String = "user://saves") -> void:
 	base_dir = p_base_dir
 	DirAccess.make_dir_recursive_absolute(base_dir)
+	migrations[1] = migrate_1_to_2
+
+
+## v1 (Fase 0): só relógio, RNG e posição. v2: módulos do mundo, journal, ouro e ficha.
+static func migrate_1_to_2(d: Dictionary) -> Dictionary:
+	var m: Dictionary = d.get("modules", {})
+	if not m.has("world_modules"): m["world_modules"] = {}
+	if not m.has("journal"): m["journal"] = []
+	var p: Dictionary = m.get("player", {})
+	if not p.has("gold"): p["gold"] = 20
+	if p.get("region_id", "") == "vila_inicial": p["region_id"] = "regiao_inicial"
+	m["player"] = p
+	d["modules"] = m
+	d["schema_version"] = 2
+	return d
 
 
 func _path(slot: String) -> String: return base_dir.path_join(slot + ".json")

@@ -1,0 +1,182 @@
+{
+ "schema_version": 1,
+ "rules": [
+  {
+   "id": "arma.adaga",
+   "valor": {
+    "dano": "1d4",
+    "margem": 19,
+    "mult": 2,
+    "alcance": "curto",
+    "tipo": "perfuracao",
+    "maos": 1,
+    "leve": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.espada_curta",
+   "valor": {
+    "dano": "1d6",
+    "margem": 19,
+    "mult": 2,
+    "tipo": "perfuracao",
+    "maos": 1,
+    "leve": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.clava",
+   "valor": {
+    "dano": "1d6",
+    "margem": 20,
+    "mult": 2,
+    "tipo": "impacto",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.lanca",
+   "valor": {
+    "dano": "1d6",
+    "margem": 20,
+    "mult": 2,
+    "alcance": "curto",
+    "tipo": "perfuracao",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.funda",
+   "valor": {
+    "dano": "1d4",
+    "margem": 20,
+    "mult": 2,
+    "alcance": "medio",
+    "tipo": "impacto",
+    "disparo": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA",
+   "nota": "Funda soma For no dano (regra específica da arma, p.148) — PENDENTE_REVISAO"
+  },
+  {
+   "id": "arma.arco_curto",
+   "valor": {
+    "dano": "1d6",
+    "margem": 20,
+    "mult": 3,
+    "alcance": "medio",
+    "tipo": "perfuracao",
+    "maos": 2,
+    "disparo": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.espada_longa",
+   "valor": {
+    "dano": "1d8",
+    "margem": 19,
+    "mult": 2,
+    "tipo": "corte",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.machado_batalha",
+   "valor": {
+    "dano": "1d8",
+    "margem": 20,
+    "mult": 3,
+    "tipo": "corte",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.couro_batido",
+   "valor": {
+    "defesa": 3,
+    "penalidade": -1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.gibao_peles",
+   "valor": {
+    "defesa": 4,
+    "penalidade": -3
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.cota_malha",
+   "valor": {
+    "defesa": 6,
+    "penalidade": -2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "escudo.leve",
+   "valor": {
+    "defesa": 1,
+    "penalidade": -1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "alcance.metros",
+   "valor": {
+    "curto": 9,
+    "medio": 30,
+    "longo": 90
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 0,
+   "pdf_page": 0,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Valores de memória; conferir no livro antes de marcar VERIFICADA."
+  }
+ ]
+}

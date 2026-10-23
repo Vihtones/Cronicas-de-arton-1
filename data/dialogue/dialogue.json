@@ -1,0 +1,769 @@
+{
+ "schema_version": 1,
+ "status": "ORIGINAL_DO_JOGO",
+ "generic": {
+  "topics": [
+   {
+    "text": "O que se conta por aí?",
+    "next": "__rumor"
+   },
+   {
+    "text": "Você viu Tomas Brandt?",
+    "cond": [
+     {
+      "fact": "f_tomas_sumiu"
+     },
+     {
+      "mystery": "ativo"
+     }
+    ],
+    "next": "g_tomas"
+   },
+   {
+    "text": "Quero comprar algo.",
+    "cond": [
+     {
+      "shop": true
+     }
+    ],
+    "effects": [
+     {
+      "event": "OPEN_SHOP"
+     }
+    ],
+    "next": "__generic"
+   },
+   {
+    "text": "Vim pagar minhas multas.",
+    "cond": [
+     {
+      "warrant": true
+     },
+     {
+      "faction_member": "guarda_vila"
+     }
+    ],
+    "effects": [
+     {
+      "pay_fine": true
+     }
+    ],
+    "next": "g_multa_paga"
+   },
+   {
+    "text": "Até mais.",
+    "next": "end"
+   }
+  ],
+  "nodes": {
+   "g_tomas": {
+    "text": "O filho do moleiro? Faz dias que não o vejo. A mãe está desesperada, coitada.",
+    "options": [
+     {
+      "text": "Mudar de assunto.",
+      "next": "__generic"
+     }
+    ]
+   },
+   "g_multa_paga": {
+    "text": "Está quitado. Que não se repita.",
+    "options": [
+     {
+      "text": "Mudar de assunto.",
+      "next": "__generic"
+     }
+    ]
+   }
+  }
+ },
+ "npcs": {
+  "hilda": {
+   "entries": [
+    {
+     "cond": [
+      {
+       "not_captive": "tomas"
+      },
+      {
+       "mystery": "resolvido"
+      }
+     ],
+     "node": "grata"
+    },
+    {
+     "cond": [
+      {
+       "mystery": "perdido"
+      }
+     ],
+     "node": "luto"
+    }
+   ],
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Por favor... o senhor é de fora? Meu Tomas sumiu há três dias. Otto jura que ele fugiu, mas meu filho não faria isso comigo.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Vou procurar seu filho.",
+       "cond": [
+        {
+         "not_flag": "aceitou_busca"
+        }
+       ],
+       "effects": [
+        {
+         "flag": "aceitou_busca"
+        }
+       ],
+       "next": "aceita"
+      },
+      {
+       "text": "Onde ele foi visto pela última vez?",
+       "next": "visto"
+      },
+      {
+       "text": "Ele andava metido em alguma coisa?",
+       "next": "metido"
+      },
+      {
+       "text": "Encontrei um retalho de linho azul na estrada.",
+       "cond": [
+        {
+         "fact": "f_tomas_levado"
+        },
+        {
+         "not_flag": "hilda_viu_retalho"
+        }
+       ],
+       "effects": [
+        {
+         "flag": "hilda_viu_retalho"
+        }
+       ],
+       "next": "retalho"
+      }
+     ]
+    },
+    "aceita": {
+     "text": "Que Lena o abençoe. O quarto dele é aqui mesmo, o baú ainda está do jeito que ele deixou. Olhe o que precisar.",
+     "options": [
+      {
+       "text": "Vou começar por aí.",
+       "effects": [
+        {
+         "flag": "permissao_quarto"
+        }
+       ],
+       "next": "inicio"
+      }
+     ]
+    },
+    "visto": {
+     "text": "Jantou conosco, foi dormir. De manhã a cama estava fria e a janela aberta. Ele ajudava o pai no moinho.",
+     "options": [
+      {
+       "text": "Entendo.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "metido": {
+     "text": "Curioso, sempre foi. Vivia falando de luzes na Torre Partida, de madrugada. Eu mandava ele parar com isso.",
+     "options": [
+      {
+       "text": "Luzes na torre...",
+       "effects": [
+        {
+         "flag": "pista_luzes"
+        }
+       ],
+       "next": "inicio"
+      }
+     ]
+    },
+    "retalho": {
+     "text": "(Ela segura o pano com as duas mãos.) Fui eu que bordei. Ele não fugiu... alguém levou meu menino.",
+     "options": [
+      {
+       "text": "Vou trazê-lo de volta.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "grata": {
+     "text": "Você trouxe meu menino para casa. Nunca vou esquecer. Esta casa é sua.",
+     "append_generic": true,
+     "options": []
+    },
+    "luto": {
+     "text": "(Hilda não levanta os olhos.) Disseram que a torre está vazia. Que eles foram embora.",
+     "append_generic": true,
+     "options": []
+    }
+   }
+  },
+  "otto": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Se veio por causa do meu filho, perde seu tempo. O rapaz sempre quis ir embora. Volta quando a fome apertar.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "(Observar o moleiro com atenção.)",
+       "test": {
+        "skill": "intuicao",
+        "cd": 10,
+        "ok_next": "medo",
+        "fail_next": "nada"
+       }
+      },
+      {
+       "text": "Ele não fugiu. Foi arrastado.",
+       "cond": [
+        {
+         "fact": "f_tomas_levado"
+        }
+       ],
+       "next": "levado"
+      }
+     ]
+    },
+    "medo": {
+     "text": "(A raiva é fachada. As mãos de Otto tremem; ele não dorme há dias.) ...O que você quer de mim?",
+     "options": [
+      {
+       "text": "Só ajudar.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "nada": {
+     "text": "Já disse o que tinha para dizer.",
+     "options": [
+      {
+       "text": "Certo.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "levado": {
+     "text": "Arrastado? ... Por Khalmyr. Fale com a capitã Elsa. Ela não me ouviu, talvez ouça você.",
+     "options": [
+      {
+       "text": "Vou falar.",
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
+  "dorn": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Uma bebidinha pro velho Dorn, forasteiro? A garganta seca não ajuda a memória.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Pagar uma caneca para ele (T$ 1).",
+       "cond": [
+        {
+         "not_flag": "dorn_bebeu"
+        }
+       ],
+       "effects": [
+        {
+         "gold": -1
+        },
+        {
+         "flag": "dorn_bebeu"
+        }
+       ],
+       "next": "bebe"
+      },
+      {
+       "text": "O que sabe sobre Tomas Brandt?",
+       "cond": [
+        {
+         "fact": "f_tomas_sumiu"
+        }
+       ],
+       "next": "nega"
+      }
+     ]
+    },
+    "bebe": {
+     "text": "Ahh. Sabe, tem gente que paga bem só pra saber quem anda bisbilhotando onde não deve. Ninguém paga o Dorn pra ficar calado, isso não.",
+     "options": [
+      {
+       "text": "Hm.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "nega": {
+     "text": "Tomas? Nunca vi. Quer dizer, vi, todo mundo vê. Mas não sei de nada.",
+     "options": [
+      {
+       "text": "(Ler a expressão dele.)",
+       "test": {
+        "skill": "intuicao",
+        "cd": 15,
+        "ok_effects": [
+         {
+          "flag": "dorn_mentindo"
+         }
+        ],
+        "ok_next": "mentindo",
+        "fail_next": "nega_ok"
+       }
+      },
+      {
+       "text": "Fale a verdade ou vai conhecer o chão da praça.",
+       "cond": [
+        {
+         "flag": "dorn_mentindo"
+        }
+       ],
+       "test": {
+        "skill": "intimidacao",
+        "cd": 15,
+        "ok_effects": [
+         {
+          "reveal": "f_dorn_informante"
+         },
+         {
+          "reveal": "f_bandidos_na_ruina"
+         }
+        ],
+        "ok_next": "confessa",
+        "fail_next": "fecha"
+       }
+      },
+      {
+       "text": "Ninguém precisa saber que você me contou.",
+       "cond": [
+        {
+         "flag": "dorn_mentindo"
+        }
+       ],
+       "test": {
+        "skill": "diplomacia",
+        "cd": 20,
+        "ok_effects": [
+         {
+          "reveal": "f_dorn_informante"
+         },
+         {
+          "reveal": "f_bandidos_na_ruina"
+         }
+        ],
+        "ok_next": "confessa",
+        "fail_next": "fecha"
+       }
+      },
+      {
+       "text": "Mudar de assunto.",
+       "next": "__generic"
+      }
+     ]
+    },
+    "mentindo": {
+     "text": "(Ele desvia o olhar e esfrega a nuca. Está mentindo, e com medo.)",
+     "options": [
+      {
+       "text": "Continuar.",
+       "next": "nega"
+      }
+     ]
+    },
+    "nega_ok": {
+     "text": "(Ele parece só um bêbado confuso.)",
+     "options": [
+      {
+       "text": "Continuar.",
+       "next": "nega"
+      }
+     ]
+    },
+    "confessa": {
+     "text": "Eu só contei pra eles! Uns sujeitos de capa cinza, vivem embaixo da Torre Partida. Me davam vinho. Eu não sabia que iam pegar o menino, juro por Nimb!",
+     "options": [
+      {
+       "text": "Isso é tudo?",
+       "next": "inicio"
+      }
+     ]
+    },
+    "fecha": {
+     "text": "Me deixa em paz! Rosana! Esse aí tá me ameaçando!",
+     "options": [
+      {
+       "text": "(Deixar para lá.)",
+       "next": "end"
+      }
+     ]
+    }
+   }
+  },
+  "ysolde": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Que Lena o guarde, viajante. Precisa de cuidados?",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Algo preocupa a senhora.",
+       "cond": [
+        {
+         "not_fact": "f_dizimo_roubado"
+        }
+       ],
+       "effects": [
+        {
+         "reveal": "f_dizimo_roubado"
+        }
+       ],
+       "next": "dizimo"
+      },
+      {
+       "text": "Trouxe o dízimo de volta.",
+       "cond": [
+        {
+         "item": "dizimo_lena"
+        }
+       ],
+       "effects": [
+        {
+         "take_item": "dizimo_lena"
+        },
+        {
+         "event": "DIZIMO_RETURNED"
+        },
+        {
+         "gold": 5
+        }
+       ],
+       "next": "devolvido"
+      },
+      {
+       "text": "Fale-me dos votos de Lena.",
+       "next": "votos"
+      }
+     ]
+    },
+    "dizimo": {
+     "text": "O dízimo do templo sumiu há uma semana. Uma bolsa pequena, mas era tudo o que tínhamos para os doentes do inverno.",
+     "options": [
+      {
+       "text": "Vou ficar atento.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "devolvido": {
+     "text": "Pela Mãe! Está intacto. Aceite isto, não é muito... e saiba que esta casa reza por você.",
+     "options": [
+      {
+       "text": "Obrigado.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "votos": {
+     "text": "Lena protege a vida. Seus devotos não causam dano letal nem perda de vida a criaturas vivas: é preferível perder a própria vida a tirá-la. Só mulheres podem ser devotas, e paladinos de qualquer gênero.",
+     "options": [
+      {
+       "text": "Aceito os votos de Lena.",
+       "cond": [
+        {
+         "flag": "personagem_feminina"
+        },
+        {
+         "devotion": ""
+        }
+       ],
+       "effects": [
+        {
+         "event": "BECOME_DEVOTEE",
+         "payload": {
+          "god": "Lena"
+         }
+        }
+       ],
+       "next": "aceita"
+      },
+      {
+       "text": "É um caminho difícil.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "aceita": {
+     "text": "Então caminhe com mãos que curam, irmã. A Mãe saberá se você falhar.",
+     "options": [
+      {
+       "text": "Assim farei.",
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
+  "elsa": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Capitã Elsa Corvo. Fale rápido, tenho uma estrada para vigiar.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Tomas Brandt foi levado à força.",
+       "cond": [
+        {
+         "fact": "f_tomas_levado"
+        },
+        {
+         "mystery": "ativo"
+        },
+        {
+         "not_flag": "guarda_avisada"
+        }
+       ],
+       "next": "provas"
+      },
+      {
+       "text": "Há bandidos escondidos sob a Torre Partida.",
+       "cond": [
+        {
+         "fact": "f_bandidos_na_ruina"
+        },
+        {
+         "mystery": "ativo"
+        },
+        {
+         "not_flag": "guarda_avisada"
+        }
+       ],
+       "effects": [
+        {
+         "flag": "guarda_avisada"
+        },
+        {
+         "event": "REPORT_TO_GUARD"
+        }
+       ],
+       "next": "incursao"
+      }
+     ]
+    },
+    "provas": {
+     "text": "Levado para onde? Sem saber onde, não tiro três homens da estrada para caçar sombras.",
+     "options": [
+      {
+       "text": "Vou descobrir.",
+       "next": "inicio"
+      }
+     ]
+    },
+    "incursao": {
+     "text": "A torre... faz sentido com as luzes que os pastores comentam. Iremos ao amanhecer. Se quiser chegar antes, o risco é seu.",
+     "options": [
+      {
+       "text": "Entendido.",
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
+  "rosana": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Bem-vindo ao Galo Rubro! Pão quente, cerveja honesta e um canto no salão para dormir.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Viu algo estranho na noite em que Tomas sumiu?",
+       "cond": [
+        {
+         "fact": "f_tomas_sumiu"
+        },
+        {
+         "mystery": "ativo"
+        }
+       ],
+       "next": "noite"
+      }
+     ]
+    },
+    "noite": {
+     "text": "Estranho? Dorn bebeu a noite toda com dois sujeitos de capa cinza. Quem pagou foram eles. Dorn nunca tem um tibar.",
+     "options": [
+      {
+       "text": "Capas cinza...",
+       "effects": [
+        {
+         "flag": "pista_dorn"
+        }
+       ],
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
+  "quill": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Hm. Forasteiro. Não pise nas minhas armadilhas.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Viu algo diferente na floresta?",
+       "next": "floresta"
+      }
+     ]
+    },
+    "floresta": {
+     "text": "Hienas, à noite. Riem antes de atacar. E luzes na Torre Partida de madrugada. Não vou lá. Ninguém com juízo vai.",
+     "options": [
+      {
+       "text": "Obrigado pelo aviso.",
+       "effects": [
+        {
+         "flag": "pista_luzes"
+        }
+       ],
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
+  "saria": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Saria das Estradas, a seu dispor! Trago de Valkaria o que a vila não tem, e as notícias de graça.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Com que frequência vem aqui?",
+       "next": "rota"
+      }
+     ]
+    },
+    "rota": {
+     "text": "Fico dois dias, sigo para a capital, volto em cinco. Se faltar ferramenta, é comigo.",
+     "options": [
+      {
+       "text": "Mudar de assunto.",
+       "next": "__generic"
+      }
+     ]
+    }
+   }
+  },
+  "tomas": {
+   "entries": [
+    {
+     "cond": [
+      {
+       "captive": "tomas"
+      }
+     ],
+     "node": "preso"
+    }
+   ],
+   "start": "livre",
+   "nodes": {
+    "preso": {
+     "text": "Quem... você não é um deles? Me tira daqui! A chave fica com o Kael, o de cicatriz.",
+     "options": [
+      {
+       "text": "Vamos, está livre.",
+       "cond": [
+        {
+         "object_open": "porta_cela"
+        }
+       ],
+       "effects": [
+        {
+         "rescue": "tomas"
+        }
+       ],
+       "next": "salvo"
+      },
+      {
+       "text": "Como saímos daqui?",
+       "next": "dica"
+      },
+      {
+       "text": "Aguente firme. Vou achar um jeito.",
+       "next": "end"
+      }
+     ]
+    },
+    "dica": {
+     "text": "De madrugada eles dormem pesado, até umas seis. A porta é velha... mas qualquer barulho pode acordar alguém.",
+     "options": [
+      {
+       "text": "Entendi.",
+       "next": "preso"
+      }
+     ]
+    },
+    "salvo": {
+     "text": "Obrigado... obrigado! Eu vi eles trazendo a bolsa do templo. Por isso me pegaram.",
+     "options": [
+      {
+       "text": "Vamos para casa.",
+       "effects": [
+        {
+         "reveal": "f_tomas_viu_carga"
+        }
+       ],
+       "next": "end"
+      }
+     ]
+    },
+    "livre": {
+     "text": "Ainda sonho com aquela cela. Mas estou vivo, graças a você... ou à Guarda.",
+     "append_generic": true,
+     "options": []
+    }
+   }
+  },
+  "orin": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Mestre Orin, alcaide desta vila. As leis aqui são simples: não roube, não quebre o que não é seu, não levante a mão contra ninguém.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "E se alguém quebrar a lei?",
+       "next": "lei"
+      }
+     ]
+    },
+    "lei": {
+     "text": "Paga multa. Furto, dez tibares. Dano, cinco. Agressão, vinte e a capitã decide o resto.",
+     "options": [
+      {
+       "text": "Mudar de assunto.",
+       "next": "__generic"
+      }
+     ]
+    }
+   }
+  }
+ }
+}

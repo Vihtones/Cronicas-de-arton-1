@@ -1,0 +1,37 @@
+{
+ "chave_cela": {
+  "name": "Chave de ferro",
+  "price": 0
+ },
+ "dizimo_lena": {
+  "name": "Bolsa do dízimo de Lena",
+  "price": 0,
+  "owner": "templo_lena"
+ },
+ "pao": {
+  "name": "Pão",
+  "price": 1,
+  "good": "comida"
+ },
+ "cerveja": {
+  "name": "Caneca de cerveja",
+  "price": 1,
+  "good": "bebida"
+ },
+ "corda": {
+  "name": "Corda (15m)",
+  "price": 1,
+  "good": "ferramentas"
+ },
+ "tocha": {
+  "name": "Tocha",
+  "price": 1,
+  "good": "ferramentas"
+ },
+ "pocao_cura": {
+  "name": "Essência de cura (placeholder)",
+  "price": 30,
+  "good": "remedio",
+  "status": "PENDENTE_REVISAO"
+ }
+}

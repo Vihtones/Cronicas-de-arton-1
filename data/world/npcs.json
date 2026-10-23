@@ -1,0 +1,956 @@
+{
+ "npcs": [
+  {
+   "id": "otto",
+   "name": "Otto Brandt",
+   "age": 52,
+   "profession": "moleiro",
+   "schedule": "moleiro",
+   "home": "casa_brandt",
+   "work": "moinho",
+   "family": "brandt",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "teimoso"
+   ],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "hilda",
+   "name": "Hilda Brandt",
+   "age": 44,
+   "profession": "fiandeira",
+   "schedule": "artesao",
+   "home": "casa_brandt",
+   "work": "casa_brandt",
+   "family": "brandt",
+   "faction": null,
+   "devotion": "Lena",
+   "traits": [
+    "aflita"
+   ],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "tomas",
+   "name": "Tomas Brandt",
+   "age": 17,
+   "profession": "ajudante de moleiro",
+   "schedule": "moleiro",
+   "home": "casa_brandt",
+   "work": "moinho",
+   "family": "brandt",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "curioso"
+   ],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "lisel",
+   "name": "Lisel Brandt",
+   "age": 12,
+   "profession": "criança",
+   "schedule": "crianca",
+   "home": "casa_brandt",
+   "work": "casa_brandt",
+   "family": "brandt",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "garrick",
+   "name": "Garrick Ferro",
+   "age": 40,
+   "profession": "ferreiro",
+   "schedule": "artesao",
+   "home": "casa_ferro",
+   "work": "ferraria",
+   "family": "ferro",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "desconfia_de_estrangeiros"
+   ],
+   "beliefs": {},
+   "gold": 30
+  },
+  {
+   "id": "mara",
+   "name": "Mara Ferro",
+   "age": 38,
+   "profession": "mercadora",
+   "schedule": "comerciante",
+   "home": "casa_ferro",
+   "work": "mercado",
+   "family": "ferro",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 40
+  },
+  {
+   "id": "davi",
+   "name": "Davi Ferro",
+   "age": 15,
+   "profession": "aprendiz",
+   "schedule": "artesao",
+   "home": "casa_ferro",
+   "work": "ferraria",
+   "family": "ferro",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "rosana",
+   "name": "Rosana Vasquel",
+   "age": 35,
+   "profession": "taverneira",
+   "schedule": "taverneiro",
+   "home": "casa_vasquel",
+   "work": "taverna",
+   "family": "vasquel",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "observadora"
+   ],
+   "beliefs": {},
+   "gold": 25
+  },
+  {
+   "id": "bento",
+   "name": "Bento Vasquel",
+   "age": 39,
+   "profession": "cozinheiro",
+   "schedule": "taverneiro",
+   "home": "casa_vasquel",
+   "work": "taverna",
+   "family": "vasquel",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "nina",
+   "name": "Nina Vasquel",
+   "age": 9,
+   "profession": "criança",
+   "schedule": "crianca",
+   "home": "casa_vasquel",
+   "work": "casa_vasquel",
+   "family": "vasquel",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "joran",
+   "name": "Joran Aldren",
+   "age": 60,
+   "profession": "lavrador",
+   "schedule": "lavrador",
+   "home": "casa_aldren",
+   "work": "campos",
+   "family": "aldren",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "celia",
+   "name": "Celia Aldren",
+   "age": 58,
+   "profession": "lavradora",
+   "schedule": "lavrador",
+   "home": "casa_aldren",
+   "work": "campos",
+   "family": "aldren",
+   "faction": null,
+   "devotion": "Allihanna",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "pell",
+   "name": "Pell Aldren",
+   "age": 30,
+   "profession": "lavrador",
+   "schedule": "lavrador",
+   "home": "casa_aldren",
+   "work": "campos",
+   "family": "aldren",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "ivi",
+   "name": "Ivi Aldren",
+   "age": 27,
+   "profession": "lavradora",
+   "schedule": "lavrador",
+   "home": "casa_aldren",
+   "work": "campos",
+   "family": "aldren",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "elsa",
+   "name": "Capitã Elsa Corvo",
+   "age": 45,
+   "profession": "capitã da guarda",
+   "schedule": "guarda_dia",
+   "home": "casa_corvo",
+   "work": "quartel",
+   "family": "corvo",
+   "faction": "guarda_vila",
+   "devotion": "Khalmyr",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "rurik",
+   "name": "Rurik Corvo",
+   "age": 22,
+   "profession": "guarda",
+   "schedule": "guarda_noite",
+   "home": "casa_corvo",
+   "work": "quartel",
+   "family": "corvo",
+   "faction": "guarda_vila",
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "teodoro",
+   "name": "Teodoro Corvo",
+   "age": 70,
+   "profession": "guarda aposentado",
+   "schedule": "idoso",
+   "home": "casa_corvo",
+   "work": "casa_corvo",
+   "family": "corvo",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "memoria_longa"
+   ],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "ysolde",
+   "name": "Irmã Ysolde",
+   "age": 41,
+   "profession": "clériga de Lena",
+   "schedule": "sacerdote",
+   "home": "templo",
+   "work": "templo",
+   "family": null,
+   "faction": "templo_lena",
+   "devotion": "Lena",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "lucan",
+   "name": "Lucan",
+   "age": 19,
+   "profession": "acólito",
+   "schedule": "sacerdote",
+   "home": "templo",
+   "work": "templo",
+   "family": null,
+   "faction": "templo_lena",
+   "devotion": "Lena",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "quill",
+   "name": "Velho Quill",
+   "age": 63,
+   "profession": "caçador",
+   "schedule": "cacador",
+   "home": "cabana_quill",
+   "work": "floresta",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "recluso"
+   ],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "saria",
+   "name": "Saria das Estradas",
+   "age": 33,
+   "profession": "mercadora viajante",
+   "schedule": "viajante",
+   "home": "taverna",
+   "work": "mercado",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "traz_noticias"
+   ],
+   "beliefs": {},
+   "gold": 60
+  },
+  {
+   "id": "orin",
+   "name": "Mestre Orin",
+   "age": 55,
+   "profession": "alcaide",
+   "schedule": "alcaide",
+   "home": "prefeitura",
+   "work": "prefeitura",
+   "family": null,
+   "faction": "guarda_vila",
+   "devotion": "Khalmyr",
+   "traits": [],
+   "beliefs": {},
+   "gold": 50
+  },
+  {
+   "id": "tobias",
+   "name": "Tobias",
+   "age": 28,
+   "profession": "guarda",
+   "schedule": "guarda_dia",
+   "home": "quartel",
+   "work": "quartel",
+   "family": null,
+   "faction": "guarda_vila",
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "fenna",
+   "name": "Fenna",
+   "age": 24,
+   "profession": "pastora",
+   "schedule": "pastora",
+   "home": "casa_aldren",
+   "work": "estrada_leste",
+   "family": "aldren",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5
+  },
+  {
+   "id": "dorn",
+   "name": "Dorn",
+   "age": 47,
+   "profession": "bêbado",
+   "schedule": "bebado",
+   "home": "taverna",
+   "work": "taverna",
+   "family": null,
+   "faction": "garras_de_cinza",
+   "devotion": "",
+   "traits": [
+    "mentiroso"
+   ],
+   "beliefs": {},
+   "gold": 5
+  }
+ ],
+ "schedule_templates": {
+  "moleiro": [
+   [
+    0,
+    6,
+    "home"
+   ],
+   [
+    6,
+    12,
+    "work"
+   ],
+   [
+    12,
+    13,
+    "taverna"
+   ],
+   [
+    13,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "taverna"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "artesao": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    12,
+    "work"
+   ],
+   [
+    12,
+    13,
+    "home"
+   ],
+   [
+    13,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "taverna"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "comerciante": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    12,
+    "mercado"
+   ],
+   [
+    12,
+    13,
+    "home"
+   ],
+   [
+    13,
+    18,
+    "mercado"
+   ],
+   [
+    18,
+    24,
+    "home"
+   ]
+  ],
+  "taverneiro": [
+   [
+    0,
+    2,
+    "taverna"
+   ],
+   [
+    2,
+    9,
+    "home"
+   ],
+   [
+    9,
+    24,
+    "taverna"
+   ]
+  ],
+  "sacerdote": [
+   [
+    0,
+    12,
+    "templo"
+   ],
+   [
+    12,
+    13,
+    "praca"
+   ],
+   [
+    13,
+    24,
+    "templo"
+   ]
+  ],
+  "guarda_dia": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    12,
+    "praca"
+   ],
+   [
+    12,
+    13,
+    "taverna"
+   ],
+   [
+    13,
+    19,
+    "ponte"
+   ],
+   [
+    19,
+    24,
+    "quartel"
+   ]
+  ],
+  "guarda_noite": [
+   [
+    0,
+    6,
+    "praca"
+   ],
+   [
+    6,
+    14,
+    "home"
+   ],
+   [
+    14,
+    18,
+    "quartel"
+   ],
+   [
+    18,
+    24,
+    "ponte"
+   ]
+  ],
+  "lavrador": [
+   [
+    0,
+    5,
+    "home"
+   ],
+   [
+    5,
+    12,
+    "campos"
+   ],
+   [
+    12,
+    13,
+    "home"
+   ],
+   [
+    13,
+    18,
+    "campos"
+   ],
+   [
+    18,
+    24,
+    "home"
+   ]
+  ],
+  "crianca": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    11,
+    "praca"
+   ],
+   [
+    11,
+    13,
+    "home"
+   ],
+   [
+    13,
+    16,
+    "templo"
+   ],
+   [
+    16,
+    18,
+    "praca"
+   ],
+   [
+    18,
+    24,
+    "home"
+   ]
+  ],
+  "idoso": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    11,
+    "praca"
+   ],
+   [
+    11,
+    18,
+    "home"
+   ],
+   [
+    18,
+    20,
+    "taverna"
+   ],
+   [
+    20,
+    24,
+    "home"
+   ]
+  ],
+  "alcaide": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    18,
+    "work"
+   ],
+   [
+    18,
+    20,
+    "taverna"
+   ],
+   [
+    20,
+    24,
+    "home"
+   ]
+  ],
+  "cacador": [
+   [
+    0,
+    5,
+    "home"
+   ],
+   [
+    5,
+    12,
+    "floresta"
+   ],
+   [
+    12,
+    14,
+    "home"
+   ],
+   [
+    14,
+    18,
+    "floresta"
+   ],
+   [
+    18,
+    20,
+    "taverna"
+   ],
+   [
+    20,
+    24,
+    "home"
+   ]
+  ],
+  "pastora": [
+   [
+    0,
+    6,
+    "home"
+   ],
+   [
+    6,
+    17,
+    "estrada_leste"
+   ],
+   [
+    17,
+    24,
+    "home"
+   ]
+  ],
+  "bebado": [
+   [
+    0,
+    10,
+    "taverna"
+   ],
+   [
+    10,
+    23,
+    "taverna"
+   ],
+   [
+    23,
+    24,
+    "trilha_floresta",
+    3
+   ]
+  ],
+  "viajante": [
+   [
+    0,
+    8,
+    "taverna"
+   ],
+   [
+    8,
+    18,
+    "mercado"
+   ],
+   [
+    18,
+    24,
+    "taverna"
+   ]
+  ]
+ },
+ "families": [
+  {
+   "id": "brandt",
+   "name": "Brandt",
+   "members": [
+    "otto",
+    "hilda",
+    "tomas",
+    "lisel"
+   ]
+  },
+  {
+   "id": "ferro",
+   "name": "Ferro",
+   "members": [
+    "garrick",
+    "mara",
+    "davi"
+   ]
+  },
+  {
+   "id": "vasquel",
+   "name": "Vasquel",
+   "members": [
+    "rosana",
+    "bento",
+    "nina"
+   ]
+  },
+  {
+   "id": "aldren",
+   "name": "Aldren",
+   "members": [
+    "joran",
+    "celia",
+    "pell",
+    "ivi",
+    "fenna"
+   ]
+  },
+  {
+   "id": "corvo",
+   "name": "Corvo",
+   "members": [
+    "elsa",
+    "rurik",
+    "teodoro"
+   ]
+  }
+ ],
+ "factions": [
+  {
+   "id": "guarda_vila",
+   "name": "Guarda da Vila",
+   "goals": [
+    "manter_ordem",
+    "proteger_estrada"
+   ],
+   "resources": {
+    "soldados": 3,
+    "ouro": 80
+   },
+   "allies": [
+    "templo_lena"
+   ],
+   "rivals": [
+    "garras_de_cinza"
+   ],
+   "jurisdiction": "vila",
+   "status": "ORIGINAL_DO_JOGO"
+  },
+  {
+   "id": "templo_lena",
+   "name": "Templo de Lena",
+   "goals": [
+    "recuperar_dizimo",
+    "curar"
+   ],
+   "resources": {
+    "ouro": 10
+   },
+   "allies": [
+    "guarda_vila"
+   ],
+   "rivals": [],
+   "status": "ORIGINAL_DO_JOGO"
+  },
+  {
+   "id": "garras_de_cinza",
+   "name": "Garras de Cinza",
+   "goals": [
+    "esconder_saque",
+    "evitar_guarda"
+   ],
+   "resources": {
+    "membros": 3,
+    "ouro": 120
+   },
+   "allies": [],
+   "rivals": [
+    "guarda_vila"
+   ],
+   "hideout": "cripta_salao",
+   "relocate_day": 12,
+   "status": "ORIGINAL_DO_JOGO"
+  }
+ ],
+ "creatures": [
+  {
+   "id": "kael",
+   "name": "Kael Mão-Cinza",
+   "rule": "criatura.bandido_ligeiro",
+   "faction": "garras_de_cinza",
+   "spawn": [
+    29,
+    54
+   ],
+   "zone": "cripta",
+   "items": [
+    "chave_cela"
+   ],
+   "sleeps": [
+    0,
+    6
+   ],
+   "important": true
+  },
+  {
+   "id": "bandido_1",
+   "name": "Bandido Magro",
+   "rule": "criatura.bandido_comum",
+   "faction": "garras_de_cinza",
+   "spawn": [
+    27,
+    57
+   ],
+   "zone": "cripta",
+   "sleeps": [
+    0,
+    6
+   ]
+  },
+  {
+   "id": "bandido_2",
+   "name": "Bandido Ruivo",
+   "rule": "criatura.bandido_comum",
+   "faction": "garras_de_cinza",
+   "spawn": [
+    31,
+    57
+   ],
+   "zone": "cripta",
+   "sleeps": [
+    1,
+    7
+   ]
+  },
+  {
+   "id": "hiena_1",
+   "name": "Hiena",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    78,
+    34
+   ],
+   "zone": "floresta",
+   "active_hours": [
+    18,
+    6
+   ],
+   "signal": "Risadas agudas ecoam entre as árvores."
+  },
+  {
+   "id": "hiena_2",
+   "name": "Hiena",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    80,
+    36
+   ],
+   "zone": "floresta",
+   "active_hours": [
+    18,
+    6
+   ]
+  }
+ ]
+}

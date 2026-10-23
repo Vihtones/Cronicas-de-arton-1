@@ -1,0 +1,660 @@
+{
+ "schema_version": 1,
+ "rules": [
+  {
+   "id": "teste.basico",
+   "valor": {
+    "formula": "1d20 + modificador >= CD"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 220,
+   "pdf_page": 226,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "teste.oposto.empate",
+   "valor": {
+    "regra": "maior valor vence; se igual, rolar de novo"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 220,
+   "pdf_page": 226,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "pericia.valor",
+   "valor": {
+    "formula": "floor(nivel/2) + atributo + treino"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 114,
+   "pdf_page": 120,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "pericia.bonus_treino",
+   "valor": {
+    "1-6": 2,
+    "7-14": 4,
+    "15+": 6
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 114,
+   "pdf_page": 120,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "pericia.tabela",
+   "valor": {
+    "acrobacia": {
+     "atributo": "Des",
+     "somente_treinada": false,
+     "armadura": true
+    },
+    "adestramento": {
+     "atributo": "Car",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "atletismo": {
+     "atributo": "For",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "atuacao": {
+     "atributo": "Car",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "cavalgar": {
+     "atributo": "Des",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "conhecimento": {
+     "atributo": "Int",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "cura": {
+     "atributo": "Sab",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "diplomacia": {
+     "atributo": "Car",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "enganacao": {
+     "atributo": "Car",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "fortitude": {
+     "atributo": "Con",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "furtividade": {
+     "atributo": "Des",
+     "somente_treinada": false,
+     "armadura": true
+    },
+    "guerra": {
+     "atributo": "Int",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "iniciativa": {
+     "atributo": "Des",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "intimidacao": {
+     "atributo": "Car",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "intuicao": {
+     "atributo": "Sab",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "investigacao": {
+     "atributo": "Int",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "jogatina": {
+     "atributo": "Car",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "ladinagem": {
+     "atributo": "Des",
+     "somente_treinada": true,
+     "armadura": true
+    },
+    "luta": {
+     "atributo": "For",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "misticismo": {
+     "atributo": "Int",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "nobreza": {
+     "atributo": "Int",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "oficio": {
+     "atributo": "Int",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "percepcao": {
+     "atributo": "Sab",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "pilotagem": {
+     "atributo": "Des",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "pontaria": {
+     "atributo": "Des",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "reflexos": {
+     "atributo": "Des",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "religiao": {
+     "atributo": "Sab",
+     "somente_treinada": true,
+     "armadura": false
+    },
+    "sobrevivencia": {
+     "atributo": "Sab",
+     "somente_treinada": false,
+     "armadura": false
+    },
+    "vontade": {
+     "atributo": "Sab",
+     "somente_treinada": false,
+     "armadura": false
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 115,
+   "pdf_page": 121,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "cd.tabela",
+   "valor": {
+    "facil": 5,
+    "media": 10,
+    "dificil": 15,
+    "desafiadora": 20,
+    "formidavel": 25,
+    "heroica": 30,
+    "quase_impossivel": 40
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 220,
+   "pdf_page": 226,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "cd.resistencia",
+   "valor": {
+    "formula": "10 + floor(nivel/2) + atributo"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 227,
+   "pdf_page": 233,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "atributos.compra_pontos",
+   "valor": {
+    "pontos": 10,
+    "custo": {
+     "-1": -1,
+     "0": 0,
+     "1": 1,
+     "2": 2,
+     "3": 4,
+     "4": 7
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 17,
+   "pdf_page": 23,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "defesa.base",
+   "valor": {
+    "formula": "10 + Des + armadura + escudo"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 106,
+   "pdf_page": 112,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Linha encontrada por busca; conferir parágrafo completo."
+  },
+  {
+   "id": "ataque.teste",
+   "valor": {
+    "corpo_a_corpo": "luta",
+    "distancia": "pontaria",
+    "dificuldade": "Defesa do alvo",
+    "acerta_se": ">="
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 230,
+   "pdf_page": 236,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "dano.forca",
+   "valor": {
+    "corpo_a_corpo_e_arremesso": "dado + For",
+    "disparo": "dado"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 230,
+   "pdf_page": 236,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "critico",
+   "valor": {
+    "margem_padrao": 20,
+    "multiplicador_padrao": 2,
+    "multiplica": "apenas dados da arma",
+    "nao_multiplica": "bonus numericos e dados extras"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 230,
+   "pdf_page": 237,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "iniciativa",
+   "valor": {
+    "teste": "iniciativa",
+    "inimigos": "um teste único com o menor valor",
+    "empate": "maior valor de perícia; depois nova rolagem",
+    "fixa_no_combate": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 231,
+   "pdf_page": 237,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "surpresa",
+   "valor": {
+    "efeito": "desprevenido e não age na 1ª rodada"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 231,
+   "pdf_page": 237,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "turno.acoes",
+   "valor": {
+    "opcoes": [
+     [
+      "padrao",
+      "movimento"
+     ],
+     [
+      "movimento",
+      "movimento"
+     ],
+     [
+      "completa"
+     ]
+    ],
+    "livres": "ilimitadas",
+    "reacoes": "ilimitadas"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 233,
+   "pdf_page": 239,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "rodada.segundos",
+   "valor": 6,
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 233,
+   "pdf_page": 239,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "deslocamento.padrao_m",
+   "valor": 9,
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 238,
+   "pdf_page": 244,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "mapa.quadrado_m",
+   "valor": 1.5,
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 236,
+   "pdf_page": 242,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "mapa.diagonal",
+   "valor": {
+    "custo_quadrados": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 238,
+   "pdf_page": 244,
+   "status": "VERIFICADA",
+   "nota": "Diagonal custa o dobro."
+  },
+  {
+   "id": "mapa.terreno_dificil",
+   "valor": {
+    "custo_multiplicador": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 238,
+   "pdf_page": 244,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "mapa.espaco_inimigo",
+   "valor": {
+    "atravessar": false,
+    "excecoes": [
+     "caido",
+     "indefeso",
+     "3 categorias de tamanho"
+    ],
+    "conta_como": "terreno_dificil"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 238,
+   "pdf_page": 244,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "situacao.flanquear",
+   "valor": {
+    "bonus_ataque": 2,
+    "apenas": "corpo a corpo"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 239,
+   "pdf_page": 245,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "situacao.cobertura_leve",
+   "valor": {
+    "bonus_defesa": 5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 239,
+   "pdf_page": 245,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "situacao.camuflagem_leve",
+   "valor": {
+    "falha_pct": 20,
+    "rolagem": "1d10: 1-2 erra"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 238,
+   "pdf_page": 244,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "situacao.atacante_caido",
+   "valor": {
+    "penalidade_corpo_a_corpo": -5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 239,
+   "pdf_page": 245,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distancia.em_corpo_a_corpo",
+   "valor": {
+    "penalidade": -5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 233,
+   "pdf_page": 239,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distancia.dobro_alcance",
+   "valor": {
+    "penalidade": -5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 233,
+   "pdf_page": 239,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "acao.investida",
+   "valor": {
+    "distancia": "até 2x deslocamento (mín 3m) em linha reta",
+    "bonus_ataque": 2,
+    "penalidade_defesa": -2,
+    "proibida_em": "terreno_dificil"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 235,
+   "pdf_page": 241,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "acao.golpe_misericordia",
+   "valor": {
+    "alvo": "adjacente e indefeso",
+    "critico_automatico": true,
+    "morte_pct_importante": 25,
+    "morte_pct_secundario": 75
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 235,
+   "pdf_page": 241,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "ferimentos.zero_pv",
+   "valor": {
+    "efeito": "inconsciente e sangrando",
+    "teste": "Con CD 15 no início do turno",
+    "falha": "perde 1d6 PV",
+    "estabilizar_cura_cd": 15
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 236,
+   "pdf_page": 242,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "ferimentos.morte",
+   "valor": {
+    "limite": "min(-10, -floor(PV_max/2))"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 236,
+   "pdf_page": 242,
+   "status": "VERIFICADA",
+   "nota": "Morre em -10 ou metade negativa dos PV totais, o que for mais baixo."
+  },
+  {
+   "id": "descanso.recuperacao",
+   "valor": {
+    "ruim": 0.5,
+    "normal": 1,
+    "confortavel": 2,
+    "luxuosa": 3,
+    "base": "nivel",
+    "recupera": [
+     "PV",
+     "PM"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 106,
+   "pdf_page": 112,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "descanso.ruim_relento",
+   "valor": {
+    "condicao": "dormir ao relento sem saco de dormir e acampamento"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 106,
+   "pdf_page": 112,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "descanso.duracao_horas",
+   "valor": 8,
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 106,
+   "pdf_page": 112,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Duração de 'uma noite de sono' assumida como 8h; conferir texto."
+  },
+  {
+   "id": "descanso.minimo",
+   "valor": {
+    "minimo": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 106,
+   "pdf_page": 112,
+   "status": "ADAPTADA",
+   "nota": "Metade do nível 1 arredonda para 0; o jogo usa mínimo 1."
+  },
+  {
+   "id": "dano.nao_letal",
+   "valor": {
+    "penalidade_ataque_para_trocar": -5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 236,
+   "pdf_page": 242,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "condicoes",
+   "valor": {
+    "abalado": {
+     "pericias": -2,
+     "acumula_em": "apavorado",
+     "tipo": "medo"
+    },
+    "apavorado": {
+     "pericias": -5,
+     "tipo": "medo"
+    },
+    "atordoado": {
+     "implica": [
+      "desprevenido"
+     ],
+     "sem_acoes": true
+    },
+    "caido": {
+     "defesa_cac": -5,
+     "defesa_distancia": 5,
+     "ataque_cac": -5,
+     "deslocamento_m": 1.5
+    },
+    "cego": {
+     "implica": [
+      "desprevenido",
+      "lento"
+     ]
+    },
+    "desprevenido": {
+     "defesa": -5,
+     "reflexos": -5
+    },
+    "enredado": {
+     "implica": [
+      "lento",
+      "vulneravel"
+     ],
+     "ataque": -2
+    },
+    "fraco": {
+     "for_des_con": -2
+    },
+    "imovel": {
+     "deslocamento_m": 0
+    },
+    "inconsciente": {
+     "implica": [
+      "indefeso"
+     ],
+     "sem_acoes": true,
+     "sem_reacoes": true
+    },
+    "indefeso": {
+     "implica": [
+      "desprevenido"
+     ],
+     "defesa": -10,
+     "falha_reflexos": true
+    },
+    "lento": {
+     "deslocamento_mult": 0.5,
+     "sem_investida": true
+    },
+    "ofuscado": {
+     "ataque": -2,
+     "percepcao": -2
+    },
+    "sangrando": {
+     "teste": "Con CD 15",
+     "falha": "perde 1d6 PV"
+    },
+    "surpreendido": {
+     "implica": [
+      "desprevenido"
+     ],
+     "sem_acoes": true
+    },
+    "vulneravel": {
+     "defesa": -2
+    },
+    "_regra": "condições iguais não se acumulam; aplicar a mais severa; terminam no fim da cena salvo indicação"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 394,
+   "pdf_page": 400,
+   "status": "VERIFICADA"
+  }
+ ]
+}

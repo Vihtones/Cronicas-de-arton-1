@@ -1,0 +1,272 @@
+class_name CombatSim
+extends RefCounted
+## Estado e regras de combate puros (LB cap. 5, p.230-239). Usado tanto pela
+## execução real (com dados) quanto pelo GhostPlanner (clone, sem dados).
+
+var rules: RuleRegistry
+var db: ContentDB
+var walk_fn: Callable            # (Vector2i) -> bool, inclui portas fechadas
+var env_fn: Callable             # (Vector2i) -> Dictionary {darkness:bool, fog:bool}
+var combatants: Dictionary = {}  # id -> {id, side, tile:Vector2i, sheet:CharacterSheet, charge_turn:int, damaged_round:int, surprised:bool, flags:Array}
+var order: Array[String] = []
+var initiative: Dictionary = {}
+var turn_idx := 0
+var round_no := 1
+var turn_counter := 0
+var budget := {"std": 1, "move": 1}
+
+
+func clone() -> CombatSim:
+	var c := CombatSim.new()
+	c.rules = rules; c.db = db; c.walk_fn = walk_fn; c.env_fn = env_fn
+	for id in combatants:
+		var x: Dictionary = combatants[id]
+		c.combatants[id] = {"id": x.id, "side": x.side, "tile": x.tile, "sheet": x.sheet.duplicate_sheet(), "charge_turn": x.charge_turn,
+			"damaged_round": x.damaged_round, "surprised": x.surprised, "flags": x.flags.duplicate()}
+	c.order = order.duplicate()
+	c.initiative = initiative.duplicate()
+	c.turn_idx = turn_idx; c.round_no = round_no; c.turn_counter = turn_counter
+	c.budget = budget.duplicate()
+	return c
+
+
+func current_id() -> String:
+	return order[turn_idx] if turn_idx < order.size() else ""
+
+
+func c(id: String) -> Dictionary:
+	return combatants.get(id, {})
+
+
+func occupant(t: Vector2i, except: String = "") -> String:
+	for id in combatants:
+		if id != except and combatants[id].tile == t and not combatants[id].sheet.is_dead():
+			return id
+	return ""
+
+
+static func cheb(a: Vector2i, b: Vector2i) -> int:
+	return maxi(absi(a.x - b.x), absi(a.y - b.y))
+
+
+func speed_squares(id: String) -> int:
+	var s: CharacterSheet = c(id).sheet
+	var q := int(s.speed_m / float(rules.value("mapa.quadrado_m", 1.5)))
+	var eff := s.effective_conditions(rules)
+	if eff.has("imovel"): return 0
+	if eff.has("caido"): return 1
+	if eff.has("lento"): q = maxi(1, q / 2)
+	return q
+
+
+func is_enemy(a: String, b: String) -> bool:
+	return c(a).side != c(b).side
+
+
+func conscious(id: String) -> bool:
+	var x := c(id)
+	return not x.is_empty() and not x.sheet.is_down() and not x.flags.has("fora")
+
+
+## --- Orçamento de ações (LB p.233) ------------------------------------------
+func can_spend(kind: String) -> bool:
+	match kind:
+		"padrao": return budget.std > 0
+		"movimento": return budget.move > 0 or budget.std > 0
+		"completa": return budget.std > 0 and budget.move > 0
+		"livre": return true
+	return false
+
+
+func spend(kind: String) -> void:
+	match kind:
+		"padrao": budget.std -= 1
+		"movimento":
+			if budget.move > 0: budget.move -= 1
+			else: budget.std -= 1
+		"completa":
+			budget.std = 0; budget.move = 0
+
+
+## --- Movimento (LB p.238) ----------------------------------------------------
+func step_cost(from: Vector2i, to: Vector2i) -> int:
+	var base := 2 if (from.x != to.x and from.y != to.y) else 1
+	if db.is_difficult(to): base *= 2
+	return base
+
+
+func passable(t: Vector2i, mover: String) -> bool:
+	if not walk_fn.call(t):
+		return false
+	var occ := occupant(t, mover)
+	if occ == "":
+		return true
+	# pode atravessar aliado; inimigo só se caído/indefeso (LB p.238)
+	return not is_enemy(mover, occ) or c(occ).sheet.is_down()
+
+
+func path_cost(mover: String, path: Array) -> Dictionary:
+	var pos: Vector2i = c(mover).tile
+	var total := 0
+	for p in path:
+		var t := Vector2i(int(p[0]), int(p[1])) if p is Array else p as Vector2i
+		if cheb(pos, t) != 1:
+			return {"ok": false, "reason": "caminho descontínuo"}
+		if not passable(t, mover):
+			return {"ok": false, "reason": "caminho bloqueado"}
+		total += step_cost(pos, t)
+		pos = t
+	if occupant(pos, mover) != "":
+		return {"ok": false, "reason": "não pode terminar num espaço ocupado"}
+	return {"ok": true, "cost": total, "end": pos}
+
+
+## Dijkstra limitado; retorna caminho até um tile adjacente a goal (ou o próprio goal).
+func find_path(mover: String, goal: Vector2i, adjacent_ok: bool = true, max_cost: int = 60) -> Array:
+	var start: Vector2i = c(mover).tile
+	var dist := {start: 0}
+	var prev := {}
+	var open: Array = [[0, start]]
+	var best: Vector2i = start
+	var best_d := cheb(start, goal)
+	while not open.is_empty():
+		open.sort_custom(func(a, b): return a[0] < b[0])
+		var cur: Array = open.pop_front()
+		var t: Vector2i = cur[1]
+		if (adjacent_ok and cheb(t, goal) == 1 and occupant(t, mover) == "") or t == goal:
+			best = t
+			break
+		for dx in [-1, 0, 1]:
+			for dy in [-1, 0, 1]:
+				if dx == 0 and dy == 0: continue
+				var n := t + Vector2i(dx, dy)
+				if not passable(n, mover): continue
+				var nd: int = dist[t] + step_cost(t, n)
+				if nd > max_cost: continue
+				if not dist.has(n) or nd < dist[n]:
+					dist[n] = nd
+					prev[n] = t
+					open.append([nd, n])
+					var dd := cheb(n, goal)
+					if dd < best_d and occupant(n, mover) == "":
+						best_d = dd
+						best = n
+	var path: Array = []
+	var cur := best
+	while cur != start and prev.has(cur):
+		path.push_front(cur)
+		cur = prev[cur]
+	return path
+
+
+## Corta um caminho para caber no deslocamento.
+func trim_path(mover: String, path: Array, budget_sq: int) -> Array:
+	var pos: Vector2i = c(mover).tile
+	var spent := 0
+	var out: Array = []
+	for t in path:
+		var cst := step_cost(pos, t)
+		if spent + cst > budget_sq: break
+		spent += cst
+		out.append(t)
+		pos = t
+	while not out.is_empty() and occupant(out[-1], mover) != "":
+		out.pop_back()
+	return out
+
+
+## --- Ataque (LB p.230-239) ----------------------------------------------------
+func flanking(attacker: String, target: String) -> bool:
+	var a: Vector2i = c(attacker).tile
+	var t: Vector2i = c(target).tile
+	var opposite := t + (t - a)
+	var ally := occupant(opposite)
+	return ally != "" and not is_enemy(attacker, ally) and conscious(ally)
+
+
+func engaged_in_melee(target: String) -> bool:
+	for id in combatants:
+		if is_enemy(id, target) and conscious(id) and cheb(c(id).tile, c(target).tile) == 1:
+			return true
+	return false
+
+
+func attack_profile(attacker: String, target: String, atk_index: int, special: bool, charge: bool) -> Dictionary:
+	var A := c(attacker)
+	var T := c(target)
+	if A.is_empty() or T.is_empty():
+		return {"ok": false, "reason": "alvo inválido"}
+	var sheet: CharacterSheet = A.sheet
+	if atk_index < 0 or atk_index >= sheet.attacks.size():
+		return {"ok": false, "reason": "ataque inexistente"}
+	var atk: Dictionary = sheet.attacks[atk_index]
+	var dist := cheb(A.tile, T.tile)
+	var ranged: bool = atk.get("distancia", false)
+	var reach := int(atk.get("alcance_q", 1))
+	var mods: Array = []
+	if not ranged and dist > 1:
+		return {"ok": false, "reason": "alvo fora do alcance corpo a corpo"}
+	if ranged and dist > reach * 2:
+		return {"ok": false, "reason": "alvo além do dobro do alcance"}
+	if T.sheet.is_dead():
+		return {"ok": false, "reason": "alvo já está morto"}
+	var mod: int = int(atk.bonus_fixo) if atk.has("bonus_fixo") else sheet.skill_value(atk.get("skill", "luta"), rules)
+	mods.append(["base", mod])
+	var cm := sheet.condition_mod(rules, "ataque")
+	if cm != 0: mods.append(["condição", cm])
+	if not ranged and sheet.has_effective_condition(rules, "caido"): mods.append(["atacante caído", -5])
+	if not ranged and flanking(attacker, target): mods.append(["flanqueando", int(rules.value("situacao.flanquear").bonus_ataque)])
+	if charge: mods.append(["investida", int(rules.value("acao.investida").bonus_ataque)])
+	if special: mods.append(["ataque especial", int(rules.value("classe.guerreiro").ataque_especial.bonus)])
+	if ranged and dist > reach: mods.append(["dobro do alcance", -5])
+	if ranged and engaged_in_melee(target): mods.append(["alvo em corpo a corpo", -5])
+	var total_mod := 0
+	for m in mods: total_mod += int(m[1])
+	var defense: int = T.sheet.defense(rules, not ranged)
+	if T.charge_turn >= 0 and T.charge_turn >= turn_counter - order.size():
+		defense += int(rules.value("acao.investida").penalidade_defesa)
+	var miss_chance := 0
+	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
+	var sees_dark: bool = sheet.senses.has("visao_penumbra")
+	if (env.get("darkness", false) and not sees_dark) or env.get("fog", false):
+		if dist > 1 or env.get("fog", false):
+			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
+	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0)
+	var hit_p := Checks.chance(total_mod, defense) * (1.0 - miss_chance / 100.0)
+	var crit_p := clampf((21 - int(atk.margem)) / 20.0, 0.0, 1.0)
+	crit_p = minf(crit_p, hit_p)
+	return {"ok": true, "atk": atk, "mod": total_mod, "mods": mods, "defense": defense, "ranged": ranged, "miss_chance": miss_chance,
+		"hit_chance": hit_p, "crit_chance": crit_p, "avg_damage": avg}
+
+
+## Aplica dano e retorna tags para a câmera (queda, morte).
+func apply_damage(target: String, amount: int) -> Array:
+	var T := c(target)
+	var s: CharacterSheet = T.sheet
+	var was_down := s.is_down()
+	s.pv -= amount
+	T.damaged_round = round_no
+	var tags: Array = []
+	if s.is_down() and not was_down:
+		s.stable = false
+		tags.append("queda")
+	if s.is_dead():
+		tags.append("morte")
+	return tags
+
+
+func next_turn() -> void:
+	turn_idx += 1
+	turn_counter += 1
+	if turn_idx >= order.size():
+		turn_idx = 0
+		round_no += 1
+	budget = {"std": 1, "move": 1}
+
+
+func sides_alive() -> Dictionary:
+	var out := {}
+	for id in combatants:
+		if conscious(id):
+			out[combatants[id].side] = true
+	return out

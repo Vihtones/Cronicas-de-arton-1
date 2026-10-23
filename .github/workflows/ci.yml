@@ -1,0 +1,29 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Dependências
+        run: pip install pillow
+      - name: Gerar conteúdo e validar dados/assets/arquitetura
+        run: |
+          python3 tools/build_rules.py
+          python3 tools/build_content.py > /dev/null
+          python3 tools/build_dialogue.py
+          git diff --exit-code data/ || (echo "data/ desatualizado: rode os geradores" && exit 1)
+          python3 tools/validate_assets.py
+          python3 tools/check_architecture.py
+      - name: Baixar Godot 4.3
+        run: |
+          curl -sSL -o godot.zip https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          unzip -q godot.zip && mv Godot_v4.3-stable_linux.x86_64 godot
+      - name: Importar e testar (headless)
+        run: |
+          ./godot --headless --path . --import || true
+          ./godot --headless --path . -s res://tests/run_tests.gd
+      - name: Cena principal sobe sem erros
+        run: ./godot --headless --path . --quit-after 120 2>&1 | tee boot.log; ! grep -q "SCRIPT ERROR" boot.log

@@ -1,0 +1,89 @@
+{
+ "goods": {
+  "comida": {
+   "base": 1.0
+  },
+  "bebida": {
+   "base": 1.0
+  },
+  "ferramentas": {
+   "base": 1.0
+  },
+  "remedio": {
+   "base": 1.0
+  }
+ },
+ "regions": {
+  "vila": {
+   "stock": {
+    "comida": 120,
+    "bebida": 80,
+    "ferramentas": 30,
+    "remedio": 4
+   },
+   "production": {
+    "comida": 14,
+    "bebida": 8,
+    "ferramentas": 2,
+    "remedio": 0
+   },
+   "consumption": {
+    "comida": 13,
+    "bebida": 8,
+    "ferramentas": 1,
+    "remedio": 0
+   },
+   "target": {
+    "comida": 120,
+    "bebida": 80,
+    "ferramentas": 30,
+    "remedio": 6
+   }
+  },
+  "valkaria": {
+   "stock": {
+    "comida": 5000,
+    "bebida": 3000,
+    "ferramentas": 2000,
+    "remedio": 300
+   },
+   "production": {
+    "comida": 500,
+    "bebida": 300,
+    "ferramentas": 200,
+    "remedio": 20
+   },
+   "consumption": {
+    "comida": 500,
+    "bebida": 300,
+    "ferramentas": 190,
+    "remedio": 18
+   },
+   "target": {
+    "comida": 5000,
+    "bebida": 3000,
+    "ferramentas": 2000,
+    "remedio": 300
+   }
+  }
+ },
+ "price_limits": [
+  0.5,
+  3.0
+ ],
+ "status": "ORIGINAL_DO_JOGO",
+ "shops": {
+  "rosana": [
+   "pao",
+   "cerveja"
+  ],
+  "mara": [
+   "corda",
+   "tocha",
+   "pao"
+  ],
+  "ysolde": [
+   "pocao_cura"
+  ]
+ }
+}

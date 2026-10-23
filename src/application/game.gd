@@ -1,59 +1,184 @@
 extends Node
-## Autoload "Game": composição da aplicação. NÃO concentra regras — só liga
-## Domínio (WorldState), Infraestrutura (repositório) e expõe comandos à Apresentação.
+## Autoload "Game": composição da aplicação. NÃO contém regras — liga Domínio
+## (WorldState + módulos), Infraestrutura (saves, IA) e expõe comandos à Apresentação.
 
 signal event_published(event: GameEvent)
+signal world_reloaded
+signal mode_changed(mode: String)
+signal settings_changed
+
+enum Mode { TITLE, EXPLORE, DIALOGUE, COMBAT, MENU, GAMEOVER }
 
 var logger := GameLogger.new()
-var bus := EventBus.new()
-var world := WorldState.new()
+var telemetry := Telemetry.new()
 var saves := JsonSaveRepository.new()
+var rules: RuleRegistry
+var db: ContentDB
+var world: WorldState
+var dialogue_provider: DialogueProvider
+var mode: Mode = Mode.TITLE
 var _cmd_seq := 0
-
-## Segundos reais por tick. PLACEHOLDER: decisão aberta §20.7 (definir em playtest).
-@export var seconds_per_tick: float = 1.0
 var _accum := 0.0
+var _last_autosave_tick := 0
+
+## Configurações do jogador (persistidas em user://settings.json)
+var settings := {
+	"graphics": "medio",          # baixo | medio | alto
+	"combat_speed": 1.0,          # 1.0, 2.0, 0.0 (instantâneo)
+	"reduce_motion": false,
+	"reduce_flashes": false,
+	"seconds_per_tick": 2.0,      # PLACEHOLDER §20.7: 2s reais = 10 min de jogo
+	"disabled_modules": [],
+}
+const SETTINGS_PATH := "user://settings.json"
 
 
 func _ready() -> void:
-	world.rng.reseed(20261023)
-	bus.subscribe("*", func(e: GameEvent): event_published.emit(e))
-	logger.info("Game", "boot", {"content_version": WorldState.CONTENT_VERSION})
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	_load_settings()
+	rules = RuleRegistry.load_default()
+	db = ContentDB.load_default()
+	if not rules.errors.is_empty():
+		logger.error("Rules", "erros no catálogo", {"errors": Array(rules.errors)})
+	var ai := LlmDialogueProvider.load_config()
+	dialogue_provider = LlmDialogueProvider.new(ai, self) if ai.get("enabled", false) else DialogueProvider.new()
+	logger.info("Game", "boot", {"content_version": WorldState.CONTENT_VERSION, "rules": rules.size(),
+		"pendentes": rules.unverified_ids().size(), "ia": dialogue_provider.provider_id()})
+
+
+func new_game(feminine: bool = false, p_seed: int = -1) -> void:
+	var s := p_seed if p_seed >= 0 else int(Time.get_unix_time_from_system()) % 1000000
+	world = WorldFactory.create(s, settings.disabled_modules, rules, db)
+	_wire()
+	if feminine:
+		world.modules.state.flags["personagem_feminina"] = true
+		world.player_sheet.name = "Aventureira"
+	_cmd_seq = 0
+	_last_autosave_tick = 0
+	mode = Mode.TITLE
+	set_mode(Mode.EXPLORE)
+	world_reloaded.emit()
+	logger.info("Game", "novo jogo", {"seed": s})
+
+
+func _wire() -> void:
+	world.bus.subscribe("*", func(e: GameEvent): event_published.emit(e))
+
+
+func has_world() -> bool:
+	return world != null
+
+
+func set_mode(m: Mode) -> void:
+	if mode == m:
+		return
+	mode = m
+	mode_changed.emit(mode_name())
+
+
+func mode_name() -> String:
+	return Mode.keys()[mode].to_lower()
 
 
 func _process(delta: float) -> void:
-	# Render usa delta; simulação avança em passos fixos.
+	telemetry.push(telemetry.frame_ms, delta * 1000.0)
+	if world == null or mode != Mode.EXPLORE:
+		return
+	# Render usa delta; simulação avança em passos fixos e inteiros.
 	_accum += delta
-	while _accum >= seconds_per_tick:
-		_accum -= seconds_per_tick
+	var spt: float = maxf(0.05, float(settings.seconds_per_tick))
+	while _accum >= spt:
+		_accum -= spt
 		send("AdvanceTime", {"ticks": 1})
+		if mode != Mode.EXPLORE:
+			break
+	if world.clock.tick - _last_autosave_tick >= 36:  # a cada 6h de jogo
+		_last_autosave_tick = world.clock.tick
+		save_game("auto")
 
 
 func send(type: String, payload: Dictionary = {}, actor: String = "player") -> GameCommand.Result:
+	if world == null:
+		return GameCommand.Result.rejected(["sem mundo"], -1)
 	_cmd_seq += 1
 	var cmd := GameCommand.create("cmd_%08d" % _cmd_seq, actor, type, payload)
-	var r := world.apply_command(cmd, bus)
-	if not r.accepted:
-		logger.warn("Game", "comando rejeitado", {"type": type, "errors": Array(r.errors)})
+	var t0 := Time.get_ticks_usec()
+	var r := world.apply_command(cmd)
+	telemetry.push(telemetry.command_ms, (Time.get_ticks_usec() - t0) / 1000.0)
+	telemetry.push(telemetry.events_per_command, r.emitted_events.size())
+	if not r.accepted and type != "AdvanceTime":
+		logger.debug("Game", "comando rejeitado", {"type": type, "errors": Array(r.errors)})
+	_update_mode_from_events(r)
 	return r
 
 
+func _update_mode_from_events(r: GameCommand.Result) -> void:
+	for e in r.emitted_events:
+		match e.event_type:
+			"COMBAT_STARTED": set_mode(Mode.COMBAT)
+			"COMBAT_ENDED":
+				if e.payload.outcome != "morte": set_mode(Mode.EXPLORE)
+			"PLAYER_DIED": set_mode(Mode.GAMEOVER)
+			"DIALOGUE_STARTED": set_mode(Mode.DIALOGUE)
+			"DIALOGUE_ENDED":
+				if mode == Mode.DIALOGUE: set_mode(Mode.EXPLORE)
+
+
 func save_game(slot: String = "quicksave") -> Error:
+	if world == null or mode == Mode.GAMEOVER:
+		return ERR_UNAVAILABLE
+	var t0 := Time.get_ticks_usec()
 	var snap := world.to_snapshot()
-	snap["modules"]["event_bus"] = bus.get_state()
 	snap["modules"]["app"] = {"cmd_seq": _cmd_seq}
 	var err := saves.save(slot, snap)
+	telemetry.push(telemetry.save_ms, (Time.get_ticks_usec() - t0) / 1000.0)
 	logger.info("Persistence", "save", {"slot": slot, "ok": err == OK})
 	return err
 
 
+func has_save(slot: String) -> bool:
+	return FileAccess.file_exists(saves.base_dir.path_join(slot + ".json")) or FileAccess.file_exists(saves.base_dir.path_join(slot + ".json.bak"))
+
+
 func load_game(slot: String = "quicksave") -> bool:
+	var t0 := Time.get_ticks_usec()
 	var res := saves.load_slot(slot)
 	if res.is_empty():
 		logger.warn("Persistence", "nenhum save válido", {"slot": slot})
 		return false
+	world = WorldFactory.create(0, settings.disabled_modules, rules, db)
 	world.from_snapshot(res.data)
-	bus.set_state(res.data.modules.get("event_bus", {}))
+	_wire()
 	_cmd_seq = int(res.data.modules.get("app", {}).get("cmd_seq", 0))
+	_last_autosave_tick = world.clock.tick
+	telemetry.push(telemetry.load_ms, (Time.get_ticks_usec() - t0) / 1000.0)
+	mode = Mode.TITLE
+	var dlg_open: bool = not world.modules.dialogue.session.is_empty()
+	set_mode(Mode.COMBAT if world.modules.combat.active else (Mode.DIALOGUE if dlg_open else Mode.EXPLORE))
+	world_reloaded.emit()
 	logger.info("Persistence", "load", {"slot": slot, "backup": res.recovered_from_backup})
 	return true
+
+
+func _load_settings() -> void:
+	if FileAccess.file_exists(SETTINGS_PATH):
+		var d = JSON.parse_string(FileAccess.get_file_as_string(SETTINGS_PATH))
+		if d is Dictionary:
+			for k in d:
+				settings[k] = d[k]
+
+
+func save_settings() -> void:
+	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(settings, "  "))
+	settings_changed.emit()
+
+
+## Atalhos de leitura (projeções) para a Apresentação
+func m(id: String) -> WorldModule:
+	return world.module(id) if world != null else null
+
+
+func player_tile() -> Vector2i:
+	return db.world_to_tile(world.player.position)

@@ -1,0 +1,48 @@
+{
+ "schema_version": 1,
+ "rules": [
+  {
+   "id": "panteao.nomes",
+   "valor": [
+    "Aharadak",
+    "Allihanna",
+    "Arsenal",
+    "Azgher",
+    "Hyninn",
+    "Kallyadranoch",
+    "Khalmyr",
+    "Lena",
+    "Lin-Wu",
+    "Marah",
+    "Megalokk",
+    "Nimb",
+    "Oceano",
+    "Sszzaas",
+    "Tanna-Toh",
+    "Tenebra",
+    "Thwor",
+    "Thyatis",
+    "Valkaria",
+    "Wynna"
+   ],
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 96,
+   "pdf_page": 102,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Nomes conferidos por contagem no texto; obrigações individuais a extrair."
+  },
+  {
+   "id": "deus.lena.obrigacao",
+   "valor": {
+    "proibido": [
+     "dano_letal_a_vivos",
+     "perda_pv_a_vivos"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 100,
+   "pdf_page": 106,
+   "status": "VERIFICADA"
+  }
+ ]
+}

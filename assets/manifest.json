@@ -1,0 +1,468 @@
+{
+ "schema_version": 1,
+ "art_bible": {
+  "perspectiva": "top-down 3/4",
+  "tile_px": 32,
+  "char_canvas": [
+   32,
+   32
+  ],
+  "resolucao_interna": [
+   640,
+   360
+  ],
+  "pivot_personagem": [
+   16,
+   28
+  ],
+  "outline": "#1a1418",
+  "status": "HIPOTESE — aprovar em cena real (§13, §20.2)"
+ },
+ "assets": [
+  {
+   "asset_id": "tileset_base",
+   "tipo": "tileset",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    576,
+    96
+   ],
+   "pivot": [
+    0,
+    0
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "6be1c4d3dd0d55a3534a6ec7212613cad39fe5c2e7c62c82548cce2fd7dc1da5",
+   "caminho": "res://assets/tiles/tileset.png",
+   "indice": {
+    ".": {
+     "col": 0,
+     "name": "grama"
+    },
+    "=": {
+     "col": 1,
+     "name": "estrada"
+    },
+    ":": {
+     "col": 2,
+     "name": "trilha"
+    },
+    ",": {
+     "col": 3,
+     "name": "chao_floresta"
+    },
+    "c": {
+     "col": 4,
+     "name": "plantacao"
+    },
+    "T": {
+     "col": 5,
+     "name": "arvore"
+    },
+    "~": {
+     "col": 6,
+     "name": "rio"
+    },
+    "#": {
+     "col": 7,
+     "name": "parede"
+    },
+    "_": {
+     "col": 8,
+     "name": "piso"
+    },
+    "%": {
+     "col": 9,
+     "name": "entulho"
+    },
+    "D": {
+     "col": 10,
+     "name": "porta_fechada"
+    },
+    "d": {
+     "col": 11,
+     "name": "porta_aberta"
+    },
+    "S": {
+     "col": 12,
+     "name": "escada_desce"
+    },
+    "U": {
+     "col": 13,
+     "name": "escada_sobe"
+    },
+    "o": {
+     "col": 14,
+     "name": "poco"
+    },
+    "X": {
+     "col": 15,
+     "name": "vazio"
+    },
+    "k": {
+     "col": 16,
+     "name": "piso_cripta"
+    },
+    "r": {
+     "col": 17,
+     "name": "piso_ruina"
+    }
+   },
+   "variantes": 3
+  },
+  {
+   "asset_id": "char_player",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "7210480dc53f546fd8f637f69cdad8ec190f94a106022983f1d07c9db77f381a",
+   "caminho": "res://assets/chars/player.png"
+  },
+  {
+   "asset_id": "char_aldeao",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "caea6243ac44c3f6731b141156c70ae0bb5a8ebbc3a0a79a959fbfaae7a171b2",
+   "caminho": "res://assets/chars/aldeao.png"
+  },
+  {
+   "asset_id": "char_artesao",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "1633e0dcd670d6bb3f8ba34faa6740ccb73cdaa30c0b8519f94d375993d9b822",
+   "caminho": "res://assets/chars/artesao.png"
+  },
+  {
+   "asset_id": "char_guarda",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "1df3ee617e81b01bb0e03174585981a59e1e3c1a112e7919d0f6f1c3e560ad5b",
+   "caminho": "res://assets/chars/guarda.png"
+  },
+  {
+   "asset_id": "char_sacerdote",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "563c893a659bc0a29343d9fea46ec31b15f676b99272de23dbb2ccecbce53c00",
+   "caminho": "res://assets/chars/sacerdote.png"
+  },
+  {
+   "asset_id": "char_crianca",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "c2bc0dcfd1ff88dd52fdd51360de826848a1b6aec2774cdfb94607a43cddfb66",
+   "caminho": "res://assets/chars/crianca.png"
+  },
+  {
+   "asset_id": "char_idoso",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "37601b9e45328a2da280f01697db9254e447d0a78055f0acb68f33bc5e717529",
+   "caminho": "res://assets/chars/idoso.png"
+  },
+  {
+   "asset_id": "char_bandido",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "f5dbf3a7a5f6707fd409c58ebd697520cfa1b9c99438910e0999dadfc83a7cbd",
+   "caminho": "res://assets/chars/bandido.png"
+  },
+  {
+   "asset_id": "char_kael",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "813166c42df643dc7a2162c9bed5368a7f65f351048316bc5091ab1599946c3d",
+   "caminho": "res://assets/chars/kael.png"
+  },
+  {
+   "asset_id": "char_hiena",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "eaa51e7441f12c52530a01d832dfe5394624022af1868ddc26617fd1bf2f7609",
+   "caminho": "res://assets/chars/hiena.png"
+  },
+  {
+   "asset_id": "ui_icons",
+   "tipo": "icones",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    256,
+    32
+   ],
+   "pivot": [
+    0,
+    0
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "dfe2975062a836cb92d5fd88af9afec18709d0836da5f6efb7912f80d6f2c5d2",
+   "caminho": "res://assets/ui/icons.png",
+   "indice": [
+    "mover",
+    "atacar",
+    "investida",
+    "especial",
+    "fim_turno",
+    "levantar",
+    "misericordia",
+    "furtivo"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "schema_version": 1,
+ "rules": [
+  {
+   "id": "classe.guerreiro",
+   "valor": {
+    "pv_inicial": 20,
+    "pv_nivel": 5,
+    "soma_con": true,
+    "pm_nivel": 3,
+    "pericias_fixas": [
+     "luta|pontaria",
+     "fortitude"
+    ],
+    "pericias_escolha": 2,
+    "lista": [
+     "adestramento",
+     "atletismo",
+     "cavalgar",
+     "guerra",
+     "iniciativa",
+     "intimidacao",
+     "luta",
+     "oficio",
+     "percepcao",
+     "pontaria",
+     "reflexos"
+    ],
+    "ataque_especial": {
+     "custo_pm": 1,
+     "bonus": 4
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.humano",
+   "valor": {
+    "atributos": "+1 em três atributos diferentes",
+    "versatil": "treinado em duas perícias"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 0,
+   "pdf_page": 0,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Versátil confirmado no texto; página exata a anotar."
+  },
+  {
+   "id": "envelhecimento",
+   "valor": {
+    "maduro": 45,
+    "velho": 70,
+    "longevidade": "70 + 2d20"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 108,
+   "pdf_page": 114,
+   "status": "VERIFICADA"
+  }
+ ]
+}

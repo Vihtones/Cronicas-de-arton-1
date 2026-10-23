@@ -1,0 +1,75 @@
+{
+ "truth_id": "m_filho_do_moleiro",
+ "status": "ORIGINAL_DO_JOGO",
+ "title": "O Filho do Moleiro",
+ "historical_context": "Há três noites, Tomas Brandt viu as Garras de Cinza levando o dízimo roubado do Templo de Lena para a cripta da Torre Partida. Dorn, bêbado da taverna e informante do bando, contou que o rapaz andava bisbilhotando. Kael mandou buscá-lo.",
+ "facts": {
+  "f_tomas_sumiu": "Tomas Brandt está desaparecido há três dias.",
+  "f_tomas_viu_carga": "Tomas viu luzes e uma carroça sem lanterna perto da Torre Partida.",
+  "f_tomas_levado": "Tomas foi arrastado por duas pessoas rumo à estrada leste.",
+  "f_dizimo_roubado": "O dízimo do Templo de Lena foi roubado há uma semana.",
+  "f_bandidos_na_ruina": "Há gente vivendo na cripta da Torre Partida.",
+  "f_dorn_informante": "Dorn passou informações a desconhecidos em troca de bebida.",
+  "f_tomas_na_masmorra": "Tomas está preso na cela da cripta."
+ },
+ "hypotheses": {
+  "h_fuga": {
+   "text": "Tomas fugiu de casa.",
+   "supported_by": [],
+   "contradicted_by": [
+    "f_tomas_levado",
+    "f_tomas_na_masmorra"
+   ]
+  },
+  "h_bandidos": {
+   "text": "Bandidos levaram Tomas para a Torre Partida.",
+   "supported_by": [
+    "f_tomas_levado",
+    "f_bandidos_na_ruina"
+   ],
+   "contradicted_by": []
+  },
+  "h_informante": {
+   "text": "Alguém da vila avisou os sequestradores.",
+   "supported_by": [
+    "f_dorn_informante"
+   ],
+   "contradicted_by": []
+  },
+  "h_dizimo": {
+   "text": "O roubo do dízimo e o sumiço estão ligados.",
+   "supported_by": [
+    "f_tomas_viu_carga",
+    "f_dizimo_roubado"
+   ],
+   "contradicted_by": []
+  }
+ },
+ "start_facts": [
+  "f_tomas_sumiu"
+ ],
+ "factions_interested": [
+  "guarda_vila",
+  "templo_lena",
+  "garras_de_cinza"
+ ],
+ "state_transitions": {
+  "resolvido": {
+   "requires_event": "NPC_RESCUED",
+   "npc": "tomas"
+  },
+  "perdido": {
+   "requires_event": "BANDITS_RELOCATED"
+  }
+ },
+ "consequences": {
+  "resolvido": [
+   "familia_brandt_gratidao",
+   "reputacao_vila"
+  ],
+  "perdido": [
+   "tomas_levado_para_longe"
+  ]
+ },
+ "deadline_day": 12
+}

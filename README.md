@@ -1,31 +1,55 @@
 # Crônicas de Arton
 
-RPG single-player 2D top-down em pixel art, inspirado em Tormenta20.
-**Estado: Fase 0 (Fundação) — código escrito, aguardando verificação na Godot.**
+RPG single-player 2D top-down em pixel art, inspirado em Tormenta20. Projeto pessoal de fã, sem distribuição.
+**Versão 0.1.0: vertical slice jogável.** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
 
-Fonte de verdade: `docs/PLANO_MESTRE.md` (v1.2). Plano de execução: `docs/PLANO_DE_EXECUCAO.md`.
+Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`.
 
-## Requisitos
-- Godot **4.3 stable** (ou 4.x compatível), renderizador GL Compatibility.
+## Como jogar
+1. Instale a **Godot 4.3 stable** (godotengine.org, versão padrão, não a .NET).
+2. Abra a Godot → *Importar* → escolha `project.godot` desta pasta → *Importar e editar*.
+3. Aperte **F5** (ou o botão ▶).
 
-## Rodar
-1. Abra a pasta na Godot (Importar → `project.godot`) e aperte F5.
-2. WASD move · F5 salva · F9 carrega. O HUD mostra data/hora e eventos.
+| Tecla | Ação |
+|---|---|
+| WASD / setas | andar |
+| E | interagir (conversar, examinar, rastrear, abrir, atacar…) |
+| 1–9 | escolher opção (menu, diálogo) |
+| J | diário: pistas, hipóteses, ficha, reputação |
+| C | andar furtivo (metade da velocidade; teste de Furtividade ao se aproximar) |
+| R | descansar 8h (recupera PV/PM conforme o local, LB p.106) |
+| F5 / F9 | salvar / carregar · Esc: menu e opções |
+| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · Q: Ataque Especial · L: levantar |
 
-## Testes (headless)
+O tempo passa sozinho (2 s reais = 10 min de jogo). Os NPCs seguem suas rotinas, conversam entre si e espalham o que viram. Se você esperar demais, o bando parte no 12º dia e leva o rapaz.
+
+## O que está implementado
+- **Regras T20 com proveniência:** 58 regras com fonte, página e status. 51 verificadas no livro, 6 pendentes de revisão humana e 1 adaptada.
+- **Combate híbrido:** iniciativa T20, ações padrão/movimento/completa, projeção fantasma sem efeitos reais, investida, flanco, camuflagem, crítico, sangramento, morte e golpe de misericórdia. As rolagens usam um fluxo de RNG rastreável. Câmera cinematográfica com opções de acessibilidade.
+- **Exploração ativa:** sem Percepção automática. Sinais naturais aparecem sem rolagem, e os testes acontecem só quando você age. Há regra anti-loop, e o diário de hipóteses é marcado por você.
+- **Simulação social:** memória por NPC, testemunhas, rumores que só se espalham entre quem está no mesmo lugar, reputação por quem sabe, agendas por hora, mensageira entre regiões (LOD L3) e facções com reações causais.
+- **Clima, crime, economia e fé:** clima por Markov, crime com testemunhas e mandado, preços por região, obrigações de Lena.
+- **IA opcional:** desligada por padrão. Só reescreve o texto da fala e nunca decide resultados (`user://ai.json`).
+- **Persistência:** saves atômicos com checksum, backup automático, migração v1→v2 e autosave a cada 6h de jogo.
+
+## Testes e ferramentas
 ```bash
-godot --headless --path . --import          # 1ª vez: registra class_names
-godot --headless --path . -s res://tests/run_tests.gd
+godot --headless --path . --import                          # 1ª vez
+godot --headless --path . -s res://tests/run_tests.gd       # 71 testes
+python3 tools/validate_assets.py                            # pipeline de assets (§13)
+python3 tools/check_architecture.py                         # dependências entre camadas (R3)
+xvfb-run godot --path . -s res://tools/benchmark.gd         # desempenho por perfil gráfico
+xvfb-run godot --path . -s res://tools/screenshot_runner.gd -- <pasta>   # capturas automáticas
 ```
-Saída 0 = tudo aprovado.
+Os geradores de conteúdo ficam em `tools/build_*.py`. Edite os geradores, não os JSON gerados.
 
-## Arquitetura (camadas)
+## Arquitetura
 | Pasta | Camada | Pode depender de |
 |---|---|---|
 | `src/core` | Contratos (Command, Event, EventBus, Logger) | nada |
-| `src/domain` | Regras e estado puros (WorldClock, RNG, WorldState) | core |
-| `src/infrastructure` | Persistência JSON atômica | core |
-| `src/application` | Composição (`Game` autoload) | todas acima |
-| `src/presentation` | Cenas, câmera, HUD | application (lê projeções, envia comandos) |
+| `src/domain` | Regras e estado puros: WorldState, 13 módulos, combate, regras | core |
+| `src/infrastructure` | Save JSON atômico, provedor de IA | core, domain |
+| `src/application` | Composição (`Game`), fábrica do mundo, telemetria | todas acima |
+| `src/presentation` | Mapa, atores, câmera, efeitos, combate visual, UI | application (lê projeções, envia comandos) |
 
-Domínio nunca importa Node, câmera, HTTP ou banco.
+Os módulos opcionais (clima, memória, facções, crime, economia, região distante, fé) podem ser desligados sem impedir o jogo. Um teste prova isso.

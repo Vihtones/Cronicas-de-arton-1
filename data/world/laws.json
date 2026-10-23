@@ -1,0 +1,21 @@
+{
+ "vila": {
+  "furto": {
+   "multa": 10,
+   "severidade": 1
+  },
+  "invasao": {
+   "multa": 3,
+   "severidade": 0
+  },
+  "dano_propriedade": {
+   "multa": 5,
+   "severidade": 1
+  },
+  "agressao": {
+   "multa": 20,
+   "severidade": 2
+  }
+ },
+ "status": "ORIGINAL_DO_JOGO"
+}
