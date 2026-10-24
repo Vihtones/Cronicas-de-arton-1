@@ -1,10 +1,11 @@
-# Fora do grafo: cache do motor, builds, mídia e binários
+# Fora do AST do Graphify (cobertos por tools/graphify_gdscript.py ou irrelevantes)
 .godot/
 build/
 assets/
+data/
+*.gd
 *.import
+*.uid
 *.png
 *.tscn
 *.tres
-# Conteúdo gerado grande (regras e catálogos são gerados por tools/build_*.py, que entram no grafo)
-data/rules/*.json

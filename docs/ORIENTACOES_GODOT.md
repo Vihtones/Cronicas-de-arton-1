@@ -20,15 +20,12 @@ sintética). Medido com capturas da tela real (não do buffer interno):
 Teste final: chuva e festa, 8 capturas cada, sem blocos pretos. Ainda não testado numa placa de vídeo real.
 
 ## Graphify (grafo de conhecimento do projeto)
-Fonte: https://github.com/Graphify-Labs/graphify (MIT/Apache-2.0). Adicionado ao projeto:
-- `.claude/skills/graphify/SKILL.md`: a skill `/graphify` para o Claude Code dentro deste repositório.
-- `.graphifyrc`: `.gd` lido com a gramática de Python (o Graphify não tem GDScript).
-- `.graphifyignore`: fora do grafo ficam `.godot/`, `build/`, `assets/` e as regras geradas.
-- `graphify-out/` no `.gitignore` (é regerável).
-
-Para gerar o grafo no seu computador (precisa de Python 3.10+):
-1. `uv tool install graphifyy` (ou `pipx install graphifyy`).
-2. Na pasta do projeto: `graphify .` → abre `graphify-out/graph.html` e gera `GRAPH_REPORT.md`.
-3. Sem enviar nada a modelos de IA: `GRAPHIFY_BACKEND=none` (o código é sempre lido localmente).
-Não instalamos os ganchos de git (`graphify hook install`); ficam a seu critério.
-Limite conhecido: neste ambiente na nuvem o PyPI está bloqueado, então o grafo ainda não foi gerado aqui.
+Fonte: https://github.com/Graphify-Labs/graphify (MIT/Apache-2.0), versão 0.9.95. Usado para **organizar o
+projeto** (não roda dentro da Godot).
+- Gerar: `python3 tools/graphify_build.py` e depois `python3 tools/graphify_mapa.py`.
+- Saídas: `graphify-out/graph.html` (navegável), `graphify-out/GRAPH_REPORT.md`, `docs/MAPA_DO_PROJETO.md`.
+- GDScript não tem gramática no Graphify: `tools/graphify_gdscript.py` extrai scripts, comandos, eventos,
+  regras e documentos de forma determinística; o AST do Graphify cobre os scripts Python.
+- `.graphifyignore` tira do AST o que a extração própria já cobre; `GRAPHIFY_BACKEND=none` (nada vai a IA).
+- Skill `/graphify` em `.claude/skills/graphify/`. Ganchos de git não instalados.
+- Decisões tiradas do grafo: `docs/ORGANIZACAO.md`.

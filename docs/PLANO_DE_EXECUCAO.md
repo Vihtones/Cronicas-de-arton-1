@@ -1,3 +1,5 @@
+> **Documento histórico** (até a 0.2.0). O estado atual está em `docs/ROADMAP.md` e o mapa do código em `docs/MAPA_DO_PROJETO.md`.
+
 # Crônicas de Arton: Plano de Execução e Status
 
 Derivado do Documento Mestre v1.2. Em caso de conflito, o Mestre vence. **Atualizado em 23/10/2026, versão 0.2.0.**

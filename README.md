@@ -1,13 +1,27 @@
 # Crônicas de Arton
 
 RPG single-player 2D top-down em pixel art, inspirado em Tormenta20. Projeto pessoal de fã, sem distribuição.
-**Versão 0.6.0: vertical slice jogável + Laboratório (22 cenários) + XP dinâmica (`docs/XP_DINAMICA.md`) + Arcanista com 3 caminhos e escolha de perícias.** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
+**Versão 0.7.0 (Godot 4.7.2): vertical slice jogável, mundo vivo (feira, festa, gente nas ruas), árvore de poderes do T20, 17 raças, Laboratório (22 cenários) e XP dinâmica.** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
 
-Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`
-**Próximos passos, correções e revisões: `docs/ROADMAP.md`** · Mapa das mecânicas: `docs/PROTOTIPOS.md` · **Arte: `docs/GOVERNADOR_DE_ARTE.md`** (só assets aprovados na pasta de arte entram no jogo).
+## Documentos (onde está cada coisa)
+| Documento | Papel |
+|---|---|
+| `docs/PLANO_MESTRE.md` | **Fonte de verdade** do design (v1.2). Em conflito, ele vence |
+| `docs/ROADMAP.md` | **Estado atual**, pendências e revisões humanas |
+| `docs/MAPA_DO_PROJETO.md` | Mapa **gerado pelo Graphify**: camadas, comandos, eventos, regras e achados (não editar à mão) |
+| `docs/ORGANIZACAO.md` | Decisões de organização tiradas do grafo |
+| `docs/REGRAS.md` | Regras do T20 com página e status (gerado por `tools/build_rules_report.py`) |
+| `docs/GOVERNADOR_DE_ARTE.md` · `docs/ART_BIBLE.md` · `docs/REFERENCIAS_VISUAIS.md` | Direção de arte: só assets aprovados entram no jogo |
+| `docs/XP_DINAMICA.md` · `docs/PROTOTIPOS.md` | Desenho da XP dinâmica e das mecânicas em protótipo |
+| `docs/ORIENTACOES_GODOT.md` | Orientações do godot-claude-skills e do Graphify |
+| `docs/adr/` | Decisões de arquitetura (ADR-0001 a 0004) |
+| `docs/PLANO_DE_EXECUCAO.md` | Histórico do plano até a 0.2.0 (o estado atual está no ROADMAP) |
+| `CHANGELOG.md` | O que mudou em cada versão |
+
+Grafo do projeto: `python3 tools/graphify_build.py && python3 tools/graphify_mapa.py` → abra `graphify-out/graph.html`.
 
 ## Como jogar
-**Windows (executável pronto):** baixe `CronicasDeArton-v0.6.0-Windows.zip`, extraia e comece por `Jogar (modo seguro).bat`. Leia o LEIA-ME do pacote.
+**Windows (executável pronto):** baixe `CronicasDeArton-v0.7.0-Windows.zip`, extraia e comece por `Jogar (modo seguro).bat`. Leia o LEIA-ME do pacote.
 **Pelo editor:**
 1. Instale a **Godot 4.7.2 stable** (godotengine.org, versão padrão, não a .NET).
 2. Abra a Godot → *Importar* → escolha `project.godot` desta pasta → *Importar e editar*.
@@ -19,10 +33,11 @@ Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_
 | E | interagir (conversar, examinar, rastrear, abrir, atacar…) |
 | 1–9 | escolher opção (menu, diálogo) |
 | J | diário: pistas, hipóteses, ficha, reputação |
+| K | árvore de poderes (escolha ao subir de nível) |
 | C | andar furtivo (metade da velocidade; teste de Furtividade ao se aproximar) |
 | R | descansar 8h (recupera PV/PM conforme o local, LB p.106) |
 | F5 / F9 | salvar / carregar · Esc: menu e opções · F3: depuração |
-| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · 4: magia (de novo troca a magia) · 5: poção · 6: atirar · Q: Ataque Especial · R: Golpe de Raspão neste turno · I: Ímpeto · V: Velocidade Ladina · M: Emboscar · P: Magia Pungente · L: levantar |
+| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · 4: magia (de novo troca a magia) · 5: poção · 6: atirar · Q: Ataque Especial · R: Golpe de Raspão neste turno · I: Ímpeto · V: Velocidade Ladina · M: Emboscar · P: Magia Pungente · L: levantar · A: Ataque Poderoso · D: Combate Defensivo |
 
 O tempo passa sozinho (2 s reais = 10 min de jogo). Os NPCs seguem suas rotinas, conversam entre si e espalham o que viram. Se você esperar demais, o bando parte no 12º dia e leva o rapaz.
 
@@ -31,7 +46,7 @@ Na tela de título, abra **Laboratório de protótipos…** para jogar um cenár
 **Criar personagem…** monta Humano ou Anão como Guerreiro, Ladino ou Arcanista pela compra de pontos do livro.
 
 ## O que está implementado
-- **Regras T20 com proveniência:** 106 regras com fonte, página e status: 105 verificadas no livro e 1 adaptada.
+- **Regras T20 com proveniência:** 136 regras com fonte, página e status: 135 verificadas no livro e 1 adaptada.
 - **Combate híbrido:** iniciativa T20, ações padrão/movimento/completa, projeção fantasma sem efeitos reais, investida, flanco, camuflagem, crítico, sangramento, morte e golpe de misericórdia. As rolagens usam um fluxo de RNG rastreável. Câmera cinematográfica com opções de acessibilidade.
 - **Exploração ativa:** sem Percepção automática. Sinais naturais aparecem sem rolagem, e os testes acontecem só quando você age. Há regra anti-loop, e o diário de hipóteses é marcado por você.
 - **Simulação social:** memória por NPC, testemunhas, rumores que só se espalham entre quem está no mesmo lugar, reputação por quem sabe, agendas por hora, mensageira entre regiões (LOD L3) e facções com reações causais.

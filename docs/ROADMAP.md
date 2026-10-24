@@ -1,6 +1,6 @@
 # Roadmap: próximos passos, correções e revisões
 
-Atualizado em 24/10/2026 para a versão 0.6.0. Estado: 144 testes passando, mais a checagem de boot do jogo; 0 violações de arquitetura; 0 vazamentos; 106 regras (105 verificadas, 1 adaptada, 0 pendentes).
+Atualizado em 24/10/2026 para a versão 0.7.0 (Godot 4.7.2). Estado: 165 testes passando, mais a checagem de boot do jogo; 0 violações de arquitetura; 0 apontamentos de estilo; 136 regras (135 verificadas, 1 adaptada, 0 pendentes). Mapa gerado do código: `docs/MAPA_DO_PROJETO.md`.
 
 ## A. Correções
 
@@ -50,6 +50,15 @@ Atualizado em 24/10/2026 para a versão 0.6.0. Estado: 144 testes passando, mais
 | C27 | Ataque Especial escalonado e Ataque Extra |
 | Build | Executável real com ANGLE, modo seguro e autoteste |
 
+### Feitas na 0.7.0
+| # | Resultado |
+|---|---|
+| Motor | Godot 4.7.2: fim da cintilação preta da 4.3; salvamentos comparados por valor |
+| Mundo | Feira semanal, Festa de Alvorada, clima que muda aos poucos, figurantes, carroças |
+| Visual | Casas com telhado e fachada, caminhos orgânicos, HUD com minimapa e cinto de atalhos |
+| Poderes | Árvore de poderes com 8 poderes gerais do LB p.124-131 |
+| A4 | Blur seletivo já existia desde a 0.6.0 (`PostProcess`); parallax segue pendente |
+
 ### Pendentes
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
@@ -58,15 +67,19 @@ Atualizado em 24/10/2026 para a versão 0.6.0. Estado: 144 testes passando, mais
 | A5 | Retratos e visuais de raça são provisórios (procedurais) | `Portrait`, `RaceLook` | retratos aprovados pelo governador (papel "retrato") |
 | A6 | Luz sem *normal maps* (exige arte aprovada) | `FxLayer` | após a prova de escala |
 | A7 | Fontes: usa a fonte padrão da Godot (fonte externa exige aprovação de asset) | tema da UI | escolher uma fonte com licença aberta e aprová-la |
-| # | Problema | Onde | Sugestão |
-|---|---|---|---|
 | C26 | NPCs sem gênero no catálogo; os casamentos ignoram gênero | `build_content.py` | adicionar o campo e decidir a regra (decisão de design) |
-| # | Problema | Onde | Sugestão |
-|---|---|---|---|
 | A1 | Arte: prova de escala (personagem de cerca de 28 px diante das árvores LPC, que pressupõem cerca de 48 px) | `assets/chars`, governador | rua + árvore + 2 personagens, comparada com o piloto v04 |
 | A2 | Arte: verdes tropicais do LPC Jungle ainda sem harmonização com o bioma | lote 02 | v02 recolorida, **com aprovação do usuário** |
 | A3 | Arte: 3 plantas altas aprovadas sem papel | `direcao_de_arte.json` | decidir após A1 |
-| A4 | Arte: parallax e blur seletivo (AD-12 e AD-13) não implementados | `fx_layer.gd` | depois de A1 |
+| A4 | Arte: parallax (AD-12) não implementado; o blur seletivo (AD-13) já existe | `fx_layer.gd` | depois de A1 |
+
+### Organização (achados do Graphify, detalhes em `docs/ORGANIZACAO.md`)
+| # | Problema | Onde | Sugestão |
+|---|---|---|---|
+| O1 | 35 regras conferidas que o código não lê (o valor está repetido à mão) | `CombatSim`, `CharacterSheet`, `StateModule`… | ler da regra, um lote por família, com teste de igualdade |
+| O2 | 9 eventos sem ninguém que reaja (o jogador não fica sabendo de `MYSTERY_LOST`, `FACTION_ALERTED`, `STOLEN_GOODS_RECOVERED`) | `Narrator`, UI | narrar os que importam ao jogador; marcar os demais como só registro |
+| O3 | 4 comandos sem teste (`CastSpell`, `UseItem`, `MarkHypothesis`, `GrantDomain`) | `tests/unit` | um teste por comando |
+| O4 | 5 módulos de domínio sem teste próprio (Fauna, Items, Objects, RegionSim, State) | `tests/unit` | suítes curtas |
 
 ## B. Revisões humanas
 | # | O que revisar |
