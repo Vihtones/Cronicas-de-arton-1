@@ -1,6 +1,6 @@
 # Roadmap: próximos passos, correções e revisões
 
-Atualizado em 24/10/2026 para a versão 0.5.0. Estado: 144 testes passando, mais a checagem de boot do jogo; 0 violações de arquitetura; 0 vazamentos; 106 regras (105 verificadas, 1 adaptada, 0 pendentes).
+Atualizado em 24/10/2026 para a versão 0.6.0. Estado: 144 testes passando, mais a checagem de boot do jogo; 0 violações de arquitetura; 0 vazamentos; 106 regras (105 verificadas, 1 adaptada, 0 pendentes).
 
 ## A. Correções
 
@@ -42,13 +42,25 @@ Atualizado em 24/10/2026 para a versão 0.5.0. Estado: 144 testes passando, mais
 | C15 | 7 dias em cerca de 150 ms (teste: < 1 s) |
 | C16 | Vazamentos zerados |
 
+### Feitas na 0.6.0
+| # | Resultado |
+|---|---|
+| C24 | Gatilho de desprevenido (`apply_condition`) e Kael com poderes |
+| C25 | Crianças crescem (6 anos: criança; 16: aprendiz) |
+| C27 | Ataque Especial escalonado e Ataque Extra |
+| Build | Executável real com ANGLE, modo seguro e autoteste |
+
 ### Pendentes
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
-| C24 | O gatilho "alvo fica desprevenido" do Ataque Reflexo ainda não existe; os inimigos não têm poderes | `CombatModule` | quando houver fintas e surpresa no meio do turno |
-| C25 | Crianças dinâmicas não crescem para a agenda de adulto nem ganham profissão | `LineageModule`, `NpcModule` | aos 16 anos, profissão da família |
+| C28 | Habilidades ativas das raças ainda sem sistema (lista "pendente" em cada regra: Armadura de Allihanna, Sorte Salvadora, Olhar Atordoante, Mau Cheiro, Magia das Fadas, Canção dos Mares, Luz/Escuridão, ataques extras de chifres e mordida) | `data/rules`, `CombatModule` | lote por tipo: ações de movimento com PM, magias raciais |
+| C29 | O deslocamento de natação e o voo (sereia, sílfide) não têm terreno de água ou altura no mapa | mapa, `CombatSim` | quando houver rios atravessáveis e desníveis |
+| A5 | Retratos e visuais de raça são provisórios (procedurais) | `Portrait`, `RaceLook` | retratos aprovados pelo governador (papel "retrato") |
+| A6 | Luz sem *normal maps* (exige arte aprovada) | `FxLayer` | após a prova de escala |
+| A7 | Fontes: usa a fonte padrão da Godot (fonte externa exige aprovação de asset) | tema da UI | escolher uma fonte com licença aberta e aprová-la |
+| # | Problema | Onde | Sugestão |
+|---|---|---|---|
 | C26 | NPCs sem gênero no catálogo; os casamentos ignoram gênero | `build_content.py` | adicionar o campo e decidir a regra (decisão de design) |
-| C27 | Poderes de 5º nível ou mais (Golpe Pessoal, Ataque Extra) | `ProgressionModule` | junto com a progressão até o nível 6 |
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
 | A1 | Arte: prova de escala (personagem de cerca de 28 px diante das árvores LPC, que pressupõem cerca de 48 px) | `assets/chars`, governador | rua + árvore + 2 personagens, comparada com o piloto v04 |

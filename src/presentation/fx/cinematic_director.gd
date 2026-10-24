@@ -193,6 +193,20 @@ func end() -> void:
 	finished.emit()
 
 
+## Salvaguarda: a escala de tempo nunca fica presa fora de 1 (hit stop/câmera lenta interrompidos).
+var _ts_off := 0.0
+
+
+func _process(delta: float) -> void:
+	if Engine.time_scale != 1.0:
+		_ts_off += delta / maxf(0.05, Engine.time_scale)
+		if _ts_off > 2.5:
+			Engine.time_scale = 1.0
+			_ts_off = 0.0
+	else:
+		_ts_off = 0.0
+
+
 func skip() -> void:
 	_skip = true
 	Engine.time_scale = 1.0

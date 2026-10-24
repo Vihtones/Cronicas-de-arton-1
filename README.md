@@ -1,12 +1,14 @@
 # Crônicas de Arton
 
 RPG single-player 2D top-down em pixel art, inspirado em Tormenta20. Projeto pessoal de fã, sem distribuição.
-**Versão 0.5.0: vertical slice jogável + Laboratório (22 cenários) + XP dinâmica (`docs/XP_DINAMICA.md`) + Arcanista com 3 caminhos e escolha de perícias.** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
+**Versão 0.6.0: vertical slice jogável + Laboratório (22 cenários) + XP dinâmica (`docs/XP_DINAMICA.md`) + Arcanista com 3 caminhos e escolha de perícias.** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
 
 Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`
 **Próximos passos, correções e revisões: `docs/ROADMAP.md`** · Mapa das mecânicas: `docs/PROTOTIPOS.md` · **Arte: `docs/GOVERNADOR_DE_ARTE.md`** (só assets aprovados na pasta de arte entram no jogo).
 
 ## Como jogar
+**Windows (executável pronto):** baixe `CronicasDeArton-v0.6.0-Windows.zip`, extraia e comece por `Jogar (modo seguro).bat`. Leia o LEIA-ME do pacote.
+**Pelo editor:**
 1. Instale a **Godot 4.3 stable** (godotengine.org, versão padrão, não a .NET).
 2. Abra a Godot → *Importar* → escolha `project.godot` desta pasta → *Importar e editar*.
 3. Aperte **F5** (ou o botão ▶).
@@ -47,6 +49,9 @@ python3 tools/check_architecture.py                         # dependências entr
 xvfb-run godot --path . -s res://tools/benchmark.gd         # desempenho por perfil gráfico
 xvfb-run godot --path . -s res://tools/screenshot_runner.gd -- <pasta>   # capturas do slice
 xvfb-run godot --path . -s res://tools/lab_runner.gd -- <pasta>          # capturas dos protótipos
+xvfb-run godot --path . -s res://tools/fx_runner.gd -- <pasta>           # luz, cinema, retratos, golpes
+xvfb-run godot --path . -s res://tools/combat_fx_check.gd -- <pasta>     # cena de abate de ponta a ponta
+tools/build_windows.sh <godot> <saida>                                   # executável verificado
 ```
 Os geradores de conteúdo ficam em `tools/build_*.py`. Edite os geradores, não os JSON gerados.
 

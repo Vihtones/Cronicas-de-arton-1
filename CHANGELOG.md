@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.6.0] — 2026-10-24 — Executável real, todas as raças, luz, cinema de combate e HUD
+### Adicionado
+- **Executável Windows de verdade:** template oficial da Godot 4.3, conferido por SHA-512, no lugar do editor renomeado que deu tela azul.
+  - Desenho via ANGLE (Direct3D 11), vsync ligado e limite de 60 FPS.
+  - Modo seguro (`--modo-seguro`): gráficos mínimos, 30 FPS e sem flashes.
+  - Autoteste do executável (`--autoteste`).
+  - `tools/build_windows.sh`: só empacota se o autoteste do build passar.
+- **Todas as raças do Livro Básico:** são 17 raças, com o suraggel em duas variantes (aggelus e sulfure).
+  - Cada raça tem atributos, deslocamento, tamanho (modificador de Furtividade), sentidos, RD por tipo, armas naturais, PM extra, bônus de perícia, Tatuagem Mística e Ossos Frágeis.
+  - O visual de cada raça é provisório (tinta e escala).
+  - O que ainda não tem sistema aparece como "pendente" na própria regra e na tela de criação.
+- **Pendências pequenas:**
+  - C24: o Ataque Reflexo dispara quando o alvo fica desprevenido, e o Kael usa Ataque Reflexo e Ímpeto.
+  - C25: as crianças crescem e viram aprendizes do ofício de um dos pais.
+  - C27: o Ataque Especial escala com o nível e há Ataque Extra no 6º nível.
+- **Luz e atmosfera**, com as fontes em `docs/REFERENCIAS_VISUAIS.md`:
+  - quadros-chave de luz por hora do dia e gradação de cor;
+  - tochas que cintilam e janelas que acendem à noite;
+  - sombras de contato e sombras projetadas pelo sol ou pela luz mais próxima;
+  - névoa em duas camadas e respingos de chuva;
+  - relâmpago na tempestade;
+  - desfoque seletivo nas bordas, que nunca atinge o centro;
+  - vinheta.
+- **Combate cinematográfico** (para o jogador e para os inimigos):
+  - Gatilhos: crítico, abate, falha crítica, aposta arriscada que deu certo, plano "garantido" que falhou e "por um fio".
+  - Encenação: barras de cinema, aproximação da câmera, retratos com expressão, câmera lenta, legenda e interface escondida.
+  - Pode ser pulado com um clique e respeita "reduzir movimento".
+- **Retratos com 8 expressões:** desenho provisório procedural, com o sistema pronto para receber retratos aprovados pelo governador.
+- **Golpes e impacto** no estilo Dead Cells:
+  - antecipação, avanço e recuperação;
+  - rastro de "vento" no golpe (corte, estocada e impacto) e no erro;
+  - *hit stop*, partículas por tipo de golpe, anel de choque, recuo, tremor e flash no alvo;
+  - esquiva;
+  - Seta Infalível como projétil, Toque Chocante como arco elétrico, aura na Armadura Arcana e na cura.
+- **Movimento fluido:** aceleração e frenagem rápidas, poeira ao arrancar e virar, compressão e estiramento, balanço ao andar e respiração.
+- **HUD e janelas** no estilo da interface de Stoneshard:
+  - placa de estado com retrato, que muda de expressão conforme os PV, e barras de PV, PM e XP;
+  - placa de hora e lugar;
+  - tema novo;
+  - janelas que entram com animação;
+  - diálogo com retrato e texto progressivo;
+  - criação com prévia ao vivo.
+- `tools/fx_runner.gd` (capturas dos sistemas visuais) e `tools/combat_fx_check.gd` (verifica de ponta a ponta que a cena de abate termina, a escala de tempo volta a 1 e a interface reaparece).
+### Corrigido durante a verificação
+- Erros de parse que só apareciam no build: duas funções que não existem na Godot 4.3. O autoteste do executável os pegou.
+- A cripta estava escura demais, com personagens ilegíveis. As tochas apareciam de dia. O entardecer estava vermelho demais (a pasta de arte pede "não tornar Arton toda rubra"). Os efeitos sumiam na escuridão: agora ficam numa camada própria.
+- A barra de estado quebrava o texto em colunas.
+
 ## [0.5.0] — 2026-10-24 — Poderes, reações, gerações vivas e regras 100% conferidas
 ### Adicionado
 - **C21, 11 poderes do Livro Básico,** com pré-requisitos checados na escolha:
