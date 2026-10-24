@@ -1,6 +1,6 @@
 # Roadmap: próximos passos, correções e revisões
 
-Atualizado em 24/10/2026 para a versão 0.4.0. Estado: 127 testes passando, com erros de script detectados (C23); 0 violações de arquitetura; 94 regras (87 verificadas, 6 pendentes de revisão).
+Atualizado em 24/10/2026 para a versão 0.5.0. Estado: 144 testes passando, mais a checagem de boot do jogo; 0 violações de arquitetura; 0 vazamentos; 106 regras (105 verificadas, 1 adaptada, 0 pendentes).
 
 ## A. Correções
 
@@ -31,15 +31,26 @@ Atualizado em 24/10/2026 para a versão 0.4.0. Estado: 127 testes passando, com 
 | C22 | Janela de resumo da XP |
 | C23 | `tools/run_tests.py` reprova testes com erro de script |
 
+### Feitas na 0.5.0
+| # | Resultado |
+|---|---|
+| R1 | 6 regras conferidas com citação do livro (`docs/REGRAS.md`) |
+| C21 | 11 poderes com pré-requisitos; Ataque Reflexo como reação |
+| C7/C8 | NPCs nascidos no jogo (registro dinâmico no save) e casamentos |
+| C11 | `NpcStats` pela Tabela 7-2; Guarda com ND 2 e 1/2 |
+| C10 | Hienas acompanham a mudança de toca |
+| C15 | 7 dias em cerca de 150 ms (teste: < 1 s) |
+| C16 | Vazamentos zerados |
+
 ### Pendentes
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
-| C7/C8 | Bebês não viram NPCs; casais fixos | `LineageModule` | registro de NPCs dinâmicos |
-| C10 | Toca nova não move hienas | `FaunaModule` | posição por toca |
-| C11 | Capitã com +4 fixo | `CrimeModule` | fichas de NPC pela Tabela 7-2 (LB p.322) |
-| C15 | `AdvanceTime` de 7 dias leva cerca de 300 ms | `MemoryModule`, `NpcModule` | lotes por região (LOD L2) |
-| C16 | 8 recursos vazando ao sair dos testes | lambdas do `CombatSim` | `Callable` de método |
-| C21 | Ímpeto, Ataque Reflexo e outros poderes do LB ainda não existem | `ProgressionModule.POWERS` | próximo lote de poderes |
+| C24 | O gatilho "alvo fica desprevenido" do Ataque Reflexo ainda não existe; os inimigos não têm poderes | `CombatModule` | quando houver fintas e surpresa no meio do turno |
+| C25 | Crianças dinâmicas não crescem para a agenda de adulto nem ganham profissão | `LineageModule`, `NpcModule` | aos 16 anos, profissão da família |
+| C26 | NPCs sem gênero no catálogo; os casamentos ignoram gênero | `build_content.py` | adicionar o campo e decidir a regra (decisão de design) |
+| C27 | Poderes de 5º nível ou mais (Golpe Pessoal, Ataque Extra) | `ProgressionModule` | junto com a progressão até o nível 6 |
+| # | Problema | Onde | Sugestão |
+|---|---|---|---|
 | A1 | Arte: prova de escala (personagem de cerca de 28 px diante das árvores LPC, que pressupõem cerca de 48 px) | `assets/chars`, governador | rua + árvore + 2 personagens, comparada com o piloto v04 |
 | A2 | Arte: verdes tropicais do LPC Jungle ainda sem harmonização com o bioma | lote 02 | v02 recolorida, **com aprovação do usuário** |
 | A3 | Arte: 3 plantas altas aprovadas sem papel | `direcao_de_arte.json` | decidir após A1 |
@@ -48,7 +59,7 @@ Atualizado em 24/10/2026 para a versão 0.4.0. Estado: 127 testes passando, com 
 ## B. Revisões humanas
 | # | O que revisar |
 |---|---|
-| R1 | **6 regras PENDENTE_REVISAO** (`docs/REGRAS.md`): Defesa base, duração do descanso, panteão, poção, CD da jornada, funda |
+| R1 | ~~6 regras pendentes~~: conferidas na 0.5.0. Revisar só as citações, se quiser |
 | R2 | Balanceamento: 4 em 6 vitórias contra 3 bandidos (Guerreiro 1º nível); hienas à noite são letais para 1 personagem solo, como no livro |
 | R3 | **Pesos da XP dinâmica** (`docs/XP_DINAMICA.md`): ritmo de subida, teto de ×2, valor de cada tática |
 | R4 | Ritmo do relógio (2 s = 10 min) e prazo do bando (12 dias) |
@@ -61,12 +72,10 @@ Atualizado em 24/10/2026 para a versão 0.4.0. Estado: 127 testes passando, com 
 
 ## C. Próximos passos
 1. **Playtest com o Laboratório** (R2–R5), anotando a XP dinâmica de cada luta.
-2. **R1:** fechar as 6 regras pendentes.
+2. **Revisão dos poderes novos** no laboratório ("Poderes de classe").
 3. **Prova de escala de arte (A1)** quando você decidir aprovar sprites.
-4. **C21:** Ímpeto, Ataque Reflexo e reações (destrava o resto de C5).
+4. **C24–C27:** gatilhos de reação, crescimento das crianças, gênero e poderes de nível alto.
 5. **Heróis de Arton (R9):** primeiras classes e raças.
-6. **C7/C8:** gerações completas.
-7. **C15:** LOD L2 para avançar dias rapidamente.
 8. **R6:** arte final da cena piloto.
 9. Segundo mistério completo e segunda vila.
 10. Builds exportadas e medição em hardware real.

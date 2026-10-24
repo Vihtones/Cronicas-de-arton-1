@@ -282,3 +282,16 @@ func test_biografia_deterministica_e_coerente() -> void:
 	eq(Biography.for_npc(db.npc_def("teodoro"), 7), b1, "determinística")
 	check(b1.begins_with("Teodoro"), "começa pelo nome")
 	check(not Biography.for_npc(db.npc_def("nina"), 7).contains("trabalha"), "criança de 9 anos não tem profissão adulta")
+
+
+func test_lab_poderes_guerreiro_nivel_3() -> void:
+	var w := _w("poderes")
+	var s := w.player_sheet
+	eq(s.level, 3)
+	check(s.has_power("ataque_reflexo") and s.has_power("impeto") and s.has_power("durao"), "poderes do cenário")
+	check(GhostPlanner.validate_power_action(_sim_for(w), "player", "impeto").ok, "Ímpeto disponível")
+
+
+func _sim_for(w: WorldState) -> CombatSim:
+	w.modules.combat._start(["bandido_1"], true, false)
+	return w.modules.combat.sim

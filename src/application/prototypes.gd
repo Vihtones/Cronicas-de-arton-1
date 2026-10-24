@@ -8,7 +8,8 @@ const LIST := [
 	{"id": "misterio", "nome": "Mistério e exploração", "desc": "Comece ao lado de Hilda. Examine pistas (E), anote hipóteses (J)."},
 	{"id": "combate", "nome": "Combate tático e fantasma", "desc": "Cripta à tarde: os bandidos estão acordados. Planeje com o mouse, Enter confirma."},
 	{"id": "furtividade", "nome": "Furtividade e surpresa", "desc": "3h da madrugada na cripta, modo furtivo ligado. Chegue perto e ataque de surpresa (E)."},
-	{"id": "magia", "nome": "Magia (Arcanista anã)", "desc": "Cripta à tarde, bandidos à frente. Tecla 4 + clique: Seta Infalível (1 PM, acerta sempre)."},
+	{"id": "magia", "nome": "Magia (Arcanista anã)", "desc": "Cripta à tarde, bandidos à frente. Tecla 4 alterna Seta Infalível, Armadura Arcana, Toque Chocante e Raio Arcano; P: Magia Pungente."},
+	{"id": "poderes", "nome": "Poderes de classe", "desc": "Guerreiro de 3º nível com Ataque Reflexo, Ímpeto (I) e Durão; ajuste quando usar cada poder no diário (J)."},
 	{"id": "ladino", "nome": "Ataque furtivo (Ladino)", "desc": "Ladino humano contra bandidos surpreendidos: +1d6 em alvo desprevenido."},
 	{"id": "criacao", "nome": "Criação de personagem", "desc": "Escolha raça, classe e distribuição de pontos (LB p.17-20)."},
 	{"id": "progressao", "nome": "Progressão e XP dinâmica", "desc": "900 XP. Vença e veja a conta da XP (desempenho e circunstâncias). Suba de nível e escolha um poder (J)."},
@@ -66,6 +67,8 @@ static func apply(id: String, w: WorldState) -> Dictionary:
 			w.modules.combat.stance_sneak = true
 		"magia":
 			w.player_sheet = CharacterBuilder.build(w.rules, "anao", "arcanista", CharacterBuilder.presets("arcanista")[0], [], "Arcanista Anã")
+			w.player_sheet.powers["raio_arcano"] = true
+			w.player_sheet.powers["magia_pungente"] = true
 			_hour(w, 1, 14)
 			_put(w, 14, 56)
 		"ladino":
@@ -75,6 +78,15 @@ static func apply(id: String, w: WorldState) -> Dictionary:
 			w.modules.combat.stance_sneak = true
 		"criacao":
 			out["ui"] = "criacao"
+		"poderes":
+			var s := w.player_sheet
+			s.level = 3; s.xp = 3000
+			s.pv_max += 2 * (5 + int(s.attrs.con)); s.pv = s.pv_max
+			s.pm_max = 9; s.pm = 9
+			for pw in ["ataque_reflexo", "impeto", "durao", "golpe_raspao"]:
+				s.powers[pw] = true
+			_hour(w, 1, 14)
+			_put(w, 14, 56)
 		"progressao":
 			w.player_sheet.xp = 900
 			_hour(w, 1, 14)

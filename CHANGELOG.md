@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.5.0] — 2026-10-24 — Poderes, reações, gerações vivas e regras 100% conferidas
+### Adicionado
+- **C21, 11 poderes do Livro Básico,** com pré-requisitos checados na escolha:
+  - **Guerreiro:**
+    - **Ataque Reflexo**, uma reação: ataca quem sai do seu alcance.
+    - **Ímpeto** (tecla I): +6m na rodada.
+    - **Arqueiro:** Sabedoria no dano à distância.
+  - **Ladino:**
+    - **Emboscar** (tecla M): ação padrão extra na 1ª rodada.
+    - **Velocidade Ladina** (tecla V): ação de movimento extra.
+    - **Rolamento Defensivo:** metade do dano, mas fica caído.
+    - **Sombra:** +2 em Furtividade.
+  - **Arcanista:**
+    - **Arcano de Batalha:** atributo-chave no dano das magias.
+    - **Magia Pungente** (tecla P): +1 PM, CD +2.
+    - **Poder Mágico:** +1 PM por nível.
+    - **Raio Arcano:** 1d8, alcance curto, Reflexos reduz à metade.
+  - O Rolamento Defensivo e o Ataque Reflexo têm política no diário, como o Durão.
+- **C7, nascimentos viram NPCs reais,** com nome, gênero, família, agenda, memória dos pais e save. Crianças pequenas ficam em casa.
+- **C8, casamentos durante o jogo:** adultos solteiros de famílias diferentes se casam, e o casal muda de casa. Novos casais também podem ter filhos.
+- **C11, fichas de NPC pela Tabela 7-2** (LB p.322-323). A capitã Elsa (ND 2) investiga com +8 em vez do +4 provisório.
+- **C10, a matilha muda de toca de verdade:** as hienas vão para a toca funda.
+- Cenário de laboratório **"Poderes de classe"**. O cenário de magia agora tem Raio Arcano e Magia Pungente.
+### Corrigido / verificado
+- **R1:** as 6 regras pendentes foram conferidas no livro. São 106 regras, 105 verificadas e 1 adaptada.
+  - A funda soma Força no dano (LB p.148).
+  - A CD da jornada depende do terreno: floresta 20 (LB p.320).
+  - A poção custa T$ 30 (LB p.341).
+- **C16:** nenhum vazamento de memória ao sair. Lambdas que criavam ciclos foram trocadas por métodos.
+- **C15:** 7 dias de jogo levam cerca de 150 ms, com teste de desempenho.
+- A checagem de testes agora também abre o jogo de verdade e reprova erros de parse nas telas.
+
 ## [0.4.0] — 2026-10-24 — Arcanista completo, perícias, poderes sob controle e resumo de XP
 ### Adicionado
 - **C17, escolha de perícias** na criação (LB p.114): as da classe saem da lista da classe, e Int e Versátil liberam perícias livres. A escolha é validada.

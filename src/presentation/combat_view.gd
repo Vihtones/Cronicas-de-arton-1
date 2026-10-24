@@ -230,6 +230,10 @@ func use_power(p: String) -> void:
 
 
 func toggle_pungente() -> void:
+	if not Game.world.player_sheet.has_power("magia_pungente"):
+		pungente = false
+		message.emit("Você não tem o poder Magia Pungente.")
+		return
 	pungente = not pungente
 	message.emit("Magia Pungente (+1 PM, CD +2): %s" % ("ligada" if pungente else "desligada"))
 	_update_preview()

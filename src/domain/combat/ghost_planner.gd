@@ -77,6 +77,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if not A.sheet.has_power("raio_arcano"): return {"ok": false, "reason": "poder Raio Arcano não adquirido"}
 			elif not A.sheet.spells.has(sp_id): return {"ok": false, "reason": "magia não conhecida"}
 			if sp.is_empty(): return {"ok": false, "reason": "magia sem regra"}
+			if a.get("pungente", false) and not A.sheet.has_power("magia_pungente"):
+				return {"ok": false, "reason": "você não tem Magia Pungente"}
 			var cost := spell_cost(sim.rules, sp, a)
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])

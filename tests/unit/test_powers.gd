@@ -148,6 +148,8 @@ func test_raio_arcano_pungente_e_arcano_de_batalha() -> void:
 				check(int(f.payload.damage) >= 1, "causa dano")
 				eq(f.payload.save, "reflexos", "Reflexos reduz à metade")
 	check(dmg_seen, "lançou")
+	c.sim.c("player").sheet.powers.erase("magia_pungente")
+	check(not GhostPlanner.validate_action(c.sim, "player", ap).ok, "sem o poder, Pungente é recusada (não cobra PM à toa)")
 	eq(CombatModule.battle_bonus(c.sim.c("player").sheet), int(s.attrs["int"]), "Arcano de Batalha soma Int")
 	c.sim.c("bandido_1").tile = Vector2i(34, 57)
 	check(not GhostPlanner.validate_action(c.sim, "player", a).ok, "fora do alcance curto")

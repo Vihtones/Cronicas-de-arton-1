@@ -450,26 +450,42 @@ func _build_combat_bar(root: Control) -> void:
 	combat_bar.add_child(v)
 	combat_info = _label("", 8)
 	v.add_child(combat_info)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 2)
+	var row := HFlowContainer.new()   # quebra linha em vez de cortar botões para fora da tela
+	row.add_theme_constant_override("h_separation", 2)
+	row.add_theme_constant_override("v_separation", 2)
 	v.add_child(row)
-	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover"], ["2 Investida", func(): combat_view.mode = "investida"],
-			["3 Misericórdia", func(): combat_view.mode = "misericordia"], ["Q Especial", func(): combat_view.special = not combat_view.special], ["R Raspão", func(): combat_view.toggle_raspao()],
-			["4 Magia", func(): combat_view.cycle_spell()], ["5 Poção", func(): combat_view.drink_potion()], ["6 Atirar", func(): combat_view.mode = "atirar"],
-			["L Levantar", func(): combat_view.stand_up()], ["I Ímpeto", func(): combat_view.use_power("impeto")],
-			["V Vel.", func(): combat_view.use_power("velocidade_ladina")], ["M Emboscar", func(): combat_view.use_power("emboscar")],
-			["P Pungente", func(): combat_view.toggle_pungente()], ["⌫ Desfazer", func(): combat_view.undo()],
-			["↵ Confirmar", func(): combat_view.confirm()], ["␣ Fim do turno", func(): combat_view.end_turn()]]:
+	# [rótulo, ação, poder exigido ("" = sempre visível)]
+	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover", ""], ["2 Investida", func(): combat_view.mode = "investida", ""],
+			["3 Misericórdia", func(): combat_view.mode = "misericordia", ""], ["Q Especial", func(): combat_view.special = not combat_view.special, "@guerreiro"],
+			["R Raspão", func(): combat_view.toggle_raspao(), "golpe_raspao"], ["4 Magia", func(): combat_view.cycle_spell(), "@magia"],
+			["5 Poção", func(): combat_view.drink_potion(), ""], ["6 Atirar", func(): combat_view.mode = "atirar", ""],
+			["L Levantar", func(): combat_view.stand_up(), ""], ["I Ímpeto", func(): combat_view.use_power("impeto"), "impeto"],
+			["V Velocidade", func(): combat_view.use_power("velocidade_ladina"), "velocidade_ladina"], ["M Emboscar", func(): combat_view.use_power("emboscar"), "emboscar"],
+			["P Pungente", func(): combat_view.toggle_pungente(), "magia_pungente"], ["⌫ Desfazer", func(): combat_view.undo(), ""],
+			["↵ Confirmar", func(): combat_view.confirm(), ""], ["␣ Fim do turno", func(): combat_view.end_turn(), ""]]:
 		var b := _button(spec[0], spec[1])
 		b.add_theme_font_size_override("font_size", 8)
+		b.set_meta("needs", spec[2])
 		row.add_child(b)
+		_combat_buttons.append(b)
 	combat_bar.visible = false
+
+
+var _combat_buttons: Array[Button] = []
 
 
 func update_combat_bar() -> void:
 	var c: CombatModule = Game.world.modules.combat
 	if not c.active:
 		return
+	var sh: CharacterSheet = c.sim.c("player").sheet
+	for b in _combat_buttons:
+		var need: String = b.get_meta("needs", "")
+		match need:
+			"": b.visible = true
+			"@guerreiro": b.visible = sh.class_id in ["", "guerreiro"]
+			"@magia": b.visible = not sh.spells.is_empty() or sh.has_power("raio_arcano")
+			_: b.visible = sh.has_power(need)
 	var s := c.sim
 	var order: Array = []
 	for id in s.order:
