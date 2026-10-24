@@ -14,6 +14,7 @@ var turn_idx := 0
 var round_no := 1
 var turn_counter := 0
 var budget := {"std": 1, "move": 1}
+var toggles: Dictionary = {}   # políticas de poderes opcionais do jogador: "ataque_poderoso"/"combate_defensivo" -> auto|sempre|nunca
 
 
 func clone() -> CombatSim:
@@ -27,6 +28,7 @@ func clone() -> CombatSim:
 	c.initiative = initiative.duplicate()
 	c.turn_idx = turn_idx; c.round_no = round_no; c.turn_counter = turn_counter
 	c.budget = budget.duplicate()
+	c.toggles = toggles.duplicate()
 	return c
 
 
@@ -223,11 +225,18 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if sheet.has_power("valentao") and (T.sheet.has_effective_condition(rules, "caido") or T.sheet.has_effective_condition(rules, "desprevenido") \
 			or T.sheet.has_effective_condition(rules, "indefeso") or (not ranged and flanking(attacker, target))):
 		mods.append(["valentão", 2])  # LB p.66
+	# Ataque Poderoso (LB p.124): corpo a corpo, -2 ataque / +5 dano. "auto" usa se a chance continuar boa.
+	if not ranged and sheet.has_power("ataque_poderoso") and _power_on(attacker, "ataque_poderoso", mods, T):
+		mods.append(["ataque poderoso", -2])
+	# Combate Defensivo (LB p.125): ao agredir, -2 nos ataques e +5 na Defesa até o próximo turno.
+	if sheet.has_power("combate_defensivo") and str(toggles.get("combate_defensivo", "nunca")) == "sempre" and attacker == "player":
+		mods.append(["combate defensivo", -2])
 	if ranged and dist > reach: mods.append(["dobro do alcance", -5])
 	if ranged and engaged_in_melee(target): mods.append(["alvo em corpo a corpo", -5])
 	var total_mod := 0
 	for m in mods: total_mod += int(m[1])
 	var defense: int = T.sheet.defense(rules, not ranged)
+	if T.flags.has("defensivo"): defense += 5   # Combate Defensivo
 	if T.charge_turn >= 0 and T.charge_turn >= turn_counter - order.size():
 		defense += int(rules.value("acao.investida").penalidade_defesa)
 	var miss_chance := 0
@@ -237,11 +246,23 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
+	if mods.any(func(m): return m[0] == "ataque poderoso"): avg += 5
 	var hit_p := Checks.chance(total_mod, defense) * (1.0 - miss_chance / 100.0)
 	var crit_p := clampf((21 - int(atk.margem)) / 20.0, 0.0, 1.0)
 	crit_p = minf(crit_p, hit_p)
 	return {"ok": true, "atk": atk, "mod": total_mod, "mods": mods, "defense": defense, "ranged": ranged, "miss_chance": miss_chance,
 		"hit_chance": hit_p, "crit_chance": crit_p, "avg_damage": avg}
+
+
+## Poder opcional ligado? Inimigos com o poder usam sempre (IA simples); o jogador segue sua política.
+## "auto": só se a chance de acerto com -2 continuar >= 55%.
+func _power_on(attacker: String, power: String, mods: Array, T: Dictionary) -> bool:
+	var pol := str(toggles.get(power, "auto")) if attacker == "player" else "sempre"
+	if pol == "nunca": return false
+	if pol == "sempre": return true
+	var m := 0
+	for x in mods: m += int(x[1])
+	return Checks.chance(m - 2, T.sheet.defense(rules, true)) >= 0.55
 
 
 ## Ataque Especial (LB p.65): +4 por 1 PM; a cada 4 níveis pode gastar +1 PM por +4. Usa o maior patamar pagável.

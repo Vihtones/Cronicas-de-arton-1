@@ -16,7 +16,12 @@ const TRANSITIONS := {
 	"neblina": {"limpo": 0.3, "neblina": 0.6, "nublado": 0.1},
 }
 
-var region := {"condition": "limpo", "temp_c": 18, "precip": 0.0, "cloud": 0.1, "wind": 0.2, "visibility": "normal", "surface": "seco"}
+var region := {"condition": "limpo", "temp_c": 18, "precip": 0.0, "cloud": 0.1, "wind": 0.2, "visibility": "normal", "surface": "seco",
+	"intensity": 0.0, "wind_dir": 200.0}
+## Intensidade da precipitação/neblina sobe e desce aos poucos (frentes chegam e passam em ~40 min),
+## para o clima mudar DURANTE a exploração e não de um quadro para o outro. ORIGINAL_DO_JOGO.
+const RAMP_PER_TICK := 0.25
+const TARGET_INTENSITY := {"limpo": 0.0, "nublado": 0.0, "chuva": 0.6, "tempestade": 1.0, "neblina": 0.8}
 var wet_hours := 0
 
 
@@ -39,6 +44,8 @@ func season() -> String:
 
 
 func on_tick(tick: int) -> Array:
+	var tgt: float = TARGET_INTENSITY.get(region.condition, 0.0)
+	region.intensity = move_toward(float(region.get("intensity", tgt)), tgt, RAMP_PER_TICK)
 	if tick % (60 / world.clock.tick_minutes) != 0:
 		return []
 	var row: Dictionary = TRANSITIONS[region.condition]
@@ -59,7 +66,8 @@ func on_tick(tick: int) -> Array:
 	region.surface = "lamacento" if wet_hours >= 3 else ("molhado" if wet_hours > 0 else "seco")
 	region.precip = {"chuva": 0.5, "tempestade": 1.0}.get(next, 0.0)
 	region.cloud = {"limpo": 0.1, "nublado": 0.7, "chuva": 0.9, "tempestade": 1.0, "neblina": 0.6}[next]
-	region.wind = {"tempestade": 0.9}.get(next, 0.2)
+	region.wind = {"tempestade": 0.9, "chuva": 0.45, "nublado": 0.35}.get(next, 0.2)
+	region.wind_dir = fposmod(float(region.get("wind_dir", 200.0)) + world.rng.stream("weather").randf_range(-25.0, 25.0), 360.0)
 	region.visibility = "reduzida" if next in ["neblina", "tempestade"] else "normal"
 	if next != region.condition:
 		var prev: String = region.condition
@@ -88,5 +96,8 @@ func perception_cd_mod() -> int:
 
 func to_dict() -> Dictionary: return {"region": region.duplicate(), "wet_hours": wet_hours}
 func from_dict(d: Dictionary) -> void:
+	var base := region.duplicate()
 	region = d.get("region", region).duplicate()
+	for k in base:
+		if not region.has(k): region[k] = base[k]   # saves antigos
 	wet_hours = int(d.get("wet_hours", 0))

@@ -85,6 +85,11 @@ static func line(e: GameEvent) -> String:
 			if Game.db.zone_at(Game.player_tile()) == "cripta": return ""
 			return {"chuva": "Começa a chover.", "tempestade": "Uma tempestade desaba.", "neblina": "Uma neblina baixa cobre o chão.",
 				"limpo": "O céu abre.", "nublado": "Nuvens cobrem o céu."}.get(p.to, "")
+		"TOWN_EVENT_STARTED":
+			return {"feira": "É dia de feira! Mascates armam barracas no mercado.", "festa": "A Festa de Alvorada começa na praça: música, lanternas e cerveja."}.get(p.event, "")
+		"TOWN_EVENT_ENDED":
+			if p.get("reason", "") == "tempestade": return "A tempestade espanta a festa; todos correm para casa."
+			return {"feira": "Os mascates desmontam as barracas.", "festa": "As últimas lanternas se apagam na praça."}.get(p.event, "")
 		"RESTED": return "Você descansa %dh (condição %s): +%d PV/PM." % [p.hours, p.quality, p.recovered]
 		"CRIME_COMMITTED": return ("Você pega a mercadoria... e %d pessoa(s) viram." % p.witnesses.size()) if not p.witnesses.is_empty() else "Você pega a mercadoria. Ninguém parece notar."
 		"WARRANT_ISSUED": return "Você sente olhares: a Guarda soube do que você fez (multa T$ %d)." % p.fine
@@ -102,7 +107,7 @@ static func line(e: GameEvent) -> String:
 		"POWER_CHOSEN": return "Poder adquirido: %s%s." % [str(p.power).replace("_", " "), (" (" + p.option + ")") if p.option != "" else ""]
 		"MANEUVER_RESOLVED": return "%s tenta derrubar %s: %d vs %d — %s" % [_name(p.attacker), _name(p.target), p.attacker_total, p.target_total, "caído!" if p.success else "resiste."]
 		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Escolha um poder no diário (J)." % [p.level, p.pv_gain, p.pm_gain]
-		"POWER_USED": return "%s usa %s (−%d PM)." % [_name(p.actor), {"impeto": "Ímpeto", "velocidade_ladina": "Velocidade Ladina", "emboscar": "Emboscar", "ataque_extra": "Ataque Extra"}.get(p.power, p.power), p.pm_cost]
+		"POWER_USED": return "%s usa %s (−%d PM)." % [_name(p.actor), {"impeto": "Ímpeto", "velocidade_ladina": "Velocidade Ladina", "emboscar": "Emboscar", "ataque_extra": "Ataque Extra", "trespassar": "Trespassar"}.get(p.power, p.power), p.pm_cost]
 		"REACTION": return "Ataque Reflexo: %s golpeia %s, que saiu do alcance!" % [_name(p.actor), _name(p.target)]
 		"SPELL_FAILED": return "%s perde a magia: %s CD %d (%s) — tirou %d." % [_name(p.caster), "Vontade" if p.check == "vontade" else "Misticismo", p.cd, p.reason, p.total]
 		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ""

@@ -14,7 +14,7 @@ static func create(p_seed: int = 20261023, disabled: Array = [], rules: RuleRegi
 	w.rng.reseed(p_seed)
 	w.player.position = d.tile_to_world(Vector2i(int(d.map.player_start[0]), int(d.map.player_start[1])))
 	# Ordem importa para listeners: estado primeiro; memória antes de crime.
-	for m in [StateModule.new(), ObjectsModule.new(), NpcModule.new(), WeatherModule.new(), ExplorationModule.new(),
+	for m in [StateModule.new(), ObjectsModule.new(), TownEventsModule.new(), NpcModule.new(), WeatherModule.new(), ExplorationModule.new(),
 			MemoryModule.new(), FactionModule.new(), CombatModule.new(), DialogueModule.new(), CrimeModule.new(),
 			EconomyModule.new(), RegionSimModule.new(), ReligionModule.new(), ProgressionModule.new(), ItemsModule.new(),
 			TravelModule.new(), DomainModule.new(), LineageModule.new(), AdventurersModule.new(), FaunaModule.new(), PacingModule.new()]:

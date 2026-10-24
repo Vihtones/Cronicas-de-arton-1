@@ -7,7 +7,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| VERIFICADA | 123 |
+| VERIFICADA | 135 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -91,6 +91,18 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `poder.magia_pungente` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
 | personagem | `poder.poder_magico` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
 | personagem | `poder.raio_arcano` | T20 Livro Básico | 39 | 45 | VERIFICADA |  |
+| personagem | `poder.geral.troca` | T20 Livro Básico | 124 | 130 | VERIFICADA |  |
+| personagem | `poder.ataque_poderoso` | T20 Livro Básico | 124 | 130 | VERIFICADA |  |
+| personagem | `poder.trespassar` | T20 Livro Básico | 129 | 135 | VERIFICADA |  |
+| personagem | `poder.quebrar_aprimorado` | T20 Livro Básico | 129 | 135 | VERIFICADA |  |
+| personagem | `poder.combate_defensivo` | T20 Livro Básico | 125 | 131 | VERIFICADA |  |
+| personagem | `poder.derrubar_aprimorado` | T20 Livro Básico | 125 | 131 | VERIFICADA |  |
+| personagem | `poder.desarmar_aprimorado` | T20 Livro Básico | 125 | 131 | VERIFICADA |  |
+| personagem | `poder.esquiva` | T20 Livro Básico | 125 | 131 | VERIFICADA |  |
+| personagem | `poder.reflexos_combate` | T20 Livro Básico | 129 | 135 | VERIFICADA |  |
+| personagem | `poder.saque_rapido` | T20 Livro Básico | 129 | 135 | VERIFICADA |  |
+| personagem | `poder.vitalidade` | T20 Livro Básico | 129 | 135 | VERIFICADA |  |
+| personagem | `poder.vontade_de_ferro` | T20 Livro Básico | 131 | 137 | VERIFICADA |  |
 | personagem | `npc.estatisticas` | T20 Livro Básico | 323 | 329 | VERIFICADA | Tabela 7-2: perícias = [focadas, demais] (p.322). |
 | personagem | `classe.guerreiro.durao` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
 | personagem | `progressao.xp_por_nivel` | T20 Livro Básico | 35 | 41 | VERIFICADA |  |

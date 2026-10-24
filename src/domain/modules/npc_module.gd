@@ -83,6 +83,13 @@ func desired_location(id: String) -> String:
 			if entry.size() > 3 and world.day_index() % int(entry[3]) != 0:
 				continue
 			result = _resolve_slot(str(entry[2]), d)
+	var te = world.module("town_events")
+	if te != null:
+		var ov: String = te.location_override(id, d, int(s.get("age", 99)))
+		if ov != "":
+			if te.is_active("festa"):
+				return ov   # a festa segue sob chuva fraca (tempestade a suspende)
+			result = ov
 	var w = world.module("weather")
 	if w != null and w.is_raining() and not bool(world.db.location(result).get("indoor", false)) and result != d.home:
 		var alt: String = d.work if bool(world.db.location(d.work).get("indoor", false)) else d.home

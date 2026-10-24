@@ -309,6 +309,189 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "poder.geral.troca",
+   "valor": {
+    "regra": "sempre que recebe um poder de classe, pode trocá-lo por um poder geral"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ataque_poderoso",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "corpo a corpo: -2 no ataque, +5 no dano (opcional)",
+    "prereq": {
+     "for": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.trespassar",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "custo_pm": 1,
+    "efeito": "ao reduzir o alvo a 0 PV com ataque corpo a corpo, ataque adicional contra outra criatura no alcance",
+    "prereq": {
+     "poder": "ataque_poderoso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.quebrar_aprimorado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "+2 para quebrar; ataque extra ao destruir a arma",
+    "prereq": {
+     "poder": "ataque_poderoso"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.combate_defensivo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "ao agredir: -2 nos ataques, +5 na Defesa até o próximo turno (opcional)",
+    "prereq": {
+     "int": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.derrubar_aprimorado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "+2 para derrubar; ataque extra (1 PM) ao derrubar",
+    "prereq": {
+     "poder": "combate_defensivo"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.desarmar_aprimorado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "+2 para desarmar; 1 PM arremessa a arma",
+    "prereq": {
+     "poder": "combate_defensivo"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.esquiva",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "defesa": 2,
+    "reflexos": 2,
+    "prereq": {
+     "des": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.reflexos_combate",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "ação de movimento extra no primeiro turno de cada combate",
+    "prereq": {
+     "des": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.saque_rapido",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "iniciativa": 2,
+    "efeito": "+2 Iniciativa; sacar/guardar como ação livre",
+    "prereq": {
+     "treinado": "iniciativa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.vitalidade",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "pv_por_nivel": 1,
+    "fortitude": 2,
+    "prereq": {
+     "con": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.vontade_de_ferro",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "pm_por_dois_niveis": 1,
+    "vontade": 2,
+    "prereq": {
+     "sab": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "npc.estatisticas",
    "valor": {
     "1/2": {

@@ -38,6 +38,7 @@ var night := 0.0                           # 0 dia .. 1 noite (para sombras e ja
 var sun_dir := Vector2(1, 0.4)             # direção da sombra do sol
 var _light_tex: Texture2D
 var _t := 0.0
+var _wet_vis := 0.0                         # chuva visível (sobe e desce com a frente)
 
 
 func build(cam: Camera2D) -> void:
@@ -146,6 +147,11 @@ func _build_fog() -> void:
 		nt.width = 512; nt.height = 288
 		nt.seamless = true
 		nt.noise = n
+		# a névoa é BRANCA com transparência vinda do ruído (antes o ruído opaco escurecia a tela)
+		var ramp := Gradient.new()
+		ramp.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
+		ramp.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.25), Color(1, 1, 1, 1.0)])
+		nt.color_ramp = ramp
 		var tr := TextureRect.new()
 		tr.texture = nt
 		tr.stretch_mode = TextureRect.STRETCH_TILE
@@ -204,9 +210,14 @@ func _process(delta: float) -> void:
 	if zone == "cripta":
 		amb = Color(0.46, 0.42, 0.52); tint = Color(0.96, 0.93, 1.04); sat = 0.86; con = 1.06; vig = 0.45
 		night = 1.0
-	elif w.enabled and w.region.condition in ["chuva", "tempestade"] and not indoor:
-		amb = amb.darkened(0.22).lerp(Color(0.55, 0.6, 0.72), 0.15)
-		sat *= 0.8; tint = tint.lerp(Color(0.9, 0.95, 1.05), 0.5); vig += 0.08
+	elif w.enabled and not indoor:
+		# frente de chuva chega aos poucos: o céu escurece com a intensidade (domínio: region.intensity)
+		var wet := float(w.region.get("intensity", 0.0)) if w.region.condition in ["chuva", "tempestade"] else 0.0
+		var cloud := clampf(float(w.region.get("cloud", 0.1)) - 0.3, 0.0, 0.7) * 0.25
+		_wet_vis = lerpf(_wet_vis, wet, minf(1.0, delta * 0.8))
+		var k2 := maxf(_wet_vis, cloud)
+		amb = amb.lerp(amb.darkened(0.22).lerp(Color(0.55, 0.6, 0.72), 0.15), k2)
+		sat *= lerpf(1.0, 0.8, k2); tint = tint.lerp(Color(0.9, 0.95, 1.05), 0.5 * k2); vig += 0.08 * k2
 	if w.enabled and w.region.condition == "tempestade" and not indoor and fmod(_t, 7.3) < 0.08 and randf() < 0.5 and post:
 		post.flash(0.35, Color(0.85, 0.9, 1.0))   # relâmpago
 	modulate_node.color = amb
@@ -222,13 +233,16 @@ func _process(delta: float) -> void:
 		var ph2: float = wl.get_meta("phase")
 		var target := float(wl.get_meta("base_energy")) * smoothstep(0.35, 0.75, night) * (0.95 + 0.05 * sin(_t * 3.0 + ph2))
 		wl.energy = lerpf(wl.energy, target, minf(1.0, delta * 2.0))
-	var raining: bool = w.is_raining() and not indoor
+	var raining: bool = w.is_raining() and not indoor and _wet_vis > 0.08
+	rain.modulate.a = clampf(_wet_vis * 1.4, 0.0, 1.0)
+	var wdir := deg_to_rad(float(w.region.get("wind_dir", 200.0)))
+	rain.gravity = Vector2(cos(wdir) * 260.0 * float(w.region.get("wind", 0.2)), rain.gravity.y)
 	rain.emitting = raining and not Game.safe_mode
 	splash.emitting = raining and not Game.safe_mode and Game.settings.graphics != "baixo"
 	# névoa em duas camadas que rolam em velocidades diferentes (profundidade)
 	var fog_target := 0.0
 	if w.enabled and w.region.condition == "neblina" and not indoor:
-		fog_target = 0.42
+		fog_target = 0.42 * clampf(float(w.region.get("intensity", 1.0)) / 0.8, 0.2, 1.0)
 	elif zone == "floresta" and night > 0.5:
 		fog_target = 0.12   # névoa baixa de mata à noite
 	elif zone == "cripta":

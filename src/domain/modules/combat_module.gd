@@ -14,8 +14,10 @@ var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict),
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
 const POWER_POLICIES := {"golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
-	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"]}
-const DEFAULT_POLICY := {"golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto"}
+	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
+	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"]}
+const DEFAULT_POLICY := {"golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
+	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
 var stance_sneak := false
@@ -145,6 +147,7 @@ func execute(cmd: GameCommand) -> Array:
 	match cmd.type:
 		"SetPowerPolicy":
 			power_policy[str(cmd.payload.power)] = str(cmd.payload.policy)
+			if sim != null: sim.toggles = power_policy.duplicate()
 			return [fact("POWER_POLICY_SET", {"power": cmd.payload.power, "policy": cmd.payload.policy}, ["player"])]
 		"SetStance":
 			stance_sneak = bool(cmd.payload.get("sneak", false))
@@ -323,6 +326,7 @@ func _new_sim() -> CombatSim:
 	# C16: Callables de método (não lambdas) — uma lambda capturava o módulo e criava ciclo módulo → sim → lambda → módulo.
 	s.walk_fn = Callable(self, "_sim_walkable")
 	s.env_fn = Callable(self, "_sim_env")
+	s.toggles = power_policy.duplicate()
 	return s
 
 
@@ -441,7 +445,14 @@ func _begin_turn(id: String) -> Dictionary:
 			facts.append(fact("BLEED_CHECK", {"actor": id, "check": r, "lost": lost, "pv": s.pv, "dead": s.is_dead(),
 				"tags": ["morte"] if s.is_dead() else []}))
 		return {"skip": true, "facts": facts}
-	facts.append(fact("TURN_STARTED", {"actor": id, "round": sim.round_no}))
+	x.flags.erase("defensivo")   # Combate Defensivo vale "até seu próximo turno" (LB p.125)
+	var extra_move := false
+	if not x.flags.has("agiu"):
+		x.flags.append("agiu")
+		if s.has_power("reflexos_combate"):
+			sim.budget.move += 1   # Reflexos de Combate (LB p.129): movimento extra no primeiro turno
+			extra_move = true
+	facts.append(fact("TURN_STARTED", {"actor": id, "round": sim.round_no, "extra_move": extra_move}))
 	return {"skip": false, "facts": facts}
 
 
@@ -473,8 +484,11 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				sim.c(id).sheet.pm -= sim.special_tier(sim.c(id).sheet)
 			(sim.c(id).flags as Array).append("agrediu_%d" % sim.round_no)
 			_cur_action = a
+			var was_up: bool = not sim.c(a.target).sheet.is_down()
 			out.append_array(_resolve_attack(id, a.target, v, special))
 			_cur_action = {}
+			if was_up and sim.c(a.target).sheet.is_down() and not bool(v.get("ranged", false)):
+				out.append_array(_cleave(id, a.target, int(a.get("attack", 0))))
 		"stand":
 			sim.c(id).sheet.remove_condition("caido")
 			out.append(fact("STOOD_UP", {"actor": id}, [id]))
@@ -721,6 +735,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	if hit:
 		var extra := int(A.sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0
 		if bully: extra += 2
+		if v.mods.any(func(m): return m[0] == "ataque poderoso"): extra += 5   # Ataque Poderoso (LB p.124)
 		extra += CombatSim.archer_bonus(A.sheet, bool(v.get("ranged", false)))   # Arqueiro (LB p.65)
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
 		if T.damaged_round == sim.round_no and Array(A.sheet.habilidades).any(func(h): return str(h).begins_with("oportunista")):
@@ -784,10 +799,34 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			T.sheet.add_condition("caido")
 		out.append(fact("MANEUVER_RESOLVED", {"attacker": attacker, "target": target, "maneuver": "derrubar", "attacker_total": mine,
 			"target_total": theirs, "success": ok, "tags": ["queda"] if ok else []}, [attacker, target]))
+	if v.mods.any(func(m): return m[0] == "combate defensivo") and not A.flags.has("defensivo"):
+		A.flags.append("defensivo")
 	_track_attack(attacker, target, v, special, hit, crit, dmg, tags)
 	log.append(out[0].payload)
 	if log.size() > 60: log.pop_front()
 	return out
+
+
+## Trespassar (LB p.129): derrubou o alvo com ataque corpo a corpo -> 1 PM por um ataque adicional
+## contra outra criatura no alcance. Jogador segue a política; inimigos com o poder sempre usam.
+func _cleave(id: String, fallen: String, atk_index: int) -> Array:
+	var A := sim.c(id)
+	if not A.sheet.has_power("trespassar") or A.sheet.pm < 1:
+		return []
+	if id == "player" and str(power_policy.get("trespassar", "auto")) == "nunca":
+		return []
+	for other in sim.combatants:
+		if other == fallen or not sim.is_enemy(id, other) or not sim.conscious(other):
+			continue
+		var v2 := sim.attack_profile(id, other, atk_index, false, false)
+		if not v2.get("ok", false):
+			continue
+		A.sheet.pm -= 1
+		if id == "player": stats.pm_spent = int(stats.get("pm_spent", 0)) + 1
+		var out: Array = [fact("POWER_USED", {"actor": id, "power": "trespassar", "target": other, "pm_cost": 1}, [id, other])]
+		out.append_array(_resolve_attack(id, other, v2, false))
+		return out
+	return []
 
 
 func _track_attack(attacker: String, target: String, v: Dictionary, special: bool, hit: bool, crit: bool, dmg: int, tags: Array) -> void:

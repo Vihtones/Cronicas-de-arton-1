@@ -127,10 +127,44 @@ func npc_near(tile: Vector2i, radius: int = 1) -> String:
 	return best
 
 
+## NPCs parados em lugares abertos não ficam congelados: dão uns passos, viram para os lados
+## (apresentação; o tile do domínio continua o mesmo).
+const MINGLE_PLACES := ["praca", "mercado", "campos", "ponte", "estrada_leste"]
+
+
+func _mingle(v: ActorView, id: String, delta: float) -> void:
+	if v.walking or not v.visible:
+		return
+	var t := float(v.get_meta("idle_t", randf_range(2.0, 6.0))) - delta
+	if t > 0.0:
+		v.set_meta("idle_t", t)
+		return
+	v.set_meta("idle_t", randf_range(3.0, 8.0))
+	var npcs: NpcModule = Game.world.modules.npcs
+	if not MINGLE_PLACES.has(str(npcs.npc(id).get("location", ""))):
+		return
+	var home := Game.db.tile_to_world(npcs.npc_tile(id))
+	if randf() < 0.4:
+		v.face_dir(Vector2.from_angle(randf() * TAU))
+		return
+	var goal := home + Vector2(randf_range(-14, 14), randf_range(-8, 8))
+	v.walk_path([goal], 22.0)
+
+
 func _process(_d: float) -> void:
 	if Game.world == null:
 		return
+	if Game.mode == Game.Mode.EXPLORE:
+		for id in npc_views:
+			_mingle(npc_views[id], id, _d)
+	# só o nome de quem está mais perto (em festa/feira a praça vira um amontoado de rótulos)
 	var p: Vector2 = Game.world.player.position
+	var best := ""
+	var bd := 72.0
 	for id in npc_views:
 		var v: ActorView = npc_views[id]
-		v.show_name(v.visible and v.position.distance_to(p) < 72)
+		var d := v.position.distance_to(p)
+		if v.visible and d < bd:
+			bd = d; best = id
+	for id in npc_views:
+		(npc_views[id] as ActorView).show_name(id == best)

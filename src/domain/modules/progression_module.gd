@@ -26,6 +26,11 @@ const POWERS := {
 	"ladino": ["gatuno", "truque_magico", "emboscar", "velocidade_ladina", "rolamento_defensivo", "sombra", "aumento_atributo"],
 	"arcanista": ["arcano_de_batalha", "magia_pungente", "poder_magico", "raio_arcano", "aumento_atributo"],
 }
+## Poderes gerais (LB p.124: um poder de classe pode ser trocado por um geral). Só os implementados
+## entram como opção; a árvore também mostra os ainda não implementados (marcados).
+const GENERAL_POWERS := ["ataque_poderoso", "trespassar", "combate_defensivo", "esquiva", "reflexos_combate",
+	"saque_rapido", "vitalidade", "vontade_de_ferro"]
+const GENERAL_TREE_ONLY := ["quebrar_aprimorado", "derrubar_aprimorado", "desarmar_aprimorado"]
 
 
 func module_id() -> String: return "progression"
@@ -200,7 +205,9 @@ func _level_up() -> Dictionary:
 	var pv_gain := int(c.pv_nivel) + int(s.attrs.con)
 	var race: Dictionary = {} if s.race_id in ["", "humano"] else world.rules.value("raca." + s.race_id, {})
 	pv_gain += int(race.get("pv_por_nivel", 0))
+	if s.has_power("vitalidade"): pv_gain += 1                                   # Vitalidade (LB p.129)
 	var pm_gain := int(c.pm_nivel) + (1 if s.has_power("poder_magico") else 0) + int(race.get("pm_por_nivel", 0))
+	if s.has_power("vontade_de_ferro") and s.level % 2 == 0: pm_gain += 1       # Vontade de Ferro (LB p.131): +1 PM a cada dois níveis
 	s.pv_max += pv_gain
 	s.pv += pv_gain
 	s.pm_max += pm_gain
@@ -212,10 +219,57 @@ func _level_up() -> Dictionary:
 		"options": available_powers()}, ["player"])
 
 
+## Árvore de poderes para a interface: nós com estado (possui / disponível / bloqueado / não implementado),
+## pré-requisitos em texto e arestas pai -> filho. Só leitura.
+func power_tree() -> Dictionary:
+	var s := world.player_sheet
+	var cls := s.class_id if s.class_id != "" else "guerreiro"
+	var avail := available_powers()
+	var nodes: Array = []
+	var branches := {cls: POWERS.get(cls, []), "geral": GENERAL_POWERS + GENERAL_TREE_ONLY}
+	for br in branches:
+		for p in branches[br]:
+			var r: Dictionary = world.rules.value("poder." + p, {})
+			var meta: Dictionary = world.rules.entry("poder." + p)
+			var implemented := bool(r.get("implementado", true))
+			var owned: bool = s.has_power(p) or (p == "aumento_atributo" and s.powers.keys().any(func(k): return str(k).begins_with("aumento_atributo")))
+			var state := "possui" if owned else ("disponivel" if avail.has(p) else ("nao_implementado" if not implemented else "bloqueado"))
+			if owned and (p == "aumento_atributo" or p == "especializacao_arma") and avail.has(p):
+				state = "possui_repetivel"
+			nodes.append({"id": p, "branch": br, "group": str(r.get("grupo", "classe")), "state": state, "parent": str(r.get("prereq", {}).get("poder", "")),
+				"prereq": _prereq_text(r.get("prereq", {})), "effect": _effect_text(r), "page": int(meta.get("pagina", 0)),
+				"cost": int(r.get("custo_pm", 0))})
+	return {"nodes": nodes, "pending": s.pending_powers, "class": cls}
+
+
+func _prereq_text(pre: Dictionary) -> String:
+	var parts: Array = []
+	for k in pre:
+		match k:
+			"treinado": parts.append("treinado em " + str(pre[k]).capitalize())
+			"poder": parts.append(str(pre[k]).replace("_", " ").capitalize())
+			_: parts.append("%s %d" % [str(k).capitalize(), int(pre[k])])
+	return ", ".join(parts) if not parts.is_empty() else "—"
+
+
+func _effect_text(r: Dictionary) -> String:
+	if r.has("efeito"): return str(r.efeito)
+	var parts: Array = []
+	for k in ["defesa", "reflexos", "fortitude", "vontade", "iniciativa", "furtividade"]:
+		if r.has(k): parts.append("+%d %s" % [int(r[k]), k.capitalize()])
+	if r.has("pv_por_nivel"): parts.append("+%d PV por nível" % int(r.pv_por_nivel))
+	if r.has("pm_por_nivel"): parts.append("+%d PM por nível" % int(r.pm_por_nivel))
+	if r.has("pm_por_dois_niveis"): parts.append("+1 PM a cada dois níveis")
+	if r.has("dano"): parts.append("dano %s (%s)" % [r.dano, r.get("dano_tipo", "")])
+	if r.has("cd_bonus"): parts.append("+%d na CD" % int(r.cd_bonus))
+	if r.has("deslocamento_m"): parts.append("+%dm de deslocamento" % int(r.deslocamento_m))
+	return ", ".join(parts)
+
+
 func available_powers() -> Array:
 	var s := world.player_sheet
 	var out: Array = []
-	for p in POWERS.get(s.class_id if s.class_id != "" else "guerreiro", []):
+	for p in POWERS.get(s.class_id if s.class_id != "" else "guerreiro", []) + GENERAL_POWERS:
 		if p == "truque_magico" and int(s.attrs["int"]) < 1: continue
 		if not prereq_ok(s, p): continue
 		if p != "aumento_atributo" and p != "especializacao_arma" and s.powers.has(p): continue
@@ -229,6 +283,8 @@ func prereq_ok(s: CharacterSheet, p: String) -> bool:
 	for k in pre:
 		if k == "treinado":
 			if not s.trained.has(str(pre[k])): return false
+		elif k == "poder":
+			if not s.has_power(str(pre[k])): return false
 		elif int(s.attrs.get(k, 0)) < int(pre[k]):
 			return false
 	return true
@@ -265,6 +321,12 @@ func execute(cmd: GameCommand) -> Array:
 			# +1 PM por nível de arcanista, retroativo (LB p.38)
 			s.powers[p] = true
 			s.pm_max += s.level; s.pm += s.level
+		"vitalidade":
+			s.powers[p] = true
+			s.pv_max += s.level; s.pv += s.level        # +1 PV por nível de personagem (LB p.129)
+		"vontade_de_ferro":
+			s.powers[p] = true
+			s.pm_max += s.level / 2; s.pm += s.level / 2  # +1 PM a cada dois níveis (LB p.131)
 		"truque_magico":
 			s.powers[p] = "seta_infalivel"
 			if not s.spells.has("seta_infalivel"): s.spells.append("seta_infalivel")

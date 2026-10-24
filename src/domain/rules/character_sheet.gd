@@ -66,6 +66,11 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 		v += 2
 	if skill == "furtividade" and powers.has("sombra"):
 		v += 2   # Sombra (LB p.74)
+	# Poderes gerais (LB p.125-131)
+	if skill == "reflexos" and powers.has("esquiva"): v += 2
+	if skill == "fortitude" and powers.has("vitalidade"): v += 2
+	if skill == "vontade" and powers.has("vontade_de_ferro"): v += 2
+	if skill == "iniciativa" and powers.has("saque_rapido"): v += 2
 	return v + race_bonus
 
 
@@ -106,6 +111,7 @@ func training_bonus() -> int:
 func defense(rules: RuleRegistry, vs_melee: bool = true) -> int:
 	var d := defense_fixed if defense_fixed >= 0 else defense_base + int(attrs.des)
 	d += condition_mod(rules, "defesa") + scene_defense + (race_defense if defense_fixed < 0 else 0)
+	if powers.has("esquiva"): d += 2   # Esquiva (LB p.125)
 	if has_effective_condition(rules, "caido"):
 		d += -5 if vs_melee else 5
 	return d

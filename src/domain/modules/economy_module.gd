@@ -8,7 +8,7 @@ var regions: Dictionary = {}
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED"])
 
 
 func _ensure() -> void:
@@ -85,6 +85,12 @@ func on_event(e: GameEvent) -> Array:
 	match e.event_type:
 		"DOMAIN_WEEK":
 			regions.vila.stock.comida = int(regions.vila.stock.comida) + int(e.payload.get("food_out", 0))
+		"TOWN_EVENT_STARTED":
+			# feira traz mascates (estoque sobe); festa consome (ORIGINAL_DO_JOGO)
+			var gd: Dictionary = e.payload.get("goods", {})
+			for g in gd:
+				if regions.vila.stock.has(g):
+					regions.vila.stock[g] = maxi(0, int(regions.vila.stock[g]) + int(gd[g]))
 		"SHEEP_KILLED":
 			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 4 * int(e.payload.get("count", 1)))
 		"DISTANT_EVENT":

@@ -300,6 +300,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_M: use_power("emboscar")
 			KEY_P: toggle_pungente()
 			KEY_X: extra_attack()
+			KEY_A: cycle_policy("ataque_poderoso")
+			KEY_D: cycle_policy("combate_defensivo")
 			_: return
 		get_viewport().set_input_as_handled()
 
@@ -594,3 +596,15 @@ func _float_text(at: Vector2, txt: String, col: Color) -> void:
 	tw.parallel().tween_property(l, "position:y", l.position.y - 22, 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_property(l, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(l.queue_free)
+
+
+## Ataque Poderoso / Combate Defensivo (LB p.124-125): alterna a política do poder opcional.
+func cycle_policy(power: String) -> void:
+	if not Game.world.player_sheet.has_power(power):
+		return
+	var opts: Array = CombatModule.POWER_POLICIES[power]
+	var cur: String = Game.world.modules.combat.power_policy.get(power, opts[0])
+	var nxt: String = opts[(opts.find(cur) + 1) % opts.size()]
+	Game.send("SetPowerPolicy", {"power": power, "policy": nxt})
+	message.emit("%s: %s" % [PowerTreePanel.NAMES.get(power, power), nxt])
+	_update_preview()

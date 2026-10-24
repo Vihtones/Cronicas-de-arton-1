@@ -57,6 +57,7 @@ func _ready() -> void:
 	_build_creation(root)
 	_build_hub(root)
 	_build_debug(root)
+	_build_tree(root)
 	Game.event_published.connect(_on_event)
 	Game.mode_changed.connect(func(_m): _refresh_mode())
 	_refresh_mode()
@@ -172,6 +173,13 @@ var bar_xp: ProgressBar
 var lbl_pv: Label
 var lbl_pm: Label
 var hud_clock: PanelContainer
+var minimap: Minimap
+var event_ribbon: PanelContainer
+var lbl_event: Label
+var toast: Label
+var belt: PanelContainer
+var _belt_slots: Dictionary = {}
+var panel_tree: PowerTreePanel
 var lbl_clock: Label
 var lbl_place: Label
 
@@ -196,7 +204,7 @@ func _bar(col: Color, h: float) -> ProgressBar:
 func _build_hud(root: Control) -> void:
 	# placa de estado (canto inferior direito): retrato com expressão, nome, PV, PM e XP
 	hud_status = _panel(root, Control.PRESET_TOP_LEFT)
-	hud_status.position = Vector2(440, 284)
+	hud_status.position = Vector2(4, 290)
 	hud_status.custom_minimum_size = Vector2(194, 0)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
@@ -233,11 +241,13 @@ func _build_hud(root: Control) -> void:
 	col.add_child(hud_right)
 	# placa de hora e lugar (canto superior direito)
 	hud_clock = _panel(root, Control.PRESET_TOP_LEFT)
-	hud_clock.position = Vector2(462, 4)
-	hud_clock.custom_minimum_size = Vector2(172, 0)
+	hud_clock.position = Vector2(500, 4)
+	hud_clock.custom_minimum_size = Vector2(136, 0)
 	var cv := VBoxContainer.new()
 	cv.add_theme_constant_override("separation", 0)
 	hud_clock.add_child(cv)
+	minimap = Minimap.new()
+	cv.add_child(minimap)
 	lbl_clock = _label("", 8)
 	lbl_clock.autowrap_mode = TextServer.AUTOWRAP_OFF
 	lbl_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -256,11 +266,44 @@ func _build_hud(root: Control) -> void:
 	signals_label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
 	root.add_child(signals_label)
 	log_box = VBoxContainer.new()
-	log_box.position = Vector2(6, 282)
-	log_box.size = Vector2(430, 72)
+	log_box.position = Vector2(6, 214)
+	log_box.size = Vector2(300, 72)
 	log_box.add_theme_constant_override("separation", 0)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(log_box)
+	# faixa do evento da vila (topo, centro) e aviso grande (clima/eventos)
+	event_ribbon = _panel(root, Control.PRESET_TOP_LEFT)
+	event_ribbon.position = Vector2(200, 4)
+	event_ribbon.custom_minimum_size = Vector2(240, 0)
+	lbl_event = _label("", 8)
+	lbl_event.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_event.autowrap_mode = TextServer.AUTOWRAP_OFF
+	lbl_event.add_theme_color_override("font_color", Color(0.98, 0.82, 0.45))
+	event_ribbon.add_child(lbl_event)
+	event_ribbon.visible = false
+	toast = _label("", 14)
+	toast.position = Vector2(0, 120)
+	toast.size = Vector2(640, 24)
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.add_theme_color_override("font_color", Color(1.0, 0.9, 0.62))
+	toast.add_theme_constant_override("outline_size", 5)
+	toast.modulate.a = 0.0
+	root.add_child(toast)
+	# cinto de atalhos da exploração (centro, embaixo)
+	belt = _panel(root, Control.PRESET_TOP_LEFT)
+	belt.position = Vector2(232, 322)
+	var brow := HBoxContainer.new()
+	brow.add_theme_constant_override("separation", 2)
+	belt.add_child(brow)
+	for spec in [["interagir", "E", "Interagir [E]", func(): get_parent().call("_explore_key", KEY_E)],
+			["diario", "J", "Diário [J]", func(): toggle_journal()],
+			["poderes", "K", "Árvore de poderes [K]", func(): toggle_tree()],
+			["furtivo", "C", "Furtividade [C]", func(): Game.send("SetStance", {"sneak": not Game.world.modules.combat.stance_sneak})],
+			["descansar", "R", "Descansar [R]", func(): get_parent().call("_explore_key", KEY_R)],
+			["salvar", "F5", "Salvar [F5]", func(): log_msg("Jogo salvo." if Game.save_game() == OK else "Não é possível salvar agora.")]]:
+		var hs := HotSlot.new().setup(spec[0], spec[1], spec[2], spec[3])
+		brow.add_child(hs)
+		_belt_slots[spec[0]] = hs
 	prompt = _label("", 9)
 	prompt.position = Vector2(200, 238)
 	prompt.size = Vector2(240, 14)
@@ -292,7 +335,7 @@ func update_hud() -> void:
 	var loc := Game.db.location(Game.db.location_at(Game.player_tile()))
 	var weather_txt: String = ("%s, %d°C" % [wm.region.condition, wm.region.temp_c]) if wm.enabled else "—"
 	hud_top.text = "Dia %d do mês %d, ano %d — %02d:%02d · %s · %s" % [c.day, c.month, c.year, c.hour, c.minute, weather_txt, loc.get("name", "Ermo")]
-	lbl_clock.text = "%02d:%02d · dia %d/%d · %s" % [c.hour, c.minute, c.day, c.month, weather_txt]
+	lbl_clock.text = "%02d:%02d · dia %d/%d · %d°C" % [c.hour, c.minute, c.day, c.month, int(wm.region.temp_c)]
 	lbl_place.text = str(loc.get("name", "Ermo"))
 	var s: CharacterSheet = w.modules.combat.sim.c("player").sheet if w.modules.combat.active else w.player_sheet
 	var sneak: bool = w.modules.combat.stance_sneak
@@ -312,8 +355,28 @@ func update_hud() -> void:
 	if hud_portrait.expression != expr:
 		hud_portrait.set_expression(expr)
 	var busy := panel_journal.visible or panel_shop.visible or panel_pause.visible or panel_dialogue.visible
+	busy = busy or panel_tree.visible
+	log_box.visible = not panel_tree.visible and not panel_journal.visible
 	hud_status.visible = Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT] and not busy
 	hud_clock.visible = Game.mode == Game.Mode.EXPLORE and not busy
+	belt.visible = Game.mode == Game.Mode.EXPLORE and not busy
+	if _belt_slots.has("poderes"):
+		(_belt_slots.poderes as HotSlot).active = s.pending_powers > 0
+		(_belt_slots.poderes as HotSlot).badge = ("+%d" % s.pending_powers) if s.pending_powers > 0 else ""
+		(_belt_slots.furtivo as HotSlot).active = sneak
+		for k in _belt_slots: (_belt_slots[k] as HotSlot).queue_redraw()
+	minimap.weather_icon = wm.region.condition if wm.enabled else "limpo"
+	minimap.night = c.hour < 6 or c.hour >= 19
+	var te: TownEventsModule = w.modules.town_events
+	var evs: Array = te.active_ids()
+	var nx: Dictionary = te.next_event()
+	if not evs.is_empty():
+		lbl_event.text = "⚑ " + " · ".join(evs.map(func(x): return TownEventsModule.EVENTS[x].name)) + " — " + str(Game.db.location(TownEventsModule.EVENTS[evs[0]].place).get("name", ""))
+	elif not nx.is_empty() and int(nx.days) == 0:
+		lbl_event.text = "Hoje: %s às %dh" % [nx.name, int(nx.from)]
+	else:
+		lbl_event.text = ""
+	event_ribbon.visible = lbl_event.text != "" and Game.mode == Game.Mode.EXPLORE and not busy
 	var sig: Array = []
 	for x in w.modules.exploration.nearby_signals(2):
 		sig.append(x.signal)
@@ -622,36 +685,48 @@ func open_shop(npc: String) -> void:
 
 # --- Barra de combate -------------------------------------------------------------------------
 func _build_combat_bar(root: Control) -> void:
+	# topo: ordem de turno e dica; embaixo: cinto de ações (estilo Stoneshard)
 	combat_bar = _panel(root, Control.PRESET_TOP_WIDE)
-	combat_bar.offset_top = 40
+	combat_bar.offset_top = 4
 	combat_bar.offset_left = 120
 	combat_bar.offset_right = -120
-	var v := VBoxContainer.new()
-	combat_bar.add_child(v)
 	combat_info = _label("", 8)
-	v.add_child(combat_info)
-	var row := HFlowContainer.new()   # quebra linha em vez de cortar botões para fora da tela
+	combat_bar.add_child(combat_info)
+	combat_belt = _panel(root, Control.PRESET_TOP_LEFT)
+	combat_belt.position = Vector2(204, 290)
+	combat_belt.custom_minimum_size = Vector2(0, 0)
+	var row := HFlowContainer.new()   # quebra linha em vez de cortar espaços para fora da tela
+	row.custom_minimum_size = Vector2(424, 0)
 	row.add_theme_constant_override("h_separation", 2)
 	row.add_theme_constant_override("v_separation", 2)
-	v.add_child(row)
-	# [rótulo, ação, poder exigido ("" = sempre visível)]
-	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover", ""], ["2 Investida", func(): combat_view.mode = "investida", ""],
-			["3 Misericórdia", func(): combat_view.mode = "misericordia", ""], ["Q Especial", func(): combat_view.special = not combat_view.special, "@guerreiro"],
-			["R Raspão", func(): combat_view.toggle_raspao(), "golpe_raspao"], ["4 Magia", func(): combat_view.cycle_spell(), "@magia"],
-			["5 Poção", func(): combat_view.drink_potion(), ""], ["6 Atirar", func(): combat_view.mode = "atirar", ""],
-			["L Levantar", func(): combat_view.stand_up(), ""], ["I Ímpeto", func(): combat_view.use_power("impeto"), "impeto"],
-			["V Velocidade", func(): combat_view.use_power("velocidade_ladina"), "velocidade_ladina"], ["M Emboscar", func(): combat_view.use_power("emboscar"), "emboscar"],
-			["P Pungente", func(): combat_view.toggle_pungente(), "magia_pungente"], ["X Ataque extra", func(): combat_view.extra_attack(), "@extra"], ["⌫ Desfazer", func(): combat_view.undo(), ""],
-			["↵ Confirmar", func(): combat_view.confirm(), ""], ["␣ Fim do turno", func(): combat_view.end_turn(), ""]]:
-		var b := _button(spec[0], spec[1])
-		b.add_theme_font_size_override("font_size", 8)
-		b.set_meta("needs", spec[2])
+	combat_belt.add_child(row)
+	# [ícone, tecla, dica, ação, poder exigido ("" = sempre visível)]
+	for spec in [["mover", "1", "Mover/Atacar", func(): combat_view.mode = "mover", ""], ["investida", "2", "Investida", func(): combat_view.mode = "investida", ""],
+			["misericordia", "3", "Golpe de misericórdia", func(): combat_view.mode = "misericordia", ""], ["especial", "Q", "Ataque Especial (+4, 1 PM)", func(): combat_view.special = not combat_view.special, "@guerreiro"],
+			["raspao", "R", "Golpe de Raspão", func(): combat_view.toggle_raspao(), "golpe_raspao"], ["magia", "4", "Magia (alternar)", func(): combat_view.cycle_spell(), "@magia"],
+			["pocao", "5", "Beber poção", func(): combat_view.drink_potion(), ""], ["atirar", "6", "Atirar", func(): combat_view.mode = "atirar", ""],
+			["levantar", "L", "Levantar", func(): combat_view.stand_up(), ""], ["impeto", "I", "Ímpeto (1 PM)", func(): combat_view.use_power("impeto"), "impeto"],
+			["velocidade", "V", "Velocidade Ladina (2 PM)", func(): combat_view.use_power("velocidade_ladina"), "velocidade_ladina"], ["emboscar", "M", "Emboscar (2 PM)", func(): combat_view.use_power("emboscar"), "emboscar"],
+			["pungente", "P", "Magia Pungente (+1 PM, +2 CD)", func(): combat_view.toggle_pungente(), "magia_pungente"], ["extra", "X", "Ataque extra", func(): combat_view.extra_attack(), "@extra"],
+			["poderoso", "A", "Ataque Poderoso: -2 ataque, +5 dano (auto/sempre/nunca)", func(): _cycle_policy("ataque_poderoso"), "ataque_poderoso"],
+			["defensivo", "D", "Combate Defensivo: -2 ataque, +5 Defesa (liga/desliga)", func(): _cycle_policy("combate_defensivo"), "combate_defensivo"],
+			["desfazer", "⌫", "Desfazer", func(): combat_view.undo(), ""], ["confirmar", "↵", "Confirmar plano", func(): combat_view.confirm(), ""], ["fim", "␣", "Fim do turno", func(): combat_view.end_turn(), ""]]:
+		var b := HotSlot.new().setup(spec[0], spec[1], spec[2], spec[3])
+		b.set_meta("needs", spec[4])
 		row.add_child(b)
 		_combat_buttons.append(b)
 	combat_bar.visible = false
+	combat_belt.visible = false
 
 
-var _combat_buttons: Array[Button] = []
+var combat_belt: PanelContainer
+
+
+func _cycle_policy(power: String) -> void:
+	if combat_view: combat_view.cycle_policy(power)
+
+
+var _combat_buttons: Array[HotSlot] = []
 
 
 func update_combat_bar() -> void:
@@ -667,6 +742,15 @@ func update_combat_bar() -> void:
 			"@magia": b.visible = not sh.spells.is_empty() or sh.has_power("raio_arcano")
 			"@extra": b.visible = sh.class_id == "guerreiro" and sh.level >= 6
 			_: b.visible = sh.has_power(need)
+		var ic := b.icon_id
+		b.active = (ic == "especial" and combat_view.special) or (ic == "raspao" and combat_view.raspao) or (ic == "pungente" and combat_view.get("pungente") == true)
+		b.badge = ""
+		if ic in ["poderoso", "defensivo"]:
+			var pol: String = c.power_policy.get("ataque_poderoso" if ic == "poderoso" else "combate_defensivo", "")
+			b.badge = pol
+			b.active = pol == "sempre"
+		b.cost = {"especial": 1, "impeto": 1, "velocidade": 2, "emboscar": 2, "pungente": 1, "raspao": 2}.get(ic, 0)
+		b.queue_redraw()
 	var s := c.sim
 	var order: Array = []
 	for id in s.order:
@@ -1102,6 +1186,8 @@ func _refresh_mode() -> void:
 		panel_lab.visible = false
 	panel_over.visible = m == Game.Mode.GAMEOVER
 	combat_bar.visible = m == Game.Mode.COMBAT
+	combat_belt.visible = m == Game.Mode.COMBAT
+	belt.visible = m == Game.Mode.EXPLORE
 	hud_status.visible = m in [Game.Mode.EXPLORE, Game.Mode.COMBAT]
 	hud_clock.visible = m == Game.Mode.EXPLORE
 	if m != Game.Mode.DIALOGUE:
@@ -1114,7 +1200,7 @@ func _refresh_mode() -> void:
 
 
 func any_panel_open() -> bool:
-	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible
+	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible
 
 
 func close_panels() -> bool:
@@ -1126,12 +1212,47 @@ func close_panels() -> bool:
 	panel_creation.visible = false
 	panel_credits.visible = false
 	panel_xp.visible = false
+	panel_tree.visible = false
 	return was
+
+
+func _build_tree(root: Control) -> void:
+	panel_tree = PowerTreePanel.new()
+	root.add_child(panel_tree)
+	panel_tree.position = Vector2(20, 14)
+	panel_tree.visibility_changed.connect(_on_panel_shown.bind(panel_tree))
+	panel_tree.visible = false
+	panel_tree.chose.connect(func(pw: String, opt: String):
+		_cmd_log("ChoosePower", {"power": pw, "option": opt})
+		panel_tree.refresh())
+
+
+func toggle_tree() -> void:
+	panel_tree.visible = not panel_tree.visible
+	if panel_tree.visible:
+		panel_tree.refresh()
+
+
+func show_toast(text: String) -> void:
+	if text == "":
+		return
+	toast.text = text
+	var tw := create_tween()
+	tw.tween_property(toast, "modulate:a", 1.0, 0.25)
+	tw.tween_interval(2.2)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.6)
 
 
 func _on_event(e: GameEvent) -> void:
 	log_msg(Narrator.line(e))
 	match e.event_type:
+		"TOWN_EVENT_STARTED":
+			show_toast(str(e.payload.get("name", "")))
+		"WEATHER_CHANGED":
+			if Game.db.zone_at(Game.player_tile()) != "cripta" and e.payload.get("to", "") in ["chuva", "tempestade", "neblina"]:
+				show_toast({"chuva": "A chuva chega", "tempestade": "Tempestade!", "neblina": "A neblina sobe"}.get(e.payload.to, ""))
+		"LEVEL_UP":
+			show_toast("Nível %d! [K] escolha um poder" % int(e.payload.get("level", 0)))
 		"OPEN_SHOP":
 			var npc: String = Game.world.modules.dialogue.session.get("npc", "")
 			if npc != "": open_shop(npc)
