@@ -12,6 +12,7 @@ var camera: CameraDirector
 var plan: Array = []
 var mode := "mover"          # mover | atacar | investida | misericordia
 var special := false
+var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var hover := Vector2i(-1, -1)
 var preview: Dictionary = {}
 var _queue: Array = []
@@ -36,6 +37,14 @@ func sim() -> CombatSim:
 
 func my_turn() -> bool:
 	return active() and sim().current_id() == "player" and not playing
+
+
+func toggle_raspao() -> void:
+	raspao = not raspao
+	for a in plan:
+		if a.get("type", "") in ["attack", "charge"]:
+			a["raspao"] = raspao
+	message.emit("Golpe de Raspão (2 PM ao errar, metade do dano): %s neste turno" % ("usar" if raspao else "não usar"))
 
 
 func clear_plan() -> void:
@@ -83,7 +92,7 @@ func candidate_actions(t: Vector2i) -> Array:
 					var path := gs.trim_path("player", gs.find_path("player", gs.c(target).tile), gs.speed_squares("player"))
 					if not path.is_empty():
 						acts.append({"type": "move", "path": path.map(func(x): return [x.x, x.y])})
-				acts.append({"type": "attack", "target": target, "special": special})
+				acts.append({"type": "attack", "target": target, "special": special, "raspao": raspao})
 				return acts
 			var path := gs.find_path("player", t, false)
 			path = gs.trim_path("player", path, gs.speed_squares("player"))
@@ -117,7 +126,7 @@ func candidate_actions(t: Vector2i) -> Array:
 			if idx < 0:
 				message.emit("Sem arma de ataque à distância equipada.")
 				return []
-			return [{"type": "attack", "target": target, "attack": idx, "special": special}]
+			return [{"type": "attack", "target": target, "attack": idx, "special": special, "raspao": raspao}]
 		"magia":
 			if target == "" or not gs.is_enemy("player", target):
 				return []
@@ -215,6 +224,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_6: mode = "atirar"; message.emit("Modo tiro: clique no alvo (sem se mover)."); _update_preview()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()
 			KEY_L: stand_up()
+			KEY_R: toggle_raspao()
 			_: return
 		get_viewport().set_input_as_handled()
 
@@ -344,6 +354,8 @@ func _play_one(e: GameEvent) -> void:
 			camera.punch(1.1, 0.4)
 			await _wait(0.4)
 		"TURN_STARTED":
+			if p.actor == "player":
+				raspao = Game.world.modules.combat.power_policy.get("golpe_raspao", "auto") == "auto"
 			var v := _actor_view(p.actor)
 			if v and p.actor != "player":
 				camera.focus_override = v.global_position

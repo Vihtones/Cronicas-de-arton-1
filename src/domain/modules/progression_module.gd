@@ -173,17 +173,21 @@ func _combat_xp(p: Dictionary) -> Array:
 			kills_by_rule[rule_id] = int(kills_by_rule.get(rule_id, 0)) + 1
 	var cm := combat_multiplier(stats, outcome)
 	lines.append_array(cm.breakdown)
-	return _award(int(round(base * cm.mult)), "combate (%s, ×%.2f)" % [outcome, cm.mult], lines)
+	return _award(int(round(base * cm.mult)), "combate (%s, ×%.2f)" % [outcome, cm.mult], lines,
+		{"combat": true, "outcome": outcome, "base": int(round(base)), "mult": cm.mult})
 
 
-func _award(amount: int, reason: String, breakdown: Array) -> Array:
+func _award(amount: int, reason: String, breakdown: Array, extra: Dictionary = {}) -> Array:
 	if amount <= 0:
 		return []
 	var s := world.player_sheet
 	s.xp += amount
 	log.append({"tick": world.clock.tick, "xp": amount, "reason": reason, "breakdown": breakdown})
 	if log.size() > 200: log.pop_front()
-	var out: Array = [fact("XP_GAINED", {"amount": amount, "total": s.xp, "reason": reason, "breakdown": breakdown, "mode": mode}, ["player"])]
+	var payload := {"amount": amount, "total": s.xp, "reason": reason, "breakdown": breakdown, "mode": mode,
+		"next": xp_to_next(), "level": s.level}
+	payload.merge(extra)
+	var out: Array = [fact("XP_GAINED", payload, ["player"])]
 	while s.xp >= xp_to_next():
 		out.append(_level_up())
 	return out

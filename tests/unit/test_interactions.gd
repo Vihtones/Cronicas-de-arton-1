@@ -95,6 +95,9 @@ func test_combate_real_gera_estatisticas_e_xp_com_conta() -> void:
 				got = true
 				check(e.payload.breakdown.any(func(b): return str(b[0]).begins_with("desvantagem")), "3 inimigos contam como desvantagem")
 				check(e.payload.breakdown.any(func(b): return str(b[0]).begins_with("táticas")), "Ataque Especial conta como tática")
+				# C22: o resumo pós-combate precisa da conta inteira
+				check(e.payload.get("combat", false) and e.payload.has("base") and e.payload.has("mult") and e.payload.has("next"), "payload do resumo pós-combate")
+				eq(int(e.payload.amount), int(round(float(e.payload.base) * float(e.payload.mult))), "XP = base × multiplicador")
 		if got: break
 	check(got, "algum combate terminou com XP dinâmica detalhada")
 
@@ -323,3 +326,52 @@ func test_derrota_para_salteadores_rouba_mas_nao_prende_na_cripta() -> void:
 	check(out.any(func(f): return f.type == "PLAYER_ROBBED"), "roubado")
 	check(w.db.zone_at(w.db.world_to_tile(w.player.position)) != "cripta", "não vai para a cela do bando")
 	eq(w.player.gold, 30, "ouro sai por evento (aplicado no commit)")
+
+
+func _raspao_world(policy: String) -> WorldState:
+	var w := WorldHelpers.world(5)
+	w.player_sheet.powers["golpe_raspao"] = true
+	w.player_sheet.pm = 20
+	WorldHelpers.put(w, 25, 57)
+	WorldHelpers.cmd(w, "SetPowerPolicy", {"power": "golpe_raspao", "policy": policy})
+	w.modules.combat._start(["bandido_1"], true, false)
+	var sim: CombatSim = w.modules.combat.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_1").sheet.defense_fixed = 99   # erra sempre (fora o 20 natural)
+	return w
+
+
+func _raspao_count(w: WorldState, action: Dictionary) -> int:
+	var c: CombatModule = w.modules.combat
+	var n := 0
+	for i in 12:
+		c.sim.round_no = 100 + i   # 1/rodada
+		var v := GhostPlanner.validate_action(c.sim, "player", {"type": "attack", "target": "bandido_1"})
+		c._cur_action = action
+		for f in c._resolve_attack("player", "bandido_1", v, false):
+			if f.type == "ATTACK_RESOLVED" and (f.payload.tags as Array).has("raspao"): n += 1
+		c._cur_action = {}
+		c.sim.c("bandido_1").sheet.pv = 50
+	return n
+
+
+func test_c20_politica_de_golpe_de_raspao() -> void:
+	check(_raspao_count(_raspao_world("auto"), {}) >= 10, "auto: usa ao errar")
+	eq(_raspao_count(_raspao_world("nunca"), {}), 0, "nunca: não gasta PM")
+	check(_raspao_count(_raspao_world("nunca"), {"raspao": true}) >= 10, "o plano do turno sobrescreve a política")
+	eq(_raspao_count(_raspao_world("auto"), {"raspao": false}), 0, "desligar no turno")
+
+
+func test_c20_politica_de_durao_e_persistencia() -> void:
+	var w := WorldHelpers.world(5)
+	var c: CombatModule = w.modules.combat
+	var sh := w.player_sheet
+	check(c._durao_wanted("player", sh.pv_max, sh), "padrão: golpe forte usa Durão")
+	check(not c._durao_wanted("player", 1, sh), "padrão: golpe fraco não")
+	check(WorldHelpers.cmd(w, "SetPowerPolicy", {"power": "durao", "policy": "sempre"}).accepted, "aceita")
+	check(c._durao_wanted("player", 1, sh), "sempre")
+	check(not WorldHelpers.cmd(w, "SetPowerPolicy", {"power": "durao", "policy": "talvez"}).accepted, "política inválida")
+	var c2 := CombatModule.new()
+	c2.from_dict(c.to_dict())
+	eq(c2.power_policy.durao, "sempre", "salvo no save")

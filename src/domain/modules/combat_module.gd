@@ -11,6 +11,11 @@ const FLEE_DISTANCE := 10
 var active := false
 var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
+## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
+## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
+const POWER_POLICIES := {"golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"]}
+var power_policy := {"golpe_raspao": "auto", "durao": "fortes"}
+var _cur_action: Dictionary = {}
 var stance_sneak := false
 var undetected_by: Dictionary = {}   # creature_id -> true (furtividade bem-sucedida nesta aproximação)
 var approach_rolled: Dictionary = {} # creature_id -> true (já rolou nesta aproximação)
@@ -21,7 +26,7 @@ var log: Array = []
 
 func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
-	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance"])
+	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy"])
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "TRAVEL_AMBUSH"])
 
@@ -101,6 +106,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	match cmd.type:
 		"SetStance":
 			if active: return PackedStringArray(["não durante o combate"])
+		"SetPowerPolicy":
+			var pw := str(cmd.payload.get("power", ""))
+			if not POWER_POLICIES.has(pw): return PackedStringArray(["poder sem política: " + pw])
+			if not (POWER_POLICIES[pw] as Array).has(str(cmd.payload.get("policy", ""))): return PackedStringArray(["política inválida"])
 		"StartCombat":
 			if active: return PackedStringArray(["combate já em andamento"])
 			var ids: Array = cmd.payload.get("enemies", [])
@@ -129,6 +138,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 
 func execute(cmd: GameCommand) -> Array:
 	match cmd.type:
+		"SetPowerPolicy":
+			power_policy[str(cmd.payload.power)] = str(cmd.payload.policy)
+			return [fact("POWER_POLICY_SET", {"power": cmd.payload.power, "policy": cmd.payload.policy}, ["player"])]
 		"SetStance":
 			stance_sneak = bool(cmd.payload.get("sneak", false))
 			undetected_by.clear(); approach_rolled.clear()
@@ -419,12 +431,16 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.c(id).tile = v.end
 			sim.c(id).charge_turn = sim.turn_counter
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y]), "charge": true}, [id]))
+			_cur_action = a
 			out.append_array(_resolve_attack(id, a.target, v, false))
+			_cur_action = {}
 		"attack":
 			var special: bool = a.get("special", false)
 			if special:
 				sim.c(id).sheet.pm -= 1
+			_cur_action = a
 			out.append_array(_resolve_attack(id, a.target, v, special))
+			_cur_action = {}
 		"stand":
 			sim.c(id).sheet.remove_condition("caido")
 			out.append(fact("STOOD_UP", {"actor": id}, [id]))
@@ -474,6 +490,20 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 	return out
 
 
+func _raspao_wanted(attacker: String) -> bool:
+	if attacker != "player":
+		return true
+	return bool(_cur_action.get("raspao", power_policy.get("golpe_raspao", "auto") == "auto"))
+
+
+func _durao_wanted(target: String, dmg: int, sheet: CharacterSheet) -> bool:
+	var pol: String = power_policy.get("durao", "fortes") if target == "player" else "fortes"
+	match pol:
+		"nunca": return false
+		"sempre": return true
+	return dmg >= maxi(4, sheet.pv_max / 4)
+
+
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
 	var A := sim.c(attacker)
 	var T := sim.c(target)
@@ -514,7 +544,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		tags.append("impacto")
 		if crit: tags.append("critico")
 		# Durão (LB p.66, guerreiro 3º nível): 3 PM reduz o dano à metade — usado em golpes de 1/4 dos PV ou mais
-		if T.sheet.has_power("durao") and T.sheet.pm >= 3 and dmg >= maxi(4, T.sheet.pv_max / 4):
+		if T.sheet.has_power("durao") and T.sheet.pm >= 3 and _durao_wanted(target, dmg, T.sheet):
 			T.sheet.pm -= 3
 			dmg = maxi(1, dmg / 2)
 			tags.append("durao")
@@ -523,7 +553,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		tags.append("esquiva" if not camo_miss else "falha")
 		# Golpe de Raspão (LB p.65): 1/rodada, 2 PM, metade do dano ao errar (automático se houver PM)
 		var gr_key := "raspao_%d" % sim.round_no
-		if A.sheet.has_power("golpe_raspao") and A.sheet.pm >= 2 and not A.flags.has(gr_key) and not camo_miss:
+		if A.sheet.has_power("golpe_raspao") and A.sheet.pm >= 2 and not A.flags.has(gr_key) and not camo_miss and _raspao_wanted(attacker):
 			A.sheet.pm -= 2
 			A.flags.append(gr_key)
 			var extra2 := int(A.sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0
@@ -734,7 +764,8 @@ func preview(actions: Array) -> Dictionary:
 func to_dict() -> Dictionary:
 	_ensure()
 	var d := {"active": active, "creature_state": creature_state.duplicate(true), "stance_sneak": stance_sneak,
-		"undetected_by": undetected_by.duplicate(), "approach_rolled": approach_rolled.duplicate(), "enemy_faction": enemy_faction}
+		"undetected_by": undetected_by.duplicate(), "approach_rolled": approach_rolled.duplicate(), "enemy_faction": enemy_faction,
+		"power_policy": power_policy.duplicate()}
 	if active:
 		var cs := {}
 		for id in sim.combatants:
@@ -754,6 +785,8 @@ func from_dict(d: Dictionary) -> void:
 	undetected_by = d.get("undetected_by", {}).duplicate()
 	approach_rolled = d.get("approach_rolled", {}).duplicate()
 	enemy_faction = str(d.get("enemy_faction", ""))
+	power_policy = {"golpe_raspao": "auto", "durao": "fortes"}
+	power_policy.merge(d.get("power_policy", {}), true)
 	active = bool(d.get("active", false))
 	if active and d.has("sim"):
 		sim = _new_sim()

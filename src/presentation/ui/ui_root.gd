@@ -53,6 +53,7 @@ func _ready() -> void:
 	_build_title(root)
 	_build_lab(root)
 	_build_credits(root)
+	_build_xp_summary(root)
 	_build_creation(root)
 	_build_hub(root)
 	_build_debug(root)
@@ -359,6 +360,20 @@ func refresh_journal() -> void:
 				xrow.add_child(_button("Escolher: " + pw.replace("_", " ") + (" (+1 For)" if opt != "" else ""), func():
 					_cmd_log("ChoosePower", {"power": pw, "option": opt}); refresh_journal()))
 		journal_body.add_child(xrow)
+		var cmb: CombatModule = w.modules.combat
+		var prow := HFlowContainer.new()
+		var labels := {"golpe_raspao": "Golpe de Raspão", "durao": "Durão"}
+		var expl := {"auto": "usar ao errar", "nunca": "nunca", "fortes": "só golpes ≥ 1/4 dos PV", "sempre": "todo golpe"}
+		for pw in CombatModule.POWER_POLICIES:
+			if not s.has_power(pw):
+				continue
+			var opts: Array = CombatModule.POWER_POLICIES[pw]
+			var cur: String = cmb.power_policy.get(pw, opts[0])
+			var nxt: String = opts[(opts.find(cur) + 1) % opts.size()]
+			prow.add_child(_button("%s: %s" % [labels[pw], expl[cur]], func():
+				_cmd_log("SetPowerPolicy", {"power": pw, "policy": nxt}); refresh_journal()))
+		if prow.get_child_count() > 0:
+			journal_body.add_child(prow)
 		for entry in prog.log.slice(maxi(0, prog.log.size() - 3)):
 			journal_body.add_child(_label("  +%d XP: %s" % [entry.xp, entry.reason], 8))
 	var dom: DomainModule = w.modules.domain
@@ -439,7 +454,7 @@ func _build_combat_bar(root: Control) -> void:
 	row.add_theme_constant_override("separation", 2)
 	v.add_child(row)
 	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover"], ["2 Investida", func(): combat_view.mode = "investida"],
-			["3 Misericórdia", func(): combat_view.mode = "misericordia"], ["Q Especial", func(): combat_view.special = not combat_view.special],
+			["3 Misericórdia", func(): combat_view.mode = "misericordia"], ["Q Especial", func(): combat_view.special = not combat_view.special], ["R Raspão", func(): combat_view.toggle_raspao()],
 			["4 Magia", func(): combat_view.mode = "magia"], ["5 Poção", func(): combat_view.drink_potion()], ["6 Atirar", func(): combat_view.mode = "atirar"],
 			["L Levantar", func(): combat_view.stand_up()], ["⌫ Desfazer", func(): combat_view.undo()],
 			["↵ Confirmar", func(): combat_view.confirm()], ["␣ Fim do turno", func(): combat_view.end_turn()]]:
@@ -461,7 +476,8 @@ func update_combat_bar() -> void:
 		order.append(("▶" if id == s.current_id() else "") + "%s %d/%d" % [nm, x.sheet.pv, x.sheet.pv_max])
 	var mine := s.current_id() == "player"
 	combat_info.text = "Rodada %d · %s\n%s" % [s.round_no, " | ".join(order),
-		("Seu turno — clique para planejar (modo: %s%s). Botão direito desfaz. Enter confirma." % [combat_view.mode, ", ESPECIAL" if combat_view.special else ""]) if mine else "Turno dos inimigos..."]
+		("Seu turno — clique para planejar (modo: %s%s). Botão direito desfaz. Enter confirma." % [combat_view.mode, (", ESPECIAL" if combat_view.special else "") +
+			(", raspão: " + ("sim" if combat_view.raspao else "não") if Game.world.player_sheet.has_power("golpe_raspao") else "")]) if mine else "Turno dos inimigos..."]
 
 
 # --- Pausa / opções ------------------------------------------------------------------------------
@@ -549,6 +565,37 @@ func _build_title(root: Control) -> void:
 	v.add_child(disc)
 
 
+# --- Resumo pós-combate da XP dinâmica (C22) ---------------------------------------------
+var panel_xp: PanelContainer
+var _xp_box: VBoxContainer
+
+
+func _build_xp_summary(root: Control) -> void:
+	panel_xp = _panel(root, Control.PRESET_CENTER)
+	panel_xp.custom_minimum_size = Vector2(340, 0)
+	panel_xp.offset_left = -170; panel_xp.offset_right = 170; panel_xp.offset_top = -110; panel_xp.offset_bottom = 110
+	_xp_box = VBoxContainer.new()
+	panel_xp.add_child(_xp_box)
+	panel_xp.visible = false
+
+
+func show_xp_summary(p: Dictionary) -> void:
+	for c in _xp_box.get_children():
+		c.queue_free()
+	var titles := {"vitoria": "Vitória", "fuga": "Fuga", "captura": "Derrota"}
+	_xp_box.add_child(_h("%s — experiência" % titles.get(p.get("outcome", ""), "Combate")))
+	_xp_box.add_child(_label("Base do livro (ND dos inimigos, com novidade): %d XP" % int(p.get("base", 0)), 8))
+	for b in p.get("breakdown", []):
+		var v := float(b[1])
+		_xp_box.add_child(_label(("  • %s  %+d%%" % [b[0], int(round(v * 100))]) if v != 0.0 else "  • " + str(b[0]), 8))
+	_xp_box.add_child(_label("Multiplicador: ×%.2f (limites ×0,5 a ×2,0)" % float(p.get("mult", 1.0)), 8))
+	var t := _label("+%d XP   ·   total %d / %d para o nível %d" % [int(p.amount), int(p.total), int(p.get("next", 0)), int(p.get("level", 1)) + 1], 10)
+	t.add_theme_color_override("font_color", Color(0.95, 0.8, 0.4))
+	_xp_box.add_child(t)
+	_xp_box.add_child(_button("Continuar", func(): panel_xp.visible = false))
+	panel_xp.visible = true
+
+
 # --- Créditos de arte (CC-BY exige atribuição integral, regra AD-03) -------------------
 var panel_credits: PanelContainer
 
@@ -622,7 +669,6 @@ func _build_creation(root: Control) -> void:
 	panel_creation.position = Vector2(90, 24)
 	panel_creation.custom_minimum_size = Vector2(460, 0)
 	panel_creation.visible = false
-	panel_credits.visible = false
 
 
 func open_creation() -> void:
@@ -773,7 +819,7 @@ func _refresh_mode() -> void:
 
 
 func any_panel_open() -> bool:
-	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible
+	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible
 
 
 func close_panels() -> bool:
@@ -783,6 +829,8 @@ func close_panels() -> bool:
 	panel_interact.visible = false
 	panel_pause.visible = false
 	panel_creation.visible = false
+	panel_credits.visible = false
+	panel_xp.visible = false
 	return was
 
 
@@ -794,6 +842,9 @@ func _on_event(e: GameEvent) -> void:
 			if npc != "": open_shop(npc)
 		"FACT_REVEALED", "HYPOTHESIS_MARKED":
 			if panel_journal.visible: refresh_journal()
+		"XP_GAINED":
+			if e.payload.get("combat", false):
+				show_xp_summary(e.payload)
 
 
 func _process(_d: float) -> void:
