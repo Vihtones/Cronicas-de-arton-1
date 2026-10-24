@@ -102,7 +102,7 @@ static func line(e: GameEvent) -> String:
 		"POWER_CHOSEN": return "Poder adquirido: %s%s." % [str(p.power).replace("_", " "), (" (" + p.option + ")") if p.option != "" else ""]
 		"MANEUVER_RESOLVED": return "%s tenta derrubar %s: %d vs %d — %s" % [_name(p.attacker), _name(p.target), p.attacker_total, p.target_total, "caído!" if p.success else "resiste."]
 		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Escolha um poder no diário (J)." % [p.level, p.pv_gain, p.pm_gain]
-		"POWER_USED": return "%s usa %s (−%d PM)." % [_name(p.actor), {"impeto": "Ímpeto", "velocidade_ladina": "Velocidade Ladina", "emboscar": "Emboscar"}.get(p.power, p.power), p.pm_cost]
+		"POWER_USED": return "%s usa %s (−%d PM)." % [_name(p.actor), {"impeto": "Ímpeto", "velocidade_ladina": "Velocidade Ladina", "emboscar": "Emboscar", "ataque_extra": "Ataque Extra"}.get(p.power, p.power), p.pm_cost]
 		"REACTION": return "Ataque Reflexo: %s golpeia %s, que saiu do alcance!" % [_name(p.actor), _name(p.target)]
 		"SPELL_FAILED": return "%s perde a magia: %s CD %d (%s) — tirou %d." % [_name(p.caster), "Vontade" if p.check == "vontade" else "Misticismo", p.cd, p.reason, p.total]
 		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ""
@@ -122,6 +122,7 @@ static func line(e: GameEvent) -> String:
 		"NPC_DIED": return "%s morreu (%s, %d anos)." % [_name(p.npc), p.cause, p.age]
 		"INHERITANCE": return "%s herda a casa e as economias de %s." % [_name(p.to), _name(p.from)]
 		"NPC_BORN": return "Nasce %s, na família %s." % [str(p.get("name", "uma criança")), str(p.family).capitalize()]
+		"NPC_CAME_OF_AGE": return "%s cresceu e agora é %s." % [_name(p.npc), p.profession]
 		"NPC_MARRIED": return "%s e %s se casam." % [_name(p.a), _name(p.b)]
 		"HERO_SUCCEEDED": return "%s assume o legado de %s. O mundo lembra do outro, não de você." % [p.new_name, p.previous_name]
 		"SHEEP_KILLED":

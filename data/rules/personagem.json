@@ -28,12 +28,25 @@
     ],
     "ataque_especial": {
      "custo_pm": 1,
-     "bonus": 4
+     "bonus": 4,
+     "a_cada_niveis": 4
     }
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 65,
    "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.guerreiro.ataque_extra",
+   "valor": {
+    "nivel": 6,
+    "custo_pm": 2,
+    "efeito": "ataque adicional ao usar agredir, 1/rodada"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
    "status": "VERIFICADA"
   },
   {

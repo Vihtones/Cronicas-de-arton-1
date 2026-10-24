@@ -33,6 +33,17 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.is_enemy(actor, a.target): return {"ok": false, "reason": "não é inimigo"}
 			prof["kind"] = "padrao"
 			return prof
+		"ataque_extra":
+			var ae: Dictionary = sim.rules.value("classe.guerreiro.ataque_extra")
+			if A.sheet.class_id != "guerreiro" or A.sheet.level < int(ae.nivel): return {"ok": false, "reason": "Ataque Extra é do guerreiro de 6º nível"}
+			if not (A.flags as Array).has("agrediu_%d" % sim.round_no): return {"ok": false, "reason": "use primeiro a ação agredir"}
+			if (A.flags as Array).has("ataque_extra_%d" % sim.round_no): return {"ok": false, "reason": "uma vez por rodada"}
+			if A.sheet.pm < int(ae.custo_pm): return {"ok": false, "reason": "PM insuficiente (2)"}
+			var prof2 := sim.attack_profile(actor, a.get("target", ""), int(a.get("attack", 0)), false, false)
+			if not prof2.ok: return prof2
+			if not sim.is_enemy(actor, a.target): return {"ok": false, "reason": "não é inimigo"}
+			prof2["kind"] = "livre"
+			return prof2
 		"charge":
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "investida exige ação completa"}
 			if A.sheet.has_effective_condition(sim.rules, "lento"): return {"ok": false, "reason": "lento não pode fazer investida"}
@@ -184,7 +195,11 @@ static func simulate(sim: CombatSim, actor: String, actions: Array) -> Dictionar
 			"cast":
 				step["hit_chance"] = 1.0; step["crit_chance"] = 0.0; step["avg_damage"] = v.avg_damage; step["mods"] = []; step["pm_cost"] = v.cost
 				g.c(actor).sheet.pm -= int(v.cost)
-			"attack":
+			"attack", "ataque_extra":
+				(g.c(actor).flags as Array).append("agrediu_%d" % g.round_no)
+				if a.type == "ataque_extra":
+					(g.c(actor).flags as Array).append("ataque_extra_%d" % g.round_no)
+					g.c(actor).sheet.pm -= 2
 				step["hit_chance"] = v.hit_chance; step["crit_chance"] = v.crit_chance; step["avg_damage"] = v.avg_damage
 				step["mods"] = v.mods; step["defense"] = v.defense; step["miss_chance"] = v.miss_chance
 			"stand":

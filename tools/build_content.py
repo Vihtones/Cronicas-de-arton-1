@@ -299,7 +299,9 @@ factions = [
 ]
 creatures = [
  {"id": "kael", "name": "Kael Mão-Cinza", "rule": "criatura.bandido_ligeiro", "faction": "garras_de_cinza", "spawn": [29, 54], "zone": "cripta",
-  "items": ["chave_cela"], "sleeps": [0, 6], "important": True},
+  "items": ["chave_cela"], "sleeps": [0, 6], "important": True,
+  # Líder: habilidades de classe para NPC (LB p.322: "veja as classes de personagem"), 3 PM por ND. Escolha ORIGINAL_DO_JOGO.
+  "poderes": ["ataque_reflexo", "impeto"], "pm": 3},
  {"id": "bandido_1", "name": "Bandido Magro", "rule": "criatura.bandido_comum", "faction": "garras_de_cinza", "spawn": [27, 57], "zone": "cripta", "sleeps": [0, 6]},
  {"id": "bandido_2", "name": "Bandido Ruivo", "rule": "criatura.bandido_comum", "faction": "garras_de_cinza", "spawn": [31, 57], "zone": "cripta", "sleeps": [1, 7]},
  {"id": "hiena_1", "name": "Hiena", "rule": "criatura.hiena", "faction": "fauna", "spawn": [78, 34], "zone": "floresta", "active_hours": [18, 6],

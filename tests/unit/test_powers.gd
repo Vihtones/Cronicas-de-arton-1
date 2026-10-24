@@ -175,3 +175,38 @@ func test_sombra_soma_furtividade() -> void:
 	var before := s.skill_value("furtividade", r)
 	s.powers["sombra"] = true
 	eq(s.skill_value("furtividade", r), before + 2, "+2 (LB p.74)")
+
+
+func test_c27_ataque_especial_escala_e_ataque_extra() -> void:
+	var w := _w()
+	var c: CombatModule = w.modules.combat
+	var P: CharacterSheet = c.sim.c("player").sheet
+	P.pm = 10
+	P.level = 5
+	eq(c.sim.special_tier(P), 2, "5º nível: +8 por 2 PM (LB p.65)")
+	var prof := c.sim.attack_profile("player", "bandido_1", 0, true, false)
+	check(prof.mods.any(func(m): return m[0] == "ataque especial" and int(m[1]) == 8), "+8 no fantasma")
+	P.level = 6
+	check(not GhostPlanner.validate_action(c.sim, "player", {"type": "ataque_extra", "target": "bandido_1"}).ok, "precisa agredir antes")
+	var g := GhostPlanner.simulate(c.sim, "player", [{"type": "attack", "target": "bandido_1"}, {"type": "ataque_extra", "target": "bandido_1"}])
+	check(g.valid, "agredir + Ataque Extra no mesmo turno (LB p.66)")
+	P.level = 5
+	check(not GhostPlanner.simulate(c.sim, "player", [{"type": "attack", "target": "bandido_1"}, {"type": "ataque_extra", "target": "bandido_1"}]).valid, "só a partir do 6º nível")
+
+
+func test_c24_condicao_que_deixa_desprevenido_dispara_reflexo() -> void:
+	var w := _w()
+	var c: CombatModule = w.modules.combat
+	c.sim.c("player").sheet.powers["ataque_reflexo"] = true
+	c.sim.c("player").sheet.pm = 5
+	c.sim.c("bandido_1").sheet.conditions = PackedStringArray()
+	c.sim.c("bandido_1").sheet.pv = 50
+	var out := c.apply_condition("bandido_1", "atordoado")
+	check(out.any(func(f): return f.type == "REACTION"), "atordoado implica desprevenido: reação (LB p.65)")
+
+
+func test_c24_kael_tem_poderes_e_pm() -> void:
+	var w := WorldHelpers.world(5)
+	var s := CharacterSheet.from_dict(w.modules.combat.creature_state.kael.sheet)
+	check(s.has_power("ataque_reflexo") and s.has_power("impeto"), "Kael usa poderes de classe (LB p.322)")
+	eq(s.pm, 3)

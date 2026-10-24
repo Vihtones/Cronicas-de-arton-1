@@ -219,7 +219,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if not ranged and sheet.has_effective_condition(rules, "caido"): mods.append(["atacante caído", -5])
 	if not ranged and flanking(attacker, target): mods.append(["flanqueando", int(rules.value("situacao.flanquear").bonus_ataque)])
 	if charge: mods.append(["investida", int(rules.value("acao.investida").bonus_ataque)])
-	if special: mods.append(["ataque especial", int(rules.value("classe.guerreiro").ataque_especial.bonus)])
+	if special: mods.append(["ataque especial", int(rules.value("classe.guerreiro").ataque_especial.bonus) * special_tier(sheet)])
 	if sheet.has_power("valentao") and (T.sheet.has_effective_condition(rules, "caido") or T.sheet.has_effective_condition(rules, "desprevenido") \
 			or T.sheet.has_effective_condition(rules, "indefeso") or (not ranged and flanking(attacker, target))):
 		mods.append(["valentão", 2])  # LB p.66
@@ -242,6 +242,13 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	crit_p = minf(crit_p, hit_p)
 	return {"ok": true, "atk": atk, "mod": total_mod, "mods": mods, "defense": defense, "ranged": ranged, "miss_chance": miss_chance,
 		"hit_chance": hit_p, "crit_chance": crit_p, "avg_damage": avg}
+
+
+## Ataque Especial (LB p.65): +4 por 1 PM; a cada 4 níveis pode gastar +1 PM por +4. Usa o maior patamar pagável.
+func special_tier(sheet: CharacterSheet) -> int:
+	var every := int(rules.value("classe.guerreiro").ataque_especial.get("a_cada_niveis", 4))
+	var max_tier := 1 + (sheet.level - 1) / every
+	return clampi(sheet.pm, 1, max_tier)
 
 
 ## Arqueiro (LB p.65): soma Sabedoria no dano à distância, limitado pelo nível.

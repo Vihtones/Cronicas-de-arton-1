@@ -55,6 +55,8 @@ func on_tick(_tick: int) -> Array:
 				"witnesses": _family(id).filter(func(x): return x != id and npcs.state.get(x, {}).get("alive", false))}, [id]))
 			if heir != "":
 				out.append(fact("INHERITANCE", {"from": id, "to": heir, "assets": ["casa", "economias"]}, [heir]))
+	# C25: crianças nascidas no jogo crescem — aos 6 viram crianças, aos 16 aprendizes do ofício de um dos pais
+	out.append_array(_grow_up(npcs))
 	# casamentos (C8): adultos solteiros de famílias diferentes
 	out.append_array(_marriages(c.year))
 	# nascimentos
@@ -94,6 +96,23 @@ func _family(id: String) -> Array:
 	for nid in dynamic_npcs:
 		if dynamic_npcs[nid].family == fam and not out.has(nid):
 			out.append(nid)
+	return out
+
+
+func _grow_up(npcs) -> Array:
+	var out: Array = []
+	for id in dynamic_npcs:
+		var d: Dictionary = dynamic_npcs[id]
+		var age := int(npcs.state.get(id, {}).get("age", 0))
+		d.age = age
+		if age >= 6 and d.profession == "bebê":
+			d.profession = "criança"
+		if age >= 16 and d.profession in ["bebê", "criança"]:
+			var parent := world.npc_def(str(d.parents[0]))
+			d.profession = "aprendiz de " + str(parent.get("profession", "ofício"))
+			d.schedule = parent.get("schedule", "aldeao")
+			d.work = parent.get("work", d.home)
+			out.append(fact("NPC_CAME_OF_AGE", {"npc": id, "profession": d.profession, "location": d.home, "witnesses": d.parents, "actor": ""}, [id]))
 	return out
 
 

@@ -229,6 +229,17 @@ func use_power(p: String) -> void:
 	_update_preview()
 
 
+## Ataque Extra (guerreiro 6º nível): repete o alvo do último ataque planejado.
+func extra_attack() -> void:
+	for i in range(plan.size() - 1, -1, -1):
+		if plan[i].get("type", "") in ["attack", "charge"]:
+			plan.append({"type": "ataque_extra", "target": plan[i].target})
+			message.emit("Planejado: Ataque Extra (2 PM) em " + Narrator._name(plan[i].target))
+			_update_preview()
+			return
+	message.emit("Planeje um ataque primeiro; o Ataque Extra repete o alvo.")
+
+
 func toggle_pungente() -> void:
 	if not Game.world.player_sheet.has_power("magia_pungente"):
 		pungente = false
@@ -278,6 +289,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_V: use_power("velocidade_ladina")
 			KEY_M: use_power("emboscar")
 			KEY_P: toggle_pungente()
+			KEY_X: extra_attack()
 			_: return
 		get_viewport().set_input_as_handled()
 
@@ -341,7 +353,7 @@ func _draw() -> void:
 			draw_circle(pos, 6, Color(0.5, 0.8, 1.0, 0.45))
 			if a.type == "move":
 				draw_string(_font, pos + Vector2(8, -8), "%d q" % int(st.cost), HORIZONTAL_ALIGNMENT_LEFT, 60, 8, Color(0.7, 0.9, 1))
-		if a.type in ["attack", "charge"]:
+		if a.type in ["attack", "charge", "ataque_extra"]:
 			var tp := Game.db.tile_to_world(s.c(a.target).tile)
 			draw_line(pos, tp, Color(1, 0.5, 0.3, 0.9), 1.5)
 			var txt := "Acerto %d%%  Crít %d%%  ~%.1f dano" % [int(st.hit_chance * 100), int(st.crit_chance * 100), st.avg_damage]

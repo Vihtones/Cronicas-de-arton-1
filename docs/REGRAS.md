@@ -7,7 +7,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| VERIFICADA | 122 |
+| VERIFICADA | 123 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -70,6 +70,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | fe | `deus.khalmyr.obrigacao` | T20 Livro Básico | 99 | 105 | VERIFICADA |  |
 | fe | `deus.allihanna.obrigacao` | T20 Livro Básico | 97 | 103 | VERIFICADA |  |
 | personagem | `classe.guerreiro` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
+| personagem | `classe.guerreiro.ataque_extra` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
 | personagem | `raca.humano` | T20 Livro Básico | 19 | 25 | VERIFICADA |  |
 | personagem | `envelhecimento` | T20 Livro Básico | 108 | 114 | VERIFICADA |  |
 | personagem | `manobra.derrubar` | T20 Livro Básico | 234 | 240 | VERIFICADA |  |

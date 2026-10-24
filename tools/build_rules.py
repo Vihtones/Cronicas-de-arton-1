@@ -97,7 +97,8 @@ equip = [
 personagem = [
  r("classe.guerreiro", {"pv_inicial": 20, "pv_nivel": 5, "soma_con": True, "pm_nivel": 3, "pericias_fixas": ["luta|pontaria", "fortitude"], "pericias_escolha": 2,
     "lista": ["adestramento","atletismo","cavalgar","guerra","iniciativa","intimidacao","luta","oficio","percepcao","pontaria","reflexos"],
-    "ataque_especial": {"custo_pm": 1, "bonus": 4}}, LB, 65, 71),
+    "ataque_especial": {"custo_pm": 1, "bonus": 4, "a_cada_niveis": 4}}, LB, 65, 71),
+ r("classe.guerreiro.ataque_extra", {"nivel": 6, "custo_pm": 2, "efeito": "ataque adicional ao usar agredir, 1/rodada"}, LB, 66, 72),
  r("raca.humano", {"atributos": "+1 em três atributos diferentes", "versatil": "treinado em duas perícias"}, LB, 19, 25),
  r("envelhecimento", {"maduro": 45, "velho": 70, "longevidade": "70 + 2d20"}, LB, 108, 114),
 ]

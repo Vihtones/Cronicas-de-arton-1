@@ -228,3 +228,18 @@ func test_c8_casamento_forma_casal_e_muda_casa() -> void:
 		eq(lin._marriages(3).filter(func(f): return f.payload.a == p.a or f.payload.b == p.a).size(), 0, "não casa de novo")
 		return
 	check(false, "nenhum casamento em 80 seeds")
+
+
+func test_c25_criancas_crescem() -> void:
+	var w := WorldHelpers.world(5)
+	var lin: LineageModule = w.modules.lineage
+	lin.dynamic_npcs["nascido_teste"] = {"id": "nascido_teste", "name": "Ana Brandt", "age": 0, "profession": "bebê", "schedule": "crianca",
+		"home": "casa_brandt", "work": "casa_brandt", "family": "brandt", "parents": ["otto", "hilda"], "dynamic": true}
+	w.modules.npcs.state["nascido_teste"] = {"location": "casa_brandt", "alive": true, "captive": false, "age": 6, "wounded_until": -1}
+	lin._grow_up(w.modules.npcs)
+	eq(w.npc_def("nascido_teste").profession, "criança")
+	w.modules.npcs.state.nascido_teste.age = 16
+	var out := lin._grow_up(w.modules.npcs)
+	check(out.size() == 1 and out[0].type == "NPC_CAME_OF_AGE", "fato de maioridade")
+	eq(w.npc_def("nascido_teste").profession, "aprendiz de moleiro", "ofício do pai")
+	eq(w.npc_def("nascido_teste").work, "moinho")

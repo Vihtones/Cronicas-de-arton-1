@@ -42,6 +42,9 @@ func _ensure() -> void:
 		sheet.name = d.name
 		sheet.faction = d.faction
 		sheet.is_important = bool(d.get("important", false))
+		for pw in d.get("poderes", []):
+			sheet.powers[str(pw)] = true
+		sheet.pm_max = int(d.get("pm", 0)); sheet.pm = sheet.pm_max
 		creature_state[id] = {"alive": true, "present": bool(d.get("start_present", true)), "tile": [int(d.spawn[0]), int(d.spawn[1])], "sheet": sheet.to_dict(), "woken_until": -1}
 
 
@@ -467,13 +470,22 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 		"attack":
 			var special: bool = a.get("special", false)
 			if special:
-				sim.c(id).sheet.pm -= 1
+				sim.c(id).sheet.pm -= sim.special_tier(sim.c(id).sheet)
+			(sim.c(id).flags as Array).append("agrediu_%d" % sim.round_no)
 			_cur_action = a
 			out.append_array(_resolve_attack(id, a.target, v, special))
 			_cur_action = {}
 		"stand":
 			sim.c(id).sheet.remove_condition("caido")
 			out.append(fact("STOOD_UP", {"actor": id}, [id]))
+		"ataque_extra":
+			# Ataque Extra (LB p.66): 2 PM, ataque adicional depois de agredir, 1/rodada
+			sim.c(id).sheet.pm -= int(world.rules.value("classe.guerreiro.ataque_extra").custo_pm)
+			(sim.c(id).flags as Array).append("ataque_extra_%d" % sim.round_no)
+			out.append(fact("POWER_USED", {"actor": id, "power": "ataque_extra", "pm_cost": 2, "pm_after": sim.c(id).sheet.pm}, [id]))
+			_cur_action = a
+			out.append_array(_resolve_attack(id, a.target, v, false))
+			_cur_action = {}
 		"impeto", "velocidade_ladina", "emboscar":
 			GhostPlanner.apply_power_action(sim, id, a.type, v)
 			out.append(fact("POWER_USED", {"actor": id, "power": a.type, "pm_cost": v.cost, "pm_after": sim.c(id).sheet.pm}, [id]))
@@ -604,6 +616,19 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 		for f in out:
 			if f.type == "ATTACK_RESOLVED": stats.dmg_dealt = int(stats.dmg_dealt) + int(f.payload.damage)
 	out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm}, [id]))
+	return out
+
+
+## Aplica uma condição durante o combate e dispara o Ataque Reflexo se o alvo passar a ficar desprevenido (LB p.65).
+func apply_condition(target: String, cond: String) -> Array:
+	var T := sim.c(target)
+	var was: bool = T.sheet.has_effective_condition(world.rules, "desprevenido")
+	if not T.sheet.conditions.has(cond):
+		T.sheet.conditions.append(cond)
+	var out: Array = []
+	if not was and T.sheet.has_effective_condition(world.rules, "desprevenido") and sim.conscious(target):
+		for r_id in _reflex_watchers(target, T.tile):
+			out.append_array(_reflex_attack(r_id, target, T.tile))
 	return out
 
 
@@ -842,6 +867,9 @@ func _ai_turn(id: String) -> Array:
 			break
 		if not sim.can_spend("movimento"):
 			break
+		# C24: inimigo com Ímpeto usa o poder quando só assim alcança o alvo nesta rodada
+		if me.sheet.has_power("impeto") and d - 1 > sim.speed_squares(id) and d - 1 <= sim.speed_squares(id) + 4:
+			out.append_array(_try(id, {"type": "impeto"}))
 		var path := sim.trim_path(id, sim.find_path(id, sim.c(target).tile), sim.speed_squares(id))
 		if path.is_empty():
 			break

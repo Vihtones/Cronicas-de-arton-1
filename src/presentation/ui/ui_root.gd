@@ -461,7 +461,7 @@ func _build_combat_bar(root: Control) -> void:
 			["5 Poção", func(): combat_view.drink_potion(), ""], ["6 Atirar", func(): combat_view.mode = "atirar", ""],
 			["L Levantar", func(): combat_view.stand_up(), ""], ["I Ímpeto", func(): combat_view.use_power("impeto"), "impeto"],
 			["V Velocidade", func(): combat_view.use_power("velocidade_ladina"), "velocidade_ladina"], ["M Emboscar", func(): combat_view.use_power("emboscar"), "emboscar"],
-			["P Pungente", func(): combat_view.toggle_pungente(), "magia_pungente"], ["⌫ Desfazer", func(): combat_view.undo(), ""],
+			["P Pungente", func(): combat_view.toggle_pungente(), "magia_pungente"], ["X Ataque extra", func(): combat_view.extra_attack(), "@extra"], ["⌫ Desfazer", func(): combat_view.undo(), ""],
 			["↵ Confirmar", func(): combat_view.confirm(), ""], ["␣ Fim do turno", func(): combat_view.end_turn(), ""]]:
 		var b := _button(spec[0], spec[1])
 		b.add_theme_font_size_override("font_size", 8)
@@ -485,6 +485,7 @@ func update_combat_bar() -> void:
 			"": b.visible = true
 			"@guerreiro": b.visible = sh.class_id in ["", "guerreiro"]
 			"@magia": b.visible = not sh.spells.is_empty() or sh.has_power("raio_arcano")
+			"@extra": b.visible = sh.class_id == "guerreiro" and sh.level >= 6
 			_: b.visible = sh.has_power(need)
 	var s := c.sim
 	var order: Array = []
