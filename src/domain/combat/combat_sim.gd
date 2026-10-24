@@ -56,6 +56,8 @@ func speed_squares(id: String) -> int:
 	if eff.has("imovel"): return 0
 	if eff.has("caido"): return 1
 	if eff.has("lento"): q = maxi(1, q / 2)
+	if (c(id).flags as Array).has("impeto_%d" % round_no):
+		q += int(float(rules.value("poder.impeto").deslocamento_m) / float(rules.value("mapa.quadrado_m", 1.5)))   # Ímpeto (LB p.66)
 	return q
 
 
@@ -234,12 +236,19 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if (env.get("darkness", false) and not sees_dark) or env.get("fog", false):
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
-	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0)
+	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
 	var hit_p := Checks.chance(total_mod, defense) * (1.0 - miss_chance / 100.0)
 	var crit_p := clampf((21 - int(atk.margem)) / 20.0, 0.0, 1.0)
 	crit_p = minf(crit_p, hit_p)
 	return {"ok": true, "atk": atk, "mod": total_mod, "mods": mods, "defense": defense, "ranged": ranged, "miss_chance": miss_chance,
 		"hit_chance": hit_p, "crit_chance": crit_p, "avg_damage": avg}
+
+
+## Arqueiro (LB p.65): soma Sabedoria no dano à distância, limitado pelo nível.
+static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
+	if not ranged or not sheet.has_power("arqueiro"):
+		return 0
+	return clampi(int(sheet.attrs.sab), 0, sheet.level)
 
 
 ## Aplica dano e retorna tags para a câmera (queda, morte).

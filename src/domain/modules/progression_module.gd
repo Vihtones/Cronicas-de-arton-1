@@ -22,9 +22,9 @@ var learned: Dictionary = {}         # chave de teste -> true
 var evaded: Dictionary = {}          # grupo -> true
 
 const POWERS := {
-	"guerreiro": ["especializacao_arma", "valentao", "golpe_raspao", "aumento_atributo"],
-	"ladino": ["gatuno", "truque_magico", "aumento_atributo"],
-	"arcanista": ["aumento_atributo"],
+	"guerreiro": ["especializacao_arma", "valentao", "golpe_raspao", "ataque_reflexo", "impeto", "arqueiro", "aumento_atributo"],
+	"ladino": ["gatuno", "truque_magico", "emboscar", "velocidade_ladina", "rolamento_defensivo", "sombra", "aumento_atributo"],
+	"arcanista": ["arcano_de_batalha", "magia_pungente", "poder_magico", "raio_arcano", "aumento_atributo"],
 }
 
 
@@ -200,7 +200,7 @@ func _level_up() -> Dictionary:
 	var pv_gain := int(c.pv_nivel) + int(s.attrs.con)
 	if s.race_id == "anao":
 		pv_gain += int(world.rules.value("raca.anao").pv_por_nivel)
-	var pm_gain := int(c.pm_nivel)
+	var pm_gain := int(c.pm_nivel) + (1 if s.has_power("poder_magico") else 0)
 	s.pv_max += pv_gain
 	s.pv += pv_gain
 	s.pm_max += pm_gain
@@ -217,9 +217,21 @@ func available_powers() -> Array:
 	var out: Array = []
 	for p in POWERS.get(s.class_id if s.class_id != "" else "guerreiro", []):
 		if p == "truque_magico" and int(s.attrs["int"]) < 1: continue
+		if not prereq_ok(s, p): continue
 		if p != "aumento_atributo" and p != "especializacao_arma" and s.powers.has(p): continue
 		out.append(p)
 	return out
+
+
+## Pré-requisitos do livro registrados na regra do poder (atributo mínimo, perícia treinada).
+func prereq_ok(s: CharacterSheet, p: String) -> bool:
+	var pre: Dictionary = world.rules.value("poder." + p, {}).get("prereq", {})
+	for k in pre:
+		if k == "treinado":
+			if not s.trained.has(str(pre[k])): return false
+		elif int(s.attrs.get(k, 0)) < int(pre[k]):
+			return false
+	return true
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -249,6 +261,10 @@ func execute(cmd: GameCommand) -> Array:
 			if opt == "con":
 				s.pv_max += s.level; s.pv += s.level  # Con retroativa (LB p.17)
 			s.powers["aumento_atributo_%s_%d" % [opt, s.level]] = true
+		"poder_magico":
+			# +1 PM por nível de arcanista, retroativo (LB p.38)
+			s.powers[p] = true
+			s.pm_max += s.level; s.pm += s.level
 		"truque_magico":
 			s.powers[p] = "seta_infalivel"
 			if not s.spells.has("seta_infalivel"): s.spells.append("seta_infalivel")

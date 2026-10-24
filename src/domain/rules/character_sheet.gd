@@ -52,6 +52,8 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 		v += armor_penalty(rules)  # LB p.115: penalidade de armadura nas perícias marcadas
 	if skill == "atletismo" and powers.has("gatuno"):
 		v += 2
+	if skill == "furtividade" and powers.has("sombra"):
+		v += 2   # Sombra (LB p.74)
 	return v + race_bonus
 
 

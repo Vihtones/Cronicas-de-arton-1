@@ -13,8 +13,10 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
-const POWER_POLICIES := {"golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"]}
-var power_policy := {"golpe_raspao": "auto", "durao": "fortes"}
+const POWER_POLICIES := {"golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
+	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"]}
+const DEFAULT_POLICY := {"golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto"}
+var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
 var stance_sneak := false
 var undetected_by: Dictionary = {}   # creature_id -> true (furtividade bem-sucedida nesta aproximação)
@@ -423,8 +425,12 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 		"move":
 			var path := GhostPlanner._tiles(a.path)
 			var from: Vector2i = sim.c(id).tile
+			var reactors := _reflex_watchers(id, from)
 			sim.c(id).tile = v.end
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y])}, [id]))
+			for r_id in reactors:
+				if CombatSim.cheb(sim.c(r_id).tile, v.end) > 1:
+					out.append_array(_reflex_attack(r_id, id, from))
 		"charge":
 			var path := GhostPlanner._tiles(a.path)
 			var from: Vector2i = sim.c(id).tile
@@ -444,6 +450,9 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 		"stand":
 			sim.c(id).sheet.remove_condition("caido")
 			out.append(fact("STOOD_UP", {"actor": id}, [id]))
+		"impeto", "velocidade_ladina", "emboscar":
+			GhostPlanner.apply_power_action(sim, id, a.type, v)
+			out.append(fact("POWER_USED", {"actor": id, "power": a.type, "pm_cost": v.cost, "pm_after": sim.c(id).sheet.pm}, [id]))
 		"coup":
 			out.append_array(_coup(id, a.target))
 		"cast":
@@ -455,6 +464,19 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append(fact("ITEM_LOST", {"item": a.item}, [id]))
 			out.append(fact("HEALED", {"actor": id, "target": id, "amount": heal.total, "pv_after": sh.pv, "source": a.item, "tags": ["cura"]}, [id]))
 	return out
+
+
+## CD de resistência das magias (LB p.173) + Magia Pungente (+2, LB p.38).
+func spell_dc(sh: CharacterSheet, a: Dictionary) -> int:
+	var cd := 10 + sh.level / 2 + int(sh.attrs.get(sh.caster_attr, 0))
+	if a.get("pungente", false) and sh.has_power("magia_pungente"):
+		cd += int(world.rules.value("poder.magia_pungente").cd_bonus)
+	return cd
+
+
+## Arcano de Batalha (LB p.38): soma o atributo-chave na rolagem de dano da magia.
+static func battle_bonus(sh: CharacterSheet) -> int:
+	return maxi(0, int(sh.attrs.get(sh.caster_attr, 0))) if sh.has_power("arcano_de_batalha") else 0
 
 
 ## CD dos testes de lançar (C5). Retorna {} se não há teste; senão o payload da falha (ou {} se passou).
@@ -488,7 +510,7 @@ func _casting_check(id: String, sh: CharacterSheet, sp: Dictionary, cost: int) -
 
 ## Magia em combate (LB cap. 4): custo por círculo; Seta Infalível acerta sempre.
 func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
-	var sp: Dictionary = world.rules.value("magia." + str(a.spell))
+	var sp: Dictionary = GhostPlanner.spell_rule(world.rules, str(a.spell))
 	var sh: CharacterSheet = sim.c(id).sheet
 	sh.pm -= int(v.cost)
 	var out: Array = []
@@ -507,10 +529,10 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 		"toque_chocante":
 			var tgt: String = a.get("target", "")
 			var T: CharacterSheet = sim.c(tgt).sheet
-			var cd := 10 + sh.level / 2 + int(sh.attrs.get(sh.caster_attr, 0))   # LB p.173
+			var cd := spell_dc(sh, a)
 			var metal := bool(world.rules.value("armadura." + str(T.equipment.get("armor", "")), {}).get("metal", false))
 			var sv := Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat", int(sp.penalidade_metal) if metal else 0)
-			var r := Dice.roll(sp.dano, world.rng, "combat")
+			var r := Dice.roll(sp.dano, world.rng, "combat", 1, battle_bonus(sh))
 			var dmg := int(r.total)
 			if sv.get("success", false):
 				dmg = maxi(1, dmg / 2)
@@ -520,12 +542,27 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Toque Chocante", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
 				"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
 				"pv_after": T.pv, "special": false, "ranged": false, "spell": true, "save": "fortitude", "saved": sv.get("success", false), "tags": tags}, [id, tgt]))
+		"raio_arcano":
+			# Raio Arcano (LB p.39): 1d8 (+1d8 por círculo acima do 1º), alcance curto, Reflexos reduz à metade
+			var tgt: String = a.get("target", (a.get("targets", [""]) as Array)[0])
+			var T: CharacterSheet = sim.c(tgt).sheet
+			var cd := spell_dc(sh, a)
+			var sv := Checks.skill(T, "reflexos", cd, world.rules, world.rng, "combat")
+			var r := Dice.roll(GhostPlanner.raio_dice(sh), world.rng, "combat", 1, battle_bonus(sh))
+			var dmg := int(r.total)
+			if sv.get("success", false): dmg = maxi(1, dmg / 2)
+			var tags: Array = ["magia", "impacto"]
+			if sv.get("success", false): tags.append("resistiu")
+			tags.append_array(sim.apply_damage(tgt, dmg))
+			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Raio Arcano", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
+				"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
+				"pv_after": T.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": sv.get("success", false), "tags": tags}, [id, tgt]))
 		"seta_infalivel":
 			var targets: Array = a.get("targets", [a.get("target", "")])
 			for i in int(sp.setas):
 				var tgt: String = targets[i % targets.size()]
 				if not sim.c(tgt).is_empty() and not sim.c(tgt).sheet.is_dead():
-					var r := Dice.roll(sp.dano_por_seta, world.rng, "combat")
+					var r := Dice.roll(sp.dano_por_seta, world.rng, "combat", 1, battle_bonus(sh) if i == 0 else 0)
 					var tags: Array = ["magia", "impacto"]
 					tags.append_array(sim.apply_damage(tgt, int(r.total)))
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
@@ -546,6 +583,46 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 	return out
 
 
+## Ataque Reflexo (LB p.65): quem tem o poder e está adjacente reage quando o alvo sai do alcance.
+func _reflex_watchers(mover: String, from: Vector2i) -> Array:
+	var out: Array = []
+	for r_id in sim.combatants:
+		var R := sim.c(r_id)
+		if R.side == sim.c(mover).side or not sim.conscious(r_id) or not R.sheet.has_power("ataque_reflexo"):
+			continue
+		if R.sheet.pm < int(world.rules.value("poder.ataque_reflexo").custo_pm) or CombatSim.cheb(R.tile, from) != 1:
+			continue
+		if r_id == "player" and power_policy.get("ataque_reflexo", "auto") == "nunca":
+			continue
+		if (R.flags as Array).has("reflexo_%s_%d" % [mover, sim.round_no]):
+			continue
+		var melee := -1
+		for i in R.sheet.attacks.size():
+			if not R.sheet.attacks[i].get("distancia", false): melee = i; break
+		if melee >= 0:
+			out.append(r_id)
+	return out
+
+
+func _reflex_attack(r_id: String, target: String, at: Vector2i) -> Array:
+	var R := sim.c(r_id)
+	var T := sim.c(target)
+	var now: Vector2i = T.tile
+	T.tile = at   # o ataque acontece quando o alvo deixa o alcance
+	var melee := 0
+	for i in R.sheet.attacks.size():
+		if not R.sheet.attacks[i].get("distancia", false): melee = i; break
+	var v := sim.attack_profile(r_id, target, melee, false, false)
+	var out: Array = []
+	if v.get("ok", false):
+		R.sheet.pm -= int(world.rules.value("poder.ataque_reflexo").custo_pm)
+		(R.flags as Array).append("reflexo_%s_%d" % [target, sim.round_no])
+		out.append(fact("REACTION", {"actor": r_id, "power": "ataque_reflexo", "target": target}, [r_id, target]))
+		out.append_array(_resolve_attack(r_id, target, v, false))
+	T.tile = now
+	return out
+
+
 func _raspao_wanted(attacker: String) -> bool:
 	if attacker != "player":
 		return true
@@ -553,7 +630,11 @@ func _raspao_wanted(attacker: String) -> bool:
 
 
 func _durao_wanted(target: String, dmg: int, sheet: CharacterSheet) -> bool:
-	var pol: String = power_policy.get("durao", "fortes") if target == "player" else "fortes"
+	return _policy_wanted("durao", target, dmg, sheet)
+
+
+func _policy_wanted(power: String, target: String, dmg: int, sheet: CharacterSheet) -> bool:
+	var pol: String = power_policy.get(power, "fortes") if target == "player" else "fortes"
 	match pol:
 		"nunca": return false
 		"sempre": return true
@@ -581,6 +662,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	if hit:
 		var extra := int(A.sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0
 		if bully: extra += 2
+		extra += CombatSim.archer_bonus(A.sheet, bool(v.get("ranged", false)))   # Arqueiro (LB p.65)
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
 		if T.damaged_round == sim.round_no and Array(A.sheet.habilidades).any(func(h): return str(h).begins_with("oportunista")):
 			extra += 2
@@ -604,6 +686,12 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			T.sheet.pm -= 3
 			dmg = maxi(1, dmg / 2)
 			tags.append("durao")
+		# Rolamento Defensivo (LB p.74): 2 PM reduz o dano à metade; depois o ladino fica caído
+		if T.sheet.has_power("rolamento_defensivo") and T.sheet.pm >= 2 and _policy_wanted("rolamento_defensivo", target, dmg, T.sheet):
+			T.sheet.pm -= 2
+			dmg = maxi(1, dmg / 2)
+			if not T.sheet.conditions.has("caido"): T.sheet.conditions.append("caido")
+			tags.append("rolamento")
 		tags.append_array(sim.apply_damage(target, dmg))
 	else:
 		tags.append("esquiva" if not camo_miss else "falha")
@@ -842,7 +930,7 @@ func from_dict(d: Dictionary) -> void:
 	undetected_by = d.get("undetected_by", {}).duplicate()
 	approach_rolled = d.get("approach_rolled", {}).duplicate()
 	enemy_faction = str(d.get("enemy_faction", ""))
-	power_policy = {"golpe_raspao": "auto", "durao": "fortes"}
+	power_policy = DEFAULT_POLICY.duplicate()
 	power_policy.merge(d.get("power_policy", {}), true)
 	active = bool(d.get("active", false))
 	if active and d.has("sim"):

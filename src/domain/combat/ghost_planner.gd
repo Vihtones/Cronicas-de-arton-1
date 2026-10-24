@@ -72,10 +72,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 		"cast":
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "lançar magia exige ação padrão"}
 			var sp_id: String = a.get("spell", "")
-			if not A.sheet.spells.has(sp_id): return {"ok": false, "reason": "magia não conhecida"}
-			var sp: Dictionary = sim.rules.value("magia." + sp_id, {})
+			var sp := spell_rule(sim.rules, sp_id)
+			if sp_id == "raio_arcano":
+				if not A.sheet.has_power("raio_arcano"): return {"ok": false, "reason": "poder Raio Arcano não adquirido"}
+			elif not A.sheet.spells.has(sp_id): return {"ok": false, "reason": "magia não conhecida"}
 			if sp.is_empty(): return {"ok": false, "reason": "magia sem regra"}
-			var cost := int(sim.rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
+			var cost := spell_cost(sim.rules, sp, a)
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
 			if str(sp.alcance) == "pessoal": targets = [actor]
@@ -89,13 +91,63 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if CombatSim.cheb(A.tile, T.tile) > reach: return {"ok": false, "reason": "fora do alcance da magia"}
 			var avg := 0.0
 			if sp.has("dano_por_seta"): avg = Dice.average(sp.dano_por_seta) * int(sp.setas)
-			elif sp.has("dano"): avg = Dice.average(sp.dano) * 0.75   # Fortitude reduz à metade: média aproximada
+			elif sp.has("dano"): avg = Dice.average(raio_dice(A.sheet) if sp_id == "raio_arcano" else str(sp.dano)) * 0.75   # resistência reduz à metade: média aproximada
+			if avg > 0.0 and A.sheet.has_power("arcano_de_batalha"): avg += maxi(0, int(A.sheet.attrs.get(A.sheet.caster_attr, 0)))
 			return {"ok": true, "kind": "padrao", "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": avg, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
 		"drink":
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
 			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}
 			return {"ok": true, "kind": "padrao"}
+		"impeto", "velocidade_ladina", "emboscar":
+			return validate_power_action(sim, actor, t)
 	return {"ok": false, "reason": "ação desconhecida: " + t}
+
+
+## Poderes ativados como ação livre (LB p.66, 73-74). Custo em PM, limite por rodada.
+static func validate_power_action(sim: CombatSim, actor: String, t: String) -> Dictionary:
+	var A := sim.c(actor)
+	if not A.sheet.has_power(t): return {"ok": false, "reason": "poder não adquirido"}
+	var cost := int(sim.rules.value("poder." + t).custo_pm)
+	if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
+	var key := "%s_%d" % [t, sim.round_no]
+	if (A.flags as Array).has(key) or (t == "emboscar" and (A.flags as Array).has("emboscar_usado")):
+		return {"ok": false, "reason": "já usado nesta rodada" if t != "emboscar" else "Emboscar só na primeira rodada do combate"}
+	if t == "emboscar" and sim.round_no != 1: return {"ok": false, "reason": "Emboscar só na primeira rodada do combate"}
+	return {"ok": true, "kind": "livre", "cost": cost, "flag": key}
+
+
+## Aplica o efeito de um poder livre no simulador (usado pelo fantasma e pela execução real).
+static func apply_power_action(sim: CombatSim, actor: String, t: String, v: Dictionary) -> void:
+	var A := sim.c(actor)
+	A.sheet.pm -= int(v.cost)
+	(A.flags as Array).append(v.flag)
+	match t:
+		"velocidade_ladina": sim.budget.move += 1
+		"emboscar":
+			sim.budget.std += 1
+			(A.flags as Array).append("emboscar_usado")
+
+
+## Raio Arcano é um poder que "conta como magia" (LB p.39): regra própria, sem custo de círculo.
+static func spell_rule(rules: RuleRegistry, sp_id: String) -> Dictionary:
+	if sp_id == "raio_arcano":
+		var r: Dictionary = rules.value("poder.raio_arcano", {}).duplicate()
+		r["tipo"] = "arcana"; r["circulo"] = 0
+		return r
+	return rules.value("magia." + sp_id, {})
+
+
+static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary) -> int:
+	var base := 0 if int(sp.get("circulo", 1)) == 0 else int(rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
+	if a.get("pungente", false):
+		base += int(rules.value("poder.magia_pungente").custo_pm)
+	return base
+
+
+## 1d8, +1d8 por círculo acima do 1º que o arcanista pode lançar (2º no 5º nível, 3º no 9º...).
+static func raio_dice(sheet: CharacterSheet) -> String:
+	var circles := 1 + maxi(0, (sheet.level - 1) / 4)
+	return "%dd8" % circles
 
 
 static func _tiles(path: Array) -> Array:
@@ -135,6 +187,9 @@ static func simulate(sim: CombatSim, actor: String, actions: Array) -> Dictionar
 				step["mods"] = v.mods; step["defense"] = v.defense; step["miss_chance"] = v.miss_chance
 			"stand":
 				g.c(actor).sheet.remove_condition("caido")
+			"impeto", "velocidade_ladina", "emboscar":
+				apply_power_action(g, actor, a.type, v)
+				step["pm_cost"] = v.cost
 		g.spend(v.kind)
 		steps.append(step)
 	return {"valid": valid, "steps": steps, "budget_after": g.budget.duplicate(), "end_tile": g.c(actor).tile}

@@ -362,7 +362,7 @@ func refresh_journal() -> void:
 		journal_body.add_child(xrow)
 		var cmb: CombatModule = w.modules.combat
 		var prow := HFlowContainer.new()
-		var labels := {"golpe_raspao": "Golpe de Raspão", "durao": "Durão"}
+		var labels := {"golpe_raspao": "Golpe de Raspão", "durao": "Durão", "rolamento_defensivo": "Rolamento Defensivo", "ataque_reflexo": "Ataque Reflexo"}
 		var expl := {"auto": "usar ao errar", "nunca": "nunca", "fortes": "só golpes ≥ 1/4 dos PV", "sempre": "todo golpe"}
 		for pw in CombatModule.POWER_POLICIES:
 			if not s.has_power(pw):
@@ -456,7 +456,9 @@ func _build_combat_bar(root: Control) -> void:
 	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover"], ["2 Investida", func(): combat_view.mode = "investida"],
 			["3 Misericórdia", func(): combat_view.mode = "misericordia"], ["Q Especial", func(): combat_view.special = not combat_view.special], ["R Raspão", func(): combat_view.toggle_raspao()],
 			["4 Magia", func(): combat_view.cycle_spell()], ["5 Poção", func(): combat_view.drink_potion()], ["6 Atirar", func(): combat_view.mode = "atirar"],
-			["L Levantar", func(): combat_view.stand_up()], ["⌫ Desfazer", func(): combat_view.undo()],
+			["L Levantar", func(): combat_view.stand_up()], ["I Ímpeto", func(): combat_view.use_power("impeto")],
+			["V Vel.", func(): combat_view.use_power("velocidade_ladina")], ["M Emboscar", func(): combat_view.use_power("emboscar")],
+			["P Pungente", func(): combat_view.toggle_pungente()], ["⌫ Desfazer", func(): combat_view.undo()],
 			["↵ Confirmar", func(): combat_view.confirm()], ["␣ Fim do turno", func(): combat_view.end_turn()]]:
 		var b := _button(spec[0], spec[1])
 		b.add_theme_font_size_override("font_size", 8)

@@ -50,7 +50,10 @@ static func line(e: GameEvent) -> String:
 		"TURN_SKIPPED": return "%s está surpreendido e não age." % _name(p.actor)
 		"ATTACK_RESOLVED":
 			if p.get("spell", false):
-				return "%s lança %s em %s: %d de dano (acerto automático)%s." % [_name(p.attacker), p.weapon, _name(p.target), p.damage, " — cai!" if p.pv_after <= 0 else ""]
+				var how := "acerto automático"
+				if p.has("save"):
+					how = "%s %d vs CD %d: %s" % [str(p.save).capitalize(), p.total, p.defense, "resistiu, metade" if p.saved else "falhou"]
+				return "%s lança %s em %s: %d de dano (%s)%s." % [_name(p.attacker), p.weapon, _name(p.target), p.damage, how, " — cai!" if p.pv_after <= 0 else ""]
 			var who := _name(p.attacker)
 			var tgt := _name(p.target)
 			var res := ""
@@ -59,7 +62,13 @@ static func line(e: GameEvent) -> String:
 				if p.pv_after <= 0: res += " — %s cai!" % tgt
 			else:
 				res = "falha (camuflagem)" if p.camo_roll > 0 and p.total >= p.defense else "erra"
-			return "%s ataca %s com %s: %d+%d=%d vs Def %d, %s." % [who, tgt, p.weapon, p.d20, p.mod, p.total, p.defense, res]
+			var extras: Array = []
+			var tg: Array = p.get("tags", [])
+			if tg.has("durao"): extras.append("Durão reduz à metade")
+			if tg.has("rolamento"): extras.append("Rolamento Defensivo: metade e cai")
+			if tg.has("raspao"): extras.append("Golpe de Raspão: metade do dano")
+			if tg.has("furtivo"): extras.append("Ataque Furtivo")
+			return "%s ataca %s com %s: %d+%d=%d vs Def %d, %s%s." % [who, tgt, p.weapon, p.d20, p.mod, p.total, p.defense, res, (" (" + "; ".join(extras) + ")") if not extras.is_empty() else ""]
 		"COUP_DE_GRACE": return "%s desfere um golpe de misericórdia em %s (%d de dano)%s." % [_name(p.attacker), _name(p.target), p.damage, " — fatal" if p.dies else ""]
 		"BLEED_CHECK": return "%s sangra: Con %d vs CD 15 — %s" % [_name(p.actor), p.check.total, "estabiliza." if p.check.success else ("perde %d PV%s." % [p.lost, " e morre" if p.dead else ""])]
 		"PLAN_INTERRUPTED": return "Plano interrompido: %s. Replaneje as ações restantes." % p.reason
@@ -93,6 +102,8 @@ static func line(e: GameEvent) -> String:
 		"POWER_CHOSEN": return "Poder adquirido: %s%s." % [str(p.power).replace("_", " "), (" (" + p.option + ")") if p.option != "" else ""]
 		"MANEUVER_RESOLVED": return "%s tenta derrubar %s: %d vs %d — %s" % [_name(p.attacker), _name(p.target), p.attacker_total, p.target_total, "caído!" if p.success else "resiste."]
 		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Escolha um poder no diário (J)." % [p.level, p.pv_gain, p.pm_gain]
+		"POWER_USED": return "%s usa %s (−%d PM)." % [_name(p.actor), {"impeto": "Ímpeto", "velocidade_ladina": "Velocidade Ladina", "emboscar": "Emboscar"}.get(p.power, p.power), p.pm_cost]
+		"REACTION": return "Ataque Reflexo: %s golpeia %s, que saiu do alcance!" % [_name(p.actor), _name(p.target)]
 		"SPELL_FAILED": return "%s perde a magia: %s CD %d (%s) — tirou %d." % [_name(p.caster), "Vontade" if p.check == "vontade" else "Misticismo", p.cd, p.reason, p.total]
 		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ""
 		"SPELL_CAST": return "Magia: %s (−%d PM, resta %d)." % [str(p.spell).replace("_", " ").capitalize(), p.pm_cost, p.pm_after] if p.caster == "player" else ""

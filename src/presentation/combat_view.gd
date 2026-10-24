@@ -13,6 +13,7 @@ var plan: Array = []
 var mode := "mover"          # mover | atacar | investida | misericordia
 var special := false
 var spell := "seta_infalivel"   # magia selecionada no modo magia (tecla 4 alterna)
+var pungente := false   # Magia Pungente no próximo lançamento
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var hover := Vector2i(-1, -1)
 var preview: Dictionary = {}
@@ -42,6 +43,8 @@ func my_turn() -> bool:
 
 func cycle_spell() -> void:
 	var known: Array = Array(Game.world.player_sheet.spells)
+	if Game.world.player_sheet.has_power("raio_arcano"):
+		known.append("raio_arcano")
 	if known.is_empty():
 		message.emit("Você não conhece magias.")
 		return
@@ -50,8 +53,8 @@ func cycle_spell() -> void:
 	else:
 		spell = known[(known.find(spell) + 1) % known.size()]
 	mode = "magia"
-	var sp: Dictionary = Game.world.rules.value("magia." + spell, {})
-	var cost := int(Game.world.rules.value("magia.custo_por_circulo")[str(int(sp.get("circulo", 1)))])
+	var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
+	var cost := GhostPlanner.spell_cost(Game.world.rules, sp, {"pungente": pungente})
 	var c: Dictionary = Game.world.modules.combat.casting_cd(Game.world.player_sheet, sp, cost)
 	var warn := ""
 	if int(c.concentration_cd) > 0: warn += " · Vontade CD %d (%s)" % [c.concentration_cd, c.reason]
@@ -150,12 +153,12 @@ func candidate_actions(t: Vector2i) -> Array:
 				return []
 			return [{"type": "attack", "target": target, "attack": idx, "special": special, "raspao": raspao}]
 		"magia":
-			var sp: Dictionary = Game.world.rules.value("magia." + spell, {})
+			var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 			if str(sp.get("alcance", "")) == "pessoal":
-				return [{"type": "cast", "spell": spell, "targets": ["player"]}]
+				return [{"type": "cast", "spell": spell, "targets": ["player"], "pungente": pungente}]
 			if target == "" or not gs.is_enemy("player", target):
 				return []
-			return [{"type": "cast", "spell": spell, "targets": [target], "target": target}]
+			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente}]
 	return []
 
 
@@ -215,6 +218,23 @@ func stand_up() -> void:
 	_update_preview()
 
 
+## Poderes de ação livre (Ímpeto, Velocidade Ladina, Emboscar): entram no plano e o fantasma mostra o efeito.
+func use_power(p: String) -> void:
+	var names := {"impeto": "Ímpeto (+6m nesta rodada)", "velocidade_ladina": "Velocidade Ladina (+1 ação de movimento)", "emboscar": "Emboscar (+1 ação padrão)"}
+	if not Game.world.player_sheet.has_power(p):
+		message.emit("Você não tem o poder %s." % names[p].get_slice(" (", 0))
+		return
+	plan.append({"type": p})
+	message.emit("Planejado: " + names[p])
+	_update_preview()
+
+
+func toggle_pungente() -> void:
+	pungente = not pungente
+	message.emit("Magia Pungente (+1 PM, CD +2): %s" % ("ligada" if pungente else "desligada"))
+	_update_preview()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not active():
 		return
@@ -250,6 +270,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()
 			KEY_L: stand_up()
 			KEY_R: toggle_raspao()
+			KEY_I: use_power("impeto")
+			KEY_V: use_power("velocidade_ladina")
+			KEY_M: use_power("emboscar")
+			KEY_P: toggle_pungente()
 			_: return
 		get_viewport().set_input_as_handled()
 

@@ -142,6 +142,160 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "poder.ataque_reflexo",
+   "valor": {
+    "classe": "guerreiro",
+    "custo_pm": 1,
+    "gatilho": "alvo em alcance corpo a corpo fica desprevenido ou sai voluntariamente do alcance",
+    "limite": "uma vez por alvo a cada rodada",
+    "prereq": {
+     "des": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.impeto",
+   "valor": {
+    "classe": "guerreiro",
+    "custo_pm": 1,
+    "deslocamento_m": 6,
+    "duracao": "uma rodada"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arqueiro",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "soma Sab no dano à distância, limitado pelo nível",
+    "prereq": {
+     "sab": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.emboscar",
+   "valor": {
+    "classe": "ladino",
+    "custo_pm": 2,
+    "efeito": "ação padrão adicional na primeira rodada",
+    "prereq": {
+     "treinado": "furtividade"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.velocidade_ladina",
+   "valor": {
+    "classe": "ladino",
+    "custo_pm": 2,
+    "efeito": "ação de movimento adicional, 1/rodada",
+    "prereq": {
+     "des": 2,
+     "treinado": "iniciativa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.rolamento_defensivo",
+   "valor": {
+    "classe": "ladino",
+    "custo_pm": 2,
+    "efeito": "reduz o dano sofrido à metade e fica caído",
+    "prereq": {
+     "treinado": "reflexos"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sombra",
+   "valor": {
+    "classe": "ladino",
+    "furtividade": 2,
+    "prereq": {
+     "treinado": "furtividade"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arcano_de_batalha",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "soma o atributo-chave no dano das magias"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_pungente",
+   "valor": {
+    "classe": "arcanista",
+    "custo_pm": 1,
+    "cd_bonus": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.poder_magico",
+   "valor": {
+    "classe": "arcanista",
+    "pm_por_nivel": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.raio_arcano",
+   "valor": {
+    "classe": "arcanista",
+    "acao": "padrao",
+    "dano": "1d8",
+    "dano_tipo": "essencia",
+    "alcance": "curto",
+    "resistencia": "reflexos_metade",
+    "cd": "atributo-chave",
+    "conta_como_magia": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 39,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "classe.guerreiro.durao",
    "valor": {
     "nivel": 3,

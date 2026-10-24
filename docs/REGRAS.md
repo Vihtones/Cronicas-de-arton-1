@@ -7,7 +7,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| VERIFICADA | 93 |
+| VERIFICADA | 104 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -79,6 +79,17 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `poder.golpe_raspao` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
 | personagem | `poder.gatuno` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
 | personagem | `poder.truque_magico` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
+| personagem | `poder.ataque_reflexo` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
+| personagem | `poder.impeto` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
+| personagem | `poder.arqueiro` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
+| personagem | `poder.emboscar` | T20 Livro Básico | 73 | 79 | VERIFICADA |  |
+| personagem | `poder.velocidade_ladina` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
+| personagem | `poder.rolamento_defensivo` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
+| personagem | `poder.sombra` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
+| personagem | `poder.arcano_de_batalha` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
+| personagem | `poder.magia_pungente` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
+| personagem | `poder.poder_magico` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
+| personagem | `poder.raio_arcano` | T20 Livro Básico | 39 | 45 | VERIFICADA |  |
 | personagem | `classe.guerreiro.durao` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
 | personagem | `progressao.xp_por_nivel` | T20 Livro Básico | 35 | 41 | VERIFICADA |  |
 | personagem | `progressao.xp_desafio` | T20 Livro Básico | 326 | 332 | VERIFICADA |  |
