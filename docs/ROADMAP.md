@@ -35,6 +35,11 @@ Atualizado em 23/10/2026 para a versão 0.3.0. Estado: 112 testes passando (incl
 | C20 | Poderes com ativação ainda são automáticos: Golpe de Raspão (sempre que houver PM), Durão (golpes ≥ ¼ dos PV) | `CombatModule` | opção "perguntar/auto" no menu |
 | C21 | Ímpeto, Ataque Reflexo e outros poderes do LB ainda não existem | `ProgressionModule.POWERS` | próximo lote de poderes |
 | C22 | A conta da XP dinâmica só aparece no registro | `ui_root.gd` | janela de resumo pós-combate |
+| C23 | O executor de testes conta como aprovado um teste que dá erro de script em tempo de execução | `tests/run_tests.gd` | detectar erro do motor por teste (ex.: contador de erros via `push_error` no `TestCase`) |
+| A1 | Arte: prova de escala (personagem de cerca de 28 px diante das árvores LPC, que pressupõem cerca de 48 px) | `assets/chars`, governador | rua + árvore + 2 personagens, comparada com o piloto v04 |
+| A2 | Arte: verdes tropicais do LPC Jungle ainda sem harmonização com o bioma | lote 02 | v02 recolorida, **com aprovação do usuário** |
+| A3 | Arte: 3 plantas altas aprovadas sem papel | `direcao_de_arte.json` | decidir após A1 |
+| A4 | Arte: parallax e blur seletivo (AD-12 e AD-13) não implementados | `fx_layer.gd` | depois de A1 |
 
 ## B. Revisões humanas
 | # | O que revisar |
@@ -48,6 +53,7 @@ Atualizado em 23/10/2026 para a versão 0.3.0. Estado: 112 testes passando (incl
 | R7 | Tabela de mecânicas ORIGINAL e ADAPTADA em `docs/REGRAS.md` |
 | R8 | Poderes automáticos (C20): o jogador quer decidir cada uso? |
 | R9 | Prioridade dos conteúdos do Heróis de Arton |
+| R10 | **Floresta com LPC Jungle** (capturas `06b`–`06d`): densidade, alfa das copas, uso na estrada |
 
 ## C. Próximos passos
 1. **Playtest com o Laboratório** (R2–R5), anotando a XP dinâmica de cada luta.

@@ -18,6 +18,7 @@ const SUITES := [
 	"res://tests/unit/test_vertical_slice.gd",
 	"res://tests/unit/test_prototypes.gd",
 	"res://tests/unit/test_interactions.gd",
+	"res://tests/unit/test_art_governor.gd",
 ]
 
 

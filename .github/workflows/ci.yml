@@ -16,6 +16,7 @@ jobs:
           python3 tools/build_dialogue.py
           git diff --exit-code data/ || (echo "data/ desatualizado: rode os geradores" && exit 1)
           python3 tools/validate_assets.py
+          python3 tools/check_art_direction.py
           python3 tools/check_architecture.py
       - name: Baixar Godot 4.3
         run: |

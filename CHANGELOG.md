@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.1] — 2026-10-24 — Governador de Direção de Arte
+### Adicionado
+- **Governador de Direção de Arte** (`docs/GOVERNADOR_DE_ARTE.md`):
+  - O registro é gerado da pasta "arte do jogo" (`tools/build_art_direction.py` → `data/art/direcao_de_arte.json`).
+  - Em tempo de execução, `ArtGovernor` aplica 16 regras AD.
+  - Na CI, a checagem é `tools/check_art_direction.py`.
+- **Vegetação aprovada na floresta:** os 20 componentes LPC Jungle do lote 02 (CC-BY 4.0), originais sem alteração e com SHA-256 conferido.
+  - Pivô na base e Y-sort.
+  - Copas translúcidas perto do jogador e no combate.
+  - Trilhas e estradas livres.
+  - A vila continua com o placeholder.
+- **Tela "Créditos de arte"** com o arquivo de créditos integral.
+- 8 testes do governador (`test_art_governor.gd`) e 3 capturas da floresta.
+### Mudado
+- `validate_assets.py` aceita `sprite_objeto` e o estado `approved_artistic`. O texto da tela de título não diz mais que toda a arte é original.
+
 ## [0.3.0] — 2026-10-23 — Protótipos evoluídos, XP dinâmica e interações
 ### Adicionado
 - **XP dinâmica** (padrão; o modo do livro pode ser ligado no diário): base do LB × desempenho e circunstâncias, novidade decrescente, XP de aprendizado e de evasão, conta sempre visível. Ver `docs/XP_DINAMICA.md`.

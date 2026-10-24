@@ -5,7 +5,7 @@ from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 REQ = ["asset_id", "tipo", "origem", "licenca", "versao", "estado", "tamanho", "pivot", "animacoes", "dependencias", "hash", "caminho"]
-ESTADOS = {"concept", "prototype", "approved"}
+ESTADOS = {"concept", "prototype", "approved_artistic", "approved"}
 NAME = re.compile(r"^[a-z0-9_]+$")
 
 def main():
@@ -28,7 +28,13 @@ def main():
             errors.append(f"{aid}: hash diverge do manifesto (arquivo alterado sem registrar versão)")
         img = Image.open(p)
         if list(img.size) != list(a["tamanho"]): errors.append(f"{aid}: tamanho {img.size} != manifesto {a['tamanho']}")
-        if img.size[0] % tile or img.size[1] % tile: errors.append(f"{aid}: dimensões não múltiplas de {tile}")
+        if a["tipo"] != "sprite_objeto" and (img.size[0] % tile or img.size[1] % tile):
+            errors.append(f"{aid}: dimensões não múltiplas de {tile}")
+        if a["tipo"] == "sprite_objeto":
+            px, py = a["pivot"]
+            if not (0 <= px < img.size[0] and 0 <= py < img.size[1]): errors.append(f"{aid}: pivô fora da imagem")
+            elif img.getpixel((px, min(py + 2, img.size[1] - 1)))[3] == 0 and img.getpixel((px, py))[3] == 0:
+                errors.append(f"{aid}: pivô em área transparente (base não encontrada)")
         if img.mode != "RGBA": errors.append(f"{aid}: sem canal alpha")
         if a["tipo"] == "spritesheet_personagem":
             px, py = a["pivot"]

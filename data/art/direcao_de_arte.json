@@ -1,0 +1,499 @@
+{
+ "schema_version": 1,
+ "gerado_por": "tools/build_art_direction.py",
+ "fonte_pasta": "C:/Users/Vitor/Documents/arte do jogo",
+ "data_leitura": "2026-10-24",
+ "documentos_fonte": [
+  {
+   "caminho": "README.md",
+   "sha256": "6beb5909384c457ac4774f0dd4495c0f63a94c21950a56fba16d2739c9e9d160"
+  },
+  {
+   "caminho": "MANIFESTO.md",
+   "sha256": "6ac109f7de73406020afd120c586c7e664a1ebf2d6997e3fb73911cf8e16e397"
+  },
+  {
+   "caminho": "01_direcao/BIBLIA_DE_ARTE_v1.0.md",
+   "sha256": "07917ecf9b876a10168f2565d20f4d0d753ce696ca79e3a2dab9b7fa1088b434"
+  },
+  {
+   "caminho": "01_direcao/DECISOES_E_CULTURAS.md",
+   "sha256": "1058ab266b5f77961d32a919008fc6813d2d22cf1591710737dfae865d4e3f49"
+  },
+  {
+   "caminho": "02_referencias/curadoria.json",
+   "sha256": "fb23031d1f1f43923826d7bfcae8a14d7cdcbbf90045b5cdafb52c5eb34de91f"
+  },
+  {
+   "caminho": "02_referencias/NAO_AVALIADAS.md",
+   "sha256": "58f0fc5bb2fb457b209ed6eaf25039d6bbb7038557f63a5033bcb834f592d4d2"
+  },
+  {
+   "caminho": "03_cena_piloto/EVOLUCAO.md",
+   "sha256": "ae2d61044b0710456a161b9b820fda4e71591258217c98d1647abe3267a3ea5d"
+  },
+  {
+   "caminho": "04_godot/ESPECIFICACAO.md",
+   "sha256": "84a11840a199a16a127114455a295bb40d9c8e9a1a7c390e9ede48544b2d93d0"
+  },
+  {
+   "caminho": "05_producao/ASSETS.md",
+   "sha256": "a34d5dbd71eea687ca1093ce52e9a68464c5c7c0a733cbcc6406b5094a60ddf7"
+  },
+  {
+   "caminho": "08_assets_gratuitos/APROVACOES.json",
+   "sha256": "7d692d3143cee7b2f05181fdedeccc3d677cdd3576fde1bf43bc0bbdeb110567"
+  },
+  {
+   "caminho": "08_assets_gratuitos/lote_02/catalogo.json",
+   "sha256": "e2517afdec18c8871df29efee20aee5b56bc4de291d428be2b2b26035bd62726"
+  },
+  {
+   "caminho": "08_assets_gratuitos/lote_02/REVISAO.md",
+   "sha256": "bd6c9a7ab2c8cd092db36a42104469078f39b5a3c6c3f54707bc87b5c4ce6cf5"
+  },
+  {
+   "caminho": "09_sprites_tormenta20/LEIA-PRIMEIRO.md",
+   "sha256": "3f15a70ecc12e7cace4ffb90a1e501036650467513aa0ed9ee68f9d90541c0fa"
+  },
+  {
+   "caminho": "09_sprites_tormenta20/ANALISE_DIRECAO_2026-10-24.md",
+   "sha256": "f6a0917ecb6f55e5782d0cc66306e45975943b03131ea380abff15701fb2b4b3"
+  }
+ ],
+ "identidade": {
+  "nome": "Beleza Marcada",
+  "resumo": "Beleza, credibilidade e história. Aconchego medieval, fantasia extraordinária e inquietação rubra. A Tormenta rompe a familiaridade com formas antinaturais e vermelho incisivo; Arton inteira não é vermelha.",
+  "fonte": "01_direcao/BIBLIA_DE_ARTE_v1.0.md"
+ },
+ "hierarquia_decisoes": [
+  "decisões explícitas mais recentes do usuário",
+  "aprovação final da cena (piloto_v04_final_aprovada.png)",
+  "curadoria individual (CUR-001..025)",
+  "Bíblia consolidada",
+  "propostas e biblioteca histórica"
+ ],
+ "pilares": [
+  {
+   "referencia": "Stoneshard",
+   "funcao": "acabamento, proporções, materiais, equipamentos e legibilidade"
+  },
+  {
+   "referencia": "Octopath Traveler II",
+   "funcao": "luz natural orgânica, sombras e emoção"
+  },
+  {
+   "referencia": "Sea of Stars",
+   "funcao": "ecossistemas, crescimento, natureza/construção e ciclos"
+  },
+  {
+   "referencia": "Children of Morta",
+   "funcao": "profundidade, névoa, separação de planos e luz localizada"
+  }
+ ],
+ "cena_referencia": {
+  "arquivo": "03_cena_piloto/piloto_v04_final_aprovada.png",
+  "status": "direção visual aprovada; concept art, não é cenário jogável, tileset ou spritesheet",
+  "mensagem_usuario": "Pronto perfeito, isso aliado ao paralax vai ficar muito bom, pode aprovar",
+  "no_build": false
+ },
+ "curadoria": {
+  "totais": {
+   "aprovada": 6,
+   "parcial": 17,
+   "rejeitada": 2
+  },
+  "nao_avaliada": [
+   "CUR-026"
+  ],
+  "itens": [
+   {
+    "id": "CUR-001",
+    "nome": "Stoneshard — vila medieval",
+    "status": "aprovada",
+    "aproveitar": "Escala, vida cotidiana e acabamento; desgaste sobretudo em bairros pobres.",
+    "ressalvas": "Não tornar toda Arton pobre ou decadente."
+   },
+   {
+    "id": "CUR-002",
+    "nome": "Blasphemous 2 — monumentalidade",
+    "status": "rejeitada",
+    "aproveitar": "Nenhum uso aprovado.",
+    "ressalvas": "Rejeitada sem observações adicionais."
+   },
+   {
+    "id": "CUR-003",
+    "nome": "Eastward — detalhes cotidianos",
+    "status": "parcial",
+    "aproveitar": "Casas com personalidade, objetos que revelam rotina.",
+    "ressalvas": "Sem excesso de cores, objetos ou poluição visual; sem elementos modernos."
+   },
+   {
+    "id": "CUR-004",
+    "nome": "Children of Morta — profundidade",
+    "status": "aprovada",
+    "aproveitar": "Névoa, separação de planos e luz localizada.",
+    "ressalvas": "Efeitos nunca escondem pixels, personagens ou caminhos."
+   },
+   {
+    "id": "CUR-005",
+    "nome": "Octopath Traveler II — luz natural",
+    "status": "aprovada",
+    "aproveitar": "Luz orgânica em vegetação, arquitetura e terreno; sombras suaves.",
+    "ressalvas": "Não obriga adoção de ambientes 3D ou da técnica HD-2D."
+   },
+   {
+    "id": "CUR-006",
+    "nome": "Sea of Stars — ecossistemas",
+    "status": "aprovada",
+    "aproveitar": "Construção orgânica, passagem do tempo, vida e ciclos naturais.",
+    "ressalvas": "Paleta subordinada à região e ao clima; sem importar saturação automaticamente."
+   },
+   {
+    "id": "CUR-007",
+    "nome": "Hyper Light Drifter — ruínas",
+    "status": "parcial",
+    "aproveitar": "Narrativa ambiental em fortalezas, templos e civilizações antigas.",
+    "ressalvas": "Sem importar estética tecnológica ou paleta roxa."
+   },
+   {
+    "id": "CUR-008",
+    "nome": "Noita — transformação física",
+    "status": "parcial",
+    "aproveitar": "Queimaduras, gelo, paredes danificadas e consequências visuais persistentes.",
+    "ressalvas": "Não exige simulação física completa nem perspectiva lateral."
+   },
+   {
+    "id": "CUR-009",
+    "nome": "The Last Night — chuva",
+    "status": "parcial",
+    "aproveitar": "Superfícies molhadas, poças, armaduras úmidas e luz na chuva.",
+    "ressalvas": "Condicionado a polimento e desempenho; níveis de qualidade; sem neon/futurismo."
+   },
+   {
+    "id": "CUR-010",
+    "nome": "Stoneshard — equipamentos",
+    "status": "aprovada",
+    "aproveitar": "Couro costurado, metal usado, tecidos e armas reconhecíveis; evolução visível.",
+    "ressalvas": "Preservar fantasia, povos e culturas de Arton."
+   },
+   {
+    "id": "CUR-011",
+    "nome": "Dead Cells — animações",
+    "status": "aprovada",
+    "aproveitar": "Antecipação, impacto, recuperação, fluidez e peso.",
+    "ressalvas": "Combate tático por turnos; sem velocidade exagerada ou duração excessiva das ações."
+   },
+   {
+    "id": "CUR-012",
+    "nome": "Sea of Stars — magias",
+    "status": "parcial",
+    "aproveitar": "Efeitos bonitos, partículas, contraste e poder; identidade de Tormenta20.",
+    "ressalvas": "Sem copiar interface ou saturação; distinguir projeção fantasma, execução real e falhas."
+   },
+   {
+    "id": "CUR-013",
+    "nome": "Chained Echoes — relevo",
+    "status": "parcial",
+    "aproveitar": "Desníveis, pontes, escadas, cavernas e caminhos alternativos.",
+    "ressalvas": "Pathfinding acessível e confiável; testes por regras, custos e alturas legíveis."
+   },
+   {
+    "id": "CUR-014",
+    "nome": "Songs of Conquest — assentamentos",
+    "status": "parcial",
+    "aproveitar": "Urbanismo orgânico, economia ligada à geografia e transições cidade-natureza.",
+    "ressalvas": "Sem perspectiva ou escala de estratégia; exploração próxima ao personagem."
+   },
+   {
+    "id": "CUR-015",
+    "nome": "Core Keeper — ambientes habitados",
+    "status": "parcial",
+    "aproveitar": "Cozinhas, oficinas, tavernas e residências funcionais; objetos revelam hábitos.",
+    "ressalvas": "Sem proporções simples, cores excessivas ou luzes demais; acabamento Stoneshard e luz Octopath."
+   },
+   {
+    "id": "CUR-016",
+    "nome": "Moonlighter — comércio",
+    "status": "parcial",
+    "aproveitar": "Organização funcional, identidade profissional e condições econômicas das lojas.",
+    "ressalvas": "Sem caricatura, proporções simplificadas e saturação elevada."
+   },
+   {
+    "id": "CUR-017",
+    "nome": "Tails of Iron — materiais",
+    "status": "rejeitada",
+    "aproveitar": "Nenhum uso aprovado.",
+    "ressalvas": "Rejeitada sem observações; não usar como referência de materiais, acabamento ou composição."
+   },
+   {
+    "id": "CUR-018",
+    "nome": "The Last Faith — ruínas e névoa",
+    "status": "parcial",
+    "aproveitar": "Vegetação, pedra envelhecida e profundidade em lugares abandonados.",
+    "ressalvas": "Gótico sombrio apenas onde cultura/história justifiquem; adaptar composição lateral."
+   },
+   {
+    "id": "CUR-019",
+    "nome": "Owlboy — arquitetura fantástica",
+    "status": "parcial",
+    "aproveitar": "Construções adaptadas à geografia, identidade cultural e detalhes artesanais.",
+    "ressalvas": "Sem saturação elevada, perspectiva lateral ou generalização de ilhas flutuantes."
+   },
+   {
+    "id": "CUR-020",
+    "nome": "CrossCode — clareza espacial",
+    "status": "parcial",
+    "aproveitar": "Caminhos, desníveis, obstáculos e terrenos acessíveis reconhecíveis.",
+    "ressalvas": "Compatível com realismo artesanal Stoneshard, pathfinding e testes de Tormenta20."
+   },
+   {
+    "id": "CUR-021",
+    "nome": "Graveyard Keeper — propriedades",
+    "status": "parcial",
+    "aproveitar": "Reformas, abandono, telhados danificados, prosperidade e decadência.",
+    "ressalvas": "Sem caricatura, texturas simples ou paleta saturada; ciclos Sea of Stars e acabamento Stoneshard."
+   },
+   {
+    "id": "CUR-022",
+    "nome": "Drova: Forsaken Kin — florestas",
+    "status": "parcial",
+    "aproveitar": "Mata densa, clareiras, trilhas naturais e vegetação que influencia visibilidade.",
+    "ressalvas": "Não importar automaticamente paleta e proporções; preservar os quatro pilares."
+   },
+   {
+    "id": "CUR-023",
+    "nome": "The Siege and the Sandfox — interiores",
+    "status": "parcial",
+    "aproveitar": "Arcos, colunas, passagens, camadas e diferenciação cultural.",
+    "ressalvas": "Sem copiar arquitetura específica, escala ou perspectiva lateral; fundamentar em Arton."
+   },
+   {
+    "id": "CUR-024",
+    "nome": "Kingdom Come: Deliverance II — vilarejos",
+    "status": "parcial",
+    "aproveitar": "Credibilidade construtiva, técnicas, materiais e organização econômica.",
+    "ressalvas": "Arton não é reconstrução europeia: magia, espécies, deuses e culturas transformam arquitetura."
+   },
+   {
+    "id": "CUR-025",
+    "nome": "Songs of Syx — noite e cidade viva",
+    "status": "parcial",
+    "aproveitar": "Luzes expressam horários de tavernas, oficinas, residências e patrulhas.",
+    "ressalvas": "Sem câmera distante, edifícios repetitivos ou sprites simples; manter Stoneshard e luz orgânica."
+   }
+  ]
+ },
+ "regras": [
+  {
+   "id": "AD-01",
+   "texto": "Só entram no build assets com aprovação registrada pelo usuário e licença conhecida.",
+   "verificacao": "governador+ci"
+  },
+  {
+   "id": "AD-02",
+   "texto": "Aprovação artística e liberação de uso são campos separados; ambas são exigidas.",
+   "verificacao": "ci"
+  },
+  {
+   "id": "AD-03",
+   "texto": "Assets CC-BY exigem o arquivo de créditos integral junto ao asset e na tela de créditos.",
+   "verificacao": "ci"
+  },
+  {
+   "id": "AD-04",
+   "texto": "O arquivo importado deve ter o mesmo SHA-256 do manifesto da pasta de arte; alterações viram nova versão.",
+   "verificacao": "ci"
+  },
+  {
+   "id": "AD-05",
+   "texto": "Referências externas (02_referencias), biblioteca histórica (00_fontes) e concepts nunca entram no build.",
+   "verificacao": "ci"
+  },
+  {
+   "id": "AD-06",
+   "texto": "O acervo Tormenta20 (09_sprites_tormenta20) não é promovido automaticamente; exige aprovação própria.",
+   "verificacao": "ci"
+  },
+  {
+   "id": "AD-07",
+   "texto": "Assets regionais só aparecem nas zonas permitidas; vegetação de selva não substitui o vilarejo temperado.",
+   "verificacao": "governador+teste"
+  },
+  {
+   "id": "AD-08",
+   "texto": "Filtro nearest e escala inteira (1:1) para sprites de mundo; sem reamostragem.",
+   "verificacao": "governador"
+  },
+  {
+   "id": "AD-09",
+   "texto": "Pivô nos pés/raiz e Y-sort; colisão vem dos dados do mapa, não da imagem.",
+   "verificacao": "teste"
+  },
+  {
+   "id": "AD-10",
+   "texto": "Chão navegável, personagens e interativos continuam legíveis: copas ficam translúcidas perto do jogador e no combate.",
+   "verificacao": "governador+teste"
+  },
+  {
+   "id": "AD-11",
+   "texto": "Áreas de respiro: árvores grandes espaçadas; o restante dos tiles bloqueados vira sub-bosque baixo.",
+   "verificacao": "teste"
+  },
+  {
+   "id": "AD-12",
+   "texto": "Parallax só em planos decorativos sem função espacial; troncos colidíveis nunca deslizam.",
+   "verificacao": "revisao_humana"
+  },
+  {
+   "id": "AD-13",
+   "texto": "Blur sutil e seletivo aprovado; nunca sobre personagens, chão navegável ou interativos; com opção de desligar.",
+   "verificacao": "revisao_humana"
+  },
+  {
+   "id": "AD-14",
+   "texto": "Evitar saturação generalizada, caricatura, ruído de detalhe e futurismo. Blasphemous 2 e Tails of Iron rejeitados.",
+   "verificacao": "revisao_humana"
+  },
+  {
+   "id": "AD-15",
+   "texto": "Desgaste diferencia condição econômica; não aplicar desgaste de bairro pobre a todo o mundo.",
+   "verificacao": "revisao_humana"
+  },
+  {
+   "id": "AD-16",
+   "texto": "Não misturar a campanha Hudra; não inventar descrições canônicas sem fonte.",
+   "verificacao": "revisao_humana"
+  }
+ ],
+ "fontes_proibidas_no_build": [
+  "02_referencias/",
+  "00_fontes/",
+  "03_cena_piloto/",
+  "06_assets/concepts/",
+  "06_assets/rejected/",
+  "09_sprites_tormenta20/"
+ ],
+ "decisoes_abertas": [
+  "reino da vila",
+  "divindade da capela",
+  "paleta final",
+  "resolução-base",
+  "tiles, medidas e zoom numéricos",
+  "hardware-alvo",
+  "sistema definitivo de navegação",
+  "escala do personagem frente às árvores LPC (prova de escala)"
+ ],
+ "aprovacoes": [
+  {
+   "id": "APR-2026-10-23-LPC-JUNGLE",
+   "item": "LPC Jungle — lote 02 (20 componentes)",
+   "tipo": "artistica",
+   "mensagem_usuario": "Lpc jungle muito bom aprovadissimo",
+   "liberacao_uso": "CC-BY 4.0 com CREDITS-jungle.txt integral",
+   "assets": [
+    "veg_floresta_arvore_de_copa_em_patamares_v01",
+    "veg_floresta_arvore_com_cipos_pendentes_v01",
+    "veg_floresta_arvore_inclinada_v01",
+    "veg_floresta_arvore_delgada_com_trepadeira_v01",
+    "veg_floresta_arvore_de_copa_compacta_v01",
+    "veg_floresta_arvore_de_raizes_expostas_v01",
+    "veg_floresta_arvore_retorcida_com_cipos_v01",
+    "veg_floresta_arvore_de_tronco_bifurcado_v01",
+    "veg_floresta_arvore_antiga_com_raizes_entrelacadas_v01",
+    "veg_floresta_arvore_de_copa_horizontal_v01",
+    "veg_floresta_samambaia_alta_a_v01",
+    "veg_floresta_samambaia_alta_b_v01",
+    "veg_floresta_samambaia_compacta_v01",
+    "veg_floresta_samambaia_baixa_v01",
+    "veg_floresta_arbusto_de_folhas_recortadas_a_v01",
+    "veg_floresta_arbusto_de_folhas_recortadas_b_v01",
+    "veg_floresta_planta_de_folhas_radiais_a_v01",
+    "veg_floresta_planta_de_folhas_radiais_b_v01",
+    "veg_floresta_planta_de_caule_alto_a_v01",
+    "veg_floresta_planta_de_caule_alto_b_v01"
+   ],
+   "limites": "adaptações de paleta, escala e sombras planejadas; integração Godot ainda não validada pelo usuário"
+  },
+  {
+   "id": "APR-2026-10-23-IMMUNITY",
+   "item": "Immunity — Resurrected RPG 1.1",
+   "tipo": "direcao",
+   "mensagem_usuario": "Bom aprovo isso continue",
+   "assets": [],
+   "limites": "download não confirmado; nenhum arquivo disponível"
+  },
+  {
+   "id": "APR-PILOTO-V04",
+   "item": "Cena-piloto v04",
+   "tipo": "direcao",
+   "assets": [],
+   "limites": "concept art; referência de aceite, não asset de jogo"
+  }
+ ],
+ "papeis": {
+  "_zonas": "floresta e o trecho da estrada que a atravessa (recomendação do assistente); nunca vila, ruína ou cripta",
+  "floresta.arvore": {
+   "zonas": [
+    "floresta",
+    "estrada"
+   ],
+   "tile": "T",
+   "assets": [
+    "veg_floresta_arvore_de_copa_em_patamares_v01",
+    "veg_floresta_arvore_com_cipos_pendentes_v01",
+    "veg_floresta_arvore_inclinada_v01",
+    "veg_floresta_arvore_delgada_com_trepadeira_v01",
+    "veg_floresta_arvore_de_copa_compacta_v01",
+    "veg_floresta_arvore_de_raizes_expostas_v01",
+    "veg_floresta_arvore_retorcida_com_cipos_v01",
+    "veg_floresta_arvore_de_tronco_bifurcado_v01",
+    "veg_floresta_arvore_antiga_com_raizes_entrelacadas_v01",
+    "veg_floresta_arvore_de_copa_horizontal_v01"
+   ]
+  },
+  "floresta.sub_bosque": {
+   "zonas": [
+    "floresta",
+    "estrada"
+   ],
+   "tile": "T",
+   "assets": [
+    "veg_floresta_samambaia_alta_b_v01",
+    "veg_floresta_samambaia_compacta_v01",
+    "veg_floresta_samambaia_baixa_v01",
+    "veg_floresta_arbusto_de_folhas_recortadas_a_v01",
+    "veg_floresta_arbusto_de_folhas_recortadas_b_v01",
+    "veg_floresta_planta_de_folhas_radiais_a_v01",
+    "veg_floresta_planta_de_folhas_radiais_b_v01"
+   ]
+  },
+  "floresta.chao_decorativo": {
+   "zonas": [
+    "floresta",
+    "estrada"
+   ],
+   "tile": ",",
+   "assets": [
+    "veg_floresta_samambaia_baixa_v01",
+    "veg_floresta_arbusto_de_folhas_recortadas_b_v01",
+    "veg_floresta_planta_de_folhas_radiais_a_v01",
+    "veg_floresta_planta_de_folhas_radiais_b_v01"
+   ]
+  }
+ },
+ "politicas_runtime": {
+  "_natureza": "recomendação técnica do assistente; ajustar na prova de escala",
+  "filtro": "nearest",
+  "escala": 1,
+  "copa_alpha_perto_jogador": 0.25,
+  "copa_raio_px": 56,
+  "copa_alpha_combate": 0.35,
+  "arvore_espacamento_tiles": 2,
+  "arvore_grande_largura_px": 150,
+  "arvore_grande_espacamento_tiles": 3,
+  "chao_decorativo_chance": 0.05,
+  "parallax": "não implementado",
+  "blur": "não implementado"
+ }
+}

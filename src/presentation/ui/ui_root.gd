@@ -52,6 +52,7 @@ func _ready() -> void:
 	_build_gameover(root)
 	_build_title(root)
 	_build_lab(root)
+	_build_credits(root)
 	_build_creation(root)
 	_build_hub(root)
 	_build_debug(root)
@@ -541,10 +542,34 @@ func _build_title(root: Control) -> void:
 	v.add_child(_button("Laboratório de protótipos…", func(): open_lab()))
 	v.add_child(_button("Continuar (salvamento rápido)", func(): request_load.emit("quicksave")))
 	v.add_child(_button("Continuar (autosave)", func(): request_load.emit("auto")))
+	v.add_child(_button("Créditos de arte", func(): panel_credits.visible = true))
 	v.add_child(_button("Sair", func(): get_tree().quit()))
-	var disc := _label("Projeto pessoal de fã baseado em Tormenta20 (Jambô). Regras citadas com página; arte e textos do jogo são originais.", 7)
+	var disc := _label("Projeto pessoal de fã baseado em Tormenta20 (Jambô). Regras citadas com página. Vegetação da floresta: [LPC] Jungle, CC-BY 4.0 (ver Créditos); demais artes e textos são originais.", 7)
 	disc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(disc)
+
+
+# --- Créditos de arte (CC-BY exige atribuição integral, regra AD-03) -------------------
+var panel_credits: PanelContainer
+
+
+func _build_credits(root: Control) -> void:
+	panel_credits = _panel(root, Control.PRESET_FULL_RECT)
+	panel_credits.offset_left = 40; panel_credits.offset_top = 16; panel_credits.offset_right = -40; panel_credits.offset_bottom = -16
+	var sc := ScrollContainer.new()
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel_credits.add_child(sc)
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(v)
+	v.add_child(_h("Créditos de arte"))
+	v.add_child(_button("Fechar", func(): panel_credits.visible = false))
+	for path in ArtGovernor.load_default().credits_paths():
+		var l := _label(FileAccess.get_file_as_string(path), 7)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size.x = 520
+		v.add_child(l)
+	panel_credits.visible = false
 
 
 # --- Laboratório de protótipos ------------------------------------------------------
@@ -597,6 +622,7 @@ func _build_creation(root: Control) -> void:
 	panel_creation.position = Vector2(90, 24)
 	panel_creation.custom_minimum_size = Vector2(460, 0)
 	panel_creation.visible = false
+	panel_credits.visible = false
 
 
 func open_creation() -> void:

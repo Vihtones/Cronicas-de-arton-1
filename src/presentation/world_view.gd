@@ -8,6 +8,7 @@ var layer: TileMapLayer
 var _cols: Dictionary = {}   # char -> coluna no atlas
 var _blocked_chars: Dictionary = {}
 var astar: AStarGrid2D
+var dressed: Dictionary = {}   # tiles 'T' cobertos por vegetação aprovada (governador de arte)
 
 
 func build() -> void:
@@ -54,6 +55,8 @@ func build() -> void:
 
 func visual_char(t: Vector2i) -> String:
 	var ch := Game.db.tile_char(t)
+	if ch == "T" and dressed.has(t):
+		return ","
 	if ch == "_":
 		var z := Game.db.zone_at(t)
 		if z == "cripta": return "k"

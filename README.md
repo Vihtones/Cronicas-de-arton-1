@@ -4,7 +4,7 @@ RPG single-player 2D top-down em pixel art, inspirado em Tormenta20. Projeto pes
 **Versão 0.3.0: vertical slice jogável + Laboratório (22 cenários) + XP dinâmica (`docs/XP_DINAMICA.md`).** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
 
 Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`
-**Próximos passos, correções e revisões: `docs/ROADMAP.md`** · Mapa das mecânicas: `docs/PROTOTIPOS.md`.
+**Próximos passos, correções e revisões: `docs/ROADMAP.md`** · Mapa das mecânicas: `docs/PROTOTIPOS.md` · **Arte: `docs/GOVERNADOR_DE_ARTE.md`** (só assets aprovados na pasta de arte entram no jogo).
 
 ## Como jogar
 1. Instale a **Godot 4.3 stable** (godotengine.org, versão padrão, não a .NET).
@@ -40,8 +40,9 @@ Na tela de título, abra **Laboratório de protótipos…** para jogar um cenár
 ## Testes e ferramentas
 ```bash
 godot --headless --path . --import                          # 1ª vez
-godot --headless --path . -s res://tests/run_tests.gd       # 112 testes
+godot --headless --path . -s res://tests/run_tests.gd       # 120 testes
 python3 tools/validate_assets.py                            # pipeline de assets (§13)
+python3 tools/check_art_direction.py                        # governador de arte (AD-01..07)
 python3 tools/check_architecture.py                         # dependências entre camadas (R3)
 xvfb-run godot --path . -s res://tools/benchmark.gd         # desempenho por perfil gráfico
 xvfb-run godot --path . -s res://tools/screenshot_runner.gd -- <pasta>   # capturas do slice

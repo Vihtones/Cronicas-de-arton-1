@@ -463,6 +463,666 @@
     "misericordia",
     "furtivo"
    ]
+  },
+  {
+   "asset_id": "veg_floresta_arvore_de_copa_em_patamares_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/01_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [0, 128, 96, 256])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-01",
+   "nome": "Árvore de copa em patamares",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    80,
+    104
+   ],
+   "pivot": [
+    38,
+    83
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "e3c01d2aa74dd200308ba203a57b177f92d92ec21cf9cdb92c2a6cfac2510e36",
+   "hash_origem": "e3c01d2aa74dd200308ba203a57b177f92d92ec21cf9cdb92c2a6cfac2510e36",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_de_copa_em_patamares_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_com_cipos_pendentes_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/02_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [96, 128, 224, 256])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-02",
+   "nome": "Árvore com cipós pendentes",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    107,
+    103
+   ],
+   "pivot": [
+    56,
+    91
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "06a5894182994f859bd515cd880119b147dc2f5a0ca5f48069abbf21f4c0df22",
+   "hash_origem": "06a5894182994f859bd515cd880119b147dc2f5a0ca5f48069abbf21f4c0df22",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_com_cipos_pendentes_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_inclinada_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/03_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [0, 352, 128, 512])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-03",
+   "nome": "Árvore inclinada",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    127,
+    142
+   ],
+   "pivot": [
+    61,
+    125
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "f756eb59a2a4769371927dac7949d389c74ca4597acea7e849602c2950d64039",
+   "hash_origem": "f756eb59a2a4769371927dac7949d389c74ca4597acea7e849602c2950d64039",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_inclinada_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_delgada_com_trepadeira_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/04_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [128, 352, 224, 512])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-04",
+   "nome": "Árvore delgada com trepadeira",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    96,
+    149
+   ],
+   "pivot": [
+    49,
+    130
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "0f3b75d9dcfcd53e087314615a7a6ef79d64ff7c89cc59804d5db8d8f960d8f9",
+   "hash_origem": "0f3b75d9dcfcd53e087314615a7a6ef79d64ff7c89cc59804d5db8d8f960d8f9",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_delgada_com_trepadeira_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_de_copa_compacta_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/05_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [0, 512, 128, 768])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-05",
+   "nome": "Árvore de copa compacta",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    128,
+    208
+   ],
+   "pivot": [
+    89,
+    194
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "382ea62211cd567d2d4f8c1ac74d39f411c79cb219ddf55c451cf17a83bf386e",
+   "hash_origem": "382ea62211cd567d2d4f8c1ac74d39f411c79cb219ddf55c451cf17a83bf386e",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_de_copa_compacta_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_de_raizes_expostas_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/06_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [128, 512, 256, 768])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-06",
+   "nome": "Árvore de raízes expostas",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    128,
+    244
+   ],
+   "pivot": [
+    40,
+    227
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "76021165ee7fe36898ddd840da6341e77f9296c61fd811dae69b4cc5f08e3045",
+   "hash_origem": "76021165ee7fe36898ddd840da6341e77f9296c61fd811dae69b4cc5f08e3045",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_de_raizes_expostas_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_retorcida_com_cipos_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/07_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [256, 512, 416, 768])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-07",
+   "nome": "Árvore retorcida com cipós",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    160,
+    233
+   ],
+   "pivot": [
+    65,
+    219
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "a470fff22f3949ac4fdf7403d37f5d0274c8f72deb227801ca1c2fb664116614",
+   "hash_origem": "a470fff22f3949ac4fdf7403d37f5d0274c8f72deb227801ca1c2fb664116614",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_retorcida_com_cipos_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_de_tronco_bifurcado_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/08_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [416, 512, 608, 768])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-08",
+   "nome": "Árvore de tronco bifurcado",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    173,
+    229
+   ],
+   "pivot": [
+    91,
+    205
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "f003ad4f263402880c17c9e75aa7f45ea8a735477bb84553c9120860e9f6a4f3",
+   "hash_origem": "f003ad4f263402880c17c9e75aa7f45ea8a735477bb84553c9120860e9f6a4f3",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_de_tronco_bifurcado_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_antiga_com_raizes_entrelacadas_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/09_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [608, 512, 800, 768])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-09",
+   "nome": "Árvore antiga com raízes entrelaçadas",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    192,
+    253
+   ],
+   "pivot": [
+    87,
+    236
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "8d78540a784d0523d85eecbbb9830f559d21cf58e709c6ccdb6e6f68943c0864",
+   "hash_origem": "8d78540a784d0523d85eecbbb9830f559d21cf58e709c6ccdb6e6f68943c0864",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_antiga_com_raizes_entrelacadas_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arvore_de_copa_horizontal_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/10_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/viney-trees.png [800, 512, 1024, 768])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-10",
+   "nome": "Árvore de copa horizontal",
+   "papel": "floresta.arvore",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar escala com personagem; definir pivô na raiz e colisor no tronco. Separar sombra pintada se conflitar com luz dinâmica.",
+   "tamanho": [
+    213,
+    237
+   ],
+   "pivot": [
+    109,
+    217
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "87547a62c9583c2361d84a1be771118be976d2fa216be3af414fc2139c85903e",
+   "hash_origem": "87547a62c9583c2361d84a1be771118be976d2fa216be3af414fc2139c85903e",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arvore_de_copa_horizontal_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_samambaia_alta_a_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/11_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [0, 352, 96, 480])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-11",
+   "nome": "Samambaia alta A",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    96,
+    125
+   ],
+   "pivot": [
+    32,
+    122
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "3ca687642c5cc70d9d2936c96b1a6d2b5ba746309a9336b7ca197980a2a5363c",
+   "hash_origem": "3ca687642c5cc70d9d2936c96b1a6d2b5ba746309a9336b7ca197980a2a5363c",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_samambaia_alta_a_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_samambaia_alta_b_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/12_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [96, 352, 192, 480])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-12",
+   "nome": "Samambaia alta B",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    87,
+    110
+   ],
+   "pivot": [
+    47,
+    107
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "af8a964462b88b43197c105210ae2241c0cce0407d3b313ac4959d6d1d7d9772",
+   "hash_origem": "af8a964462b88b43197c105210ae2241c0cce0407d3b313ac4959d6d1d7d9772",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_samambaia_alta_b_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_samambaia_compacta_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/13_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [192, 384, 256, 480])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-13",
+   "nome": "Samambaia compacta",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    64,
+    83
+   ],
+   "pivot": [
+    29,
+    80
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "11a8e44c95c3ce692d316545d500f689765c1c90798d945ecc9c756f95972d94",
+   "hash_origem": "11a8e44c95c3ce692d316545d500f689765c1c90798d945ecc9c756f95972d94",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_samambaia_compacta_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_samambaia_baixa_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/14_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [256, 416, 352, 480])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-14",
+   "nome": "Samambaia baixa",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    78,
+    62
+   ],
+   "pivot": [
+    34,
+    56
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "29b86a58553503a186bae52a495d3d7509c11a8c70b390255c77176f1dc2a18d",
+   "hash_origem": "29b86a58553503a186bae52a495d3d7509c11a8c70b390255c77176f1dc2a18d",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_samambaia_baixa_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arbusto_de_folhas_recortadas_a_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/15_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [0, 480, 96, 608])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-15",
+   "nome": "Arbusto de folhas recortadas A",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    83,
+    111
+   ],
+   "pivot": [
+    33,
+    103
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "38766b7e67a4011d5d006a79a90c00fc51d7a2565ce7f69fefb79e4d0fd4c6a9",
+   "hash_origem": "38766b7e67a4011d5d006a79a90c00fc51d7a2565ce7f69fefb79e4d0fd4c6a9",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arbusto_de_folhas_recortadas_a_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_arbusto_de_folhas_recortadas_b_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/16_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [96, 480, 192, 576])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-16",
+   "nome": "Arbusto de folhas recortadas B",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    83,
+    73
+   ],
+   "pivot": [
+    43,
+    63
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "e19da3dc2374735342961a7803c9f46bc448ea9697c4ace38b10de05b136be73",
+   "hash_origem": "e19da3dc2374735342961a7803c9f46bc448ea9697c4ace38b10de05b136be73",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_arbusto_de_folhas_recortadas_b_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_planta_de_folhas_radiais_a_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/17_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [192, 480, 288, 576])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-17",
+   "nome": "Planta de folhas radiais A",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    80,
+    65
+   ],
+   "pivot": [
+    36,
+    56
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "00284652bf14e9ae0dcd64f2f2a6922549d66f63602c7f4ccb5e8e479f962299",
+   "hash_origem": "00284652bf14e9ae0dcd64f2f2a6922549d66f63602c7f4ccb5e8e479f962299",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_planta_de_folhas_radiais_a_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_planta_de_folhas_radiais_b_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/18_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [288, 480, 384, 576])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-18",
+   "nome": "Planta de folhas radiais B",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    71,
+    73
+   ],
+   "pivot": [
+    35,
+    67
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "43facee7043e29f28137ace85ea41b00e6e8d4dc0558e3e081e5a6d48321a89d",
+   "hash_origem": "43facee7043e29f28137ace85ea41b00e6e8d4dc0558e3e081e5a6d48321a89d",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_planta_de_folhas_radiais_b_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_planta_de_caule_alto_a_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/19_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [0, 608, 96, 736])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-19",
+   "nome": "Planta de caule alto A",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    76,
+    123
+   ],
+   "pivot": [
+    39,
+    118
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "5b08316a641a22ffcf27de4628651ce568402156bed21779bd5a2fa8aba01864",
+   "hash_origem": "5b08316a641a22ffcf27de4628651ce568402156bed21779bd5a2fa8aba01864",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_planta_de_caule_alto_a_v01.png"
+  },
+  {
+   "asset_id": "veg_floresta_planta_de_caule_alto_b_v01",
+   "tipo": "sprite_objeto",
+   "origem": "pasta_arte:08_assets_gratuitos/lote_02/componentes/20_vegetacao.png (recorte de extraidos/lpc-jungle-v2/lpc-jungle-v2/giant-plants.png [96, 576, 192, 736])",
+   "fonte_url": "https://opengameart.org/content/lpc-jungle",
+   "licenca": "CC-BY-4.0",
+   "creditos": "res://assets/approved/vegetacao/lpc_jungle/CREDITS-jungle.txt",
+   "versao": 1,
+   "estado": "approved_artistic",
+   "aprovacao": "APR-2026-10-23-LPC-JUNGLE",
+   "id_curadoria": "FREE-02-20",
+   "nome": "Planta de caule alto B",
+   "papel": "floresta.planta",
+   "zonas_permitidas": [
+    "floresta",
+    "estrada"
+   ],
+   "validacao_tecnica": "pendente: escala, paleta do bioma e sombra pintada (REVISAO.md do lote 02)",
+   "adaptacao_pendente": "Harmonizar verdes com o bioma, reduzir realces amarelos e conferir luz pintada. Validar espécie/forma no bioma e evitar proporção de planta gigante na vila. Testar folhagem como decoração sem colisão.",
+   "tamanho": [
+    82,
+    159
+   ],
+   "pivot": [
+    41,
+    156
+   ],
+   "animacoes": [],
+   "dependencias": [],
+   "hash": "a8a12b86705ff660a7aa87b4c27e9fe6195b9765f024622dafc0d60bc0246954",
+   "hash_origem": "a8a12b86705ff660a7aa87b4c27e9fe6195b9765f024622dafc0d60bc0246954",
+   "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_planta_de_caule_alto_b_v01.png"
   }
  ]
 }

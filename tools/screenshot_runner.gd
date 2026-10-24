@@ -36,6 +36,9 @@ func _run() -> void:
 	var G = _game()
 	await _frames(10)
 	await _shot("01_titulo")
+	main.ui.panel_credits.visible = true
+	await _shot("01b_creditos")
+	main.ui.panel_credits.visible = false
 	G.new_game(false, 7)
 	G.world.clock.tick = 6 * 10  # 10h
 	G.world.player.position = G.db.tile_to_world(Vector2i(38, 15))
@@ -82,6 +85,18 @@ func _run() -> void:
 	main.npc_layer.sync_all()
 	await _frames(40)
 	await _shot("06_noite_chuva")
+	# floresta com a vegetação aprovada (governador de arte): estrada, trilha e entardecer
+	G.world.modules.weather.region.condition = "limpo"
+	for spec in [[Vector2i(62, 26), 6 * 10 + 144, "06b_floresta_estrada"], [Vector2i(74, 17), 6 * 15 + 144, "06c_floresta_trilha"],
+			[Vector2i(66, 31), 6 * 18 + 144, "06d_floresta_entardecer"]]:
+		G.world.clock.tick = spec[1]
+		G.world.player.position = G.db.tile_to_world(spec[0])
+		main.player.sync_from_world(); main.camera.reset_smoothing()
+		G.send("AdvanceTime", {"ticks": 1})
+		G.world.modules.weather.region.condition = "limpo"
+		main.npc_layer.sync_all()
+		await _frames(30)
+		await _shot(spec[2])
 	# cripta e combate
 	G.world.clock.tick = 6 * 14 + 144
 	G.world.modules.weather.region.condition = "limpo"

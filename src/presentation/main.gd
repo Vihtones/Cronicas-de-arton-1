@@ -9,6 +9,8 @@ var camera: CameraDirector
 var fx: FxLayer
 var combat_view: CombatView
 var ui: UiRoot
+var art: ArtGovernor
+var vegetation: VegetationLayer
 
 
 func _ready() -> void:
@@ -16,7 +18,11 @@ func _ready() -> void:
 	var actors := Node2D.new(); actors.name = "Atores"; actors.y_sort_enabled = true; add_child(actors)
 	npc_layer = NpcLayer.new(); npc_layer.name = "NPCs"; actors.add_child(npc_layer)
 	npc_layer.world_view = world_view
+	art = ArtGovernor.load_default()
+	vegetation = VegetationLayer.new(); vegetation.name = "Vegetacao"; vegetation.governor = art; actors.add_child(vegetation)
+	Game.logger.info("Arte", "governador", art.report())
 	player = PlayerView.new(); player.name = "Jogador"; actors.add_child(player)
+	vegetation.follow = player
 	camera = CameraDirector.new(); camera.name = "Camera"; add_child(camera)
 	camera.target = player
 	camera.make_current()
@@ -38,6 +44,7 @@ func _ready() -> void:
 
 func _set_world_visible(v: bool) -> void:
 	world_view.visible = v
+	vegetation.visible = v
 	npc_layer.visible = v
 	player.visible = v
 	fx.visible = v
@@ -53,7 +60,10 @@ func _load(slot: String) -> void:
 
 
 func _on_world_reloaded() -> void:
+	var veg_plan := VegetationLayer.plan(Game.db, art)
+	world_view.dressed = VegetationLayer.dressed_tiles(veg_plan)
 	world_view.build()
+	vegetation.build(Game.db, veg_plan)
 	camera.set_bounds(Game.db.size)
 	player.sync_from_world()
 	npc_layer.rebuild()
@@ -66,6 +76,7 @@ func _on_world_reloaded() -> void:
 
 
 func _on_mode(_m: String) -> void:
+	vegetation.set_combat(Game.mode == Game.Mode.COMBAT)
 	if Game.mode == Game.Mode.TITLE:
 		_set_world_visible(false)
 	combat_view.clear_plan()
