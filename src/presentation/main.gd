@@ -7,6 +7,7 @@ var npc_layer: NpcLayer
 var player: PlayerView
 var camera: CameraDirector
 var fx: FxLayer
+var cine: CinematicDirector
 var combat_view: CombatView
 var ui: UiRoot
 var art: ArtGovernor
@@ -28,10 +29,17 @@ func _ready() -> void:
 	camera.make_current()
 	fx = FxLayer.new(); fx.name = "Efeitos"; add_child(fx)
 	fx.build(camera)
+	ActorView.fx = fx
+	cine = CinematicDirector.new(); cine.name = "Cinema"; add_child(cine)
+	cine.camera = camera
+	cine.post = fx.post
 	combat_view = CombatView.new(); combat_view.name = "Combate"; add_child(combat_view)
 	combat_view.npc_layer = npc_layer; combat_view.player_view = player; combat_view.camera = camera
+	combat_view.cine = cine; combat_view.fx_post = fx.post; combat_view.fx_glow = fx.glow
 	ui = UiRoot.new(); ui.name = "UI"; add_child(ui)
 	ui.combat_view = combat_view
+	cine.started.connect(ui.set_cinematic.bind(true))
+	cine.finished.connect(ui.set_cinematic.bind(false))
 	combat_view.message.connect(ui.log_msg)
 	ui.request_new_game.connect(_new_game)
 	ui.request_load.connect(_load)

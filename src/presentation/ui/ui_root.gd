@@ -62,6 +62,14 @@ func _ready() -> void:
 	_refresh_mode()
 
 
+## Durante um momento cinematográfico a interface sai de cena (só fica a leitura do momento).
+func set_cinematic(on: bool) -> void:
+	var tw := create_tween()
+	for c in get_children():
+		if c is Control:
+			tw.parallel().tween_property(c, "modulate:a", 0.0 if on else 1.0, 0.15)
+
+
 # --- Tema ---------------------------------------------------------------------------
 func _make_theme() -> Theme:
 	var t := Theme.new()

@@ -3,6 +3,10 @@ extends CharacterBody2D
 ## Jogador: input -> movimento físico -> comando MovePlayer quando muda de tile.
 
 @export var speed: float = 80.0
+## Movimento responsivo (Dead Cells): acelera e freia rápido, sem "patinar"; poeira ao arrancar e virar.
+@export var accel: float = 900.0
+@export var decel: float = 1100.0
+var _last_dir := Vector2.ZERO
 var view: ActorView
 var _last_tile := Vector2i(-999, -999)
 var input_enabled := true
@@ -34,9 +38,14 @@ func _physics_process(_delta: float) -> void:
 	if input_enabled and Game.mode == Game.Mode.EXPLORE and Game.world.modules.travel.current_region == "vila":
 		dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var sneaking: bool = Game.world.modules.combat.stance_sneak
-	velocity = dir * (speed * (0.5 if sneaking else 1.0))
+	var target_v := dir * (speed * (0.5 if sneaking else 1.0))
+	var rate := accel if dir != Vector2.ZERO else decel
+	velocity = velocity.move_toward(target_v, rate * _delta)
+	if dir != Vector2.ZERO and (_last_dir == Vector2.ZERO or dir.dot(_last_dir) < 0.2) and not sneaking:
+		ImpactFx.dust(get_parent(), global_position, dir, 4)   # arrancar ou mudar de direção levanta poeira
+	_last_dir = dir
 	move_and_slide()
-	view.walking = dir != Vector2.ZERO
+	view.walking = velocity.length() > 8.0
 	if dir != Vector2.ZERO:
 		view.face_towards(view.position + dir * 10)
 	view.modulate = Color(0.75, 0.75, 0.95, 0.85) if sneaking else Color.WHITE

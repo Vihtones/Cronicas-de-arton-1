@@ -9,6 +9,9 @@ signal playback_finished
 var npc_layer: NpcLayer
 var player_view: PlayerView
 var camera: CameraDirector
+var cine: CinematicDirector
+var fx_post: PostProcess
+var fx_glow: Node   # camada de efeitos sem escurecimento (FxLayer.glow)
 var plan: Array = []
 var mode := "mover"          # mover | atacar | investida | misericordia
 var special := false
@@ -189,6 +192,12 @@ func undo() -> void:
 func confirm() -> void:
 	if plan.is_empty() or not my_turn():
 		return
+	# guarda o que o fantasma previa, para os momentos "contra as probabilidades" e "deu errado"
+	if cine and not preview.is_empty():
+		cine.expectations.clear()
+		for st in preview.get("steps", []):
+			if st.get("ok", false) and str(st.action.get("type", "")) in ["attack", "charge", "ataque_extra"]:
+				cine.expectations[st.action.target] = float(st.get("hit_chance", -1.0))
 	var r := Game.send("ExecutePlan", {"actions": plan})
 	if not r.accepted:
 		message.emit("Plano rejeitado: " + "; ".join(r.errors))
@@ -255,6 +264,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if playing and (event.is_action_pressed("ui_cancel") or (event is InputEventMouseButton and event.pressed)):
 		_skip = true
+		if cine: cine.skip()
 		get_viewport().set_input_as_handled()
 		return
 	if not my_turn():
@@ -378,7 +388,8 @@ func _process(_d: float) -> void:
 
 # --- Reprodução cinematográfica ----------------------------------------------------------
 func _on_event(e: GameEvent) -> void:
-	if e.event_type in ["COMBAT_STARTED", "COMBAT_MOVED", "ATTACK_RESOLVED", "COUP_DE_GRACE", "BLEED_CHECK", "TURN_STARTED", "COMBAT_ENDED", "STOOD_UP"]:
+	if e.event_type in ["COMBAT_STARTED", "COMBAT_MOVED", "ATTACK_RESOLVED", "COUP_DE_GRACE", "BLEED_CHECK", "TURN_STARTED", "COMBAT_ENDED", "STOOD_UP",
+			"BUFF_APPLIED", "HEALED", "SPELL_FAILED", "REACTION", "POWER_USED"]:
 		_queue.append(e)
 		if not playing:
 			_play()
@@ -419,6 +430,7 @@ func _play_one(e: GameEvent) -> void:
 			camera.punch(1.1, 0.4)
 			await _wait(0.4)
 		"TURN_STARTED":
+			if cine: cine.new_turn()
 			if p.actor == "player":
 				raspao = Game.world.modules.combat.power_policy.get("golpe_raspao", "auto") == "auto"
 			var v := _actor_view(p.actor)
@@ -448,31 +460,34 @@ func _play_one(e: GameEvent) -> void:
 			await tw.finished
 			av.walking = false
 		"ATTACK_RESOLVED", "COUP_DE_GRACE":
-			var a := _actor_view(p.attacker)
-			var t := _actor_view(p.target)
-			if a == null or t == null:
-				return
-			var start: Vector2 = a.global_position
-			var dirv: Vector2 = (t.global_position - start).normalized()
-			if _speed() > 0.0 and not _skip:
-				var tw := create_tween()
-				tw.tween_property(a, "global_position", start + dirv * 8, 0.08 * _speed())
-				tw.tween_property(a, "global_position", start, 0.1 * _speed())
-				await tw.finished
-			var tags: Array = p.get("tags", [])
-			camera.react(tags)
-			_float_text(t.global_position, (("%d!" if p.get("crit", false) else "%d") % int(p.damage)) if p.get("hit", true) else ("falha" if p.get("camo_roll", 0) > 0 else "erra"),
-				Color(1, 0.3, 0.2) if p.get("crit", false) else (Color(1, 0.9, 0.5) if p.get("hit", true) else Color(0.7, 0.8, 1)))
-			if not Game.settings.reduce_flashes and p.get("hit", true):
-				var tv: ActorView = t.view if t is PlayerView else t
-				tv.modulate = Color(2, 2, 2)
-				get_tree().create_timer(0.08).timeout.connect(func(): if is_instance_valid(tv): tv.modulate = Color.WHITE)
-			if t is ActorView and p.has("pv_after"):
-				var sh: CharacterSheet = sim().c(p.target).sheet if sim() and sim().combatants.has(p.target) else null
-				if sh: t.set_hp(int(p.pv_after), sh.pv_max)
-			elif t is PlayerView:
-				t.view.set_down(int(p.get("pv_after", 1)) <= 0)
+			await _play_attack(p, e.event_type == "COUP_DE_GRACE")
+		"BUFF_APPLIED":
+			var bv := _actor_view(p.actor)
+			if bv:
+				ImpactFx.aura(_fxp(), bv.global_position, Color(0.6, 0.75, 1.0))
+				_float_text(bv.global_position, "+%d Defesa" % int(p.get("defense", 0)), Color(0.7, 0.85, 1.0))
+				if fx_post: fx_post.flash(0.15, Color(0.7, 0.8, 1.0))
 			await _wait(0.35)
+		"HEALED":
+			var hv := _actor_view(p.target)
+			if hv:
+				ImpactFx.aura(_fxp(), hv.global_position, Color(0.55, 1.0, 0.6), true)
+				_float_text(hv.global_position, "+%d" % int(p.amount), Color(0.55, 1.0, 0.6))
+			await _wait(0.35)
+		"SPELL_FAILED":
+			var fv := _actor_view(p.caster)
+			if fv:
+				ImpactFx.shockwave(_fxp(), fv.global_position + Vector2(0, -10), 10.0, Color(0.5, 0.5, 0.6, 0.8))
+				_float_text(fv.global_position, "magia perdida", Color(0.7, 0.7, 0.8))
+			await _wait(0.35)
+		"REACTION", "POWER_USED":
+			var rv := _actor_view(p.actor)
+			if rv:
+				_float_text(rv.global_position, "Ataque Reflexo!" if e.event_type == "REACTION" else str(p.power).replace("_", " ").capitalize() + "!", Color(1.0, 0.8, 0.4))
+				if e.event_type == "POWER_USED":
+					ImpactFx.dust(_fxp(), rv.global_position, Vector2.ZERO, 8)
+					(rv.view if rv is PlayerView else rv).squash(0.15)
+			await _wait(0.2)
 		"BLEED_CHECK":
 			var v := _actor_view(p.actor)
 			if v: _float_text(v.global_position, "sangra -%d" % p.lost if p.lost > 0 else "estável", Color(0.9, 0.2, 0.2))
@@ -483,6 +498,85 @@ func _play_one(e: GameEvent) -> void:
 			await _wait(0.3)
 
 
+## Encenação de um ataque: momento cinematográfico (se merecer) → antecipação → rastro do golpe ou da
+## magia → impacto (hit stop, partículas, recuo e flash do alvo, tremor) ou esquiva → números.
+func _play_attack(p: Dictionary, coup: bool) -> void:
+	var a := _actor_view(p.attacker)
+	var t := _actor_view(p.target)
+	if a == null or t == null:
+		return
+	var av: ActorView = a.view if a is PlayerView else a
+	var tv: ActorView = t.view if t is PlayerView else t
+	var hit: bool = p.get("hit", true)
+	var crit: bool = p.get("crit", false)
+	var spell: bool = p.get("spell", false)
+	var a_pos: Vector2 = a.global_position + Vector2(0, -10)
+	var t_pos: Vector2 = t.global_position + Vector2(0, -10)
+	var dir: Vector2 = (t_pos - a_pos).normalized()
+	var fast: bool = _speed() <= 0.0 or _skip
+	var m: Dictionary = {} if (fast or cine == null) else cine.evaluate(p, sim())
+	if not m.is_empty():
+		await cine.begin(m, a_pos, t_pos)
+	var kind := _weapon_kind(p)
+	if not fast:
+		var wind := av.play_attack(dir, crit or coup)
+		await _wait(wind + 0.03)
+		match str(p.get("weapon", "")):
+			"Seta Infalível":
+				ImpactFx.spell_bolt(_fxp(), a_pos, t_pos, Color(0.7, 0.6, 1.0), 0.2)
+				await _wait(0.2)
+			"Raio Arcano":
+				ImpactFx.spell_bolt(_fxp(), a_pos, t_pos, Color(1.0, 0.8, 0.55), 0.16, 4.0)
+				await _wait(0.16)
+			"Toque Chocante":
+				ImpactFx.lightning(_fxp(), a_pos, t_pos)
+				if fx_post: fx_post.flash(0.25, Color(0.75, 0.9, 1.0))
+			_:
+				if not spell:
+					ImpactFx.slash_trail(_fxp(), a_pos, t_pos, kind, hit, crit)
+	if hit:
+		if not fast:
+			if not spell:
+				ImpactFx.impact_burst(_fxp(), t_pos, dir, kind, crit, clampf(float(p.get("damage", 1)) / 6.0, 0.6, 2.0))
+			tv.play_hit(dir, clampf(float(p.get("damage", 1)) / 8.0, 0.5, 1.6), crit)
+			ImpactFx.hit_stop(get_tree(), 0.09 if crit else 0.045, 0.18 if crit else 0.0)
+			if crit and fx_post:
+				fx_post.flash(0.3, Color(1.0, 0.95, 0.85))
+				fx_post.aberration(0.8)
+		camera.react(p.get("tags", []))
+	elif not fast:
+		tv.play_dodge(dir)
+	_float_text(t.global_position, (("%d!" if crit else "%d") % int(p.damage)) if hit else ("falha" if p.get("camo_roll", 0) > 0 else "erra"),
+		Color(1, 0.3, 0.2) if crit else (Color(1, 0.9, 0.5) if hit else Color(0.7, 0.8, 1)))
+	if t is ActorView and p.has("pv_after"):
+		var sh: CharacterSheet = sim().c(p.target).sheet if sim() and sim().combatants.has(p.target) else null
+		if sh: t.set_hp(int(p.pv_after), sh.pv_max)
+	elif t is PlayerView:
+		t.view.set_down(int(p.get("pv_after", 1)) <= 0)
+	if not m.is_empty():
+		await cine.reaction(m)
+	else:
+		await _wait(0.3)
+
+
+func _fxp() -> Node:
+	return fx_glow if fx_glow != null else get_parent()
+
+
+func _weapon_kind(p: Dictionary) -> String:
+	if p.get("spell", false):
+		return "magia"
+	var s := sim()
+	if s and s.combatants.has(p.attacker):
+		for atk in s.c(p.attacker).sheet.attacks:
+			if str(atk.get("nome", "")) == str(p.get("weapon", "")) and atk.has("tipo"):
+				return str(atk.tipo)
+	var w := str(p.get("weapon", "")).to_lower()
+	if w.contains("clava") or w.contains("funda") or w.contains("maça") or w.contains("martelo"): return "impacto"
+	if w.contains("mordida") or w.contains("adaga") or w.contains("lança") or w.contains("chifre"): return "perfuracao"
+	return "corte"
+
+
 func _float_text(at: Vector2, txt: String, col: Color) -> void:
 	var l := Label.new()
 	l.text = txt
@@ -491,9 +585,12 @@ func _float_text(at: Vector2, txt: String, col: Color) -> void:
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 4)
 	l.position = at + Vector2(-20, -40)
-	l.z_index = 20
-	get_parent().add_child(l)
+	l.z_index = 40
+	l.pivot_offset = Vector2(20, 8)
+	l.scale = Vector2.ONE * 1.7
+	_fxp().add_child(l)
 	var tw := l.create_tween()
-	tw.tween_property(l, "position:y", l.position.y - 18, 0.7)
-	tw.parallel().tween_property(l, "modulate:a", 0.0, 0.7)
+	tw.tween_property(l, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(l, "position:y", l.position.y - 22, 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(l.queue_free)
