@@ -72,33 +72,56 @@ func set_cinematic(on: bool) -> void:
 
 # --- Tema ---------------------------------------------------------------------------
 func _make_theme() -> Theme:
+	## Tema inspirado na interface de Stoneshard (atualização #39): painéis escuros e "monumentais",
+	## moldura sólida de bronze gasto com filete interno, títulos dourados e texto claro legível.
 	var t := Theme.new()
 	t.default_font_size = 9
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.09, 0.07, 0.11, 0.92)
-	sb.border_color = Color(0.78, 0.63, 0.3)
-	sb.set_border_width_all(1)
-	sb.set_corner_radius_all(3)
-	sb.set_content_margin_all(6)
+	sb.bg_color = Color(0.075, 0.065, 0.075, 0.94)
+	sb.border_color = Color(0.62, 0.48, 0.25)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(1)
+	sb.set_content_margin_all(8)
+	sb.shadow_color = Color(0, 0, 0, 0.55)
+	sb.shadow_size = 4
+	sb.shadow_offset = Vector2(0, 2)
+	sb.expand_margin_left = 1; sb.expand_margin_right = 1
 	t.set_stylebox("panel", "PanelContainer", sb)
 	var bn := StyleBoxFlat.new()
-	bn.bg_color = Color(0.17, 0.13, 0.2)
-	bn.border_color = Color(0.5, 0.4, 0.25)
-	bn.set_border_width_all(1)
-	bn.set_corner_radius_all(2)
-	bn.content_margin_left = 6; bn.content_margin_right = 6; bn.content_margin_top = 2; bn.content_margin_bottom = 2
-	var bh := bn.duplicate(); bh.bg_color = Color(0.3, 0.22, 0.32); bh.border_color = Color(0.9, 0.75, 0.4)
-	var bd := bn.duplicate(); bd.bg_color = Color(0.12, 0.1, 0.13); bd.border_color = Color(0.3, 0.27, 0.25)
+	bn.bg_color = Color(0.16, 0.13, 0.14)
+	bn.border_color = Color(0.4, 0.31, 0.19)
+	bn.border_width_left = 1; bn.border_width_right = 1; bn.border_width_top = 1; bn.border_width_bottom = 2
+	bn.set_corner_radius_all(1)
+	bn.content_margin_left = 6; bn.content_margin_right = 6; bn.content_margin_top = 2; bn.content_margin_bottom = 3
+	var bh := bn.duplicate(); bh.bg_color = Color(0.27, 0.2, 0.17); bh.border_color = Color(0.86, 0.68, 0.36)
+	var bp := bn.duplicate(); bp.bg_color = Color(0.12, 0.09, 0.09); bp.border_color = Color(0.86, 0.68, 0.36)
+	bp.border_width_top = 2; bp.border_width_bottom = 1
+	var bd := bn.duplicate(); bd.bg_color = Color(0.1, 0.09, 0.1); bd.border_color = Color(0.24, 0.21, 0.19)
 	t.set_stylebox("normal", "Button", bn)
 	t.set_stylebox("hover", "Button", bh)
-	t.set_stylebox("pressed", "Button", bh)
+	t.set_stylebox("pressed", "Button", bp)
 	t.set_stylebox("focus", "Button", bh)
 	t.set_stylebox("disabled", "Button", bd)
-	t.set_color("font_color", "Button", Color(0.95, 0.9, 0.8))
-	t.set_color("font_color", "Label", Color(0.95, 0.92, 0.85))
+	t.set_color("font_color", "Button", Color(0.93, 0.88, 0.78))
+	t.set_color("font_hover_color", "Button", Color(1.0, 0.92, 0.7))
+	t.set_color("font_disabled_color", "Button", Color(0.5, 0.47, 0.44))
+	t.set_color("font_color", "Label", Color(0.93, 0.9, 0.84))
 	t.set_color("font_outline_color", "Label", Color(0, 0, 0))
 	t.set_constant("outline_size", "Label", 2)
+	t.set_constant("line_spacing", "Label", 1)
 	t.set_font_size("font_size", "Button", 9)
+	var sep := StyleBoxLine.new()
+	sep.color = Color(0.45, 0.35, 0.2, 0.8)
+	sep.thickness = 1
+	t.set_stylebox("separator", "HSeparator", sep)
+	var grab := StyleBoxFlat.new()
+	grab.bg_color = Color(0.55, 0.42, 0.22)
+	grab.set_corner_radius_all(1)
+	t.set_stylebox("grabber", "VScrollBar", grab)
+	t.set_stylebox("grabber_highlight", "VScrollBar", grab)
+	var track := StyleBoxFlat.new()
+	track.bg_color = Color(0.1, 0.08, 0.09)
+	t.set_stylebox("scroll", "VScrollBar", track)
 	return t
 
 
@@ -106,7 +129,20 @@ func _panel(parent: Control, anchor_preset: int) -> PanelContainer:
 	var p := PanelContainer.new()
 	parent.add_child(p)
 	p.set_anchors_preset(anchor_preset)
+	p.visibility_changed.connect(_on_panel_shown.bind(p))
 	return p
+
+
+## Janelas entram com um leve crescimento e fade (sensação de peso, sem demora: 0,12 s).
+func _on_panel_shown(p: Control) -> void:
+	if not p.visible or Game.settings.reduce_motion:
+		return
+	p.pivot_offset = p.size / 2.0
+	p.scale = Vector2(0.96, 0.96)
+	p.modulate.a = 0.0
+	var tw := p.create_tween().set_parallel(true)
+	tw.tween_property(p, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(p, "modulate:a", 1.0, 0.1)
 
 
 func _label(text: String = "", size: int = 9) -> Label:
@@ -127,25 +163,101 @@ func _button(text: String, cb: Callable) -> Button:
 
 
 # --- HUD ------------------------------------------------------------------------------
+var hud_status: PanelContainer
+var hud_portrait: Portrait
+var hud_name: Label
+var bar_pv: ProgressBar
+var bar_pm: ProgressBar
+var bar_xp: ProgressBar
+var lbl_pv: Label
+var lbl_pm: Label
+var hud_clock: PanelContainer
+var lbl_clock: Label
+var lbl_place: Label
+
+
+func _bar(col: Color, h: float) -> ProgressBar:
+	var b := ProgressBar.new()
+	b.show_percentage = false
+	b.custom_minimum_size = Vector2(110, h)
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.05, 0.04, 0.05)
+	bg.border_color = Color(0.36, 0.28, 0.17)
+	bg.set_border_width_all(1)
+	var fg := StyleBoxFlat.new()
+	fg.bg_color = col
+	fg.border_color = col.lightened(0.35)
+	fg.border_width_top = 1
+	b.add_theme_stylebox_override("background", bg)
+	b.add_theme_stylebox_override("fill", fg)
+	return b
+
+
 func _build_hud(root: Control) -> void:
-	hud_top = _label("", 9)
-	hud_top.position = Vector2(6, 4)
-	hud_top.size = Vector2(420, 24)
-	hud_top.autowrap_mode = TextServer.AUTOWRAP_OFF
+	# placa de estado (canto inferior direito): retrato com expressão, nome, PV, PM e XP
+	hud_status = _panel(root, Control.PRESET_TOP_LEFT)
+	hud_status.position = Vector2(440, 284)
+	hud_status.custom_minimum_size = Vector2(194, 0)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	hud_status.add_child(row)
+	hud_portrait = Portrait.new()
+	hud_portrait.custom_minimum_size = Vector2(44, 44)
+	hud_portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(hud_portrait)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 1)
+	row.add_child(col)
+	hud_name = _label("", 8)
+	hud_name.autowrap_mode = TextServer.AUTOWRAP_OFF
+	hud_name.add_theme_color_override("font_color", Color(0.98, 0.82, 0.45))
+	col.add_child(hud_name)
+	var pv_row := HBoxContainer.new()
+	bar_pv = _bar(Color(0.62, 0.12, 0.1), 7)
+	pv_row.add_child(bar_pv)
+	lbl_pv = _label("", 7)
+	lbl_pv.autowrap_mode = TextServer.AUTOWRAP_OFF
+	pv_row.add_child(lbl_pv)
+	col.add_child(pv_row)
+	var pm_row := HBoxContainer.new()
+	bar_pm = _bar(Color(0.16, 0.3, 0.62), 5)
+	pm_row.add_child(bar_pm)
+	lbl_pm = _label("", 7)
+	lbl_pm.autowrap_mode = TextServer.AUTOWRAP_OFF
+	pm_row.add_child(lbl_pm)
+	col.add_child(pm_row)
+	bar_xp = _bar(Color(0.75, 0.6, 0.25), 2)
+	col.add_child(bar_xp)
+	hud_right = _label("", 7)
+	hud_right.autowrap_mode = TextServer.AUTOWRAP_OFF
+	col.add_child(hud_right)
+	# placa de hora e lugar (canto superior direito)
+	hud_clock = _panel(root, Control.PRESET_TOP_LEFT)
+	hud_clock.position = Vector2(462, 4)
+	hud_clock.custom_minimum_size = Vector2(172, 0)
+	var cv := VBoxContainer.new()
+	cv.add_theme_constant_override("separation", 0)
+	hud_clock.add_child(cv)
+	lbl_clock = _label("", 8)
+	lbl_clock.autowrap_mode = TextServer.AUTOWRAP_OFF
+	lbl_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	cv.add_child(lbl_clock)
+	lbl_place = _label("", 8)
+	lbl_place.autowrap_mode = TextServer.AUTOWRAP_OFF
+	lbl_place.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	lbl_place.add_theme_color_override("font_color", Color(0.98, 0.82, 0.45))
+	cv.add_child(lbl_place)
+	hud_top = _label("", 8)   # mantido para compatibilidade (texto completo, oculto)
+	hud_top.visible = false
 	root.add_child(hud_top)
-	hud_right = _label("", 9)
-	hud_right.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	hud_right.position = Vector2(400, 4)
-	hud_right.size = Vector2(234, 40)
-	root.add_child(hud_right)
 	signals_label = _label("", 8)
-	signals_label.position = Vector2(6, 26)
+	signals_label.position = Vector2(6, 6)
 	signals_label.size = Vector2(380, 30)
 	signals_label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
 	root.add_child(signals_label)
 	log_box = VBoxContainer.new()
-	log_box.position = Vector2(6, 270)
-	log_box.size = Vector2(400, 80)
+	log_box.position = Vector2(6, 282)
+	log_box.size = Vector2(430, 72)
 	log_box.add_theme_constant_override("separation", 0)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(log_box)
@@ -180,9 +292,28 @@ func update_hud() -> void:
 	var loc := Game.db.location(Game.db.location_at(Game.player_tile()))
 	var weather_txt: String = ("%s, %d°C" % [wm.region.condition, wm.region.temp_c]) if wm.enabled else "—"
 	hud_top.text = "Dia %d do mês %d, ano %d — %02d:%02d · %s · %s" % [c.day, c.month, c.year, c.hour, c.minute, weather_txt, loc.get("name", "Ermo")]
-	var s := w.player_sheet
+	lbl_clock.text = "%02d:%02d · dia %d/%d · %s" % [c.hour, c.minute, c.day, c.month, weather_txt]
+	lbl_place.text = str(loc.get("name", "Ermo"))
+	var s: CharacterSheet = w.modules.combat.sim.c("player").sheet if w.modules.combat.active else w.player_sheet
 	var sneak: bool = w.modules.combat.stance_sneak
-	hud_right.text = "PV %d/%d · PM %d/%d · T$ %d\n%s" % [s.pv, s.pv_max, s.pm, s.pm_max, w.player.gold, "[Furtivo]" if sneak else ""]
+	hud_name.text = "%s · nível %d" % [s.name, s.level]
+	bar_pv.max_value = maxi(1, s.pv_max); bar_pv.value = maxi(0, s.pv)
+	bar_pm.max_value = maxi(1, s.pm_max); bar_pm.value = maxi(0, s.pm)
+	lbl_pv.text = "%d/%d" % [s.pv, s.pv_max]
+	lbl_pm.text = "%d/%d" % [s.pm, s.pm_max]
+	var prog: ProgressionModule = w.modules.progression
+	bar_xp.max_value = maxi(1, prog.xp_to_next()); bar_xp.value = s.xp
+	hud_right.text = "%s %s · T$ %d%s" % [CharacterBuilder.RACE_NAMES.get(s.race_id, ""), s.class_id.capitalize(), w.player.gold, " · furtivo" if sneak else ""]
+	if hud_portrait.actor_id != "player" or hud_portrait.race != s.race_id:
+		hud_portrait.set_actor("player", s.race_id)
+	var ratio := float(s.pv) / maxf(1.0, s.pv_max)
+	var expr := "neutro" if ratio > 0.6 else ("determinado" if ratio > 0.3 else "dor")
+	if s.pv <= 0: expr = "medo"
+	if hud_portrait.expression != expr:
+		hud_portrait.set_expression(expr)
+	var busy := panel_journal.visible or panel_shop.visible or panel_pause.visible or panel_dialogue.visible
+	hud_status.visible = Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT] and not busy
+	hud_clock.visible = Game.mode == Game.Mode.EXPLORE and not busy
 	var sig: Array = []
 	for x in w.modules.exploration.nearby_signals(2):
 		sig.append(x.signal)
@@ -230,24 +361,51 @@ func _do_interact(i: int) -> void:
 
 
 # --- Diálogo ----------------------------------------------------------------------------------
+var dlg_portrait: Portrait
+var _type_tween: Tween
+
+
 func _build_dialogue(root: Control) -> void:
 	panel_dialogue = _panel(root, Control.PRESET_BOTTOM_WIDE)
-	panel_dialogue.offset_top = -150
-	panel_dialogue.offset_left = 20
-	panel_dialogue.offset_right = -20
-	panel_dialogue.offset_bottom = -8
+	panel_dialogue.offset_top = -132
+	panel_dialogue.offset_left = 12
+	panel_dialogue.offset_right = -12
+	panel_dialogue.offset_bottom = -6
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	panel_dialogue.add_child(row)
+	dlg_portrait = Portrait.new()
+	dlg_portrait.custom_minimum_size = Vector2(76, 76)
+	dlg_portrait.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(dlg_portrait)
 	var v := VBoxContainer.new()
-	panel_dialogue.add_child(v)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.add_theme_constant_override("separation", 2)
+	row.add_child(v)
 	dlg_name = _label("", 10)
 	dlg_name.add_theme_color_override("font_color", Color(1, 0.85, 0.45))
 	v.add_child(dlg_name)
+	v.add_child(HSeparator.new())
 	dlg_text = _label("", 9)
-	dlg_text.custom_minimum_size = Vector2(560, 30)
+	dlg_text.custom_minimum_size = Vector2(500, 30)
 	v.add_child(dlg_text)
 	dlg_opts = VBoxContainer.new()
 	dlg_opts.add_theme_constant_override("separation", 1)
 	v.add_child(dlg_opts)
 	panel_dialogue.visible = false
+
+
+## Texto aparece letra a letra (rápido; reduzir movimento mostra tudo de uma vez).
+func _typewrite(lbl: Label, txt: String) -> void:
+	if _type_tween and _type_tween.is_valid():
+		_type_tween.kill()
+	lbl.text = txt
+	if Game.settings.reduce_motion:
+		lbl.visible_ratio = 1.0
+		return
+	lbl.visible_ratio = 0.0
+	_type_tween = lbl.create_tween()
+	_type_tween.tween_property(lbl, "visible_ratio", 1.0, clampf(txt.length() / 90.0, 0.15, 1.2))
 
 
 func refresh_dialogue() -> void:
@@ -258,10 +416,14 @@ func refresh_dialogue() -> void:
 		return
 	panel_dialogue.visible = true
 	dlg_name.text = view.name
+	if dlg_portrait.actor_id != view.npc:
+		dlg_portrait.set_actor(view.npc, "humano")
+		dlg_portrait.set_expression("neutro")
 	var base: String = view.text
 	if base != _dlg_shown_text:
 		_dlg_shown_text = base
-		dlg_text.text = base
+		_typewrite(dlg_text, base)
+		dlg_portrait.set_expression(_tone_expression(base))
 		var d := Game.world.npc_def(view.npc)
 		Game.dialogue_provider.verbalize_async(view.npc, base, {"name": d.get("name", ""), "profession": d.get("profession", ""),
 			"allowed_names": ["Tomas", "Hilda", "Otto", "Lena", "Valkaria", "Khalmyr", "Kael", "Dorn", "Elsa", "Rosana"]},
@@ -270,6 +432,16 @@ func refresh_dialogue() -> void:
 		c.queue_free()
 	for o in view.options:
 		dlg_opts.add_child(_button("%d. %s" % [o.index + 1, o.text], _choose.bind(o.index)))
+
+
+## Expressão provisória pelo tom da fala (até o diálogo ter emoção explícita por nó).
+func _tone_expression(txt: String) -> String:
+	var t := txt.to_lower()
+	if t.contains("!") and (t.contains("socorro") or t.contains("filho") or t.contains("por favor")): return "medo"
+	if t.contains("obrigad") or t.contains("graças") or t.contains("bem-vind"): return "alegria"
+	if t.contains("fora") or t.contains("suma") or t.contains("ladr") or t.contains("estranho"): return "furioso"
+	if t.contains("?"): return "concentrado"
+	return "neutro"
 
 
 func _choose(i: int) -> void:
@@ -724,10 +896,37 @@ func _row_label(t: String) -> Label:
 func _refresh_creation() -> void:
 	for c in panel_creation.get_children():
 		c.queue_free()
+	var split := HBoxContainer.new()
+	split.add_theme_constant_override("separation", 8)
+	panel_creation.add_child(split)
 	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(460, 300)
+	sc.custom_minimum_size = Vector2(372, 312)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	panel_creation.add_child(sc)
+	split.add_child(sc)
+	# prévia à direita: retrato, figura com a aparência provisória da raça e resumo
+	var pv := VBoxContainer.new()
+	pv.custom_minimum_size = Vector2(104, 0)
+	split.add_child(pv)
+	var ptr := Portrait.new()
+	ptr.custom_minimum_size = Vector2(96, 96)
+	ptr.set_actor("player", _creation.race)
+	ptr.set_expression("determinado")
+	pv.add_child(ptr)
+	var fig := TextureRect.new()
+	var at := AtlasTexture.new()
+	at.atlas = load("res://assets/chars/player.png")
+	at.region = Rect2(0, 0, 32, 32)
+	fig.texture = at
+	fig.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	fig.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var look := RaceLook.of(_creation.race)
+	fig.custom_minimum_size = Vector2(96, 96 * float(look.scale))
+	fig.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fig.self_modulate = look.tint
+	pv.add_child(fig)
+	var pv_info := _label("", 8)
+	pv_info.custom_minimum_size = Vector2(100, 0)
+	pv.add_child(pv_info)
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(v)
@@ -796,6 +995,8 @@ func _refresh_creation() -> void:
 	var errs := CharacterBuilder.validate_skills(Game.rules, _creation["class"], _creation.race, base.attrs, _creation.class_picks, _creation.free_picks) \
 		if not _creation.class_picks.is_empty() else PackedStringArray()
 	var s := CharacterBuilder.build_from(Game.rules, b_dict)
+	pv_info.text = "%s\n%s\nPV %d · PM %d\nDefesa %d\n%.0fm · %s" % [CharacterBuilder.RACE_NAMES[_creation.race], _creation["class"].capitalize(),
+		s.pv_max, s.pm_max, s.defense(Game.rules), s.speed_m, s.size]
 	v.add_child(_label("Resultado: PV %d · PM %d · Defesa %d · Deslocamento %.0fm · Perícias: %s%s" % [s.pv_max, s.pm_max, s.defense(Game.rules), s.speed_m,
 		", ".join(Array(s.trained)), ("\nMagias: " + ", ".join(Array(s.spells)) + ((" · caminho " + s.arcane_path) if s.arcane_path != "" else "")) if not s.spells.is_empty() else ""], 8))
 	if _creation.class_picks.is_empty():
@@ -901,6 +1102,8 @@ func _refresh_mode() -> void:
 		panel_lab.visible = false
 	panel_over.visible = m == Game.Mode.GAMEOVER
 	combat_bar.visible = m == Game.Mode.COMBAT
+	hud_status.visible = m in [Game.Mode.EXPLORE, Game.Mode.COMBAT]
+	hud_clock.visible = m == Game.Mode.EXPLORE
 	if m != Game.Mode.DIALOGUE:
 		panel_dialogue.visible = false
 		_dlg_shown_text = ""
