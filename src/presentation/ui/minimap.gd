@@ -10,6 +10,7 @@ var _size := Vector2i.ZERO
 var weather_icon := "limpo"
 var night := false
 var _t := 0.0
+var _acc := 0.0
 
 
 func _init() -> void:
@@ -41,7 +42,9 @@ func build(db: ContentDB) -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	if visible:
+	_acc += delta
+	if visible and _acc >= 0.1:   # 10 quadros/s bastam para o minimapa
+		_acc = 0.0
 		queue_redraw()
 
 

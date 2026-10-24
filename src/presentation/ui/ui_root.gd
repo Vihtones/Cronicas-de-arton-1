@@ -179,6 +179,7 @@ var lbl_event: Label
 var toast: Label
 var belt: PanelContainer
 var _belt_slots: Dictionary = {}
+var _belt_key := ""
 var panel_tree: PowerTreePanel
 var lbl_clock: Label
 var lbl_place: Label
@@ -364,7 +365,10 @@ func update_hud() -> void:
 		(_belt_slots.poderes as HotSlot).active = s.pending_powers > 0
 		(_belt_slots.poderes as HotSlot).badge = ("+%d" % s.pending_powers) if s.pending_powers > 0 else ""
 		(_belt_slots.furtivo as HotSlot).active = sneak
-		for k in _belt_slots: (_belt_slots[k] as HotSlot).queue_redraw()
+		var key := "%d|%s" % [s.pending_powers, sneak]
+		if key != _belt_key:
+			_belt_key = key
+			for k in _belt_slots: (_belt_slots[k] as HotSlot).queue_redraw()
 	minimap.weather_icon = wm.region.condition if wm.enabled else "limpo"
 	minimap.night = c.hour < 6 or c.hour >= 19
 	var te: TownEventsModule = w.modules.town_events
@@ -750,7 +754,10 @@ func update_combat_bar() -> void:
 			b.badge = pol
 			b.active = pol == "sempre"
 		b.cost = {"especial": 1, "impeto": 1, "velocidade": 2, "emboscar": 2, "pungente": 1, "raspao": 2}.get(ic, 0)
-		b.queue_redraw()
+		var st := "%s|%s|%s|%d" % [b.visible, b.active, b.badge, b.cost]
+		if st != str(b.get_meta("st", "")):
+			b.set_meta("st", st)
+			b.queue_redraw()
 	var s := c.sim
 	var order: Array = []
 	for id in s.order:

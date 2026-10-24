@@ -39,7 +39,7 @@ func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["CREATURE_DEFEATED", "COMBAT_ENDED", "MYSTERY_RESOLVED", "TARGET_INSPECTED", "DIALOGUE_TEST", "STEALTH_CHECK"])
 
 
-static func nd_value(nd) -> float:
+static func nd_value(nd: Variant) -> float:
 	var s := str(nd)
 	if s.contains("/"):
 		return float(s.get_slice("/", 0)) / float(s.get_slice("/", 1))

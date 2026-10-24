@@ -99,7 +99,7 @@ func _family(id: String) -> Array:
 	return out
 
 
-func _grow_up(npcs) -> Array:
+func _grow_up(npcs: NpcModule) -> Array:
 	var out: Array = []
 	for id in dynamic_npcs:
 		var d: Dictionary = dynamic_npcs[id]

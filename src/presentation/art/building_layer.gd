@@ -79,10 +79,13 @@ func build(db: ContentDB) -> void:
 	# fica bem abaixo do limite de comandos do renderizador de compatibilidade
 	for b in buildings:
 		var rn := Node2D.new()
+		rn.name = "Telhado_" + str(b.id)
+		rn.add_to_group("telhados")
 		rn.draw.connect(_draw_roof_on.bind(rn, b))
 		add_child(rn)
 		b["node"] = rn
 		var fn := Node2D.new()
+		fn.name = "Fachada_" + str(b.id)
 		fn.draw.connect(_draw_facade_on.bind(fn, b))
 		facade.add_child(fn)
 		b["fnode"] = fn

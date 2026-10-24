@@ -145,6 +145,8 @@ func _pick(cat: String) -> Vector2i:
 func _new_view(sheet: String, scale_: float = 1.0) -> ActorView:
 	var v := ActorView.new()
 	v.setup("figurante_%d" % _rng.randi(), "res://assets/chars/%s.png" % sheet, "")
+	v.name = "Figurante_%s" % sheet.capitalize()
+	v.add_to_group("figurantes")
 	v.sprite.self_modulate = TINTS[_rng.randi() % TINTS.size()]
 	v.base_scale = scale_
 	v.shadow_contact.scale = Vector2.ONE * scale_
@@ -352,6 +354,8 @@ func _tick_carts(delta: float, raining: bool) -> void:
 		_cart_t = _rng.randf_range(18.0, 40.0) * (2.0 if raining else 1.0)
 		var east := _rng.randf() < 0.5
 		var node := Cart.new()
+		node.name = "Carroca"
+		node.add_to_group("figurantes")
 		node.dir = -1.0 if east else 1.0
 		node.position = Vector2((47 if east else 0) * TILE, (25 if east else 26) * TILE + 16)
 		node.cargo = _rng.randi() % 3
@@ -384,6 +388,7 @@ func _rebuild_decor(events: Array) -> void:
 			Vector2(17.2, 28.6), Vector2(26.2, 28.6)]
 		for i in spots.size():
 			var s := Stall.new()
+			s.name = "Barraca_%d" % i
 			s.position = (spots[i] as Vector2) * TILE + Vector2(0, 24)
 			s.stripe = [Color(0.7, 0.18, 0.15), Color(0.2, 0.4, 0.65), Color(0.85, 0.65, 0.2), Color(0.3, 0.55, 0.3), Color(0.55, 0.25, 0.55)][i % 5]
 			s.goods = i % 4

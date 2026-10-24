@@ -24,11 +24,12 @@ func _frames(n: int) -> void:
 
 func _shot(name: String) -> void:
 	await _frames(2)
+	await RenderingServer.frame_post_draw   # captura só com o quadro completo (sob carga pegava quadros pela metade)
 	root.get_texture().get_image().save_png(out_dir.path_join(name + ".png"))
 	print("shot ", name)
 
 
-func _goto(G, tile: Vector2i, day: int, hour: int, weather := "limpo") -> void:
+func _goto(G: Node, tile: Vector2i, day: int, hour: int, weather := "limpo") -> void:
 	var target := (day * 24 + hour) * 6
 	if target > G.world.clock.tick:
 		G.send("AdvanceTime", {"ticks": target - G.world.clock.tick})

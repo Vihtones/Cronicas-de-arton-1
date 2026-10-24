@@ -50,7 +50,7 @@ func has(id: String) -> bool:
 	return _rules.has(id)
 
 
-func value(id: String, default = null):
+func value(id: String, default: Variant = null) -> Variant:
 	return _rules[id].valor if _rules.has(id) else default
 
 

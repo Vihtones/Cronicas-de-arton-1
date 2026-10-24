@@ -34,6 +34,7 @@ func _frames(n: int) -> void:
 
 func _shot(name: String) -> void:
 	await _frames(4)
+	await RenderingServer.frame_post_draw   # captura só com o quadro completo (sob carga pegava quadros pela metade)
 	root.get_texture().get_image().save_png(out_dir.path_join(name + ".png"))
 	print("shot ", name)
 

@@ -87,7 +87,7 @@ func role_tile(role: String) -> String:
 	return str(direction.get("papeis", {}).get(role, {}).get("tile", ""))
 
 
-func policy(key: String, default_value = null):
+func policy(key: String, default_value: Variant = null) -> Variant:
 	return direction.get("politicas_runtime", {}).get(key, default_value)
 
 

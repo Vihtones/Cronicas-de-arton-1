@@ -48,11 +48,13 @@ func build(db: ContentDB, wv: WorldView) -> void:
 	for cy in range(0, db.size.y, CHUNK):
 		for cx in range(0, db.size.x, CHUNK):
 			var ch := Node2D.new()
+			ch.name = "Chao_%d_%d" % [cx, cy]
 			ch.draw.connect(_draw_chunk.bind(ch, Rect2i(cx, cy, CHUNK, CHUNK)))
 			add_child(ch)
 			move_child(ch, 0)
 			_chunks.append(ch)
 			ch.queue_redraw()
+	call_deferred("_bake_chunks")
 	var ex := Node2D.new()
 	ex.draw.connect(_draw_extras.bind(ex))
 	add_child(ex)
@@ -258,3 +260,50 @@ func _draw_puddles() -> void:
 			pts.append(p + Vector2(cos(a) * (9.0 + (i * 7 + k * 3) % 4) * s, sin(a) * (4.0 + (i + k) % 2) * s))
 		puddles.draw_colored_polygon(pts, Color(0.32, 0.36, 0.42, 0.55 * _wet))
 		puddles.draw_line(p + Vector2(-4, -1) * s, p + Vector2(3, -2) * s, Color(0.75, 0.8, 0.88, 0.35 * _wet), 1.0)
+
+
+## Assa cada pedaço numa textura (uma vez): o chão decorado vira um sprite por pedaço em vez de
+## milhares de comandos de desenho por quadro. Sob carga, o renderizador de compatibilidade
+## chegava a perder pedaços da tela (blocos pretos). Sem renderização (headless) mantém o desenho vivo.
+func _bake_chunks() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var gen := _chunks.duplicate()
+	for ch in gen:
+		if not is_instance_valid(ch) or not (ch is Node2D) or ch.get_child_count() > 0:
+			continue
+		var area: Rect2i = Rect2i()
+		for c in (ch as Node2D).draw.get_connections():
+			var args: Array = (c.callable as Callable).get_bound_arguments()
+			if args.size() == 2 and args[1] is Rect2i: area = args[1]
+		if area.size == Vector2i.ZERO:
+			continue
+		var vp := SubViewport.new()
+		vp.size = area.size * TILE
+		vp.transparent_bg = true
+		vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+		vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+		var painter := Node2D.new()
+		painter.position = -Vector2(area.position * TILE)
+		painter.draw.connect(_draw_chunk.bind(painter, area))
+		vp.add_child(painter)
+		add_child(vp)
+		await RenderingServer.frame_post_draw
+		await RenderingServer.frame_post_draw
+		if not is_instance_valid(ch):
+			vp.queue_free()
+			return
+		var img := vp.get_texture().get_image()
+		vp.queue_free()
+		if img == null or img.is_empty():
+			continue
+		var spr := Sprite2D.new()
+		spr.name = "ChaoAssado_%d_%d" % [area.position.x, area.position.y]
+		spr.texture = ImageTexture.create_from_image(img)
+		spr.centered = false
+		spr.position = Vector2(area.position * TILE)
+		var idx := (ch as Node).get_index()
+		add_child(spr)
+		move_child(spr, idx)
+		_chunks[_chunks.find(ch)] = spr
+		(ch as Node).queue_free()

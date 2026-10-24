@@ -10,7 +10,7 @@ var events_per_command: Array[int] = []
 const CAP := 3000
 
 
-func push(arr: Array, v) -> void:
+func push(arr: Array, v: Variant) -> void:
 	arr.append(v)
 	if arr.size() > CAP:
 		arr.pop_front()
