@@ -17,7 +17,8 @@ func test_reputacao_nao_sobe_se_ninguem_sabe() -> void:
 	var rep := mem.settlement_reputation()
 	eq(rep.known_by, 1, "só Tomas testemunhou")
 	check(mem.reputation("tomas") > 0, "Tomas grato")
-	eq(mem.reputation("garrick"), 0.0, "ferreiro não sabe")
+	eq(mem.reputation("mara"), 0.0, "mercadora não sabe")
+	eq(mem.reputation("garrick"), -10.0, "ferreiro desconfia de estranhos (viés individual, não regra de raça)")
 
 
 func test_rumor_espalha_com_o_tempo_e_preserva_causalidade() -> void:

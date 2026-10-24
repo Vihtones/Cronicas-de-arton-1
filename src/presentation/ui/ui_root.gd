@@ -51,6 +51,10 @@ func _ready() -> void:
 	_build_pause(root)
 	_build_gameover(root)
 	_build_title(root)
+	_build_lab(root)
+	_build_creation(root)
+	_build_hub(root)
+	_build_debug(root)
 	Game.event_published.connect(_on_event)
 	Game.mode_changed.connect(func(_m): _refresh_mode())
 	_refresh_mode()
@@ -289,6 +293,12 @@ func toggle_journal() -> void:
 		refresh_journal()
 
 
+func _cmd_log(type: String, payload: Dictionary) -> void:
+	var r := Game.send(type, payload)
+	if not r.accepted:
+		log_msg("✘ " + "; ".join(r.errors))
+
+
 func _h(text: String) -> Label:
 	var l := _label(text, 10)
 	l.add_theme_color_override("font_color", Color(1, 0.82, 0.4))
@@ -303,7 +313,8 @@ func refresh_journal() -> void:
 	journal_body.add_child(_h("Diário — %s  [J fecha]" % Game.db.mystery.title + ("  (resolvido)" if ex.mystery_state == "resolvido" else ("  (perdido)" if ex.mystery_state == "perdido" else ""))))
 	journal_body.add_child(_h("Pistas"))
 	for n in ex.notes:
-		journal_body.add_child(_label("• " + str(n.text), 9))
+		var mt: String = Game.db.mystery_def(str(n.get("mystery", ""))).get("title", "")
+		journal_body.add_child(_label("• " + (("[" + mt + "] ") if mt != "" and mt != Game.db.mystery.title else "") + str(n.text), 9))
 	journal_body.add_child(_h("Hipóteses (você decide no que acredita)"))
 	for h in ex.hypothesis_view():
 		var row := HBoxContainer.new()
@@ -323,6 +334,44 @@ func refresh_journal() -> void:
 	for it in w.modules.state.inventory:
 		inv.append("%s x%d" % [Game.db.items.get(it, {}).get("name", it), w.modules.state.inventory[it]])
 	journal_body.add_child(_label("Inventário: %s · Ouro: T$ %d" % [", ".join(inv) if not inv.is_empty() else "—", w.player.gold], 9))
+	var inv_row := HBoxContainer.new()
+	for it in w.modules.state.inventory:
+		if ItemsModule.EQUIPPABLE.has(it):
+			inv_row.add_child(_button("Equipar " + Game.db.items.get(it, {}).get("name", it), func(): _cmd_log("Equip", {"item": it}); refresh_journal()))
+		elif it == "pocao_cura":
+			inv_row.add_child(_button("Beber poção", func(): _cmd_log("UseItem", {"item": it}); refresh_journal()))
+	for sp in s.spells:
+		if w.rules.value("magia." + sp, {}).has("cura"):
+			inv_row.add_child(_button("Lançar " + sp, func(): _cmd_log("CastSpell", {"spell": sp}); refresh_journal()))
+	if inv_row.get_child_count() > 0:
+		journal_body.add_child(inv_row)
+	var prog: ProgressionModule = w.modules.progression
+	if prog.enabled:
+		journal_body.add_child(_label("Experiência: %d XP · próximo nível em %d XP · poderes a escolher: %d (escolha de poderes ainda não implementada)" % [s.xp, prog.xp_to_next(), s.pending_powers], 9))
+	var dom: DomainModule = w.modules.domain
+	if dom.enabled and dom.owned:
+		journal_body.add_child(_h("Domínio — " + dom.domain_name))
+		journal_body.add_child(_label("Tesouro T$ %d · moral %d · segurança %d · imposto %s · patrulha %s · celeiro %s · %s" % [dom.treasury, dom.morale, dom.security,
+			dom.policy.imposto, "sim" if dom.policy.patrulha else "não", "sim" if dom.policy.celeiro else "não", "delegado aos conselheiros" if dom.delegated else "você decide"], 9))
+		var drow := HBoxContainer.new()
+		for tax in ["baixo", "medio", "alto"]:
+			drow.add_child(_button("Imposto " + tax, func(): _cmd_log("SetPolicy", {"key": "imposto", "value": tax}); refresh_journal()))
+		drow.add_child(_button("Patrulha", func(): _cmd_log("SetPolicy", {"key": "patrulha", "value": not dom.policy.patrulha}); refresh_journal()))
+		drow.add_child(_button("Celeiro", func(): _cmd_log("SetPolicy", {"key": "celeiro", "value": not dom.policy.celeiro}); refresh_journal()))
+		drow.add_child(_button("Delegar" if not dom.delegated else "Retomar", func(): _cmd_log("Delegate", {"on": not dom.delegated}); refresh_journal()))
+		journal_body.add_child(drow)
+		if not dom.reports.is_empty():
+			var rp: Dictionary = dom.reports[-1]
+			journal_body.add_child(_label("Última semana: renda %d, custos %d%s" % [rp.income, rp.upkeep, (" — " + rp.event) if rp.event != "" else ""], 8))
+	var lin: LineageModule = w.modules.lineage
+	if lin.enabled and (not lin.deaths.is_empty() or not lin.newborns.is_empty() or not lin.heroes.is_empty()):
+		journal_body.add_child(_h("Gerações"))
+		for d in lin.deaths:
+			journal_body.add_child(_label("✝ %s (%d anos) — herdeiro: %s" % [Game.db.npc_def(d.npc).name, d.age, Game.db.npc_def(d.heir).get("name", "ninguém")], 8))
+		for b in lin.newborns:
+			journal_body.add_child(_label("✦ %s, ano %d" % [b.name, b.born_year], 8))
+		for hh in lin.heroes:
+			journal_body.add_child(_label("Herói anterior: %s (nível %d)" % [hh.name, hh.level], 8))
 	var mem: MemoryModule = w.modules.memory
 	if mem.enabled:
 		var rep := mem.settlement_reputation()
@@ -378,6 +427,7 @@ func _build_combat_bar(root: Control) -> void:
 	v.add_child(row)
 	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover"], ["2 Investida", func(): combat_view.mode = "investida"],
 			["3 Misericórdia", func(): combat_view.mode = "misericordia"], ["Q Especial", func(): combat_view.special = not combat_view.special],
+			["4 Magia", func(): combat_view.mode = "magia"], ["5 Poção", func(): combat_view.drink_potion()],
 			["L Levantar", func(): combat_view.stand_up()], ["⌫ Desfazer", func(): combat_view.undo()],
 			["↵ Confirmar", func(): combat_view.confirm()], ["␣ Fim do turno", func(): combat_view.end_turn()]]:
 		var b := _button(spec[0], spec[1])
@@ -447,6 +497,12 @@ func _build_gameover(root: Control) -> void:
 	panel_over.add_child(v)
 	v.add_child(_h("Você morreu."))
 	v.add_child(_label("Arton não protege ninguém. O mundo segue sem você.", 9))
+	v.add_child(_button("Continuar como herdeiro (mesmo mundo)", func():
+		var r := Game.send("ContinueAsHeir")
+		if r.accepted:
+			Game.set_mode(Game.Mode.EXPLORE)
+			Game.world_reloaded.emit()
+		else: log_msg("✘ " + "; ".join(r.errors))))
 	v.add_child(_button("Carregar último salvamento", func(): request_load.emit("quicksave" if Game.has_save("quicksave") else "auto")))
 	v.add_child(_button("Carregar autosave", func(): request_load.emit("auto")))
 	v.add_child(_button("Voltar ao título", func(): Game.world = null; Game.set_mode(Game.Mode.TITLE)))
@@ -470,8 +526,10 @@ func _build_title(root: Control) -> void:
 	var st := _label("O Filho do Moleiro — vertical slice", 9)
 	st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(st)
-	v.add_child(_button("Novo jogo — Aventureiro", func(): request_new_game.emit(false)))
-	v.add_child(_button("Novo jogo — Aventureira", func(): request_new_game.emit(true)))
+	v.add_child(_button("Novo jogo — Aventureiro (Guerreiro pronto)", func(): request_new_game.emit(false)))
+	v.add_child(_button("Novo jogo — Aventureira (Guerreira pronta)", func(): request_new_game.emit(true)))
+	v.add_child(_button("Criar personagem…", func(): open_creation()))
+	v.add_child(_button("Laboratório de protótipos…", func(): open_lab()))
 	v.add_child(_button("Continuar (salvamento rápido)", func(): request_load.emit("quicksave")))
 	v.add_child(_button("Continuar (autosave)", func(): request_load.emit("auto")))
 	v.add_child(_button("Sair", func(): get_tree().quit()))
@@ -480,9 +538,178 @@ func _build_title(root: Control) -> void:
 	v.add_child(disc)
 
 
+# --- Laboratório de protótipos ------------------------------------------------------
+var panel_lab: PanelContainer
+var panel_creation: PanelContainer
+var panel_hub: PanelContainer
+var debug_label: Label
+var _creation := {"race": "humano", "class": "guerreiro", "preset": 0, "feminine": false}
+
+
+func _build_lab(root: Control) -> void:
+	panel_lab = _panel(root, Control.PRESET_FULL_RECT)
+	panel_lab.offset_left = 40; panel_lab.offset_top = 16; panel_lab.offset_right = -40; panel_lab.offset_bottom = -16
+	var sc := ScrollContainer.new()
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel_lab.add_child(sc)
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(v)
+	v.add_child(_h("Laboratório de protótipos — uma mecânica por cenário"))
+	for p in Prototypes.LIST:
+		var row := HBoxContainer.new()
+		var b := _button(p.nome, func(): panel_lab.visible = false; _start_proto(p.id))
+		b.custom_minimum_size.x = 170
+		row.add_child(b)
+		var l := _label(p.desc, 8)
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.custom_minimum_size.x = 360
+		row.add_child(l)
+		v.add_child(row)
+	v.add_child(_button("Voltar", func(): panel_lab.visible = false))
+	panel_lab.visible = false
+
+
+func open_lab() -> void:
+	panel_lab.visible = true
+
+
+func _start_proto(id: String) -> void:
+	var info: Dictionary = Game.start_prototype(id)
+	log_msg(info.intro)
+	if info.get("ui", "") == "criacao":
+		open_creation()
+
+
+# --- Criação de personagem ----------------------------------------------------------------
+func _build_creation(root: Control) -> void:
+	panel_creation = _panel(root, Control.PRESET_CENTER)
+	panel_creation.position = Vector2(90, 24)
+	panel_creation.custom_minimum_size = Vector2(460, 0)
+	panel_creation.visible = false
+
+
+func open_creation() -> void:
+	panel_creation.visible = true
+	_refresh_creation()
+
+
+func _row_label(t: String) -> Label:
+	var l := _label(t, 9)
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	l.custom_minimum_size.x = 60
+	return l
+
+
+func _refresh_creation() -> void:
+	for c in panel_creation.get_children():
+		c.queue_free()
+	var v := VBoxContainer.new()
+	panel_creation.add_child(v)
+	v.add_child(_h("Criação de personagem (LB cap. 1)"))
+	var rr := HBoxContainer.new()
+	rr.add_child(_row_label("Raça:"))
+	for r in CharacterBuilder.RACES:
+		rr.add_child(_button(("● " if _creation.race == r else "") + r.capitalize(), func(): _creation.race = r; _refresh_creation()))
+	v.add_child(rr)
+	var cr := HBoxContainer.new()
+	cr.add_child(_row_label("Classe:"))
+	for c in CharacterBuilder.CLASSES:
+		cr.add_child(_button(("● " if _creation["class"] == c else "") + c.capitalize(), func(): _creation["class"] = c; _creation.preset = 0; _refresh_creation()))
+	v.add_child(cr)
+	var pr := HBoxContainer.new()
+	pr.add_child(_row_label("Atributos:"))
+	var presets: Array = CharacterBuilder.presets(_creation["class"])
+	for i in presets.size():
+		var pre: Dictionary = presets[i]
+		pr.add_child(_button(("● " if _creation.preset == i else "") + "F%d D%d C%d I%d S%d Ca%d" % [pre["for"], pre.des, pre.con, pre["int"], pre.sab, pre.car],
+			func(): _creation.preset = i; _refresh_creation()))
+	v.add_child(pr)
+	v.add_child(_button("Gênero: " + ("feminino" if _creation.feminine else "masculino"), func(): _creation.feminine = not _creation.feminine; _refresh_creation()))
+	var attrs: Dictionary = presets[_creation.preset]
+	var s := CharacterBuilder.build(Game.rules, _creation.race, _creation["class"], attrs, ["for", "des", "con"] if _creation["class"] == "guerreiro" else (["des", "int", "car"] if _creation["class"] == "ladino" else ["int", "des", "sab"]))
+	v.add_child(_label("Resultado: PV %d · PM %d · Defesa %d · Deslocamento %.0fm · Perícias: %s%s" % [s.pv_max, s.pm_max, s.defense(Game.rules), s.speed_m,
+		", ".join(Array(s.trained)), ("
+Magias: " + ", ".join(Array(s.spells))) if not s.spells.is_empty() else ""], 8))
+	v.add_child(_label("Elfo, goblin, minotauro e demais raças/classes: ainda não implementados (ver ROADMAP).", 7))
+	v.add_child(_button("Começar", func():
+		panel_creation.visible = false
+		var picks: Array = ["for", "des", "con"] if _creation["class"] == "guerreiro" else (["des", "int", "car"] if _creation["class"] == "ladino" else ["int", "des", "sab"])
+		Game.new_game_with_build({"race": _creation.race, "class": _creation["class"], "attrs": attrs, "human_picks": picks,
+			"name": ("Aventureira" if _creation.feminine else "Aventureiro")}, _creation.feminine)))
+	v.add_child(_button("Cancelar", func(): panel_creation.visible = false))
+
+
+# --- Valkaria (região distante, LOD L3, sem mapa) --------------------------------------------
+func _build_hub(root: Control) -> void:
+	panel_hub = _panel(root, Control.PRESET_FULL_RECT)
+	panel_hub.offset_left = 60; panel_hub.offset_top = 40; panel_hub.offset_right = -60; panel_hub.offset_bottom = -60
+	panel_hub.visible = false
+
+
+func refresh_hub() -> void:
+	var tr: TravelModule = Game.world.modules.travel
+	panel_hub.visible = tr.enabled and tr.current_region != "vila"
+	if not panel_hub.visible:
+		return
+	for c in panel_hub.get_children():
+		c.queue_free()
+	var v := VBoxContainer.new()
+	panel_hub.add_child(v)
+	v.add_child(_h({"valkaria": "Valkaria, a capital", "ermos_norte": "Ermos do Norte"}.get(tr.current_region, tr.current_region)))
+	v.add_child(_label("Protótipo de região distante (LOD L3): sem mapa, só decisões, mercado e notícias.", 8))
+	var eco: EconomyModule = Game.world.modules.economy
+	if tr.current_region == "valkaria" and eco.enabled:
+		v.add_child(_label("Mercado: comida %d · ferramentas %d · remédios %d (estoques agregados)" % [eco.regions.valkaria.stock.comida, eco.regions.valkaria.stock.ferramentas, eco.regions.valkaria.stock.remedio], 9))
+	var rs: RegionSimModule = Game.world.modules.region_sim
+	for h in rs.history.slice(maxi(0, rs.history.size() - 4)):
+		v.add_child(_label("• " + str(h.news), 8))
+	var adv: AdventurersModule = Game.world.modules.adventurers
+	for p in adv.parties:
+		var mem: Array = p.members.map(func(m): return "%s (%s %d%s)" % [m.name, m["class"], m.level, "" if m.alive else ", morto"])
+		v.add_child(_label("%s: %s" % [p.name, ", ".join(mem)], 8))
+	v.add_child(_button("Descansar numa estalagem (8h)", func(): var r := Game.send("Rest"); refresh_hub()))
+	for route in tr.available_routes():
+		v.add_child(_button("Viajar: " + route.replace("->", " → ").replace("_", " "), func():
+			var r := Game.send("Travel", {"route": route})
+			if not r.accepted: log_msg("✘ " + "; ".join(r.errors))
+			refresh_hub()
+			Game.world_reloaded.emit()))
+
+
+# --- Depuração (F3) --------------------------------------------------------------------------
+func _build_debug(root: Control) -> void:
+	debug_label = _label("", 7)
+	debug_label.position = Vector2(440, 44)
+	debug_label.size = Vector2(196, 200)
+	debug_label.add_theme_color_override("font_color", Color(0.6, 1, 0.6))
+	debug_label.visible = false
+	root.add_child(debug_label)
+
+
+func toggle_debug() -> void:
+	debug_label.visible = not debug_label.visible
+
+
+func _update_debug() -> void:
+	var w := Game.world
+	var t := Game.telemetry.report()
+	var mods: Array = []
+	for id in w.modules:
+		mods.append(("" if w.modules[id].enabled else "✘") + id)
+	var npcs: NpcModule = w.modules.npcs
+	var l1 := 0
+	for id in npcs.state:
+		if npcs.state[id].alive: l1 += 1
+	debug_label.text = "FPS %d · frame p95 %.1fms · cmd p95 %.2fms\ntick %d · rev %d · journal %d\nNPCs L1 %d · seed %s\nRNG combat/world/weather separados\n%s" % [
+		Engine.get_frames_per_second(), t.frame_p95_ms, t.cmd_p95_ms, w.clock.tick, w.revision, w.journal.size(), l1, str(w.rng.world_seed), " ".join(mods)]
+
+
 func _refresh_mode() -> void:
 	var m := Game.mode
 	panel_title.visible = m == Game.Mode.TITLE
+	if m != Game.Mode.TITLE:
+		panel_lab.visible = false
 	panel_over.visible = m == Game.Mode.GAMEOVER
 	combat_bar.visible = m == Game.Mode.COMBAT
 	if m != Game.Mode.DIALOGUE:
@@ -495,7 +722,7 @@ func _refresh_mode() -> void:
 
 
 func any_panel_open() -> bool:
-	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible
+	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible
 
 
 func close_panels() -> bool:
@@ -504,6 +731,7 @@ func close_panels() -> bool:
 	panel_shop.visible = false
 	panel_interact.visible = false
 	panel_pause.visible = false
+	panel_creation.visible = false
 	return was
 
 
@@ -521,5 +749,7 @@ func _process(_d: float) -> void:
 	if Game.world == null:
 		return
 	update_hud()
+	if debug_label.visible:
+		_update_debug()
 	if Game.mode == Game.Mode.COMBAT:
 		update_combat_bar()

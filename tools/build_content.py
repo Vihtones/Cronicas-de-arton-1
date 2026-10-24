@@ -179,6 +179,19 @@ targets += [
      "fail": "Só o vento nas pedras."}}},
 ]
 
+targets += [
+ {"id": "carcaca_ovelha", "tile": [58, 26], "name": "Carcaça de ovelha", "requires_flag": "ovelha_morta",
+  "signal": "Uma ovelha morta à beira da estrada. Moscas.",
+  "actions": {
+   "examinar": {"skill": "percepcao", "cd": 15, "reveals": ["f_ovelhas_mortas", "f_marcas_hiena"],
+     "ok": "Mordidas largas e ossos partidos: mandíbula forte demais para lobo. Hienas.", "fail": "Uma ovelha morta. Lobos, talvez."},
+   "rastrear": {"skill": "sobrevivencia", "cd": 15, "reveals": ["f_ovelhas_mortas", "f_toca_hienas"],
+     "ok": "Pegadas de quatro patas, desiguais, rumo ao leste do bosque. Uma toca.", "fail": "O rastro some no capim."}}},
+ {"id": "toca_hienas", "tile": [80, 37], "name": "Toca sob as raízes",
+  "signal": "Ossos roídos e um cheiro azedo saem de baixo de um carvalho tombado.",
+  "actions": {"examinar": {"skill": "percepcao", "cd": 10, "reveals": ["f_toca_hienas"], "ok": "É a toca da matilha.", "fail": "Ossos velhos."}}},
+]
+
 # --- Mistério -------------------------------------------------------------------
 mystery = {
  "truth_id": "m_filho_do_moleiro", "status": "ORIGINAL_DO_JOGO",
@@ -282,7 +295,9 @@ creatures = [
  {"id": "bandido_2", "name": "Bandido Ruivo", "rule": "criatura.bandido_comum", "faction": "garras_de_cinza", "spawn": [31, 57], "zone": "cripta", "sleeps": [1, 7]},
  {"id": "hiena_1", "name": "Hiena", "rule": "criatura.hiena", "faction": "fauna", "spawn": [78, 34], "zone": "floresta", "active_hours": [18, 6],
   "signal": "Risadas agudas ecoam entre as árvores."},
- {"id": "hiena_2", "name": "Hiena", "rule": "criatura.hiena", "faction": "fauna", "spawn": [80, 36], "zone": "floresta", "active_hours": [18, 6]},
+ {"id": "hiena_2", "name": "Hiena Malhada", "rule": "criatura.hiena", "faction": "fauna", "spawn": [80, 36], "zone": "floresta", "active_hours": [18, 6]},
+ {"id": "hiena_3", "name": "Hiena Jovem", "rule": "criatura.hiena", "faction": "fauna", "spawn": [82, 35], "zone": "floresta", "active_hours": [18, 6], "start_present": False},
+ {"id": "hiena_4", "name": "Hiena Jovem", "rule": "criatura.hiena", "faction": "fauna", "spawn": [79, 38], "zone": "floresta", "active_hours": [18, 6], "start_present": False},
 ]
 items = {
  "chave_cela": {"name": "Chave de ferro", "price": 0},
@@ -291,7 +306,16 @@ items = {
  "cerveja": {"name": "Caneca de cerveja", "price": 1, "good": "bebida"},
  "corda": {"name": "Corda (15m)", "price": 1, "good": "ferramentas"},
  "tocha": {"name": "Tocha", "price": 1, "good": "ferramentas"},
- "pocao_cura": {"name": "Essência de cura (placeholder)", "price": 30, "good": "remedio", "status": "PENDENTE_REVISAO"},
+ "pocao_cura": {"name": "Poção de Curar Ferimentos", "price": 30, "good": "remedio", "status": "PENDENTE_REVISAO"},
+ "saco_de_dormir": {"name": "Saco de dormir", "price": 1, "good": "ferramentas", "rule": "item.saco_de_dormir"},
+ # Armas e armaduras: preços do LB p.144 e p.153 (data/rules/equipamento.json)
+ "espada_longa": {"name": "Espada longa", "price": 15, "good": "ferramentas", "rule": "arma.espada_longa"},
+ "espada_curta": {"name": "Espada curta", "price": 10, "good": "ferramentas", "rule": "arma.espada_curta"},
+ "adaga": {"name": "Adaga", "price": 2, "good": "ferramentas", "rule": "arma.adaga"},
+ "machado_batalha": {"name": "Machado de batalha", "price": 10, "good": "ferramentas", "rule": "arma.machado_batalha"},
+ "arco_curto": {"name": "Arco curto", "price": 30, "good": "ferramentas", "rule": "arma.arco_curto"},
+ "couro_batido": {"name": "Couro batido", "price": 35, "good": "ferramentas", "rule": "armadura.couro_batido"},
+ "cota_malha": {"name": "Cota de malha", "price": 150, "good": "ferramentas", "rule": "armadura.cota_malha"},
 }
 economy = {
  "goods": {"comida": {"base": 1.0}, "bebida": {"base": 1.0}, "ferramentas": {"base": 1.0}, "remedio": {"base": 1.0}},
@@ -302,7 +326,8 @@ economy = {
            "consumption": {"comida": 500, "bebida": 300, "ferramentas": 190, "remedio": 18}, "target": {"comida": 5000, "bebida": 3000, "ferramentas": 2000, "remedio": 300}},
  },
  "price_limits": [0.5, 3.0], "status": "ORIGINAL_DO_JOGO",
- "shops": {"rosana": ["pao", "cerveja"], "mara": ["corda", "tocha", "pao"], "ysolde": ["pocao_cura"]},
+ "shops": {"rosana": ["pao", "cerveja"], "mara": ["corda", "tocha", "pao", "saco_de_dormir"], "ysolde": ["pocao_cura"],
+           "garrick": ["adaga", "espada_curta", "espada_longa", "machado_batalha", "arco_curto", "couro_batido", "cota_malha"]},
 }
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
@@ -323,7 +348,17 @@ zones = [{"id": "vila", "rect": [2, 6, 44, 42]}, {"id": "estrada", "rect": [44, 
          {"id": "ruina", "rect": [80, 4, 13, 11]}, {"id": "cripta", "rect": [3, 50, 42, 13]}]
 world = {"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "tile_px": 32, "size": [W, H], "grid": grid, "legend": legend, "zones": zones,
          "player_start": [23, 27], "locations": locations, "objects": objects, "targets": targets}
-files = {"map": world, "npcs": {"npcs": npcs, "schedule_templates": SCHED, "families": families, "factions": factions, "creatures": creatures},
+mysteries_extra = {"mysteries": [{
+ "truth_id": "m_ovelhas", "status": "ORIGINAL_DO_JOGO", "title": "As Ovelhas de Fenna",
+ "historical_context": "Quando a matilha passa fome, caça as ovelhas da estrada leste. Fenna acredita que são lobos.",
+ "facts": {"f_ovelhas_mortas": "Algo está matando as ovelhas de Fenna na estrada leste.",
+           "f_marcas_hiena": "As mordidas são de hienas, não de lobos.",
+           "f_toca_hienas": "A matilha tem uma toca no leste do Bosque Sombrio."},
+ "hypotheses": {"h_lobos": {"text": "Lobos estão atacando o rebanho.", "supported_by": [], "contradicted_by": ["f_marcas_hiena"]},
+                "h_hienas": {"text": "As hienas do bosque atacam o rebanho por fome.", "supported_by": ["f_marcas_hiena", "f_toca_hienas"], "contradicted_by": []}},
+ "start_facts": [], "factions_interested": [], "state_transitions": {"resolvido": {"requires": "matilha derrotada"}},
+}]}
+files = {"mysteries_extra": mysteries_extra, "map": world, "npcs": {"npcs": npcs, "schedule_templates": SCHED, "families": families, "factions": factions, "creatures": creatures},
          "mystery": mystery, "items": items, "economy": economy, "laws": laws, "distant": distant}
 for k, v in files.items():
     (OUT / f"{k}.json").write_text(json.dumps(v, ensure_ascii=False, indent=1), encoding="utf-8")

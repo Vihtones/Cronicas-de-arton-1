@@ -1,0 +1,39 @@
+{
+ "mysteries": [
+  {
+   "truth_id": "m_ovelhas",
+   "status": "ORIGINAL_DO_JOGO",
+   "title": "As Ovelhas de Fenna",
+   "historical_context": "Quando a matilha passa fome, caça as ovelhas da estrada leste. Fenna acredita que são lobos.",
+   "facts": {
+    "f_ovelhas_mortas": "Algo está matando as ovelhas de Fenna na estrada leste.",
+    "f_marcas_hiena": "As mordidas são de hienas, não de lobos.",
+    "f_toca_hienas": "A matilha tem uma toca no leste do Bosque Sombrio."
+   },
+   "hypotheses": {
+    "h_lobos": {
+     "text": "Lobos estão atacando o rebanho.",
+     "supported_by": [],
+     "contradicted_by": [
+      "f_marcas_hiena"
+     ]
+    },
+    "h_hienas": {
+     "text": "As hienas do bosque atacam o rebanho por fome.",
+     "supported_by": [
+      "f_marcas_hiena",
+      "f_toca_hienas"
+     ],
+     "contradicted_by": []
+    }
+   },
+   "start_facts": [],
+   "factions_interested": [],
+   "state_transitions": {
+    "resolvido": {
+     "requires": "matilha derrotada"
+    }
+   }
+  }
+ ]
+}

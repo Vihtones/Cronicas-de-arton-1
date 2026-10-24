@@ -28,6 +28,19 @@ out += ["", "## Mecânicas ORIGINAL_DO_JOGO e ADAPTADA (fora do catálogo de reg
 "| Economia agregada com preços limitados a 0,5×–3× | `EconomyModule` | ORIGINAL | `data/world/economy.json` |",
 "| Calendário 30 dias × 12 meses, estações por trimestre | `WorldClock`, `WeatherModule.season` | PLACEHOLDER | sim |",
 "| 1 tick = 10 min; 2 s reais por tick | `WorldClock`, `Game.settings` | PLACEHOLDER (§20.7) | sim |",
-"| Mistério 'O Filho do Moleiro', vila, NPCs, facções, diálogos | `data/world`, `data/dialogue` | ORIGINAL_DO_JOGO | — |"]
+"| Mistério 'O Filho do Moleiro', vila, NPCs, facções, diálogos | `data/world`, `data/dialogue` | ORIGINAL_DO_JOGO | — |",
+"| XP de mistério resolvido = ND 1 ('XP alternativo', LB p.326) | `ProgressionModule.MYSTERY_ND` | ORIGINAL | constante |",
+"| Fuga conta como empate (½ XP); captura como derrota (¼ XP) | `ProgressionModule` | ADAPTADA | — |",
+"| Presets de atributos e perícias padrão por classe | `CharacterBuilder` | ORIGINAL (dentro das regras) | — |",
+"| Alcance médio de magia = 20 quadrados | `GhostPlanner` (cast) | PLACEHOLDER (alcance.metros pendente) | — |",
+"| Relento com saco de dormir = condição normal | `StateModule.rest_quality` | ADAPTADA | — |",
+"| Rotas, distâncias e risco de emboscada (5%/20% por dia) | `TravelModule` | ORIGINAL | constantes |",
+"| Domínio: renda, moral, segurança, conselheiros | `DomainModule` | ORIGINAL | constantes |",
+"| Casais, chance de nascimento 15%/ano; herança ao parente vivo mais velho; herdeiro com ½ do ouro | `LineageModule` | ORIGINAL | constantes |",
+"| Aventureiros NPC: missões 25%/dia, ND sorteado, XP pela regra do LB | `AdventurersModule` | ORIGINAL (XP: LB) | constantes |",
+"| Matilha: comida, caça por estação, ataques a ovelhas, crescimento até 4 | `FaunaModule` | ORIGINAL | constantes |",
+"| Investigação criminal: Investigação +4 da capitã vs CD 20 − pistas | `CrimeModule._investigate` | PLACEHOLDER | — |",
+"| Preconceito individual: −10 de reputação e +20% no preço até 3 memórias | `MemoryModule.bias`, `EconomyModule.price` | ORIGINAL | traço do NPC |",
+"| Vinhetas do diretor de ritmo | `PacingModule` | ORIGINAL | — |"]
 (ROOT / "docs" / "REGRAS.md").write_text("\n".join(out) + "\n", encoding="utf-8")
 print("regras", len(rows), counts)

@@ -13,11 +13,16 @@ func handled_commands() -> PackedStringArray: return PackedStringArray(["Rest"])
 
 ## Descanso (LB p.106): recupera PV e PM conforme a condição do local.
 func rest_quality() -> String:
+	var tr = world.module("travel")
+	if tr != null and tr.current_region != "vila":
+		return "normal" if int(world.player.gold) >= 1 else "ruim"  # estalagem comum (LB p.163) ou relento
 	var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
 	if loc == "taverna" and int(world.player.gold) >= 1:
 		return "normal"  # salão comunal / quarto simples
 	if bool(world.db.location(loc).get("indoor", false)):
 		return "ruim" if world.db.zone_at(world.db.world_to_tile(world.player.position)) == "cripta" else "normal"
+	if has_item("saco_de_dormir"):
+		return "normal"  # ADAPTADA: relento COM saco de dormir deixa de ser condição ruim (LB p.106)
 	return "ruim"  # relento sem acampamento
 
 
@@ -38,7 +43,9 @@ func execute(cmd: GameCommand) -> Array:
 	var mult: float = float(world.rules.value("descanso.recuperacao", {}).get(quality, 1))
 	var amount := maxi(int(world.rules.value("descanso.minimo", {"minimo": 1}).minimo), int(floor(world.player_sheet.level * mult)))
 	var out: Array = []
-	if quality == "normal" and world.db.location_at(world.db.world_to_tile(world.player.position)) == "taverna":
+	var tr2 = world.module("travel")
+	var in_town: bool = tr2 != null and tr2.current_region != "vila"
+	if quality == "normal" and (in_town or world.db.location_at(world.db.world_to_tile(world.player.position)) == "taverna"):
 		out.append(fact("GOLD_CHANGED", {"delta": -1, "reason": "pernoite na taverna"}))
 	out.append_array(world.advance_ticks(hours * 60 / world.clock.tick_minutes))
 	var s := world.player_sheet

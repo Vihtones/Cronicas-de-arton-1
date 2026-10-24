@@ -24,18 +24,28 @@ var is_important: bool = true     # golpe de misericórdia: 25% vs 75%
 var devotion: String = ""
 var faction: String = ""
 var source_rule: String = ""
+var class_id: String = ""
+var race_id: String = ""
+var xp: int = 0
+var spells: PackedStringArray = PackedStringArray()
+var equipment := {"weapon": "", "armor": ""}
+var pending_powers: int = 0
+var caster_attr: String = ""
 
 
-func skill_value(skill: String, rules: RuleRegistry) -> int:
+func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> int:
 	if flat_skills.has(skill):
 		return int(flat_skills[skill])
+	var race_bonus := 0
+	if context == "subterraneo" and race_id != "":
+		race_bonus = int(rules.value("raca." + race_id, {}).get("bonus_subterraneo", {}).get(skill, 0))
 	var table: Dictionary = rules.value("pericia.tabela", {})
 	var info: Dictionary = table.get(skill, {"atributo": "Sab"})
 	var attr_key: String = str(info.atributo).to_lower()
 	var v: int = level / 2 + int(attrs.get(attr_key, 0))
 	if trained.has(skill):
 		v += training_bonus()
-	return v
+	return v + race_bonus
 
 
 func can_use_skill(skill: String, rules: RuleRegistry) -> bool:
@@ -132,6 +142,8 @@ func to_dict() -> Dictionary:
 		"defense_base": defense_base, "defense_fixed": defense_fixed, "speed_m": speed_m,
 		"attacks": attacks.duplicate(true), "conditions": Array(conditions), "senses": Array(senses), "habilidades": Array(habilidades), "stable": stable,
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
+		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
+		"pending_powers": pending_powers, "caster_attr": caster_attr,
 	}
 
 
@@ -150,6 +162,10 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.habilidades = PackedStringArray(d.get("habilidades", []))
 	s.is_important = bool(d.get("is_important", true)); s.devotion = str(d.get("devotion", ""))
 	s.faction = str(d.get("faction", "")); s.source_rule = str(d.get("source_rule", ""))
+	s.class_id = str(d.get("class_id", "")); s.race_id = str(d.get("race_id", "")); s.xp = int(d.get("xp", 0))
+	s.spells = PackedStringArray(d.get("spells", []))
+	s.equipment = d.get("equipment", {"weapon": "", "armor": ""}).duplicate()
+	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
 	return s
 
 
@@ -177,6 +193,8 @@ static func premade_warrior(rules: RuleRegistry, p_id: String = "player", p_name
 	s.attacks.append({"nome": "Espada longa", "skill": "luta", "dano": w.dano, "for_no_dano": true,
 		"margem": int(w.margem), "mult": int(w.mult), "alcance_q": 1, "tipo": w.tipo})
 	s.source_rule = "ORIGINAL_DO_JOGO:premade_guerreiro_humano"
+	s.class_id = "guerreiro"; s.race_id = "humano"
+	s.equipment = {"weapon": "espada_longa", "armor": "couro_batido"}
 	return s
 
 

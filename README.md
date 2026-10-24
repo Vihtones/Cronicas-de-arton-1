@@ -1,9 +1,10 @@
 # Crônicas de Arton
 
 RPG single-player 2D top-down em pixel art, inspirado em Tormenta20. Projeto pessoal de fã, sem distribuição.
-**Versão 0.1.0: vertical slice jogável.** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
+**Versão 0.2.0: vertical slice jogável + Laboratório de protótipos (21 cenários, um por mecânica).** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
 
-Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`.
+Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`
+**Próximos passos, correções e revisões: `docs/ROADMAP.md`** · Mapa das mecânicas: `docs/PROTOTIPOS.md`.
 
 ## Como jogar
 1. Instale a **Godot 4.3 stable** (godotengine.org, versão padrão, não a .NET).
@@ -18,10 +19,14 @@ Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_
 | J | diário: pistas, hipóteses, ficha, reputação |
 | C | andar furtivo (metade da velocidade; teste de Furtividade ao se aproximar) |
 | R | descansar 8h (recupera PV/PM conforme o local, LB p.106) |
-| F5 / F9 | salvar / carregar · Esc: menu e opções |
-| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · Q: Ataque Especial · L: levantar |
+| F5 / F9 | salvar / carregar · Esc: menu e opções · F3: depuração |
+| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · 4: magia · 5: poção · Q: Ataque Especial · L: levantar |
 
 O tempo passa sozinho (2 s reais = 10 min de jogo). Os NPCs seguem suas rotinas, conversam entre si e espalham o que viram. Se você esperar demais, o bando parte no 12º dia e leva o rapaz.
+
+## Laboratório de protótipos
+Na tela de título, abra **Laboratório de protótipos…** para jogar um cenário curto por mecânica: mistério, combate, furtividade, magia, ataque furtivo, criação de personagem, progressão, equipamento, rumores, crime, investigação, economia, clima, viagem a Valkaria, domínio, gerações, sucessão do herói, fauna e 2º mistério, fé, IA de diálogo local, aventureiros NPC e ritmo.
+**Criar personagem…** monta Humano ou Anão como Guerreiro, Ladino ou Arcanista pela compra de pontos do livro.
 
 ## O que está implementado
 - **Regras T20 com proveniência:** 58 regras com fonte, página e status. 51 verificadas no livro, 6 pendentes de revisão humana e 1 adaptada.
@@ -35,11 +40,12 @@ O tempo passa sozinho (2 s reais = 10 min de jogo). Os NPCs seguem suas rotinas,
 ## Testes e ferramentas
 ```bash
 godot --headless --path . --import                          # 1ª vez
-godot --headless --path . -s res://tests/run_tests.gd       # 71 testes
+godot --headless --path . -s res://tests/run_tests.gd       # 88 testes
 python3 tools/validate_assets.py                            # pipeline de assets (§13)
 python3 tools/check_architecture.py                         # dependências entre camadas (R3)
 xvfb-run godot --path . -s res://tools/benchmark.gd         # desempenho por perfil gráfico
-xvfb-run godot --path . -s res://tools/screenshot_runner.gd -- <pasta>   # capturas automáticas
+xvfb-run godot --path . -s res://tools/screenshot_runner.gd -- <pasta>   # capturas do slice
+xvfb-run godot --path . -s res://tools/lab_runner.gd -- <pasta>          # capturas dos protótipos
 ```
 Os geradores de conteúdo ficam em `tools/build_*.py`. Edite os geradores, não os JSON gerados.
 
@@ -47,7 +53,7 @@ Os geradores de conteúdo ficam em `tools/build_*.py`. Edite os geradores, não 
 | Pasta | Camada | Pode depender de |
 |---|---|---|
 | `src/core` | Contratos (Command, Event, EventBus, Logger) | nada |
-| `src/domain` | Regras e estado puros: WorldState, 13 módulos, combate, regras | core |
+| `src/domain` | Regras e estado puros: WorldState, 21 módulos, combate, regras, criação de personagem | core |
 | `src/infrastructure` | Save JSON atômico, provedor de IA | core, domain |
 | `src/application` | Composição (`Game`), fábrica do mundo, telemetria | todas acima |
 | `src/presentation` | Mapa, atores, câmera, efeitos, combate visual, UI | application (lê projeções, envia comandos) |

@@ -90,7 +90,7 @@ func _resolve_raid() -> Array:
 			out.append(fact("CREATURE_DEFEATED", {"creature": id, "name": world.db.creature_def(id).name, "by": "guarda_vila", "actor": "guarda_vila", "witnesses": witnesses}))
 		var npcs = world.module("npcs")
 		if npcs != null and npcs.npc("tomas").get("captive", false):
-			out.append(fact("NPC_RESCUED", {"npc": "tomas", "location": "cripta_cela", "rescuer": "guarda_vila", "witnesses": witnesses}))
+			out.append(fact("NPC_RESCUED", {"npc": "tomas", "location": "cripta_cela", "rescuer": "guarda_vila", "witnesses": witnesses + ["tomas"]}))
 		out.append(fact("DIZIMO_RETURNED", {"actor": "guarda_vila", "location": "templo", "witnesses": ["ysolde", "lucan"]}))
 		out.append(fact("GUARD_RAID_RESOLVED", {"result": "sucesso", "p": p, "roll": roll, "witnesses": witnesses}))
 	else:

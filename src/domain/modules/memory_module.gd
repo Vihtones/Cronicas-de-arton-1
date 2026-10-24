@@ -23,12 +23,14 @@ const EVENT_MEMORY := {
 	"OBLIGATION_VIOLATED": {"fact": "violou_obrigacao", "valence": -15, "emotion": "decepcao", "durable": false},
 	"PLAYER_CAPTURED": {"fact": "capturou_forasteiro", "valence": 0, "emotion": "desprezo", "durable": false},
 	"FINE_PAID": {"fact": "pagou_multa", "valence": 10, "emotion": "neutro", "durable": false},
+	"DOMAIN_UNREST": {"fact": "impostos_altos", "valence": -15, "emotion": "raiva", "durable": false},
+	"NPC_DIED": {"fact": "luto", "valence": 0, "emotion": "tristeza", "durable": true},
 }
 
 
 func module_id() -> String: return "memory"
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(EVENT_MEMORY.keys() + ["DISTANT_EVENT", "DIALOGUE_STARTED", "MYSTERY_RESOLVED", "NPC_RESCUED_BY_OTHER"])
+	return PackedStringArray(EVENT_MEMORY.keys() + ["DISTANT_EVENT", "DIALOGUE_STARTED", "MYSTERY_RESOLVED", "NPC_RESCUED_BY_OTHER", "HERO_SUCCEEDED", "SHEEP_KILLED"])
 
 
 func list(npc_id: String) -> Array:
@@ -91,6 +93,19 @@ func on_event(e: GameEvent) -> Array:
 				"tick": e.world_tick, "emotion": "curiosidade", "reliability": 1.0, "source": "visto", "durable": false,
 				"text": "Conheci o forasteiro."})
 		return []
+	if e.event_type == "HERO_SUCCEEDED":
+		# o herdeiro é outra pessoa: lembranças do herói anterior não passam para ele
+		for id in memories:
+			for m in memories[id]:
+				if m.about == "player":
+					m.about = e.payload.previous
+		return []
+	if e.event_type == "SHEEP_KILLED":
+		# Fenna interpreta errado (NPCs não são oniscientes): culpa lobos.
+		add_memory("fenna", {"key": "ovelhas_mortas:%d" % e.world_tick, "about": "lobos", "subject": "fenna", "valence": 0, "location": e.payload.location,
+			"tick": e.world_tick, "emotion": "medo", "reliability": 0.6, "source": "evidencia", "durable": true,
+			"text": "Lobos mataram minhas ovelhas na estrada leste! Ouvi uivos... acho."})
+		return []
 	if not EVENT_MEMORY.has(e.event_type):
 		return []
 	var spec: Dictionary = EVENT_MEMORY[e.event_type]
@@ -122,6 +137,8 @@ func _describe(type: String, actor: String, subject: String, p: Dictionary) -> S
 		"CRIME_COMMITTED": return "%s cometeu %s." % [who.capitalize(), str(p.get("crime", "um crime"))]
 		"CREATURE_DEFEATED": return "%s derrotou %s." % [who.capitalize(), str(p.get("name", "uma ameaça"))]
 		"OBLIGATION_VIOLATED": return "%s desonrou os votos a %s." % [who.capitalize(), str(p.get("god", ""))]
+		"NPC_DIED": return "%s morreu." % _name(subject)
+		"DOMAIN_UNREST": return "Os impostos do moinho estão pesados demais."
 		"FINE_PAID": return "%s pagou sua multa." % who.capitalize()
 	return type
 
@@ -185,11 +202,22 @@ func on_tick(tick: int) -> Array:
 
 ## Reputação do jogador para um NPC: soma das crenças sobre ele.
 func reputation(npc_id: String, about: String = "player") -> float:
-	var total := 0.0
+	var total := bias(npc_id, about)
 	for m in list(npc_id):
 		if m.about == about:
 			total += float(m.valence) * float(m.reliability)
 	return total
+
+
+## Preconceito é propriedade INDIVIDUAL (traço), não regra de raça (§11). Some com convivência.
+func bias(npc_id: String, about: String) -> float:
+	if about != "player":
+		return 0.0
+	var traits: Array = world.db.npc_def(npc_id).get("traits", [])
+	if traits.has("desconfia_de_estrangeiros"):
+		var known := list(npc_id).filter(func(m): return m.about == about).size()
+		return -10.0 if known < 3 else 0.0
+	return 0.0
 
 
 func faction_reputation(faction_id: String, about: String = "player") -> Dictionary:

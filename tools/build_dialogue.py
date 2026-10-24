@@ -6,6 +6,7 @@ bye = {"text": "Até mais.", "next": "end"}
 generic = {
  "topics": [
   {"text": "O que se conta por aí?", "next": "__rumor"},
+  {"text": "Fale um pouco de você.", "next": "__bio"},
   {"text": "Você viu Tomas Brandt?", "cond": [{"fact": "f_tomas_sumiu"}, {"mystery": "ativo"}], "next": "g_tomas"},
   {"text": "Quero comprar algo.", "cond": [{"shop": True}], "effects": [{"event": "OPEN_SHOP"}], "next": "__generic"},
   {"text": "Vim pagar minhas multas.", "cond": [{"warrant": True}, {"faction_member": "guarda_vila"}], "effects": [{"pay_fine": True}], "next": "g_multa_paga"},
@@ -19,9 +20,11 @@ npcs = {
   "nodes": {
    "inicio": {"text": "Por favor... o senhor é de fora? Meu Tomas sumiu há três dias. Otto jura que ele fugiu, mas meu filho não faria isso comigo.", "append_generic": True, "options": [
      {"text": "Vou procurar seu filho.", "cond": [{"not_flag": "aceitou_busca"}], "effects": [{"flag": "aceitou_busca"}], "next": "aceita"},
+     {"text": "Não posso ajudar.", "cond": [{"not_flag": "aceitou_busca"}, {"not_flag": "recusou_hilda"}], "effects": [{"flag": "recusou_hilda"}, {"event": "REFUSED_HELP", "payload": {"npc": "hilda"}}], "next": "recusa"},
      {"text": "Onde ele foi visto pela última vez?", "next": "visto"},
      {"text": "Ele andava metido em alguma coisa?", "next": "metido"},
      {"text": "Encontrei um retalho de linho azul na estrada.", "cond": [{"fact": "f_tomas_levado"}, {"not_flag": "hilda_viu_retalho"}], "effects": [{"flag": "hilda_viu_retalho"}], "next": "retalho"}]},
+   "recusa": {"text": "(Hilda baixa os olhos.) Entendo. Ninguém pode.", "options": [{"text": "...", "next": "end"}]},
    "aceita": {"text": "Que Lena o abençoe. O quarto dele é aqui mesmo, o baú ainda está do jeito que ele deixou. Olhe o que precisar.", "options": [{"text": "Vou começar por aí.", "effects": [{"flag": "permissao_quarto"}], "next": "inicio"}]},
    "visto": {"text": "Jantou conosco, foi dormir. De manhã a cama estava fria e a janela aberta. Ele ajudava o pai no moinho.", "options": [{"text": "Entendo.", "next": "inicio"}]},
    "metido": {"text": "Curioso, sempre foi. Vivia falando de luzes na Torre Partida, de madrugada. Eu mandava ele parar com isso.", "options": [{"text": "Luzes na torre...", "effects": [{"flag": "pista_luzes"}], "next": "inicio"}]},
@@ -64,7 +67,11 @@ npcs = {
    "inicio": {"text": "Capitã Elsa Corvo. Fale rápido, tenho uma estrada para vigiar.", "append_generic": True, "options": [
      {"text": "Tomas Brandt foi levado à força.", "cond": [{"fact": "f_tomas_levado"}, {"mystery": "ativo"}, {"not_flag": "guarda_avisada"}], "next": "provas"},
      {"text": "Há bandidos escondidos sob a Torre Partida.", "cond": [{"fact": "f_bandidos_na_ruina"}, {"mystery": "ativo"}, {"not_flag": "guarda_avisada"}],
-      "effects": [{"flag": "guarda_avisada"}, {"event": "REPORT_TO_GUARD"}], "next": "incursao"}]},
+      "effects": [{"flag": "guarda_avisada"}, {"event": "REPORT_TO_GUARD"}], "next": "incursao"},
+     {"text": "Quero seguir Khalmyr, o Deus da Justiça.", "cond": [{"devotion": ""}], "next": "khalmyr"}]},
+   "khalmyr": {"text": "Então saiba: devotos de Khalmyr não recusam ajuda a inocentes e obedecem à hierarquia da igreja. Ainda quer?", "options": [
+     {"text": "Juro pela balança.", "effects": [{"event": "BECOME_DEVOTEE", "payload": {"god": "Khalmyr"}}], "next": "inicio"},
+     {"text": "Preciso pensar.", "next": "inicio"}]},
    "provas": {"text": "Levado para onde? Sem saber onde, não tiro três homens da estrada para caçar sombras.", "options": [{"text": "Vou descobrir.", "next": "inicio"}]},
    "incursao": {"text": "A torre... faz sentido com as luzes que os pastores comentam. Iremos ao amanhecer. Se quiser chegar antes, o risco é seu.", "options": [{"text": "Entendido.", "next": "inicio"}]}}},
  "rosana": {"start": "inicio", "nodes": {
@@ -79,6 +86,16 @@ npcs = {
    "inicio": {"text": "Saria das Estradas, a seu dispor! Trago de Valkaria o que a vila não tem, e as notícias de graça.", "append_generic": True, "options": [
      {"text": "Com que frequência vem aqui?", "next": "rota"}]},
    "rota": {"text": "Fico dois dias, sigo para a capital, volto em cinco. Se faltar ferramenta, é comigo.", "options": [back]}}},
+ "fenna": {"start": "inicio", "nodes": {
+   "inicio": {"text": "Cuidado com o rebanho, forasteiro. Já basta o que os lobos fazem.", "append_generic": True, "options": [
+     {"text": "Que lobos?", "cond": [{"flag": "ovelha_morta"}], "effects": [{"reveal": "f_ovelhas_mortas"}], "next": "lobos"}]},
+   "lobos": {"text": "Mataram mais uma na estrada leste. Ouvi uivos... acho que eram uivos. Ninguém me ajuda.", "options": [{"text": "Vou ver isso.", "next": "inicio"}]}}},
+ "celia": {"start": "inicio", "nodes": {
+   "inicio": {"text": "A terra dá o que a gente cuida, moço. Allihanna sabe.", "append_generic": True, "options": [
+     {"text": "Fale-me de Allihanna.", "next": "votos"}]},
+   "votos": {"text": "Quem segue a Mãe Natureza não veste metal, nem dorme em cidade grande. Prefere o relento.", "options": [
+     {"text": "Quero segui-la.", "cond": [{"devotion": ""}], "effects": [{"event": "BECOME_DEVOTEE", "payload": {"god": "Allihanna"}}], "next": "inicio"},
+     {"text": "Bonito caminho.", "next": "inicio"}]}}},
  "tomas": {"entries": [{"cond": [{"captive": "tomas"}], "node": "preso"}], "start": "livre", "nodes": {
    "preso": {"text": "Quem... você não é um deles? Me tira daqui! A chave fica com o Kael, o de cicatriz.", "options": [
      {"text": "Vamos, está livre.", "cond": [{"object_open": "porta_cela"}], "effects": [{"rescue": "tomas"}], "next": "salvo"},
@@ -89,7 +106,11 @@ npcs = {
    "livre": {"text": "Ainda sonho com aquela cela. Mas estou vivo, graças a você... ou à Guarda.", "append_generic": True, "options": []}}},
  "orin": {"start": "inicio", "nodes": {
    "inicio": {"text": "Mestre Orin, alcaide desta vila. As leis aqui são simples: não roube, não quebre o que não é seu, não levante a mão contra ninguém.", "append_generic": True, "options": [
-     {"text": "E se alguém quebrar a lei?", "next": "lei"}]},
+     {"text": "E se alguém quebrar a lei?", "next": "lei"},
+     {"text": "O que será do moinho agora?", "cond": [{"mystery": "resolvido"}, {"rep_gte": 5}, {"not_flag": "dominio_concedido"}], "next": "dominio"}]},
+   "dominio": {"text": "Otto não dá conta sozinho, e a vila confia em você. Administre o moinho e as terras dos Brandt: impostos, celeiro, patrulhas. Aceita?", "options": [
+     {"text": "Aceito.", "effects": [{"flag": "dominio_concedido"}, {"event": "GRANT_DOMAIN", "payload": {"domain": "Moinho Brandt", "by": "orin"}}], "next": "inicio"},
+     {"text": "Não é para mim.", "next": "inicio"}]},
    "lei": {"text": "Paga multa. Furto, dez tibares. Dano, cinco. Agressão, vinte e a capitã decide o resto.", "options": [back]}}},
 }
 OUT.write_text(json.dumps({"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "generic": generic, "npcs": npcs}, ensure_ascii=False, indent=1), encoding="utf-8")

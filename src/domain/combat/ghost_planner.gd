@@ -27,7 +27,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "ação padrão já usada"}
 			var special: bool = a.get("special", false)
 			if special and A.sheet.pm < 1: return {"ok": false, "reason": "PM insuficiente para Ataque Especial"}
-			if special and not A.sheet.source_rule.contains("guerreiro"): return {"ok": false, "reason": "sem Ataque Especial"}
+			if special and A.sheet.class_id != "guerreiro" and not A.sheet.source_rule.contains("guerreiro"): return {"ok": false, "reason": "sem Ataque Especial"}
 			var prof := sim.attack_profile(actor, a.get("target", ""), int(a.get("attack", 0)), special, false)
 			if not prof.ok: return prof
 			if not sim.is_enemy(actor, a.target): return {"ok": false, "reason": "não é inimigo"}
@@ -69,6 +69,27 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not T.sheet.has_effective_condition(sim.rules, "indefeso"): return {"ok": false, "reason": "alvo não está indefeso"}
 			if T.sheet.is_dead(): return {"ok": false, "reason": "alvo já morto"}
 			return {"ok": true, "kind": "completa"}
+		"cast":
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "lançar magia exige ação padrão"}
+			var sp_id: String = a.get("spell", "")
+			if not A.sheet.spells.has(sp_id): return {"ok": false, "reason": "magia não conhecida"}
+			var sp: Dictionary = sim.rules.value("magia." + sp_id, {})
+			if sp.is_empty(): return {"ok": false, "reason": "magia sem regra"}
+			var cost := int(sim.rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
+			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
+			var targets: Array = a.get("targets", [a.get("target", actor)])
+			var reach := 20 if sp.alcance == "medio" else (6 if sp.alcance == "curto" else 1)  # PENDENTE: alcance.metros
+			for tg in targets:
+				var T := sim.c(tg)
+				if T.is_empty(): return {"ok": false, "reason": "alvo inválido"}
+				if CombatSim.cheb(A.tile, T.tile) > reach: return {"ok": false, "reason": "fora do alcance da magia"}
+			var avg := 0.0
+			if sp.has("dano_por_seta"): avg = Dice.average(sp.dano_por_seta) * int(sp.setas)
+			return {"ok": true, "kind": "padrao", "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": avg, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
+		"drink":
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
+			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}
+			return {"ok": true, "kind": "padrao"}
 	return {"ok": false, "reason": "ação desconhecida: " + t}
 
 
@@ -101,6 +122,9 @@ static func simulate(sim: CombatSim, actor: String, actions: Array) -> Dictionar
 				g.c(actor).tile = v.end
 				step["to"] = v.end
 				step["hit_chance"] = v.hit_chance; step["crit_chance"] = v.crit_chance; step["avg_damage"] = v.avg_damage; step["mods"] = v.mods
+			"cast":
+				step["hit_chance"] = 1.0; step["crit_chance"] = 0.0; step["avg_damage"] = v.avg_damage; step["mods"] = []; step["pm_cost"] = v.cost
+				g.c(actor).sheet.pm -= int(v.cost)
 			"attack":
 				step["hit_chance"] = v.hit_chance; step["crit_chance"] = v.crit_chance; step["avg_damage"] = v.avg_damage
 				step["mods"] = v.mods; step["defense"] = v.defense; step["miss_chance"] = v.miss_chance

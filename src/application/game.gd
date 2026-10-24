@@ -61,6 +61,27 @@ func new_game(feminine: bool = false, p_seed: int = -1) -> void:
 	logger.info("Game", "novo jogo", {"seed": s})
 
 
+## Novo jogo com ficha montada pela criação de personagem.
+func new_game_with_build(build: Dictionary, feminine: bool) -> void:
+	new_game(feminine)
+	world.player_sheet = CharacterBuilder.build(rules, build.race, build["class"], build.attrs, build.get("human_picks", ["for", "des", "con"]), build.get("name", "Aventureiro"))
+	world_reloaded.emit()
+
+
+## Laboratório: novo mundo (seed fixa) configurado pelo cenário do protótipo.
+func start_prototype(id: String) -> Dictionary:
+	new_game(false, 7)
+	var info := Prototypes.apply(id, world)
+	for k in info.get("settings", {}):
+		settings[k] = info.settings[k]
+	if info.get("provider", "") == "eco_local":
+		dialogue_provider = LocalEchoProvider.new()
+	if world.player_sheet.is_dead():
+		set_mode(Mode.GAMEOVER)
+	world_reloaded.emit()
+	return info
+
+
 func _wire() -> void:
 	world.bus.subscribe("*", func(e: GameEvent): event_published.emit(e))
 

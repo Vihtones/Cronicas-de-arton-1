@@ -1,6 +1,8 @@
 # Crônicas de Arton: Plano de Execução e Status
 
-Derivado do Documento Mestre v1.2. Em caso de conflito, o Mestre vence. **Atualizado em 23/10/2026, versão 0.1.0.**
+Derivado do Documento Mestre v1.2. Em caso de conflito, o Mestre vence. **Atualizado em 23/10/2026, versão 0.2.0.**
+
+> **Novidade da 0.2.0:** todas as mecânicas do Mestre têm um protótipo jogável no Laboratório (ver `docs/PROTOTIPOS.md`). **Próximos passos, correções e revisões** estão em `docs/ROADMAP.md`, que substitui as seções 5 e 6 abaixo.
 
 Escopo autorizado pelo dono do projeto: uso pessoal, sem redistribuição. Por isso o risco R10 (licenciamento) fica **aceito para uso privado**, e a distribuição continua bloqueada.
 
@@ -17,7 +19,7 @@ Escopo autorizado pelo dono do projeto: uso pessoal, sem redistribuição. Por i
 | 4 Social | ✅ | o mundo muda na ausência e preserva causalidade | `test_rumor_espalha_com_o_tempo_e_preserva_causalidade`, `test_bando_parte_no_prazo...`, `test_mensageiro_traz_noticias_com_latencia` |
 | 5 Clima/arte | 🟡 | benchmark e consistência visual | benchmark feito (ver §4); arte **provisória** validada por script; **falta aprovar a direção visual numa cena piloto (decisão humana)** |
 | 6 IA opcional | ✅ (desligada) | desligar a IA não impede o jogo | `test_llm_fallback_e_validacao`; provedor real só com `user://ai.json` |
-| 7 Expansão | 🟡 inicial | gate por funcionalidade | crime, economia, fé e região distante em módulos isolados e testados; domínios, viagens e novos biomas **não iniciados** |
+| 7 Expansão | 🟡 protótipos | gate por funcionalidade | crime, investigação, economia, fé (3 deuses), região distante, viagem, domínio, gerações, aventureiros NPC, fauna e 2º mistério: todos com protótipo e teste; novos biomas **não iniciados** |
 
 ## 2. O que foi construído (mapa rápido)
 

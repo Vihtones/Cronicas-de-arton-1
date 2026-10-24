@@ -1021,6 +1021,58 @@
      "fail": "Só o vento nas pedras."
     }
    }
+  },
+  {
+   "id": "carcaca_ovelha",
+   "tile": [
+    58,
+    26
+   ],
+   "name": "Carcaça de ovelha",
+   "requires_flag": "ovelha_morta",
+   "signal": "Uma ovelha morta à beira da estrada. Moscas.",
+   "actions": {
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 15,
+     "reveals": [
+      "f_ovelhas_mortas",
+      "f_marcas_hiena"
+     ],
+     "ok": "Mordidas largas e ossos partidos: mandíbula forte demais para lobo. Hienas.",
+     "fail": "Uma ovelha morta. Lobos, talvez."
+    },
+    "rastrear": {
+     "skill": "sobrevivencia",
+     "cd": 15,
+     "reveals": [
+      "f_ovelhas_mortas",
+      "f_toca_hienas"
+     ],
+     "ok": "Pegadas de quatro patas, desiguais, rumo ao leste do bosque. Uma toca.",
+     "fail": "O rastro some no capim."
+    }
+   }
+  },
+  {
+   "id": "toca_hienas",
+   "tile": [
+    80,
+    37
+   ],
+   "name": "Toca sob as raízes",
+   "signal": "Ossos roídos e um cheiro azedo saem de baixo de um carvalho tombado.",
+   "actions": {
+    "examinar": {
+     "skill": "percepcao",
+     "cd": 10,
+     "reveals": [
+      "f_toca_hienas"
+     ],
+     "ok": "É a toca da matilha.",
+     "fail": "Ossos velhos."
+    }
+   }
   }
  ]
 }

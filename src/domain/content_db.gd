@@ -10,6 +10,7 @@ var economy: Dictionary = {}
 var laws: Dictionary = {}
 var distant: Dictionary = {}
 var dialogue: Dictionary = {}
+var mysteries: Array = []          # todos os mistérios (principal + secundários)
 
 var grid: PackedStringArray
 var size := Vector2i.ZERO
@@ -44,6 +45,10 @@ func load_dir(dir: String) -> void:
 	economy = _read(dir.path_join("economy.json"))
 	laws = _read(dir.path_join("laws.json"))
 	distant = _read(dir.path_join("distant.json"))
+	mysteries = [mystery]
+	var extra := _read(dir.path_join("mysteries_extra.json"))
+	for m in extra.get("mysteries", []):
+		mysteries.append(m)
 	_index()
 
 
@@ -85,6 +90,27 @@ func world_to_tile(p: Vector2) -> Vector2i:
 
 func tile_to_world(t: Vector2i) -> Vector2:
 	return Vector2(t.x * tile_px + tile_px / 2.0, t.y * tile_px + tile_px / 2.0)
+
+
+func fact_text(f: String) -> String:
+	for m in mysteries:
+		if m.get("facts", {}).has(f):
+			return m.facts[f]
+	return ""
+
+
+func mystery_of_fact(f: String) -> String:
+	for m in mysteries:
+		if m.get("facts", {}).has(f):
+			return m.truth_id
+	return ""
+
+
+func mystery_def(id: String) -> Dictionary:
+	for m in mysteries:
+		if m.get("truth_id", "") == id:
+			return m
+	return {}
 
 
 func location(id: String) -> Dictionary: return _loc_by_id.get(id, {})

@@ -7,8 +7,8 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| PENDENTE_REVISAO | 6 |
-| VERIFICADA | 51 |
+| PENDENTE_REVISAO | 8 |
+| VERIFICADA | 67 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -56,7 +56,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | equipamento | `arma.espada_curta` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.clava` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.lanca` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
-| equipamento | `arma.funda` | T20 Livro Básico | 144 | 150 | VERIFICADA | Funda soma For no dano (regra específica da arma, p.148) — PENDENTE_REVISAO |
+| equipamento | `arma.funda` | T20 Livro Básico | 144 | 150 | PENDENTE_REVISAO | Funda soma For no dano (regra específica da arma, p.148) — conferir. |
 | equipamento | `arma.arco_curto` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.espada_longa` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.machado_batalha` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
@@ -67,9 +67,27 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | equipamento | `alcance.metros` | T20 Livro Básico | 0 | 0 | PENDENTE_REVISAO | Valores de memória; conferir no livro antes de marcar VERIFICADA. |
 | fe | `panteao.nomes` | T20 Livro Básico | 96 | 102 | PENDENTE_REVISAO | Nomes conferidos por contagem no texto; obrigações individuais a extrair. |
 | fe | `deus.lena.obrigacao` | T20 Livro Básico | 100 | 106 | VERIFICADA |  |
+| fe | `deus.khalmyr.obrigacao` | T20 Livro Básico | 99 | 105 | VERIFICADA |  |
+| fe | `deus.allihanna.obrigacao` | T20 Livro Básico | 97 | 103 | VERIFICADA |  |
 | personagem | `classe.guerreiro` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
-| personagem | `raca.humano` | T20 Livro Básico | 0 | 0 | PENDENTE_REVISAO | Versátil confirmado no texto; página exata a anotar. |
+| personagem | `raca.humano` | T20 Livro Básico | 19 | 25 | VERIFICADA |  |
 | personagem | `envelhecimento` | T20 Livro Básico | 108 | 114 | VERIFICADA |  |
+| personagem | `progressao.xp_por_nivel` | T20 Livro Básico | 35 | 41 | VERIFICADA |  |
+| personagem | `progressao.xp_desafio` | T20 Livro Básico | 326 | 332 | VERIFICADA |  |
+| personagem | `raca.anao` | T20 Livro Básico | 20 | 26 | VERIFICADA |  |
+| personagem | `racas.tabela` | T20 Livro Básico | 18 | 24 | VERIFICADA |  |
+| personagem | `classe.ladino` | T20 Livro Básico | 73 | 79 | VERIFICADA |  |
+| personagem | `classe.arcanista` | T20 Livro Básico | 37 | 43 | VERIFICADA |  |
+| personagem | `magia.custo_por_circulo` | T20 Livro Básico | 170 | 176 | VERIFICADA |  |
+| personagem | `magia.seta_infalivel` | T20 Livro Básico | 206 | 212 | VERIFICADA |  |
+| personagem | `magia.curar_ferimentos` | T20 Livro Básico | 189 | 195 | VERIFICADA |  |
+| personagem | `acao.usar_item_pocao` | T20 Livro Básico | 234 | 240 | VERIFICADA |  |
+| personagem | `item.saco_de_dormir` | T20 Livro Básico | 156 | 162 | VERIFICADA |  |
+| personagem | `item.pocao_curar_ferimentos` | T20 Livro Básico | 0 | 0 | PENDENTE_REVISAO | Preço e regra de poções a conferir no cap. de itens mágicos. |
+| personagem | `viagem.velocidade` | T20 Livro Básico | 270 | 276 | VERIFICADA |  |
+| personagem | `viagem.marcha_forcada` | T20 Livro Básico | 270 | 276 | VERIFICADA |  |
+| personagem | `perigo.jornada_ermos` | T20 Livro Básico | 320 | 326 | VERIFICADA |  |
+| personagem | `perigo.jornada_ermos.cd` | T20 Livro Básico | 320 | 326 | PENDENTE_REVISAO | CD da jornada não lida no trecho extraído. |
 
 ## Mecânicas ORIGINAL_DO_JOGO e ADAPTADA (fora do catálogo de regras)
 
@@ -89,3 +107,16 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Calendário 30 dias × 12 meses, estações por trimestre | `WorldClock`, `WeatherModule.season` | PLACEHOLDER | sim |
 | 1 tick = 10 min; 2 s reais por tick | `WorldClock`, `Game.settings` | PLACEHOLDER (§20.7) | sim |
 | Mistério 'O Filho do Moleiro', vila, NPCs, facções, diálogos | `data/world`, `data/dialogue` | ORIGINAL_DO_JOGO | — |
+| XP de mistério resolvido = ND 1 ('XP alternativo', LB p.326) | `ProgressionModule.MYSTERY_ND` | ORIGINAL | constante |
+| Fuga conta como empate (½ XP); captura como derrota (¼ XP) | `ProgressionModule` | ADAPTADA | — |
+| Presets de atributos e perícias padrão por classe | `CharacterBuilder` | ORIGINAL (dentro das regras) | — |
+| Alcance médio de magia = 20 quadrados | `GhostPlanner` (cast) | PLACEHOLDER (alcance.metros pendente) | — |
+| Relento com saco de dormir = condição normal | `StateModule.rest_quality` | ADAPTADA | — |
+| Rotas, distâncias e risco de emboscada (5%/20% por dia) | `TravelModule` | ORIGINAL | constantes |
+| Domínio: renda, moral, segurança, conselheiros | `DomainModule` | ORIGINAL | constantes |
+| Casais, chance de nascimento 15%/ano; herança ao parente vivo mais velho; herdeiro com ½ do ouro | `LineageModule` | ORIGINAL | constantes |
+| Aventureiros NPC: missões 25%/dia, ND sorteado, XP pela regra do LB | `AdventurersModule` | ORIGINAL (XP: LB) | constantes |
+| Matilha: comida, caça por estação, ataques a ovelhas, crescimento até 4 | `FaunaModule` | ORIGINAL | constantes |
+| Investigação criminal: Investigação +4 da capitã vs CD 20 − pistas | `CrimeModule._investigate` | PLACEHOLDER | — |
+| Preconceito individual: −10 de reputação e +20% no preço até 3 memórias | `MemoryModule.bias`, `EconomyModule.price` | ORIGINAL | traço do NPC |
+| Vinhetas do diretor de ritmo | `PacingModule` | ORIGINAL | — |

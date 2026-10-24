@@ -9,7 +9,7 @@ var state: Dictionary = {}  # id -> {location, alive, captive, age, wounded_unti
 func module_id() -> String: return "npcs"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["RescueNPC"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["NPC_RESCUED", "BANDITS_RELOCATED", "NPC_WOUNDED", "NPC_CAPTURED"])
+	return PackedStringArray(["NPC_RESCUED", "BANDITS_RELOCATED", "NPC_WOUNDED", "NPC_CAPTURED", "NPC_DIED"])
 
 
 func _ensure() -> void:
@@ -157,6 +157,11 @@ func on_event(e: GameEvent) -> Array:
 			for id in state:
 				if state[id].captive and state[id].alive:
 					state[id].location = "desconhecido"
+		"NPC_DIED":
+			var id: String = e.payload.npc
+			if state.has(id):
+				state[id].alive = false
+				state[id].location = ""
 		"NPC_WOUNDED":
 			var id: String = e.payload.npc
 			if state.has(id):

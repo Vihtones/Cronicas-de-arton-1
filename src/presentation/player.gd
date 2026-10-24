@@ -30,7 +30,7 @@ func _physics_process(_delta: float) -> void:
 	if Game.world == null:
 		return
 	var dir := Vector2.ZERO
-	if input_enabled and Game.mode == Game.Mode.EXPLORE:
+	if input_enabled and Game.mode == Game.Mode.EXPLORE and Game.world.modules.travel.current_region == "vila":
 		dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var sneaking: bool = Game.world.modules.combat.stance_sneak
 	velocity = dir * (speed * (0.5 if sneaking else 1.0))

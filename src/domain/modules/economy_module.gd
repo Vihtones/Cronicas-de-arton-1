@@ -16,10 +16,13 @@ func _ensure() -> void:
 		regions = world.db.economy.get("regions", {}).duplicate(true)
 
 
-func price(item_id: String, region: String = "vila") -> int:
+func price(item_id: String, region: String = "vila", seller: String = "") -> int:
 	_ensure()
 	var it: Dictionary = world.db.items.get(item_id, {})
 	var base := int(it.get("price", 0))
+	var mem = world.module("memory")
+	if seller != "" and mem != null and mem.bias(seller, "player") < 0:
+		base = int(ceil(base * 1.2))  # vendedor desconfiado cobra mais de estranhos (ORIGINAL)
 	var good: String = it.get("good", "")
 	if good == "" or not regions.has(region):
 		return base
@@ -43,14 +46,14 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	var good: String = world.db.items[item].get("good", "")
 	if good != "" and int(regions.vila.stock[good]) <= 0:
 		return PackedStringArray(["em falta"])
-	if int(world.player.gold) < price(item):
+	if int(world.player.gold) < price(item, "vila", npc):
 		return PackedStringArray(["ouro insuficiente"])
 	return PackedStringArray()
 
 
 func execute(cmd: GameCommand) -> Array:
 	var item: String = cmd.payload.item
-	var p := price(item)
+	var p := price(item, "vila", cmd.payload.npc_id)
 	var good: String = world.db.items[item].get("good", "")
 	if good != "":
 		regions.vila.stock[good] = int(regions.vila.stock[good]) - 1

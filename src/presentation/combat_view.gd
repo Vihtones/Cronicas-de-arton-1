@@ -108,6 +108,10 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "":
 				return []
 			return [{"type": "coup", "target": target}]
+		"magia":
+			if target == "" or not gs.is_enemy("player", target):
+				return []
+			return [{"type": "cast", "spell": "seta_infalivel", "targets": [target]}]
 	return []
 
 
@@ -154,6 +158,14 @@ func end_turn() -> void:
 	Game.send("EndTurn")
 
 
+func drink_potion() -> void:
+	if not Game.world.modules.state.has_item("pocao_cura"):
+		message.emit("Sem poção.")
+		return
+	plan.append({"type": "drink", "item": "pocao_cura"})
+	_update_preview()
+
+
 func stand_up() -> void:
 	plan.append({"type": "stand"})
 	_update_preview()
@@ -188,6 +200,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_1: mode = "mover"; _update_preview()
 			KEY_2: mode = "investida"; _update_preview()
 			KEY_3: mode = "misericordia"; _update_preview()
+			KEY_4: mode = "magia"; message.emit("Modo magia: clique no alvo (Seta Infalível, 1 PM)."); _update_preview()
+			KEY_5: drink_potion()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()
 			KEY_L: stand_up()
 			_: return
@@ -259,6 +273,11 @@ func _draw() -> void:
 			var txt := "Acerto %d%%  Crít %d%%  ~%.1f dano" % [int(st.hit_chance * 100), int(st.crit_chance * 100), st.avg_damage]
 			draw_string(_font, tp + Vector2(-60, -30 - y_text), txt, HORIZONTAL_ALIGNMENT_LEFT, 200, 8, Color(1, 0.85, 0.5))
 			y_text += 10
+		if a.type == "cast":
+			for tg in a.get("targets", []):
+				var tp := Game.db.tile_to_world(s.c(tg).tile)
+				draw_line(pos, tp, Color(0.6, 0.6, 1.0, 0.9), 1.5)
+				draw_string(_font, tp + Vector2(-60, -30), "Seta Infalível: acerta sempre, ~%.1f dano (−%d PM)" % [st.avg_damage, int(st.get("pm_cost", 1))], HORIZONTAL_ALIGNMENT_LEFT, 220, 8, Color(0.75, 0.8, 1))
 		if a.type == "coup":
 			var tp := Game.db.tile_to_world(s.c(a.target).tile)
 			draw_string(_font, tp + Vector2(-50, -30), "Golpe de misericórdia", HORIZONTAL_ALIGNMENT_LEFT, 160, 8, Color(1, 0.4, 0.4))

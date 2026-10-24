@@ -13,20 +13,25 @@ var attempts: Dictionary = {}        # "alvo|pericia" -> {tick, success, skill_v
 var mystery_state: String = "ativo"  # ativo | resolvido | perdido
 var notes: Array[Dictionary] = []    # entradas do diário (texto exibido ao jogador)
 var flags_seen: Dictionary = {}
+var side_states: Dictionary = {}     # mistérios secundários: truth_id -> estado
 var weather_affects_tests: bool = true  # ADAPTADA: neblina/chuva forte dificultam percepção ao ar livre
 
 
 func module_id() -> String: return "exploration"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["InspectTarget", "MarkHypothesis"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["FACT_REVEALED", "NPC_RESCUED", "BANDITS_RELOCATED", "PLAYER_MOVED", "PLAYER_TELEPORTED", "ITEM_GAINED"])
+	return PackedStringArray(["FACT_REVEALED", "NPC_RESCUED", "BANDITS_RELOCATED", "PLAYER_MOVED", "PLAYER_TELEPORTED", "ITEM_GAINED",
+		"SHEEP_KILLED", "CREATURE_DEFEATED"])
 
 
 func _ensure() -> void:
 	if not hypotheses.is_empty():
 		return
-	for h in world.db.mystery.get("hypotheses", {}):
-		hypotheses[h] = "aberta"
+	for m in world.db.mysteries:
+		for h in m.get("hypotheses", {}):
+			hypotheses[h] = "aberta"
+		if m != world.db.mystery:
+			side_states[m.truth_id] = "latente"
 	for f in world.db.mystery.get("start_facts", []):
 		known_facts[f] = {"tick": 0, "source": "inicio"}
 		notes.append({"tick": 0, "text": world.db.mystery.facts[f], "fact": f})
@@ -40,7 +45,10 @@ func knows(f: String) -> bool:
 func nearby_signals(radius: int = 2) -> Array:
 	var p := world.db.world_to_tile(world.player.position)
 	var out: Array = []
+	var st = world.module("state")
 	for t in world.db.all_targets():
+		if t.has("requires_flag") and (st == null or not st.has_flag(t.requires_flag)):
+			continue
 		var tt := Vector2i(int(t.tile[0]), int(t.tile[1]))
 		if absi(tt.x - p.x) <= radius and absi(tt.y - p.y) <= radius:
 			out.append({"id": t.id, "name": t.name, "signal": t.signal, "actions": t.actions.keys()})
@@ -73,6 +81,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		"InspectTarget":
 			var t := world.db.target_def(cmd.payload.get("target_id", ""))
 			if t.is_empty(): return PackedStringArray(["nada para examinar"])
+			if t.has("requires_flag") and not world.module("state").has_flag(t.requires_flag): return PackedStringArray(["nada de especial aqui"])
 			var approach: String = cmd.payload.get("approach", "")
 			if not t.actions.has(approach): return PackedStringArray(["abordagem não se aplica: " + approach])
 			var tt := Vector2i(int(t.tile[0]), int(t.tile[1]))
@@ -98,7 +107,8 @@ func execute(cmd: GameCommand) -> Array:
 			var t := world.db.target_def(cmd.payload.target_id)
 			var a: Dictionary = t.actions[cmd.payload.approach]
 			var cd := int(a.cd) + _environment_cd_mod(t)
-			var r := Checks.skill(world.player_sheet, a.skill, cd, world.rules, world.rng)
+			var ctx := "subterraneo" if world.db.zone_at(world.db.world_to_tile(world.player.position)) == "cripta" else ""
+			var r := Checks.skill(world.player_sheet, a.skill, cd, world.rules, world.rng, "world", world.player_sheet.skill_value(a.skill, world.rules, ctx) - world.player_sheet.skill_value(a.skill, world.rules))
 			record_attempt("alvo:" + t.id, a.skill, r.success)
 			var out: Array = [fact("TARGET_INSPECTED", {"target": t.id, "approach": cmd.payload.approach, "check": r,
 				"text": a.ok if r.success else a.fail}, ["player"])]
@@ -129,9 +139,12 @@ func on_event(e: GameEvent) -> Array:
 	match e.event_type:
 		"FACT_REVEALED":
 			var f: String = e.payload.fact
-			if not known_facts.has(f) and world.db.mystery.get("facts", {}).has(f):
+			if not known_facts.has(f) and world.db.fact_text(f) != "":
 				known_facts[f] = {"tick": e.world_tick, "source": e.payload.get("source", "")}
-				notes.append({"tick": e.world_tick, "text": world.db.mystery.facts[f], "fact": f})
+				notes.append({"tick": e.world_tick, "text": world.db.fact_text(f), "fact": f, "mystery": world.db.mystery_of_fact(f)})
+				var mid := world.db.mystery_of_fact(f)
+				if side_states.get(mid, "") == "latente":
+					side_states[mid] = "ativo"
 		"NPC_RESCUED":
 			if e.payload.npc == "tomas" and mystery_state == "ativo":
 				mystery_state = "resolvido"
@@ -147,6 +160,13 @@ func on_event(e: GameEvent) -> Array:
 			var npcs = world.module("npcs")
 			if loc == "cripta_cela" and npcs != null and npcs.npc("tomas").get("captive", false) and not knows("f_tomas_na_masmorra"):
 				return [fact("FACT_REVEALED", {"fact": "f_tomas_na_masmorra", "source": "visto"})]
+		"SHEEP_KILLED":
+			return [fact("FLAG_SET", {"flag": "ovelha_morta"})]
+		"CREATURE_DEFEATED":
+			var fauna = world.module("fauna")
+			if side_states.get("m_ovelhas", "") == "ativo" and fauna != null and fauna.pack_size() == 0:
+				side_states["m_ovelhas"] = "resolvido"
+				return [fact("MYSTERY_RESOLVED", {"mystery": "m_ovelhas", "by": e.payload.get("by", "player")})]
 		"ITEM_GAINED":
 			if e.payload.item == "dizimo_lena" and not knows("f_dizimo_roubado"):
 				return [fact("FACT_REVEALED", {"fact": "f_dizimo_roubado", "source": "bau"})]
@@ -157,22 +177,29 @@ func on_event(e: GameEvent) -> Array:
 func hypothesis_view() -> Array:
 	_ensure()
 	var out: Array = []
-	for h in world.db.mystery.get("hypotheses", {}):
-		var def: Dictionary = world.db.mystery.hypotheses[h]
-		var sup := []
-		var con := []
-		for f in def.supported_by:
-			if knows(f): sup.append(f)
-		for f in def.contradicted_by:
-			if knows(f): con.append(f)
-		out.append({"id": h, "text": def.text, "state": hypotheses[h], "supporting": sup, "contradicting": con})
+	for m in world.db.mysteries:
+		if m != world.db.mystery and side_states.get(m.truth_id, "latente") == "latente":
+			continue
+		for h in m.get("hypotheses", {}):
+			out.append(_hview(m, h))
 	return out
+
+
+func _hview(m: Dictionary, h: String) -> Dictionary:
+	var def: Dictionary = m.hypotheses[h]
+	var sup := []
+	var con := []
+	for f in def.supported_by:
+		if knows(f): sup.append(f)
+	for f in def.contradicted_by:
+		if knows(f): con.append(f)
+	return {"id": h, "mystery": m.truth_id, "text": def.text, "state": hypotheses.get(h, "aberta"), "supporting": sup, "contradicting": con}
 
 
 func to_dict() -> Dictionary:
 	_ensure()
 	return {"known_facts": known_facts.duplicate(true), "hypotheses": hypotheses.duplicate(), "attempts": attempts.duplicate(true),
-		"mystery_state": mystery_state, "notes": notes.duplicate(true)}
+		"mystery_state": mystery_state, "notes": notes.duplicate(true), "side_states": side_states.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -180,6 +207,7 @@ func from_dict(d: Dictionary) -> void:
 	hypotheses = d.get("hypotheses", {}).duplicate()
 	attempts = d.get("attempts", {}).duplicate(true)
 	mystery_state = d.get("mystery_state", "ativo")
+	side_states = d.get("side_states", side_states).duplicate()
 	notes.clear()
 	for n in d.get("notes", []):
 		notes.append(n)

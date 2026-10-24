@@ -74,8 +74,8 @@
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
    "pdf_page": 150,
-   "status": "VERIFICADA",
-   "nota": "Funda soma For no dano (regra específica da arma, p.148) — PENDENTE_REVISAO"
+   "status": "PENDENTE_REVISAO",
+   "nota": "Funda soma For no dano (regra específica da arma, p.148) — conferir."
   },
   {
    "id": "arma.arco_curto",
@@ -125,7 +125,8 @@
    "id": "armadura.couro_batido",
    "valor": {
     "defesa": 3,
-    "penalidade": -1
+    "penalidade": -1,
+    "metal": false
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 153,
@@ -136,7 +137,8 @@
    "id": "armadura.gibao_peles",
    "valor": {
     "defesa": 4,
-    "penalidade": -3
+    "penalidade": -3,
+    "metal": false
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 153,
@@ -147,7 +149,8 @@
    "id": "armadura.cota_malha",
    "valor": {
     "defesa": 6,
-    "penalidade": -2
+    "penalidade": -2,
+    "metal": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 153,

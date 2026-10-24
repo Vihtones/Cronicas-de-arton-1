@@ -43,10 +43,9 @@
     "versatil": "treinado em duas perícias"
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
-   "pagina": 0,
-   "pdf_page": 0,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Versátil confirmado no texto; página exata a anotar."
+   "pagina": 19,
+   "pdf_page": 25,
+   "status": "VERIFICADA"
   },
   {
    "id": "envelhecimento",
@@ -59,6 +58,257 @@
    "pagina": 108,
    "pdf_page": 114,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "progressao.xp_por_nivel",
+   "valor": {
+    "1": 0,
+    "2": 1000,
+    "3": 3000,
+    "4": 6000,
+    "5": 10000,
+    "6": 15000,
+    "7": 21000,
+    "8": 28000,
+    "9": 36000,
+    "10": 45000
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 35,
+   "pdf_page": 41,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "progressao.xp_desafio",
+   "valor": {
+    "formula": "ND x 1000 / personagens",
+    "empate": 0.5,
+    "derrota": 0.25,
+    "irrelevante_se_nd_menor_que_nivel_menos": 5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 326,
+   "pdf_page": 332,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.anao",
+   "valor": {
+    "atributos": {
+     "con": 2,
+     "sab": 1,
+     "des": -1
+    },
+    "deslocamento_m": 6,
+    "pv_nivel1": 3,
+    "pv_por_nivel": 1,
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "bonus_subterraneo": {
+     "percepcao": 2,
+     "sobrevivencia": 2
+    },
+    "sem_reducao_deslocamento_armadura": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 20,
+   "pdf_page": 26,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "racas.tabela",
+   "valor": {
+    "humano": "+1 em três",
+    "anao": "Con+2 Sab+1 Des-1",
+    "elfo": "Int+2 Des+1 Con-1",
+    "goblin": "Des+2 Int+1 Car-1",
+    "minotauro": "For+2 Con+1 Sab-1"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 18,
+   "pdf_page": 24,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.ladino",
+   "valor": {
+    "pv_inicial": 12,
+    "pv_nivel": 3,
+    "soma_con": true,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "ladinagem",
+     "reflexos"
+    ],
+    "pericias_escolha": 8,
+    "ataque_furtivo": {
+     "dados": "1d6",
+     "condicao": "alvo desprevenido (cac ou alcance curto) ou flanqueado",
+     "por_rodada": 1,
+     "imunes": "imunes a crítico"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.arcanista",
+   "valor": {
+    "pv_inicial": 8,
+    "pv_nivel": 2,
+    "soma_con": true,
+    "pm_nivel": 6,
+    "soma_atributo_chave_pm": true,
+    "pericias_fixas": [
+     "misticismo",
+     "vontade"
+    ],
+    "pericias_escolha": 2,
+    "magias_iniciais": 3,
+    "circulo_inicial": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 37,
+   "pdf_page": 43,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.custo_por_circulo",
+   "valor": {
+    "1": 1,
+    "2": 3,
+    "3": 6,
+    "4": 10,
+    "5": 15
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 170,
+   "pdf_page": 176,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.seta_infalivel",
+   "valor": {
+    "tipo": "arcana",
+    "circulo": 1,
+    "escola": "evocacao",
+    "execucao": "padrao",
+    "alcance": "medio",
+    "setas": 2,
+    "dano_por_seta": "1d4+1",
+    "dano_tipo": "essencia",
+    "acerta_automaticamente": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 206,
+   "pdf_page": 212,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.curar_ferimentos",
+   "valor": {
+    "tipo": "divina",
+    "circulo": 1,
+    "escola": "evocacao",
+    "execucao": "padrao",
+    "alcance": "toque",
+    "cura": "2d8+2"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 189,
+   "pdf_page": 195,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "acao.usar_item_pocao",
+   "valor": {
+    "acao": "padrao"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 234,
+   "pdf_page": 240,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "item.saco_de_dormir",
+   "valor": {
+    "preco": 1,
+    "espacos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 156,
+   "pdf_page": 162,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "item.pocao_curar_ferimentos",
+   "valor": {
+    "efeito": "magia.curar_ferimentos",
+    "preco": 30
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 0,
+   "pdf_page": 0,
+   "status": "PENDENTE_REVISAO",
+   "nota": "Preço e regra de poções a conferir no cap. de itens mágicos."
+  },
+  {
+   "id": "viagem.velocidade",
+   "valor": {
+    "9": {
+     "km_hora": 4.5,
+     "km_dia": 36
+    },
+    "6": {
+     "km_hora": 3,
+     "km_dia": 24
+    },
+    "terreno_dificil_ou_clima_ruim": 0.5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 270,
+   "pdf_page": 276,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "viagem.marcha_forcada",
+   "valor": {
+    "dobra_por_hora": true,
+    "teste": "Fortitude CD 15 +1 por teste",
+    "falha": "perde 1d6 PV"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 270,
+   "pdf_page": 276,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "perigo.jornada_ermos",
+   "valor": {
+    "nd": 2,
+    "curta": 3,
+    "media": 5,
+    "longa": 7,
+    "falha": "perde 2d6 PV",
+    "limite_falhas": 3,
+    "pericia": "sobrevivencia"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 320,
+   "pdf_page": 326,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "perigo.jornada_ermos.cd",
+   "valor": 15,
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 320,
+   "pdf_page": 326,
+   "status": "PENDENTE_REVISAO",
+   "nota": "CD da jornada não lida no trecho extraído."
   }
  ]
 }

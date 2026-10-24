@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0] — 2026-10-23 — Todas as mecânicas em protótipo
+### Adicionado
+- **Laboratório de protótipos:** 21 cenários jogáveis (`src/application/prototypes.gd`), cada um com teste (`tests/unit/test_prototypes.gd`).
+- **Regras novas (18):** tabela de XP (LB p.35), XP por desafio (p.326), Anão (p.20), tabela de raças (p.18), Ladino (p.73), Arcanista (p.37), custo de magia (p.170), Seta Infalível (p.206), Curar Ferimentos (p.189), poção como ação padrão (p.234), saco de dormir (p.156), viagem (p.270), jornada pelos ermos (p.320), Khalmyr (p.99), Allihanna (p.97).
+- **Módulos novos:** progression, items, travel, domain, lineage, adventurers, fauna, pacing.
+- **Domínio:** `CharacterBuilder` (criação), `Biography` (histórico gerado), magia e poção no combate, Ataque Furtivo, investigação criminal sem testemunhas, preconceito individual, obrigações de Khalmyr e Allihanna, vários mistérios simultâneos ("As Ovelhas de Fenna").
+- **Interface:** laboratório, criação de personagem, painel de Valkaria, seções do diário (XP, inventário com equipar/usar, domínio, gerações), sucessão na tela de morte, overlay F3, modos de magia e poção no combate.
+- **Infraestrutura:** `LocalEchoProvider`, uma IA local de demonstração.
+- **Documentação:** `docs/ROADMAP.md` (correções, revisões, próximos passos), `docs/PROTOTIPOS.md`, ADR-0004.
+### Corrigido
+- Tomas incluído entre as testemunhas do próprio resgate pela Guarda.
+- Tempo de viagem passa a contar dias de calendário (marcha mais descanso).
+- Descanso em Valkaria usa estalagem, não a regra da vila.
+
 ## [0.1.0] — 2026-10-23 — Vertical slice (Fases 1–7 no escopo do slice)
 ### Adicionado
 - **Regras:** `RuleRegistry` com 58 regras extraídas do Livro Básico e do Bestiário, cada uma com fonte, página impressa, página do PDF e status. `CharacterSheet`, `Checks` e `Dice` seguem LB p.114, 220, 230–239 e 394.

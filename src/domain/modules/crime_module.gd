@@ -80,7 +80,8 @@ func _record(act: String, victim: String, loc: String, witnesses: Array, extra: 
 	var l := law(act)
 	var rec := {"id": "crime_%d" % _seq, "act": act, "actor": "player", "victim": victim, "location": loc, "tick": world.clock.tick,
 		"witnesses": witnesses.duplicate(), "evidence": ["item_faltando"] if act == "furto" else ["dano_visivel"],
-		"known_by_authority": false, "fine": int(l.get("multa", 0)), "resolved": false, "law_status": world.db.laws.get("status", "")}
+		"known_by_authority": false, "fine": int(l.get("multa", 0)), "resolved": false, "law_status": world.db.laws.get("status", ""),
+		"near": _near_npcs(loc), "investigation": 0}
 	records.append(rec)
 	var p := {"crime_id": rec.id, "crime": act, "actor": "player", "victim": victim, "location": loc, "witnesses": witnesses}
 	p.merge(extra)
@@ -97,6 +98,43 @@ func on_event(e: GameEvent) -> Array:
 	return []
 
 
+## Quem estava na mesma zona, fora do local, pode ter visto o forasteiro passar (evidência indireta).
+func _near_npcs(loc: String) -> Array:
+	var npcs = world.module("npcs")
+	if npcs == null: return []
+	var zone: String = world.db.location(loc).get("zone", "")
+	var out: Array = []
+	for id in npcs.state:
+		var l: String = npcs.state[id].location
+		if l != loc and l != "" and world.db.location(l).get("zone", "") == zone and npcs.state[id].alive:
+			out.append(id)
+	return out
+
+
+## Investigação diária (ORIGINAL): a Guarda que sabe de um crime sem autor tenta
+## identificá-lo. Teste de Investigação da capitã (PLACEHOLDER +4) contra CD 20 − 1 por pista.
+func _investigate() -> Array:
+	var mem = world.module("memory")
+	var out: Array = []
+	for r in records:
+		if r.known_by_authority or r.resolved or not r.witnesses.is_empty():
+			continue
+		var guard_knows := false
+		for g in ["elsa", "rurik", "tobias"]:
+			if mem.list(g).any(func(m): return str(m.key) == "crime:desconhecido:" + str(r.id)):
+				guard_knows = true
+		if not guard_knows:
+			continue
+		var cd := 20 - mini(10, r.near.size())
+		var roll: int = world.rng.roll("world", 1, 20)[0] + 4
+		r.investigation = int(r.investigation) + 1
+		out.append(fact("CRIME_INVESTIGATED", {"crime_id": r.id, "roll": roll, "cd": cd, "success": roll >= cd, "day": r.investigation}))
+		if roll >= cd:
+			r.known_by_authority = true
+			out.append(fact("WARRANT_ISSUED", {"crime_id": r.id, "crime": r.act, "fine": r.fine, "by": "investigacao"}))
+	return out
+
+
 ## A cada hora: se algum guarda lembra de um crime (testemunha ou rumor), a autoridade sabe.
 func on_tick(tick: int) -> Array:
 	if tick % (60 / world.clock.tick_minutes) != 0:
@@ -105,6 +143,8 @@ func on_tick(tick: int) -> Array:
 	if mem == null:
 		return []
 	var out: Array = []
+	if tick % (24 * 60 / world.clock.tick_minutes) == 0:
+		out.append_array(_investigate())
 	var guards: Array = []
 	for n in world.db.npcs.get("npcs", []):
 		if n.get("faction", "") == "guarda_vila":

@@ -49,6 +49,8 @@ func _dynamic_node(npc: String, node_id: String) -> Dictionary:
 			if rep >= 30: greet = "Ah, é você! Sempre bem-vindo."
 			elif rep <= -20: greet = "...O que você quer?"
 			return {"text": "%s Sou %s, %s." % [greet, d.name, d.profession], "options": []}
+		"__bio":
+			return {"text": Biography.for_npc(d, int(world.rng.world_seed)), "options": [{"text": "Entendo.", "next": "__generic"}]}
 		"__rumor":
 			var mem = world.module("memory")
 			var best: Dictionary = {}

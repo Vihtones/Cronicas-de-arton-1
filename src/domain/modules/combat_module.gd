@@ -22,7 +22,7 @@ func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
 	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED"])
+	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW"])
 
 
 func _ensure() -> void:
@@ -34,7 +34,7 @@ func _ensure() -> void:
 		sheet.name = d.name
 		sheet.faction = d.faction
 		sheet.is_important = bool(d.get("important", false))
-		creature_state[id] = {"alive": true, "present": true, "tile": [int(d.spawn[0]), int(d.spawn[1])], "sheet": sheet.to_dict(), "woken_until": -1}
+		creature_state[id] = {"alive": true, "present": bool(d.get("start_present", true)), "tile": [int(d.spawn[0]), int(d.spawn[1])], "sheet": sheet.to_dict(), "woken_until": -1}
 
 
 func creatures_of_faction(f: String, alive_only: bool = true) -> Array:
@@ -113,6 +113,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			if sim.current_id() != "player": return PackedStringArray(["não é o seu turno"])
 			var actions: Array = cmd.payload.get("actions", [])
 			if actions.is_empty(): return PackedStringArray(["plano vazio"])
+			var st = world.module("state")
+			for act in actions:
+				if act.get("type", "") == "drink" and (st == null or not st.has_item(str(act.get("item", "")))):
+					return PackedStringArray(["você não tem " + str(act.get("item", ""))])
 			var g := GhostPlanner.simulate(sim, "player", actions)
 			if not g.valid:
 				return PackedStringArray(["plano inválido: " + str(g.steps[-1].reason)])
@@ -162,6 +166,10 @@ func execute(cmd: GameCommand) -> Array:
 func on_event(e: GameEvent) -> Array:
 	_ensure()
 	match e.event_type:
+		"PACK_GREW":
+			if creature_state.has(e.payload.creature):
+				creature_state[e.payload.creature].present = true
+			return []
 		"BANDITS_RELOCATED":
 			for id in e.payload.get("members", []):
 				if creature_state.has(id): creature_state[id].present = false
@@ -398,6 +406,42 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append(fact("STOOD_UP", {"actor": id}, [id]))
 		"coup":
 			out.append_array(_coup(id, a.target))
+		"cast":
+			out.append_array(_cast(id, a, v))
+		"drink":
+			var heal := Dice.roll(str(world.rules.value("magia.curar_ferimentos").cura), world.rng, "combat")
+			var sh: CharacterSheet = sim.c(id).sheet
+			sh.pv = mini(sh.pv_max, sh.pv + int(heal.total))
+			out.append(fact("ITEM_LOST", {"item": a.item}, [id]))
+			out.append(fact("HEALED", {"actor": id, "target": id, "amount": heal.total, "pv_after": sh.pv, "source": a.item, "tags": ["cura"]}, [id]))
+	return out
+
+
+## Magia em combate (LB cap. 4): custo por círculo; Seta Infalível acerta sempre.
+func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
+	var sp: Dictionary = world.rules.value("magia." + str(a.spell))
+	var sh: CharacterSheet = sim.c(id).sheet
+	sh.pm -= int(v.cost)
+	var out: Array = []
+	match str(a.spell):
+		"seta_infalivel":
+			var targets: Array = a.get("targets", [a.get("target", "")])
+			for i in int(sp.setas):
+				var tgt: String = targets[i % targets.size()]
+				if not sim.c(tgt).is_empty() and not sim.c(tgt).sheet.is_dead():
+					var r := Dice.roll(sp.dano_por_seta, world.rng, "combat")
+					var tags: Array = ["magia", "impacto"]
+					tags.append_array(sim.apply_damage(tgt, int(r.total)))
+					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
+						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
+						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"curar_ferimentos":
+			var tgt: String = a.get("target", id)
+			var r := Dice.roll(sp.cura, world.rng, "combat")
+			var ts: CharacterSheet = sim.c(tgt).sheet
+			ts.pv = mini(ts.pv_max, ts.pv + int(r.total))
+			out.append(fact("HEALED", {"actor": id, "target": tgt, "amount": r.total, "pv_after": ts.pv, "source": a.spell, "tags": ["magia", "cura"]}, [id, tgt]))
+	out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm}, [id]))
 	return out
 
 
@@ -424,6 +468,16 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
 		dmg = maxi(1, int(r.total))
 		rolls = r.rolls
+		# Ataque Furtivo (LB p.73): 1/rodada, alvo desprevenido ou flanqueado; dados extras não multiplicam.
+		var sa_key := "furtivo_%d" % sim.round_no
+		if A.sheet.class_id == "ladino" and not A.flags.has(sa_key) and \
+				(T.sheet.has_effective_condition(world.rules, "desprevenido") or (not v.ranged and sim.flanking(attacker, target))):
+			var n_dice: int = 1 + (int(A.sheet.level) - 1) / 2
+			var sa := Dice.roll("%dd6" % n_dice, world.rng, "combat")
+			dmg += int(sa.total)
+			rolls.append_array(sa.rolls)
+			A.flags.append(sa_key)
+			tags.append("furtivo")
 		tags.append("impacto")
 		if crit: tags.append("critico")
 		tags.append_array(sim.apply_damage(target, dmg))
@@ -577,7 +631,8 @@ func _end_combat(outcome: String) -> Array:
 					creature_state[id].tile = world.db.creature_def(id).spawn.duplicate()
 		"morte":
 			out.append(fact("PLAYER_DIED", {"location": loc, "round": sim.round_no}, ["player"]))
-	out.append(fact("COMBAT_ENDED", {"outcome": outcome, "enemy_faction": enemy_faction, "rounds": sim.round_no, "location": loc}, ["player"]))
+	var enemies: Array = sim.combatants.keys().filter(func(x): return x != "player")
+	out.append(fact("COMBAT_ENDED", {"outcome": outcome, "enemy_faction": enemy_faction, "rounds": sim.round_no, "location": loc, "enemies": enemies}, ["player"]))
 	active = false
 	undetected_by.clear()
 	approach_rolled.clear()

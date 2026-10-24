@@ -80,10 +80,20 @@
   "mara": [
    "corda",
    "tocha",
-   "pao"
+   "pao",
+   "saco_de_dormir"
   ],
   "ysolde": [
    "pocao_cura"
+  ],
+  "garrick": [
+   "adaga",
+   "espada_curta",
+   "espada_longa",
+   "machado_batalha",
+   "arco_curto",
+   "couro_batido",
+   "cota_malha"
   ]
  }
 }

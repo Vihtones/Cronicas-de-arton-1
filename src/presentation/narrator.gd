@@ -27,7 +27,7 @@ static func line(e: GameEvent) -> String:
 	match e.event_type:
 		"TARGET_INSPECTED": return "%s%s" % [p.text, _check(p.check)]
 		"FACT_REVEALED":
-			var t: String = Game.db.mystery.facts.get(p.fact, "")
+			var t: String = Game.db.fact_text(p.fact)
 			return "[Diário] " + t if t != "" else ""
 		"OBJECT_OPENED": return "Aberto: %s." % Game.db.object_def(p.object).name if mine else ""
 		"OBJECT_CLOSED": return "Fechado." if mine else ""
@@ -49,6 +49,8 @@ static func line(e: GameEvent) -> String:
 			return s
 		"TURN_SKIPPED": return "%s está surpreendido e não age." % _name(p.actor)
 		"ATTACK_RESOLVED":
+			if p.get("spell", false):
+				return "%s lança %s em %s: %d de dano (acerto automático)%s." % [_name(p.attacker), p.weapon, _name(p.target), p.damage, " — cai!" if p.pv_after <= 0 else ""]
 			var who := _name(p.attacker)
 			var tgt := _name(p.target)
 			var res := ""
@@ -79,9 +81,31 @@ static func line(e: GameEvent) -> String:
 		"FINE_PAID": return "Multa paga."
 		"ITEM_BOUGHT": return "Comprado: %s por T$ %d." % [Game.db.items[p.item].name, p.price]
 		"DIZIMO_RETURNED": return "O dízimo volta ao templo." if p.get("actor", "") == "player" else ""
-		"BECOME_DEVOTEE": return "Você agora é devota de %s." % p.god
+		"BECOME_DEVOTEE": return "Você agora é devoto(a) de %s." % p.god
 		"OBLIGATION_VIOLATED": return "Você causou dano letal. Seus votos a %s foram quebrados." % p.god
 		"DIALOGUE_TEST": return "Teste%s" % _check(p.check)
+		"XP_GAINED": return "+%d XP (%s). Total: %d." % [p.amount, p.reason, p.total]
+		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Poder de classe a escolher: %d (em breve)." % [p.level, p.pv_gain, p.pm_gain, p.pending_powers]
+		"SPELL_CAST": return "Magia: %s (−%d PM, resta %d)." % [str(p.spell).replace("_", " ").capitalize(), p.pm_cost, p.pm_after] if p.caster == "player" else ""
+		"HEALED": return "%s recupera %d PV." % [_name(p.target), p.amount]
+		"EQUIPPED": return "Equipado: %s (Defesa %d)." % [Game.db.items.get(p.item, {}).get("name", p.item), p.defense]
+		"TRAVEL_STARTED": return "Você parte: %d km, cerca de %.1f dias de marcha." % [p.km, p.days]
+		"TRAVEL_AMBUSH": return "Emboscada no dia %d! −%d PV, −T$ %d." % [p.day, p.pv_lost, p.gold_lost]
+		"JOURNEY_CHALLENGE": return "Jornada pelos ermos: %d sucessos, %d falhas." % [p.successes, p.failures]
+		"TRAVEL_ARRIVED": return "Você chega a %s." % {"valkaria": "Valkaria", "vila": "Vila Alvorada", "ermos_norte": "os Ermos do Norte"}.get(p.region, p.region)
+		"GRANT_DOMAIN": return "Você agora administra %s. (J > Domínio)" % p.domain
+		"DOMAIN_WEEK": return "Domínio, semana %d: renda %d, custos %d, tesouro %d, moral %d, segurança %d.%s" % [p.week, p.income, p.upkeep, p.treasury, p.morale, p.security, (" " + p.event) if p.event != "" else ""]
+		"DOMAIN_UNREST": return "Há murmúrios contra os impostos no moinho."
+		"NPC_DIED": return "%s morreu (%s, %d anos)." % [_name(p.npc), p.cause, p.age]
+		"INHERITANCE": return "%s herda a casa e as economias de %s." % [_name(p.to), _name(p.from)]
+		"NPC_BORN": return "Nasce uma criança na família %s." % str(p.family).capitalize()
+		"HERO_SUCCEEDED": return "%s assume o legado de %s. O mundo lembra do outro, não de você." % [p.new_name, p.previous_name]
+		"SHEEP_KILLED":
+			return "Gritos de Fenna na estrada: uma ovelha morta." if Game.db.zone_at(Game.player_tile()) != "cripta" else ""
+		"PACK_RELOCATED": return ""
+		"CRIME_INVESTIGATED": return ""
+		"AMBIENT_VIGNETTE": return p.text
+		"OBLIGATION_VIOLATED": return "Você quebrou os votos a %s." % p.god
 		"TRADE_DELIVERED":
 			return "Saria chega com mercadorias de Valkaria." if Game.db.location_at(Game.player_tile()) in ["mercado", "taverna", "praca"] else ""
 	return ""

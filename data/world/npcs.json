@@ -939,7 +939,7 @@
   },
   {
    "id": "hiena_2",
-   "name": "Hiena",
+   "name": "Hiena Malhada",
    "rule": "criatura.hiena",
    "faction": "fauna",
    "spawn": [
@@ -951,6 +951,38 @@
     18,
     6
    ]
+  },
+  {
+   "id": "hiena_3",
+   "name": "Hiena Jovem",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    82,
+    35
+   ],
+   "zone": "floresta",
+   "active_hours": [
+    18,
+    6
+   ],
+   "start_present": false
+  },
+  {
+   "id": "hiena_4",
+   "name": "Hiena Jovem",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    79,
+    38
+   ],
+   "zone": "floresta",
+   "active_hours": [
+    18,
+    6
+   ],
+   "start_present": false
   }
  ]
 }

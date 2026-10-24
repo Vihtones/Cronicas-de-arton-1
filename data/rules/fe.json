@@ -43,6 +43,32 @@
    "pagina": 100,
    "pdf_page": 106,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "deus.khalmyr.obrigacao",
+   "valor": {
+    "proibido": [
+     "recusar_ajuda_a_inocentes"
+    ],
+    "arma_preferida": "espada longa"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 99,
+   "pdf_page": 105,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "deus.allihanna.obrigacao",
+   "valor": {
+    "proibido": [
+     "armadura_ou_escudo_de_metal",
+     "descansar_em_comunidade_maior_que_aldeia"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 97,
+   "pdf_page": 103,
+   "status": "VERIFICADA"
   }
  ]
 }

@@ -57,8 +57,10 @@ func _on_world_reloaded() -> void:
 	camera.set_bounds(Game.db.size)
 	player.sync_from_world()
 	npc_layer.rebuild()
-	_set_world_visible(true)
+	var in_vila: bool = Game.world.modules.travel.current_region == "vila"
+	_set_world_visible(in_vila)
 	ui.close_panels()
+	ui.refresh_hub()
 	ui.log_msg("Vila Alvorada. Hilda Brandt procura o filho desaparecido. [E] interagir · [J] diário · [Esc] menu")
 	camera.reset_smoothing()
 
@@ -79,6 +81,8 @@ func _on_event(e: GameEvent) -> void:
 				world_view.call_deferred("refresh_object", "porta_cela")
 			npc_layer.call_deferred("sync_all")
 			camera.call_deferred("reset_smoothing")
+		"TRAVEL_ARRIVED":
+			call_deferred("_on_world_reloaded")
 		"DIALOGUE_CHOICE", "DIALOGUE_STARTED":
 			ui.call_deferred("refresh_dialogue")
 
@@ -127,6 +131,12 @@ func build_actions() -> Array:
 		if Game.db.npc_def(owner).get("work", "") == loc:
 			for it in Game.db.economy.shops[owner]:
 				out.append({"label": "Pegar escondido: %s (furto)" % Game.db.items[it].name, "cmd": "StealFromStall", "payload": {"owner": owner, "item": it}})
+	var tr: TravelModule = w.modules.travel
+	if tr.enabled and TravelModule.DEPARTURE_LOCS.has(loc):
+		for route in tr.available_routes():
+			var rd: Dictionary = TravelModule.ROUTES[route]
+			out.append({"label": "Viajar: %s (%d km, ~%.1f dias)" % [str(rd.to).replace("_", " ").capitalize(), rd.km, float(rd.km) / tr.km_per_day(rd)],
+				"cmd": "Travel", "payload": {"route": route}})
 	var c: CombatModule = w.modules.combat
 	var foes: Array = []
 	for id in c.visible_creatures():
@@ -146,6 +156,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not ui.close_panels() and Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT, Game.Mode.DIALOGUE]:
 			ui.toggle_pause()
 		get_viewport().set_input_as_handled()
+		return
+	if k == KEY_F3:
+		ui.toggle_debug()
 		return
 	if k == KEY_F5:
 		ui.log_msg("Jogo salvo." if Game.save_game() == OK else "Não é possível salvar agora.")

@@ -8,6 +8,10 @@
     "next": "__rumor"
    },
    {
+    "text": "Fale um pouco de você.",
+    "next": "__bio"
+   },
+   {
     "text": "Você viu Tomas Brandt?",
     "cond": [
      {
@@ -120,6 +124,29 @@
        "next": "aceita"
       },
       {
+       "text": "Não posso ajudar.",
+       "cond": [
+        {
+         "not_flag": "aceitou_busca"
+        },
+        {
+         "not_flag": "recusou_hilda"
+        }
+       ],
+       "effects": [
+        {
+         "flag": "recusou_hilda"
+        },
+        {
+         "event": "REFUSED_HELP",
+         "payload": {
+          "npc": "hilda"
+         }
+        }
+       ],
+       "next": "recusa"
+      },
+      {
        "text": "Onde ele foi visto pela última vez?",
        "next": "visto"
       },
@@ -143,6 +170,15 @@
         }
        ],
        "next": "retalho"
+      }
+     ]
+    },
+    "recusa": {
+     "text": "(Hilda baixa os olhos.) Entendo. Ninguém pode.",
+     "options": [
+      {
+       "text": "...",
+       "next": "end"
       }
      ]
     },
@@ -558,6 +594,36 @@
         }
        ],
        "next": "incursao"
+      },
+      {
+       "text": "Quero seguir Khalmyr, o Deus da Justiça.",
+       "cond": [
+        {
+         "devotion": ""
+        }
+       ],
+       "next": "khalmyr"
+      }
+     ]
+    },
+    "khalmyr": {
+     "text": "Então saiba: devotos de Khalmyr não recusam ajuda a inocentes e obedecem à hierarquia da igreja. Ainda quer?",
+     "options": [
+      {
+       "text": "Juro pela balança.",
+       "effects": [
+        {
+         "event": "BECOME_DEVOTEE",
+         "payload": {
+          "god": "Khalmyr"
+         }
+        }
+       ],
+       "next": "inicio"
+      },
+      {
+       "text": "Preciso pensar.",
+       "next": "inicio"
       }
      ]
     },
@@ -671,6 +737,81 @@
     }
    }
   },
+  "fenna": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "Cuidado com o rebanho, forasteiro. Já basta o que os lobos fazem.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Que lobos?",
+       "cond": [
+        {
+         "flag": "ovelha_morta"
+        }
+       ],
+       "effects": [
+        {
+         "reveal": "f_ovelhas_mortas"
+        }
+       ],
+       "next": "lobos"
+      }
+     ]
+    },
+    "lobos": {
+     "text": "Mataram mais uma na estrada leste. Ouvi uivos... acho que eram uivos. Ninguém me ajuda.",
+     "options": [
+      {
+       "text": "Vou ver isso.",
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
+  "celia": {
+   "start": "inicio",
+   "nodes": {
+    "inicio": {
+     "text": "A terra dá o que a gente cuida, moço. Allihanna sabe.",
+     "append_generic": true,
+     "options": [
+      {
+       "text": "Fale-me de Allihanna.",
+       "next": "votos"
+      }
+     ]
+    },
+    "votos": {
+     "text": "Quem segue a Mãe Natureza não veste metal, nem dorme em cidade grande. Prefere o relento.",
+     "options": [
+      {
+       "text": "Quero segui-la.",
+       "cond": [
+        {
+         "devotion": ""
+        }
+       ],
+       "effects": [
+        {
+         "event": "BECOME_DEVOTEE",
+         "payload": {
+          "god": "Allihanna"
+         }
+        }
+       ],
+       "next": "inicio"
+      },
+      {
+       "text": "Bonito caminho.",
+       "next": "inicio"
+      }
+     ]
+    }
+   }
+  },
   "tomas": {
    "entries": [
     {
@@ -751,6 +892,46 @@
       {
        "text": "E se alguém quebrar a lei?",
        "next": "lei"
+      },
+      {
+       "text": "O que será do moinho agora?",
+       "cond": [
+        {
+         "mystery": "resolvido"
+        },
+        {
+         "rep_gte": 5
+        },
+        {
+         "not_flag": "dominio_concedido"
+        }
+       ],
+       "next": "dominio"
+      }
+     ]
+    },
+    "dominio": {
+     "text": "Otto não dá conta sozinho, e a vila confia em você. Administre o moinho e as terras dos Brandt: impostos, celeiro, patrulhas. Aceita?",
+     "options": [
+      {
+       "text": "Aceito.",
+       "effects": [
+        {
+         "flag": "dominio_concedido"
+        },
+        {
+         "event": "GRANT_DOMAIN",
+         "payload": {
+          "domain": "Moinho Brandt",
+          "by": "orin"
+         }
+        }
+       ],
+       "next": "inicio"
+      },
+      {
+       "text": "Não é para mim.",
+       "next": "inicio"
       }
      ]
     },

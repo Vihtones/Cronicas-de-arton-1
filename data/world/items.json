@@ -29,9 +29,57 @@
   "good": "ferramentas"
  },
  "pocao_cura": {
-  "name": "Essência de cura (placeholder)",
+  "name": "Poção de Curar Ferimentos",
   "price": 30,
   "good": "remedio",
   "status": "PENDENTE_REVISAO"
+ },
+ "saco_de_dormir": {
+  "name": "Saco de dormir",
+  "price": 1,
+  "good": "ferramentas",
+  "rule": "item.saco_de_dormir"
+ },
+ "espada_longa": {
+  "name": "Espada longa",
+  "price": 15,
+  "good": "ferramentas",
+  "rule": "arma.espada_longa"
+ },
+ "espada_curta": {
+  "name": "Espada curta",
+  "price": 10,
+  "good": "ferramentas",
+  "rule": "arma.espada_curta"
+ },
+ "adaga": {
+  "name": "Adaga",
+  "price": 2,
+  "good": "ferramentas",
+  "rule": "arma.adaga"
+ },
+ "machado_batalha": {
+  "name": "Machado de batalha",
+  "price": 10,
+  "good": "ferramentas",
+  "rule": "arma.machado_batalha"
+ },
+ "arco_curto": {
+  "name": "Arco curto",
+  "price": 30,
+  "good": "ferramentas",
+  "rule": "arma.arco_curto"
+ },
+ "couro_batido": {
+  "name": "Couro batido",
+  "price": 35,
+  "good": "ferramentas",
+  "rule": "armadura.couro_batido"
+ },
+ "cota_malha": {
+  "name": "Cota de malha",
+  "price": 150,
+  "good": "ferramentas",
+  "rule": "armadura.cota_malha"
  }
 }
