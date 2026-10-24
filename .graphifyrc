@@ -1,0 +1,6 @@
+# Graphify (https://github.com/Graphify-Labs/graphify) — configuração do projeto.
+# O Graphify não tem gramática de GDScript; a sintaxe é próxima de Python, então o
+# código .gd é lido com a gramática de Python (funções, classes e chamadas aparecem;
+# anotações de tipo podem gerar nós espúrios).
+language.gd=python
+viz_node_limit=0

@@ -2,3 +2,6 @@
 .godot/
 build/
 export/
+
+# saída do Graphify (regerável)
+graphify-out/

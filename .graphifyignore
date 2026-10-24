@@ -1,0 +1,10 @@
+# Fora do grafo: cache do motor, builds, mídia e binários
+.godot/
+build/
+assets/
+*.import
+*.png
+*.tscn
+*.tres
+# Conteúdo gerado grande (regras e catálogos são gerados por tools/build_*.py, que entram no grafo)
+data/rules/*.json
