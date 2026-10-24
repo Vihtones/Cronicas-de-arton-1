@@ -65,3 +65,14 @@ Os valores numéricos acima são **recomendação do assistente**, não decisão
 2. **Harmonizar os verdes** com o bioma temperado e reduzir os realces amarelos. Pede aprovação antes, porque altera o asset (vira v02, com novo hash).
 3. Separar a sombra pintada se ela conflitar com a luz dinâmica.
 4. Parallax e blur continuam **não implementados** (AD-12 e AD-13).
+
+## Teste do acervo Tormenta20 no cenário (24/10/2026) — não é aprovação
+`tools/art_test_runner.gd` lê os PNGs direto da pasta de arte, em tempo de execução, e não copia nada para o projeto nem para o manifesto. Foram testados:
+- **7 pessoas e 4 criaturas** do bestiário v3, nas vistas 1/3/5/7. As escalas testadas foram 1/2, 1/3, 1/4 e 1/5, com filtro nearest e com filtro suave.
+- **8 materiais**, repetidos a 1/2: calçamento, terra, madeira envelhecida, tijolo, musgo, lama, pedra e grama.
+
+Observações (recomendações do assistente, a revisar):
+- **Escala:** 1/4 (cerca de 55 px) combina com as árvores LPC, e 1/5 (cerca de 44 px) fica na faixa de 36–44 px da Bíblia. Nas duas, o personagem provisório (cerca de 28 px) fica pequeno demais. O nearest em 1/4 ficou legível, e o filtro suave borra. Reduzir não substitui a pixelização manual (ANALISE §4).
+- **Materiais:** o calçamento e a terra encaixam. O tijolo está saturado, e a madeira, clara demais em 1/2. A lama mostra uma emenda visível na repetição.
+- **Criaturas:** a Alma Acorrentada é vermelho intenso, adequado só como marca da Tormenta. A asa-assassina some entre as copas. Na floresta, o sub-bosque esconde parte dos materiais testados.
+- **Direções:** as quatro vistas do Bandido Ligeiro mantêm a identidade. As oito vistas não são animação de caminhada.
