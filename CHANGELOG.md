@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.4.0] — 2026-10-24 — Arcanista completo, perícias, poderes sob controle e resumo de XP
+### Adicionado
+- **C17, escolha de perícias** na criação (LB p.114): as da classe saem da lista da classe, e Int e Versátil liberam perícias livres. A escolha é validada.
+- **C4, Caminho do Arcanista** (LB p.37): Bruxo (Int), Feiticeiro (Car) e Mago (Int, +1 magia). Duas magias novas:
+  - **Armadura Arcana**: +5 de Defesa pela cena, sem acumular com armadura (LB p.183).
+  - **Toque Chocante**: 2d8+2, Fortitude reduz à metade, −5 contra armadura de metal (LB p.209). A CD das magias segue LB p.173.
+  - A tecla 4 alterna entre as magias conhecidas e avisa quando haverá teste.
+- **C5, concentração ao lançar** (LB p.170): caído ou em tempestade, Vontade CD 15 + custo. Lançar magia arcana de armadura pede Misticismo CD 20 + custo com penalidade (LB p.171). Na falha, a magia se perde e os PM são gastos.
+- **C20, controle dos poderes com custo:**
+  - Golpe de Raspão: "usar ao errar" ou "nunca", e a tecla R troca só no turno.
+  - Durão: "golpes fortes", "sempre" ou "nunca".
+  - Ajustável no diário e salvo no save.
+- **C22, janela de resumo pós-combate** com base, cada fator, multiplicador e progresso até o próximo nível.
+- **C23, `tools/run_tests.py`:** um teste que dá erro de script em tempo de execução agora reprova (antes passava).
+- 9 regras novas verificadas (94 no total: 87 verificadas). 7 testes novos (127 no total).
+
 ## [0.3.1] — 2026-10-24 — Governador de Direção de Arte
 ### Adicionado
 - **Governador de Direção de Arte** (`docs/GOVERNADOR_DE_ARTE.md`):

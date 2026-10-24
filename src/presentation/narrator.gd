@@ -93,6 +93,8 @@ static func line(e: GameEvent) -> String:
 		"POWER_CHOSEN": return "Poder adquirido: %s%s." % [str(p.power).replace("_", " "), (" (" + p.option + ")") if p.option != "" else ""]
 		"MANEUVER_RESOLVED": return "%s tenta derrubar %s: %d vs %d — %s" % [_name(p.attacker), _name(p.target), p.attacker_total, p.target_total, "caído!" if p.success else "resiste."]
 		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Escolha um poder no diário (J)." % [p.level, p.pv_gain, p.pm_gain]
+		"SPELL_FAILED": return "%s perde a magia: %s CD %d (%s) — tirou %d." % [_name(p.caster), "Vontade" if p.check == "vontade" else "Misticismo", p.cd, p.reason, p.total]
+		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ""
 		"SPELL_CAST": return "Magia: %s (−%d PM, resta %d)." % [str(p.spell).replace("_", " ").capitalize(), p.pm_cost, p.pm_after] if p.caster == "player" else ""
 		"HEALED": return "%s recupera %d PV." % [_name(p.target), p.amount]
 		"EQUIPPED": return "Equipado: %s (Defesa %d)." % [Game.db.items.get(p.item, {}).get("name", p.item), p.defense]

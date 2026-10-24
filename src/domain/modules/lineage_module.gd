@@ -102,7 +102,7 @@ func execute(cmd: GameCommand) -> Array:
 	if b.is_empty():
 		sheet = CharacterSheet.premade_warrior(world.rules, "player", "Herdeiro de " + world.player_sheet.name)
 	else:
-		sheet = CharacterBuilder.build(world.rules, b.race, b["class"], b.attrs, b.get("human_picks", ["for", "des", "con"]), b.get("name", "Herdeiro"))
+		sheet = CharacterBuilder.build_from(world.rules, b)
 	var inherited := int(world.player.gold) / 2  # testamento: metade do ouro (ORIGINAL)
 	world.player_sheet = sheet
 	world.player.gold = inherited

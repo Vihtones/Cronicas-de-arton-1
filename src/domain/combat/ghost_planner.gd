@@ -78,13 +78,18 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var cost := int(sim.rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
-			var reach := int(sim.rules.value("alcance.quadrados", {}).get(str(sp.alcance), 1))  # LB p.143
+			if str(sp.alcance) == "pessoal": targets = [actor]
+			var reach := int(sim.rules.value("alcance.quadrados", {}).get(str(sp.alcance), 1))  # LB p.143 (toque/pessoal = 1)
+			if str(sp.alcance) == "toque":
+				for tg in targets:
+					if tg == actor: return {"ok": false, "reason": "escolha um alvo adjacente"}
 			for tg in targets:
 				var T := sim.c(tg)
 				if T.is_empty(): return {"ok": false, "reason": "alvo inválido"}
 				if CombatSim.cheb(A.tile, T.tile) > reach: return {"ok": false, "reason": "fora do alcance da magia"}
 			var avg := 0.0
 			if sp.has("dano_por_seta"): avg = Dice.average(sp.dano_por_seta) * int(sp.setas)
+			elif sp.has("dano"): avg = Dice.average(sp.dano) * 0.75   # Fortitude reduz à metade: média aproximada
 			return {"ok": true, "kind": "padrao", "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": avg, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
 		"drink":
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}

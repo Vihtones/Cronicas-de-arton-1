@@ -31,6 +31,8 @@ var spells: PackedStringArray = PackedStringArray()
 var equipment := {"weapon": "", "armor": ""}
 var pending_powers: int = 0
 var caster_attr: String = ""
+var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37)
+var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
 
 
@@ -89,7 +91,7 @@ func training_bonus() -> int:
 
 func defense(rules: RuleRegistry, vs_melee: bool = true) -> int:
 	var d := defense_fixed if defense_fixed >= 0 else defense_base + int(attrs.des)
-	d += condition_mod(rules, "defesa")
+	d += condition_mod(rules, "defesa") + scene_defense
 	if has_effective_condition(rules, "caido"):
 		d += -5 if vs_melee else 5
 	return d
@@ -158,6 +160,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
+		"arcane_path": arcane_path, "scene_defense": scene_defense,
 	}
 
 
@@ -181,6 +184,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.equipment = d.get("equipment", {"weapon": "", "armor": ""}).duplicate()
 	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
 	s.powers = d.get("powers", {}).duplicate(true)
+	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0))
 	return s
 
 

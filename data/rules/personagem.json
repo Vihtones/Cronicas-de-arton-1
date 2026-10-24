@@ -283,6 +283,174 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "classe.ladino.lista",
+   "valor": [
+    "acrobacia",
+    "atletismo",
+    "atuacao",
+    "cavalgar",
+    "conhecimento",
+    "diplomacia",
+    "enganacao",
+    "furtividade",
+    "iniciativa",
+    "intimidacao",
+    "intuicao",
+    "investigacao",
+    "jogatina",
+    "luta",
+    "oficio",
+    "percepcao",
+    "pilotagem",
+    "pontaria"
+   ],
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.arcanista.lista",
+   "valor": [
+    "conhecimento",
+    "diplomacia",
+    "enganacao",
+    "guerra",
+    "iniciativa",
+    "intimidacao",
+    "intuicao",
+    "investigacao",
+    "nobreza",
+    "oficio",
+    "percepcao"
+   ],
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 37,
+   "pdf_page": 43,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "pericias.escolha",
+   "valor": {
+    "classe": "número da classe, da lista da classe",
+    "inteligencia": "perícias adicionais = Int (qualquer lista)",
+    "versatil_humano": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 114,
+   "pdf_page": 120,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.arcanista.caminho",
+   "valor": {
+    "bruxo": {
+     "atributo": "int",
+     "foco": "empunhar o foco ou Misticismo CD 20 + custo; foco RD 10, PV = metade dos seus"
+    },
+    "feiticeiro": {
+     "atributo": "car",
+     "aprende": "uma magia nova a cada nível ímpar",
+     "linhagem": "herança básica (p.39)"
+    },
+    "mago": {
+     "atributo": "int",
+     "magias_iniciais_extra": 1,
+     "memoriza": "metade das magias conhecidas, 1 hora de estudo, 1×/dia"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 37,
+   "pdf_page": 43,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.cd_resistencia",
+   "valor": {
+    "formula": "10 + floor(nivel/2) + atributo-chave"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 173,
+   "pdf_page": 179,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.concentracao",
+   "valor": {
+    "teste": "vontade",
+    "ferido_na_execucao": "CD = dano (só reação ou dano contínuo em magias de ação padrão)",
+    "condicao_ruim": {
+     "cd_base": 15,
+     "exemplos": [
+      "caido",
+      "galope",
+      "tempestade"
+     ]
+    },
+    "condicao_terrivel": {
+     "cd_base": 20,
+     "exemplos": [
+      "agarrado",
+      "terremoto"
+     ]
+    },
+    "falha": "magia perdida, PM gastos"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 170,
+   "pdf_page": 176,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.armadura_e_arcana",
+   "valor": {
+    "teste": "misticismo",
+    "cd_base": 20,
+    "soma_custo": true,
+    "penalidade_armadura": true,
+    "falha": "não funciona, PM gastos"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 171,
+   "pdf_page": 177,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.armadura_arcana",
+   "valor": {
+    "tipo": "arcana",
+    "circulo": 1,
+    "escola": "abjuracao",
+    "execucao": "padrao",
+    "alcance": "pessoal",
+    "duracao": "cena",
+    "defesa": 5,
+    "cumulativo_com_armadura": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 183,
+   "pdf_page": 189,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.toque_chocante",
+   "valor": {
+    "tipo": "arcana",
+    "circulo": 1,
+    "escola": "evocacao",
+    "execucao": "padrao",
+    "alcance": "toque",
+    "dano": "2d8+2",
+    "dano_tipo": "eletricidade",
+    "resistencia": "fortitude_metade",
+    "penalidade_metal": -5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 209,
+   "pdf_page": 215,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "magia.seta_infalivel",
    "valor": {
     "tipo": "arcana",

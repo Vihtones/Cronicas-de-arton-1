@@ -1,6 +1,6 @@
 # Roadmap: próximos passos, correções e revisões
 
-Atualizado em 23/10/2026 para a versão 0.3.0. Estado: 112 testes passando (incluindo 20 de interação entre sistemas), 0 violações de arquitetura, 6 regras pendentes de revisão (eram 8).
+Atualizado em 24/10/2026 para a versão 0.4.0. Estado: 127 testes passando, com erros de script detectados (C23); 0 violações de arquitetura; 94 regras (87 verificadas, 6 pendentes de revisão).
 
 ## A. Correções
 
@@ -21,21 +21,25 @@ Atualizado em 23/10/2026 para a versão 0.3.0. Estado: 112 testes passando (incl
 | novo | Rumores travados | Corrigido: o NPC conta o que alguém presente ainda não sabe |
 | novo | Derrota para salteadores levava à cripta | Corrigido: roubo e despertar na estrada |
 
+### Feitas na 0.4.0
+| # | Resultado |
+|---|---|
+| C4 | Caminhos Bruxo, Feiticeiro e Mago; Armadura Arcana e Toque Chocante. Pendentes: a 4ª magia do Mago, a linhagem do Feiticeiro e a memorização (ADAPTADA em `docs/REGRAS.md`) |
+| C5 | Vontade quando caído ou em tempestade; Misticismo de armadura. Pendente: ser ferido durante a execução (precisa de reações) |
+| C17 | Escolha de perícias da classe e livres (Int/Versátil) |
+| C20 | Políticas de Golpe de Raspão e Durão, mais a troca por turno (R) |
+| C22 | Janela de resumo da XP |
+| C23 | `tools/run_tests.py` reprova testes com erro de script |
+
 ### Pendentes
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
-| C4 | Arcanista: 2 das 3 magias iniciais e o Caminho | `CharacterBuilder`, `data/rules` | extrair 2 magias de 1º círculo (ex.: Armadura Arcana, Raio do Enfraquecimento) |
-| C5 | Teste de concentração ao lançar magia | `CombatModule._cast` | Vontade ao lançar com dano no turno (LB p.170) |
 | C7/C8 | Bebês não viram NPCs; casais fixos | `LineageModule` | registro de NPCs dinâmicos |
 | C10 | Toca nova não move hienas | `FaunaModule` | posição por toca |
 | C11 | Capitã com +4 fixo | `CrimeModule` | fichas de NPC pela Tabela 7-2 (LB p.322) |
 | C15 | `AdvanceTime` de 7 dias leva cerca de 300 ms | `MemoryModule`, `NpcModule` | lotes por região (LOD L2) |
 | C16 | 8 recursos vazando ao sair dos testes | lambdas do `CombatSim` | `Callable` de método |
-| C17 | Perícias escolhidas por padrão | `CharacterBuilder`, UI | tela de escolha |
-| C20 | Poderes com ativação ainda são automáticos: Golpe de Raspão (sempre que houver PM), Durão (golpes ≥ ¼ dos PV) | `CombatModule` | opção "perguntar/auto" no menu |
 | C21 | Ímpeto, Ataque Reflexo e outros poderes do LB ainda não existem | `ProgressionModule.POWERS` | próximo lote de poderes |
-| C22 | A conta da XP dinâmica só aparece no registro | `ui_root.gd` | janela de resumo pós-combate |
-| C23 | O executor de testes conta como aprovado um teste que dá erro de script em tempo de execução | `tests/run_tests.gd` | detectar erro do motor por teste (ex.: contador de erros via `push_error` no `TestCase`) |
 | A1 | Arte: prova de escala (personagem de cerca de 28 px diante das árvores LPC, que pressupõem cerca de 48 px) | `assets/chars`, governador | rua + árvore + 2 personagens, comparada com o piloto v04 |
 | A2 | Arte: verdes tropicais do LPC Jungle ainda sem harmonização com o bioma | lote 02 | v02 recolorida, **com aprovação do usuário** |
 | A3 | Arte: 3 plantas altas aprovadas sem papel | `direcao_de_arte.json` | decidir após A1 |
@@ -58,8 +62,8 @@ Atualizado em 23/10/2026 para a versão 0.3.0. Estado: 112 testes passando (incl
 ## C. Próximos passos
 1. **Playtest com o Laboratório** (R2–R5), anotando a XP dinâmica de cada luta.
 2. **R1:** fechar as 6 regras pendentes.
-3. **C4 + C17:** Arcanista completo e escolha de perícias.
-4. **C20–C22:** controle dos poderes ativos e resumo pós-combate da XP.
+3. **Prova de escala de arte (A1)** quando você decidir aprovar sprites.
+4. **C21:** Ímpeto, Ataque Reflexo e reações (destrava o resto de C5).
 5. **Heróis de Arton (R9):** primeiras classes e raças.
 6. **C7/C8:** gerações completas.
 7. **C15:** LOD L2 para avançar dias rapidamente.

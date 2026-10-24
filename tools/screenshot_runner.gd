@@ -39,6 +39,12 @@ func _run() -> void:
 	main.ui.panel_credits.visible = true
 	await _shot("01b_creditos")
 	main.ui.panel_credits.visible = false
+	main.ui._creation["class"] = "arcanista"; main.ui._creation.path = "mago"
+	main.ui._creation.class_picks = ["conhecimento", "intuicao"]; main.ui._creation.free_picks = ["percepcao"]
+	main.ui.open_creation()
+	await _frames(5)
+	await _shot("01c_criacao_arcanista")
+	main.ui.panel_creation.visible = false
 	G.new_game(false, 7)
 	G.world.clock.tick = 6 * 10  # 10h
 	G.world.player.position = G.db.tile_to_world(Vector2i(38, 15))
@@ -125,5 +131,9 @@ func _run() -> void:
 		cv.confirm()
 		await _frames(60)
 		await _shot("09_combate_execucao")
+	main.ui.show_xp_summary({"amount": 390, "total": 390, "next": 1000, "level": 1, "outcome": "vitoria", "base": 250, "mult": 1.55,
+		"breakdown": [["desvantagem numérica (3 inimigos)", 0.2], ["táticas: flanco, magia", 0.1], ["vitória rápida (3 rodadas)", 0.1], ["quase sem ferimentos", 0.15]]})
+	await _frames(5)
+	await _shot("10_resumo_xp")
 	print("telemetria ", JSON.stringify(G.telemetry.report()))
 	quit()

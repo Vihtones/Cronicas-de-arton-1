@@ -64,7 +64,7 @@ func new_game(feminine: bool = false, p_seed: int = -1) -> void:
 ## Novo jogo com ficha montada pela criação de personagem.
 func new_game_with_build(build: Dictionary, feminine: bool) -> void:
 	new_game(feminine)
-	world.player_sheet = CharacterBuilder.build(rules, build.race, build["class"], build.attrs, build.get("human_picks", ["for", "des", "con"]), build.get("name", "Aventureiro"))
+	world.player_sheet = CharacterBuilder.build_from(rules, build)
 	world_reloaded.emit()
 
 

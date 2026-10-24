@@ -12,6 +12,7 @@ var camera: CameraDirector
 var plan: Array = []
 var mode := "mover"          # mover | atacar | investida | misericordia
 var special := false
+var spell := "seta_infalivel"   # magia selecionada no modo magia (tecla 4 alterna)
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var hover := Vector2i(-1, -1)
 var preview: Dictionary = {}
@@ -37,6 +38,27 @@ func sim() -> CombatSim:
 
 func my_turn() -> bool:
 	return active() and sim().current_id() == "player" and not playing
+
+
+func cycle_spell() -> void:
+	var known: Array = Array(Game.world.player_sheet.spells)
+	if known.is_empty():
+		message.emit("Você não conhece magias.")
+		return
+	if mode != "magia" or not known.has(spell):
+		spell = known[0]
+	else:
+		spell = known[(known.find(spell) + 1) % known.size()]
+	mode = "magia"
+	var sp: Dictionary = Game.world.rules.value("magia." + spell, {})
+	var cost := int(Game.world.rules.value("magia.custo_por_circulo")[str(int(sp.get("circulo", 1)))])
+	var c: Dictionary = Game.world.modules.combat.casting_cd(Game.world.player_sheet, sp, cost)
+	var warn := ""
+	if int(c.concentration_cd) > 0: warn += " · Vontade CD %d (%s)" % [c.concentration_cd, c.reason]
+	if not (c.armor as Dictionary).is_empty(): warn += " · Misticismo CD %d (armadura)" % c.armor.cd
+	message.emit("Magia: %s (%d PM, %s)%s. [4] troca de magia." % [spell.replace("_", " ").capitalize(), cost,
+		"em você" if str(sp.get("alcance", "")) == "pessoal" else "clique no alvo", warn])
+	_update_preview()
 
 
 func toggle_raspao() -> void:
@@ -128,9 +150,12 @@ func candidate_actions(t: Vector2i) -> Array:
 				return []
 			return [{"type": "attack", "target": target, "attack": idx, "special": special, "raspao": raspao}]
 		"magia":
+			var sp: Dictionary = Game.world.rules.value("magia." + spell, {})
+			if str(sp.get("alcance", "")) == "pessoal":
+				return [{"type": "cast", "spell": spell, "targets": ["player"]}]
 			if target == "" or not gs.is_enemy("player", target):
 				return []
-			return [{"type": "cast", "spell": "seta_infalivel", "targets": [target]}]
+			return [{"type": "cast", "spell": spell, "targets": [target], "target": target}]
 	return []
 
 
@@ -219,7 +244,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_1: mode = "mover"; _update_preview()
 			KEY_2: mode = "investida"; _update_preview()
 			KEY_3: mode = "misericordia"; _update_preview()
-			KEY_4: mode = "magia"; message.emit("Modo magia: clique no alvo (Seta Infalível, 1 PM)."); _update_preview()
+			KEY_4: cycle_spell()
 			KEY_5: drink_potion()
 			KEY_6: mode = "atirar"; message.emit("Modo tiro: clique no alvo (sem se mover)."); _update_preview()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()

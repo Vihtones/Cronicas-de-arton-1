@@ -8,7 +8,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 |---|---|
 | ADAPTADA | 1 |
 | PENDENTE_REVISAO | 6 |
-| VERIFICADA | 78 |
+| VERIFICADA | 87 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -88,6 +88,15 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `classe.ladino` | T20 Livro Básico | 73 | 79 | VERIFICADA |  |
 | personagem | `classe.arcanista` | T20 Livro Básico | 37 | 43 | VERIFICADA |  |
 | personagem | `magia.custo_por_circulo` | T20 Livro Básico | 170 | 176 | VERIFICADA |  |
+| personagem | `classe.ladino.lista` | T20 Livro Básico | 73 | 79 | VERIFICADA |  |
+| personagem | `classe.arcanista.lista` | T20 Livro Básico | 37 | 43 | VERIFICADA |  |
+| personagem | `pericias.escolha` | T20 Livro Básico | 114 | 120 | VERIFICADA |  |
+| personagem | `classe.arcanista.caminho` | T20 Livro Básico | 37 | 43 | VERIFICADA |  |
+| personagem | `magia.cd_resistencia` | T20 Livro Básico | 173 | 179 | VERIFICADA |  |
+| personagem | `magia.concentracao` | T20 Livro Básico | 170 | 176 | VERIFICADA |  |
+| personagem | `magia.armadura_e_arcana` | T20 Livro Básico | 171 | 177 | VERIFICADA |  |
+| personagem | `magia.armadura_arcana` | T20 Livro Básico | 183 | 189 | VERIFICADA |  |
+| personagem | `magia.toque_chocante` | T20 Livro Básico | 209 | 215 | VERIFICADA |  |
 | personagem | `magia.seta_infalivel` | T20 Livro Básico | 206 | 212 | VERIFICADA |  |
 | personagem | `magia.curar_ferimentos` | T20 Livro Básico | 189 | 195 | VERIFICADA |  |
 | personagem | `acao.usar_item_pocao` | T20 Livro Básico | 234 | 240 | VERIFICADA |  |
@@ -119,6 +128,10 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | XP de mistério resolvido = ND 1 ('XP alternativo', LB p.326) | `ProgressionModule.MYSTERY_ND` | ORIGINAL | constante |
 | Fuga conta como empate (½ XP); captura como derrota (¼ XP) | `ProgressionModule` | ADAPTADA | — |
 | Presets de atributos e perícias padrão por classe | `CharacterBuilder` | ORIGINAL (dentro das regras) | — |
+| Bruxo: o foco é considerado empunhado; sem PV/RD do foco | `CharacterBuilder`, `CombatModule._cast` | ADAPTADA (simplificação) | LB p.37 |
+| Feiticeiro sem linhagem; Mago sem memorização e com 3 magias em vez de 4 | `CharacterBuilder` | ADAPTADA (pendente) | LB p.37 |
+| Concentração: só condição ruim (caído, tempestade); ser ferido na execução não ocorre (não há reações) | `CombatModule.casting_cd` | ADAPTADA (parcial) | LB p.170 |
+| Toque Chocante: −5 por armadura de metal só quando a ficha registra a armadura | `CombatModule._cast` | ADAPTADA | LB p.209 |
 | Alcance médio de magia = 20 quadrados | `GhostPlanner` (cast) | PLACEHOLDER (alcance.metros pendente) | — |
 | Relento com saco de dormir = condição normal | `StateModule.rest_quality` | ADAPTADA | — |
 | Rotas, distâncias e risco de emboscada (5%/20% por dia) | `TravelModule` | ORIGINAL | constantes |

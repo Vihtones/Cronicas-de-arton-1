@@ -14,7 +14,46 @@ const DEFAULT_CHOICES := {
 	"ladino": ["furtividade", "acrobacia", "enganacao", "intuicao", "investigacao", "percepcao", "iniciativa", "atletismo"],
 	"arcanista": ["conhecimento", "percepcao"],
 }
-const DEFAULT_SPELLS := ["seta_infalivel"]  # outras 2 magias iniciais: PENDENTE (não implementadas)
+## Magias arcanas de 1º círculo implementadas (LB cap. 4). O Mago começa com 4 (LB p.37), mas só há 3 prontas: PENDENTE.
+const ARCANE_SPELLS := ["seta_infalivel", "armadura_arcana", "toque_chocante"]
+const ARCANE_PATHS := ["bruxo", "feiticeiro", "mago"]
+
+
+## Lista de perícias da classe (LB p.37, 65, 73).
+static func class_list(rules: RuleRegistry, p_class: String) -> Array:
+	if p_class == "guerreiro":
+		return rules.value("classe.guerreiro").lista
+	return rules.value("classe.%s.lista" % p_class, [])
+
+
+## Quantas perícias livres a criação pede (LB p.114): da classe + Int (qualquer) + Versátil (humano, qualquer).
+static func skill_slots(rules: RuleRegistry, p_class: String, p_race: String, attrs_final: Dictionary) -> Dictionary:
+	return {"classe": int(rules.value("classe." + p_class).pericias_escolha),
+		"livres": maxi(0, int(attrs_final.get("int", 0))) + (int(rules.value("pericias.escolha").versatil_humano) if p_race == "humano" else 0)}
+
+
+## Valida a escolha: class_picks vêm da lista da classe; free_picks de qualquer perícia; sem repetir as fixas.
+static func validate_skills(rules: RuleRegistry, p_class: String, p_race: String, attrs_final: Dictionary,
+		class_picks: Array, free_picks: Array) -> PackedStringArray:
+	var errs := PackedStringArray()
+	var slots := skill_slots(rules, p_class, p_race, attrs_final)
+	var lst := class_list(rules, p_class)
+	var fixed: Array = []
+	for f in rules.value("classe." + p_class).pericias_fixas:
+		fixed.append(str(f).get_slice("|", 0))
+	if class_picks.size() != slots.classe:
+		errs.append("escolha %d perícias da classe (tem %d)" % [slots.classe, class_picks.size()])
+	if free_picks.size() > slots.livres:
+		errs.append("no máximo %d perícias livres" % slots.livres)
+	var seen := {}
+	var table: Dictionary = rules.value("pericia.tabela", {})
+	for k in class_picks + free_picks:
+		if seen.has(k) or fixed.has(k): errs.append("perícia repetida: " + str(k))
+		seen[k] = true
+		if not table.has(k): errs.append("perícia desconhecida: " + str(k))
+	for k in class_picks:
+		if not lst.has(k): errs.append("%s não é da lista da classe" % k)
+	return errs
 
 
 ## Valida a compra de pontos. attrs_base = valores ANTES da raça.
@@ -34,7 +73,8 @@ static func validate_points(rules: RuleRegistry, attrs_base: Dictionary) -> Pack
 
 
 static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_base: Dictionary,
-		human_picks: Array = ["for", "des", "con"], p_name: String = "Aventureiro", extra_trained: Array = []) -> CharacterSheet:
+		human_picks: Array = ["for", "des", "con"], p_name: String = "Aventureiro", extra_trained: Array = [],
+		class_picks: Array = [], p_path: String = "bruxo", p_spells: Array = []) -> CharacterSheet:
 	assert(RACES.has(p_race) and CLASSES.has(p_class), "raça/classe não implementada")
 	assert(validate_points(rules, attrs_base).is_empty(), "compra de pontos inválida")
 	var s := CharacterSheet.new()
@@ -59,14 +99,20 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	s.pv = s.pv_max
 	s.pm_max = int(c.pm_nivel)
 	if p_class == "arcanista":
-		s.caster_attr = "int"
-		s.pm_max += maxi(0, int(s.attrs["int"]))
-		for sp in DEFAULT_SPELLS:
-			s.spells.append(sp)
+		# Caminho do Arcanista (LB p.37): define o atributo-chave; o PM soma esse atributo.
+		var path: String = p_path if ARCANE_PATHS.has(p_path) else "bruxo"
+		s.arcane_path = path
+		s.caster_attr = str(rules.value("classe.arcanista.caminho")[path].atributo)
+		s.pm_max += maxi(0, int(s.attrs[s.caster_attr]))
+		var want := int(c.magias_iniciais) + int(rules.value("classe.arcanista.caminho")[path].get("magias_iniciais_extra", 0))
+		var chosen: Array = p_spells if not p_spells.is_empty() else ARCANE_SPELLS
+		for sp in chosen:
+			if ARCANE_SPELLS.has(sp) and not s.spells.has(sp) and s.spells.size() < want:
+				s.spells.append(sp)
 	s.pm = s.pm_max
 	for f in c.pericias_fixas:
 		s.trained.append(str(f).get_slice("|", 0))
-	for k in DEFAULT_CHOICES[p_class]:
+	for k in (class_picks if not class_picks.is_empty() else DEFAULT_CHOICES[p_class]):
 		if not s.trained.has(k):
 			s.trained.append(k)
 	for k in extra_trained:  # Versátil (humano) / Inteligência
@@ -80,6 +126,19 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	apply_equipment(rules, s)
 	s.source_rule = "builder:%s_%s" % [p_race, p_class]
 	return s
+
+
+## Monta a partir do dicionário da tela de criação / sucessão. Escolhas inválidas de perícia caem no padrão.
+static func build_from(rules: RuleRegistry, b: Dictionary) -> CharacterSheet:
+	var cls: String = b["class"]
+	var picks: Array = b.get("human_picks", ["for", "des", "con"])
+	var cp: Array = b.get("class_picks", [])
+	var fp: Array = b.get("free_picks", [])
+	if not cp.is_empty():
+		var probe := build(rules, b.race, cls, b.attrs, picks)
+		if not validate_skills(rules, cls, b.race, probe.attrs, cp, fp).is_empty():
+			cp = []; fp = []
+	return build(rules, b.race, cls, b.attrs, picks, b.get("name", "Aventureiro"), fp, cp, b.get("path", "bruxo"), b.get("spells", []))
 
 
 ## Recalcula Defesa e ataques a partir do equipamento (LB cap. 3).

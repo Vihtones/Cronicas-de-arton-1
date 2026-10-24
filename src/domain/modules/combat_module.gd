@@ -457,13 +457,69 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 	return out
 
 
+## CD dos testes de lançar (C5). Retorna {} se não há teste; senão o payload da falha (ou {} se passou).
+func casting_cd(sh: CharacterSheet, sp: Dictionary, cost: int) -> Dictionary:
+	var conc: Dictionary = world.rules.value("magia.concentracao")
+	var cd := 0
+	var why := ""
+	if sh.conditions.has("caido"):
+		cd = int(conc.condicao_ruim.cd_base) + cost; why = "caído"
+	elif world.modules.has("weather") and world.modules.weather.enabled and world.modules.weather.region.condition == "tempestade":
+		cd = int(conc.condicao_ruim.cd_base) + cost; why = "tempestade"
+	var arm := {}
+	if str(sp.get("tipo", "")) == "arcana" and str(sh.equipment.get("armor", "")) != "":
+		var ar: Dictionary = world.rules.value("magia.armadura_e_arcana")
+		arm = {"skill": "misticismo", "cd": int(ar.cd_base) + cost, "mod": sh.armor_penalty(world.rules)}
+	return {"concentration_cd": cd, "reason": why, "armor": arm}
+
+
+func _casting_check(id: String, sh: CharacterSheet, sp: Dictionary, cost: int) -> Dictionary:
+	var c := casting_cd(sh, sp, cost)
+	if int(c.concentration_cd) > 0:
+		var r := Checks.skill(sh, "vontade", int(c.concentration_cd), world.rules, world.rng, "combat")
+		if not r.get("success", true):
+			return {"caster": id, "check": "vontade", "cd": c.concentration_cd, "reason": c.reason, "d20": r.d20, "total": r.total}
+	if not (c.armor as Dictionary).is_empty():
+		var r2 := Checks.skill(sh, "misticismo", int(c.armor.cd), world.rules, world.rng, "combat", int(c.armor.mod))
+		if not r2.get("allowed", true) or not r2.get("success", false):
+			return {"caster": id, "check": "misticismo", "cd": c.armor.cd, "reason": "armadura", "d20": int(r2.get("d20", 0)), "total": int(r2.get("total", 0))}
+	return {}
+
+
 ## Magia em combate (LB cap. 4): custo por círculo; Seta Infalível acerta sempre.
 func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 	var sp: Dictionary = world.rules.value("magia." + str(a.spell))
 	var sh: CharacterSheet = sim.c(id).sheet
 	sh.pm -= int(v.cost)
 	var out: Array = []
+	# C5 — Concentração (LB p.170) e armadura (LB p.171): a falha perde a magia, mas os PM já foram gastos.
+	var fail := _casting_check(id, sh, sp, int(v.cost))
+	if not fail.is_empty():
+		out.append(fact("SPELL_FAILED", fail, [id]))
+		out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm, "failed": true}, [id]))
+		return out
 	match str(a.spell):
+		"armadura_arcana":
+			# +5 na Defesa pela cena; não acumula com o bônus de armadura (LB p.183)
+			var arm: Dictionary = world.rules.value("armadura." + str(sh.equipment.get("armor", "")), {})
+			sh.scene_defense = maxi(0, int(sp.defesa) - int(arm.get("defesa", 0)))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "armadura_arcana", "defense": sh.scene_defense, "tags": ["magia"]}, [id]))
+		"toque_chocante":
+			var tgt: String = a.get("target", "")
+			var T: CharacterSheet = sim.c(tgt).sheet
+			var cd := 10 + sh.level / 2 + int(sh.attrs.get(sh.caster_attr, 0))   # LB p.173
+			var metal := bool(world.rules.value("armadura." + str(T.equipment.get("armor", "")), {}).get("metal", false))
+			var sv := Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat", int(sp.penalidade_metal) if metal else 0)
+			var r := Dice.roll(sp.dano, world.rng, "combat")
+			var dmg := int(r.total)
+			if sv.get("success", false):
+				dmg = maxi(1, dmg / 2)
+			var tags: Array = ["magia", "impacto", "eletricidade"]
+			if sv.get("success", false): tags.append("resistiu")
+			tags.append_array(sim.apply_damage(tgt, dmg))
+			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Toque Chocante", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
+				"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
+				"pv_after": T.pv, "special": false, "ranged": false, "spell": true, "save": "fortitude", "saved": sv.get("success", false), "tags": tags}, [id, tgt]))
 		"seta_infalivel":
 			var targets: Array = a.get("targets", [a.get("target", "")])
 			for i in int(sp.setas):
@@ -709,6 +765,7 @@ func _end_combat(outcome: String) -> Array:
 	var P := sim.c("player")
 	world.player_sheet = P.sheet
 	world.player_sheet.remove_condition("surpreendido")
+	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
 	world.player.position = world.db.tile_to_world(P.tile)
 	for id in sim.combatants:
 		if id == "player":

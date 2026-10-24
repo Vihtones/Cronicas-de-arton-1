@@ -15,10 +15,10 @@ Cada mecânica do Plano Mestre tem uma versão básica funcional, um cenário no
 | 2º mistério e fauna | ■■□□ | `fauna_module.gd`, `mysteries_extra.json` | Fauna e 2º mistério | `test_fauna_faminta_...` | a toca nova não move as hienas no mapa |
 | Combate tático e fantasma | ■■■■ | `combat_sim.gd`, `ghost_planner.gd`, `combat_module.gd` | Combate tático | `test_combat` | reações (Ataque Reflexo) |
 | Furtividade e surpresa | ■■■□ | `CombatModule._check_encounter` | Furtividade | `test_encontro_...` | cobertura e luz influenciando a furtividade |
-| Magia | ■■□□ | `ghost_planner.gd` (cast), `items_module.gd` | Magia (Arcanista anã) | `test_magia_...` | 2 das 3 magias iniciais, Caminho do Arcanista, teste de concentração |
+| Magia | ■■■□ | `ghost_planner.gd` (cast), `items_module.gd` | Magia (Arcanista anã) | `test_magia_...` | 4ª magia do Mago, linhagem, memorização, ferido durante a execução |
 | Ataque furtivo (Ladino) | ■■■□ | `CombatModule._resolve_attack` | Ataque furtivo | `test_ladino_...` | Especialista e Evasão |
-| Criação de personagem | ■■□□ | `character_builder.gd`, UI de criação | Criação de personagem | `test_criacao_...` | outras raças/classes, origens, escolha livre de perícias |
-| Progressão e XP dinâmica | ■■■□ | `progression_module.gd`, `docs/XP_DINAMICA.md` | Progressão e XP dinâmica | `test_interactions` (xp_*) | resumo pós-combate; mais poderes |
+| Criação de personagem | ■■■□ | `character_builder.gd`, UI de criação | Criação de personagem | `test_criacao_...` | outras raças/classes, origens |
+| Progressão e XP dinâmica | ■■■□ | `progression_module.gd`, `docs/XP_DINAMICA.md` | Progressão e XP dinâmica | `test_interactions` (xp_*) | mais poderes (C21) |
 | Equipamento e loja | ■■■□ | `items_module.gd`, `economy_module.gd` | Equipamento e loja | `test_equipamento_...`, `test_mercado_...` | carga e escudos |
 | NPCs com agenda (L1) | ■■■■ | `npc_module.gd` | (qualquer) | `test_social` | — |
 | Memória, rumores e reputação | ■■■■ | `memory_module.gd` | Memória e rumores | `test_social` | esquecimento por tempo (revisão de memória) |
