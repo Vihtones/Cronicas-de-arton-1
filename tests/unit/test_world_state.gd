@@ -41,4 +41,4 @@ func test_snapshot_round_trip() -> void:
 	var s1 := JSON.stringify(w.to_snapshot())
 	var w2 := WorldState.new()
 	w2.from_snapshot(JSON.parse_string(s1))
-	eq(JSON.stringify(w2.to_snapshot()), s1, "snapshot idêntico após round-trip")
+	eq(WorldHelpers.norm(w2.to_snapshot()), WorldHelpers.norm(JSON.parse_string(s1)), "snapshot idêntico após round-trip")

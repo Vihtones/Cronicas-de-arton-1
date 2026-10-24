@@ -21,6 +21,8 @@ var _puddle_spots: Array = []
 var _wet := -1.0
 var _trails: Array = []          # Array[PackedVector2Array]
 var _chunks: Array = []
+static var _tex_cache: Dictionary = {}   # Rect2i -> ImageTexture (o mapa é estático: assa uma vez por sessão)
+signal baked
 const CHUNK := 16
 
 
@@ -267,6 +269,7 @@ func _draw_puddles() -> void:
 ## chegava a perder pedaços da tela (blocos pretos). Sem renderização (headless) mantém o desenho vivo.
 func _bake_chunks() -> void:
 	if DisplayServer.get_name() == "headless":
+		baked.emit()
 		return
 	var gen := _chunks.duplicate()
 	for ch in gen:
@@ -277,6 +280,9 @@ func _bake_chunks() -> void:
 			var args: Array = (c.callable as Callable).get_bound_arguments()
 			if args.size() == 2 and args[1] is Rect2i: area = args[1]
 		if area.size == Vector2i.ZERO:
+			continue
+		if _tex_cache.has(area):
+			_swap_chunk(ch, area, _tex_cache[area])
 			continue
 		var vp := SubViewport.new()
 		vp.size = area.size * TILE
@@ -297,13 +303,19 @@ func _bake_chunks() -> void:
 		vp.queue_free()
 		if img == null or img.is_empty():
 			continue
-		var spr := Sprite2D.new()
-		spr.name = "ChaoAssado_%d_%d" % [area.position.x, area.position.y]
-		spr.texture = ImageTexture.create_from_image(img)
-		spr.centered = false
-		spr.position = Vector2(area.position * TILE)
-		var idx := (ch as Node).get_index()
-		add_child(spr)
-		move_child(spr, idx)
-		_chunks[_chunks.find(ch)] = spr
-		(ch as Node).queue_free()
+		_tex_cache[area] = ImageTexture.create_from_image(img)
+		_swap_chunk(ch, area, _tex_cache[area])
+	baked.emit()
+
+
+func _swap_chunk(ch: Node, area: Rect2i, tex: Texture2D) -> void:
+	var spr := Sprite2D.new()
+	spr.name = "ChaoAssado_%d_%d" % [area.position.x, area.position.y]
+	spr.texture = tex
+	spr.centered = false
+	spr.position = Vector2(area.position * TILE)
+	var idx := ch.get_index()
+	add_child(spr)
+	move_child(spr, idx)
+	_chunks[_chunks.find(ch)] = spr
+	ch.queue_free()

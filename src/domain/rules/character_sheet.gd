@@ -195,7 +195,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.pv_max = int(d.pv_max); s.pv = int(d.pv); s.pm_max = int(d.pm_max); s.pm = int(d.pm)
 	s.defense_base = int(d.defense_base); s.defense_fixed = int(d.defense_fixed); s.speed_m = float(d.speed_m)
 	s.attacks.clear()
-	for a in d.attacks: s.attacks.append(a)
+	for a in d.attacks: s.attacks.append(_int_fields(a))
 	s.conditions = PackedStringArray(d.conditions); s.stable = bool(d.stable)
 	s.senses = PackedStringArray(d.get("senses", []))
 	s.habilidades = PackedStringArray(d.get("habilidades", []))
@@ -263,3 +263,16 @@ static func from_creature(rules: RuleRegistry, rule_id: String, p_id: String) ->
 	s.habilidades = PackedStringArray(c.get("habilidades", []))
 	s.source_rule = rule_id
 	return s
+
+
+## JSON devolve números como float; na Godot 4.7 isso aparece no salvamento (19 vira 19.0).
+## Campos inteiros dos ataques voltam a int para o jogo carregado ser idêntico ao salvo.
+const _ATTACK_INT_KEYS := ["margem", "mult", "alcance_q", "bonus_fixo", "derrubar"]
+
+
+static func _int_fields(a: Dictionary) -> Dictionary:
+	var out := a.duplicate(true)
+	for k in _ATTACK_INT_KEYS:
+		if out.has(k) and out[k] is float:
+			out[k] = int(out[k])
+	return out

@@ -11,8 +11,10 @@ usuário e não se aplicam ao ambiente na nuvem; as demais foram usadas como gui
 | Captura com tempo estável e evidência estruturada (godot-interactive) | Todos os executores de captura esperam `RenderingServer.frame_post_draw` antes de salvar. |
 | Desempenho de desenho 2D | Chão decorado assado em texturas por pedaço; telhados e fachadas redesenham só quando mudam; minimapa a 10 quadros/s; cinto de atalhos só redesenha quando o estado muda. |
 
-## Achado em aberto
-Com renderização por software (llvmpipe, no servidor), a versão 0.7 em andamento mostra blocos
-pretos piscando em parte da tela; a 0.6.0 no mesmo teste não mostra. O problema aumenta com a carga
-de desenho e some ao retirar a decoração do chão e os telhados. Ainda não confirmado em placa de
-vídeo real. Pela diretriz D1, o executável da 0.7 não será gerado até isso ser resolvido.
+## Cintilação resolvida
+Na Godot 4.3, sob carga de desenho, a tela piscava com blocos pretos (também reproduzido na 0.6.0 com carga
+sintética). Medido com capturas da tela real (não do buffer interno):
+- Godot 4.7.2 (a versão enviada pelo usuário, conferida pelo SHA-512 oficial) eliminou a cintilação em regime;
+- o restante acontecia só enquanto o chão e os telhados eram assados em textura, e agora fica coberto pela tela
+  "Preparando a vila..." (uma vez por sessão; depois vem do cache).
+Teste final: chuva e festa, 8 capturas cada, sem blocos pretos. Ainda não testado numa placa de vídeo real.

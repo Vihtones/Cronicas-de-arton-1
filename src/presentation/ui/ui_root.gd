@@ -1278,3 +1278,29 @@ func _process(_d: float) -> void:
 		_update_debug()
 	if Game.mode == Game.Mode.COMBAT:
 		update_combat_bar()
+
+
+# --- Tela de preparo ---------------------------------------------------------------------------
+var _loading: ColorRect
+
+
+func show_loading(on: bool) -> void:
+	if _loading == null:
+		_loading = ColorRect.new()
+		_loading.color = Color(0.03, 0.025, 0.03)
+		_loading.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_loading.mouse_filter = Control.MOUSE_FILTER_STOP
+		var l := _label("Preparando a vila...", 12)
+		l.position = Vector2(0, 170)
+		l.size = Vector2(640, 20)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.add_theme_color_override("font_color", Color(0.98, 0.82, 0.45))
+		_loading.add_child(l)
+		add_child(_loading)
+	if on:
+		_loading.modulate.a = 1.0
+		_loading.visible = true
+	else:
+		var tw := create_tween()
+		tw.tween_property(_loading, "modulate:a", 0.0, 0.4)
+		tw.tween_callback(func(): _loading.visible = false)

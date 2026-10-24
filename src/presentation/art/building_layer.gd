@@ -35,6 +35,8 @@ var _mill_angle := 0.0
 var _smokes: Array = []
 var _last_night := -1.0
 var _mills: Array = []
+static var _tex_cache: Dictionary = {}   # id do prédio -> [ImageTexture, posição]
+signal baked
 
 
 func _init() -> void:
@@ -104,6 +106,7 @@ func build(db: ContentDB) -> void:
 	for b in buildings:
 		(b.node as CanvasItem).queue_redraw()
 		(b.fnode as CanvasItem).queue_redraw()
+	call_deferred("_bake_roofs")
 
 
 func _roof_rect(b: Dictionary) -> Rect2:
@@ -156,7 +159,10 @@ func _process(delta: float) -> void:
 		var a := move_toward(float(b.alpha), target, delta * 4.0)
 		if a != b.alpha:
 			b.alpha = a
-			(b.node as CanvasItem).queue_redraw()
+			if b.has("sprite"):
+				(b.sprite as Sprite2D).modulate.a = a
+			else:
+				(b.node as CanvasItem).queue_redraw()
 	# vento leva a fumaça (direção vem do domínio do clima)
 	var w: WeatherModule = Game.world.modules.weather
 	var wind := float(w.region.get("wind", 0.2))
@@ -179,8 +185,61 @@ var _ci: CanvasItem   # item onde as rotinas de desenho escrevem agora
 
 
 func _draw_roof_on(ci: CanvasItem, b: Dictionary) -> void:
+	if b.has("sprite"):
+		return   # já assado em textura
 	_ci = ci
 	_draw_roof(b)
+
+
+## Telhados assados em textura (uma vez): milhares de traços de palha/telha por quadro viravam
+## carga de desenho que, no renderizador de compatibilidade, chegou a apagar pedaços da tela.
+## A transparência ao entrar na casa passa a ser o modulate do sprite.
+func _bake_roofs() -> void:
+	if DisplayServer.get_name() == "headless":
+		baked.emit()
+		return
+	for b in buildings:
+		if b.has("sprite") or not is_instance_valid(b.node):
+			continue
+		if _tex_cache.has(b.id):
+			_attach_roof(b, _tex_cache[b.id][0], _tex_cache[b.id][1])
+			continue
+		var rr := _roof_rect(b)
+		var bounds := Rect2(rr.position - Vector2(6, 58), rr.size + Vector2(12, 72)).abs()
+		bounds.position = bounds.position.floor()
+		bounds.size = bounds.size.ceil()
+		var vp := SubViewport.new()
+		vp.size = Vector2i(bounds.size)
+		vp.transparent_bg = true
+		vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+		var painter := Node2D.new()
+		painter.position = -bounds.position
+		var copy: Dictionary = b.duplicate()
+		copy.alpha = 1.0
+		painter.draw.connect(func(): _ci = painter; _draw_roof(copy))
+		vp.add_child(painter)
+		add_child(vp)
+		await RenderingServer.frame_post_draw
+		await RenderingServer.frame_post_draw
+		var img := vp.get_texture().get_image()
+		vp.queue_free()
+		if img == null or img.is_empty() or not is_instance_valid(b.node):
+			continue
+		_tex_cache[b.id] = [ImageTexture.create_from_image(img), bounds.position]
+		_attach_roof(b, _tex_cache[b.id][0], bounds.position)
+	baked.emit()
+
+
+func _attach_roof(b: Dictionary, tex: Texture2D, pos: Vector2) -> void:
+	var spr := Sprite2D.new()
+	spr.name = "TelhadoAssado_" + str(b.id)
+	spr.texture = tex
+	spr.centered = false
+	spr.position = pos
+	spr.modulate.a = float(b.alpha)
+	(b.node as Node).add_child(spr)
+	b["sprite"] = spr
+	(b.node as CanvasItem).queue_redraw()
 
 
 func _draw_mill_on(ci: CanvasItem, b: Dictionary) -> void:
@@ -212,17 +271,17 @@ func _draw_roof(b: Dictionary) -> void:
 	var y0 := rr.position.y
 	var y1 := rr.end.y
 	var ym := y0 + rr.size.y * 0.42
-	var inset := minf(rr.size.y * 0.45, rr.size.x * 0.35)
+	var inset := minf(rr.size.y * 0.45, rr.size.x * 0.5 - 2.0)
 	var north := PackedVector2Array([Vector2(x0, y0), Vector2(x1, y0), Vector2(x1 - inset, ym), Vector2(x0 + inset, ym)])
 	var south := PackedVector2Array([Vector2(x0 + inset, ym), Vector2(x1 - inset, ym), Vector2(x1, y1), Vector2(x0, y1)])
 	var west := PackedVector2Array([Vector2(x0, y0), Vector2(x0 + inset, ym), Vector2(x0, y1)])
 	var east := PackedVector2Array([Vector2(x1, y0), Vector2(x1, y1), Vector2(x1 - inset, ym)])
 	# sombra projetada do beiral sobre a fachada e o chão
 	_ci.draw_rect(Rect2(Vector2(x0 + 2, y1), Vector2(rr.size.x - 4, 6)), Color(0, 0, 0, 0.32 * a))
-	_ci.draw_colored_polygon(north, Color(cols[0], a))
-	_ci.draw_colored_polygon(south, Color(cols[1], a))
-	_ci.draw_colored_polygon(west, Color(cols[2], a))
-	_ci.draw_colored_polygon(east, Color((cols[2] as Color).darkened(0.12), a))
+	_poly(north, Color(cols[0], a))
+	_poly(south, Color(cols[1], a))
+	_poly(west, Color(cols[2], a))
+	_poly(east, Color((cols[2] as Color).darkened(0.12), a))
 	var seed := absi(hash(b.id))
 	# textura: fiadas de telha/ardósia, ou palha em feixes
 	var step := 5.0 if kind != "palha" else 4.0
@@ -271,7 +330,7 @@ func _draw_roof(b: Dictionary) -> void:
 		var bp := Vector2(x0 + 10, y0 + 2)
 		_ci.draw_line(bp, bp + Vector2(0, -22), Color(0.3, 0.22, 0.14, a), 2.0)
 		var wave := sin(Time.get_ticks_msec() / 300.0) * 2.0
-		_ci.draw_colored_polygon(PackedVector2Array([bp + Vector2(1, -22), bp + Vector2(15, -20 + wave), bp + Vector2(1, -13)]), Color(st.banner, a))
+		_poly(PackedVector2Array([bp + Vector2(1, -22), bp + Vector2(15, -20 + wave), bp + Vector2(1, -13)]), Color(st.banner, a))
 
 
 func _course(kind: String, lx: float, rx: float, y: float, row: int, col: Color, seed: int) -> void:
@@ -304,7 +363,7 @@ func _draw_tower(c: Vector2, a: float) -> void:
 	_ci.draw_rect(Rect2(c + Vector2(-9, -26), Vector2(18, 26)), Color(0.2, 0.18, 0.18, 0.6 * a), false, 1.0)
 	_ci.draw_rect(Rect2(c + Vector2(-4, -21), Vector2(8, 9)), Color(0.1, 0.09, 0.1, a))   # abertura do sino
 	_ci.draw_circle(c + Vector2(0, -14), 2.5, Color(0.75, 0.6, 0.25, a))
-	_ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-11, -26), c + Vector2(11, -26), c + Vector2(0, -42)]), Color(0.3, 0.33, 0.39, a))
+	_poly(PackedVector2Array([c + Vector2(-11, -26), c + Vector2(11, -26), c + Vector2(0, -42)]), Color(0.3, 0.33, 0.39, a))
 	_ci.draw_line(c + Vector2(0, -42), c + Vector2(0, -48), Color(0.8, 0.7, 0.35, a), 1.0)
 	_ci.draw_circle(c + Vector2(0, -49), 1.5, Color(0.9, 0.78, 0.4, a))
 
@@ -318,7 +377,7 @@ func _draw_mill(c: Vector2, a: float) -> void:
 		var n := Vector2(-d.y, d.x)
 		var tip := c + d * 44.0
 		_ci.draw_line(c, tip, wood, 2.0)
-		_ci.draw_colored_polygon(PackedVector2Array([c + d * 12.0, tip, tip + n * 9.0, c + d * 12.0 + n * 9.0]), cloth)
+		_poly(PackedVector2Array([c + d * 12.0, tip, tip + n * 9.0, c + d * 12.0 + n * 9.0]), cloth)
 		_ci.draw_line(c + d * 12.0 + n * 9.0, tip + n * 9.0, wood, 1.0)
 	_ci.draw_circle(c, 4.0, Color(0.25, 0.18, 0.12, a))
 
@@ -339,7 +398,7 @@ func _facade_row(b: Dictionary, ty: int, night: float) -> void:
 			# lintel e soleira; porta de cima ganha um alpendre
 			draw_rect_on(Rect2(x - 2, y - 1, 36, 4), beam)
 			if b.door_top:
-				_ci.draw_colored_polygon(PackedVector2Array([Vector2(x - 4, y + 3), Vector2(x + 36, y + 3), Vector2(x + 32, y - 7), Vector2(x, y - 7)]), (ROOF_COLORS[st.get("roof", "palha")][1] as Color))
+				_poly(PackedVector2Array([Vector2(x - 4, y + 3), Vector2(x + 36, y + 3), Vector2(x + 32, y - 7), Vector2(x, y - 7)]), (ROOF_COLORS[st.get("roof", "palha")][1] as Color))
 			continue
 		var plinth := 8.0
 		draw_rect_on(Rect2(x, y, TILE, TILE - plinth), wall)
@@ -396,7 +455,7 @@ func _sign(b: Dictionary) -> void:
 			_ci.draw_rect(Rect2(c + Vector2(-4, -2), Vector2(8, 2)), ink)
 			_ci.draw_rect(Rect2(c + Vector2(-1, 0), Vector2(3, 3)), ink)
 		"escudo":
-			_ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-3, -3), c + Vector2(3, -3), c + Vector2(3, 0), c + Vector2(0, 4), c + Vector2(-3, 0)]), ink)
+			_poly(PackedVector2Array([c + Vector2(-3, -3), c + Vector2(3, -3), c + Vector2(3, 0), c + Vector2(0, 4), c + Vector2(-3, 0)]), ink)
 		"pergaminho":
 			_ci.draw_rect(Rect2(c + Vector2(-3, -3), Vector2(6, 6)), ink)
 			_ci.draw_line(c + Vector2(-2, -1), c + Vector2(2, -1), wood, 1.0)
@@ -406,3 +465,12 @@ func _sign(b: Dictionary) -> void:
 			for k in 3:
 				_ci.draw_circle(c + Vector2(-1.5, -2 + k * 2), 1.0, ink)
 				_ci.draw_circle(c + Vector2(1.5, -2 + k * 2), 1.0, ink)
+
+
+## Polígono só é desenhado se for válido. Um polígono degenerado (pontos repetidos ou colineares)
+## falha na triangulação e, no renderizador de compatibilidade, corrompia o lote de desenho:
+## pedaços da tela ficavam pretos por alguns quadros.
+func _poly(pts: PackedVector2Array, col: Color) -> void:
+	if pts.size() < 3 or Geometry2D.triangulate_polygon(pts).is_empty():
+		return
+	_ci.draw_colored_polygon(pts, col)

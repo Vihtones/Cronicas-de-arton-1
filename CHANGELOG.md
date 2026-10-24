@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2
+### Mudou
+- **Motor: Godot 4.7.2** (a versão que o usuário enviou; conferida contra o SHA-512 oficial). Na 4.3, a tela
+  piscava com blocos pretos sob carga de desenho no renderizador de compatibilidade; na 4.7.2 o mesmo teste fica limpo.
+  - JSON da 4.7 escreve `19.0` onde a 4.3 escrevia `19`: os campos inteiros dos ataques voltam a int ao carregar e os
+    testes comparam salvamentos por valor.
+### Adicionado
+- **Eventos da vila** (`TownEventsModule`, ORIGINAL_DO_JOGO): feira semanal (mascates enchem o estoque, artesãos vão ao
+  mercado) e Festa de Alvorada a cada 14 dias (a vila vai à praça; guardas ficam no posto; tempestade suspende).
+- **Clima que muda aos poucos:** a intensidade da chuva/neblina sobe e desce em ~40 min; vento com direção (leva a fumaça
+  e inclina a chuva).
+- **Árvore de poderes (tecla K):** ramo da classe e poderes gerais do LB p.124-131, conferidos no PDF: Ataque Poderoso,
+  Trespassar, Combate Defensivo, Esquiva, Reflexos de Combate, Saque Rápido, Vitalidade e Vontade de Ferro.
+  Quebrar, Derrubar e Desarmar Aprimorado aparecem marcados como "ainda não implementado".
+- **Casas com volume:** telhado de quatro águas (telha, ardósia, palha) que some ao entrar, fachada em enxaimel com
+  janelas que acendem à noite, placas de ofício, chaminés com fumaça, torre do templo e moinho girando.
+- **Caminhos orgânicos:** bordas irregulares nas estradas, trilhas contínuas, trilhas de desejo das portas até a
+  estrada, praça calçada em volta do poço, flores e seixos, poças quando o chão está molhado.
+- **Gente nas ruas (figurantes, só apresentação):** passantes, gente trabalhando, conversas, vendedores gritando,
+  crianças brincando de pega-pega, carroças, correria para casa na chuva; barracas na feira; bandeirolas, lanternas,
+  fogueira, músico e dança na festa. NPCs parados em lugares abertos dão alguns passos.
+- **HUD estilo Stoneshard:** minimapa com ícone do clima, faixa do evento da vila, avisos grandes (chuva, festa, nível),
+  cinto de atalhos na exploração e cinto de ações com ícones no combate (Ataque Poderoso e Combate Defensivo nas teclas A e D).
+- **Orientações do pacote godot-claude-skills** (`docs/ORIENTACOES_GODOT.md`): checagem de tipos
+  (`tools/check_gdscript_style.py`), nomes e grupos de nós, capturas só com o quadro completo.
+- Chão decorado e telhados são desenhados uma vez em textura (com a tela "Preparando a vila..." por alguns segundos).
+### Corrigido
+- Névoa escurecia a tela (o ruído era opaco); agora é branca e transparente.
+
 ## [0.6.0] — 2026-10-24 — Executável real, todas as raças, luz, cinema de combate e HUD
 ### Adicionado
 - **Executável Windows de verdade:** template oficial da Godot 4.3, conferido por SHA-512, no lugar do editor renomeado que deu tela azul.

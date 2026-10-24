@@ -1,5 +1,5 @@
 #!/bin/bash
-# Gera o executável Windows de verdade (template oficial de exportação da Godot 4.3) e o verifica
+# Gera o executável Windows de verdade (template oficial de exportação da Godot 4.7.2) e o verifica
 # antes de empacotar. Uso: tools/build_windows.sh <godot_linux> <pasta_saida>
 # Verificação: o MESMO conteúdo é exportado como .pck e roda com --autoteste (novo jogo, 2 dias,
 # salvar e carregar) fora da pasta do projeto. Se o autoteste falhar, nada é empacotado.

@@ -30,4 +30,22 @@ static func advance_hours(w: WorldState, h: int) -> GameCommand.Result:
 
 
 static func snap(w: WorldState) -> String:
-	return JSON.stringify(w.to_snapshot(), "", true)
+	return norm(w.to_snapshot())
+
+
+## Texto canônico de um dado: JSON não distingue 1 de 1.0, e a Godot 4.7 escreve 1.0 onde a 4.3
+## escrevia 1. Converte todo número para float antes de comparar (mesmo valor = mesmo texto).
+static func norm(v: Variant) -> String:
+	return JSON.stringify(_floats(JSON.parse_string(JSON.stringify(v))), "", true)
+
+
+static func _floats(v: Variant) -> Variant:
+	if v is Dictionary:
+		var d := {}
+		for k in v: d[k] = _floats(v[k])
+		return d
+	if v is Array:
+		return (v as Array).map(func(x): return _floats(x))
+	if v is int:
+		return float(v)
+	return v

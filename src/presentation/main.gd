@@ -87,6 +87,11 @@ func _on_world_reloaded() -> void:
 	world_view.dressed = VegetationLayer.dressed_tiles(veg_plan)
 	world_view.build()
 	vegetation.build(Game.db, veg_plan)
+	# cobre a tela enquanto chão e telhados são assados em textura (uma vez por sessão)
+	ui.show_loading(true)
+	_bakes_left = 2
+	if not paths.baked.is_connected(_bake_done): paths.baked.connect(_bake_done)
+	if not buildings.baked.is_connected(_bake_done): buildings.baked.connect(_bake_done)
 	paths.build(Game.db, world_view)
 	buildings.build(Game.db)
 	life.rebuild()
@@ -239,3 +244,12 @@ func _explore_key(k: int) -> void:
 			else:
 				npc_layer.sync_all()
 				life.prefill()
+
+
+var _bakes_left := 0
+
+
+func _bake_done() -> void:
+	_bakes_left -= 1
+	if _bakes_left <= 0:
+		ui.show_loading(false)

@@ -9,7 +9,7 @@ Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_
 ## Como jogar
 **Windows (executável pronto):** baixe `CronicasDeArton-v0.6.0-Windows.zip`, extraia e comece por `Jogar (modo seguro).bat`. Leia o LEIA-ME do pacote.
 **Pelo editor:**
-1. Instale a **Godot 4.3 stable** (godotengine.org, versão padrão, não a .NET).
+1. Instale a **Godot 4.7.2 stable** (godotengine.org, versão padrão, não a .NET).
 2. Abra a Godot → *Importar* → escolha `project.godot` desta pasta → *Importar e editar*.
 3. Aperte **F5** (ou o botão ▶).
 
