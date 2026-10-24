@@ -116,7 +116,8 @@
       "dano": "1d6+7",
       "margem": 20,
       "mult": 3,
-      "alcance_q": 1
+      "alcance_q": 1,
+      "derrubar": 9
      }
     ],
     "atributos": {
@@ -142,8 +143,8 @@
    "fonte": "Bestiário Tormenta20 (Ameaças de Arton — arquivo 'Bestiario_tormenta.pdf')",
    "pagina": 120,
    "pdf_page": 122,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Bloco extraído de layout em colunas; conferir valores."
+   "status": "VERIFICADA",
+   "nota": "Reconferido com layout preservado (pdftotext -layout). ND pressupõe grupo de 4."
   }
  ]
 }

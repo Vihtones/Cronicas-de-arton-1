@@ -91,7 +91,8 @@ equip = [
  r("armadura.gibao_peles", {"defesa": 4, "penalidade": -3, "metal": False}, LB, 153, 159),
  r("armadura.cota_malha", {"defesa": 6, "penalidade": -2, "metal": True}, LB, 153, 159),
  r("escudo.leve", {"defesa": 1, "penalidade": -1}, LB, 153, 159),
- r("alcance.metros", {"curto": 9, "medio": 30, "longo": 90}, LB, 0, 0, "PENDENTE_REVISAO", "Valores de memória; conferir no livro antes de marcar VERIFICADA."),
+ r("alcance.metros", {"curto": 9, "medio": 30, "longo": 90}, LB, 143, 149),
+ r("alcance.quadrados", {"curto": 6, "medio": 20, "longo": 60, "dobro_penalidade": -5, "arremesso_sem_alcance": "curto com -5"}, LB, 143, 149),
 ]
 personagem = [
  r("classe.guerreiro", {"pv_inicial": 20, "pv_nivel": 5, "soma_con": True, "pm_nivel": 3, "pericias_fixas": ["luta|pontaria", "fortitude"], "pericias_escolha": 2,
@@ -101,6 +102,14 @@ personagem = [
  r("envelhecimento", {"maduro": 45, "velho": 70, "longevidade": "70 + 2d20"}, LB, 108, 114),
 ]
 personagem += [
+ r("manobra.derrubar", {"teste": "manobra oposta (ataque corpo a corpo x Luta)", "efeito": "alvo caído", "vencer_por_5": "empurra 1 quadrado"}, LB, 234, 240),
+ r("poder.especializacao_arma", {"classe": "guerreiro", "efeito": "+2 dano com a arma escolhida", "repetivel": True}, LB, 65, 71),
+ r("poder.valentao", {"classe": "guerreiro", "efeito": "+2 ataque e dano contra caídos, desprevenidos, flanqueados ou indefesos"}, LB, 66, 72),
+ r("poder.aumento_atributo", {"classe": "qualquer", "efeito": "+1 em um atributo, uma vez por patamar por atributo"}, LB, 65, 71),
+ r("poder.golpe_raspao", {"classe": "guerreiro", "efeito": "1/rodada ao errar: 2 PM, metade do dano"}, LB, 65, 71),
+ r("poder.gatuno", {"classe": "ladino", "efeito": "+2 Atletismo; escala sem ficar desprevenido"}, LB, 74, 80),
+ r("poder.truque_magico", {"classe": "ladino", "efeito": "aprende magia arcana de 1º círculo (Int)", "prereq": {"int": 1}}, LB, 74, 80),
+ r("classe.guerreiro.durao", {"nivel": 3, "efeito": "3 PM: reduz dano sofrido à metade"}, LB, 66, 72),
  r("progressao.xp_por_nivel", {"1": 0, "2": 1000, "3": 3000, "4": 6000, "5": 10000, "6": 15000, "7": 21000, "8": 28000, "9": 36000, "10": 45000}, LB, 35, 41),
  r("progressao.xp_desafio", {"formula": "ND x 1000 / personagens", "empate": 0.5, "derrota": 0.25, "irrelevante_se_nd_menor_que_nivel_menos": 5}, LB, 326, 332),
  r("raca.anao", {"atributos": {"con": 2, "sab": 1, "des": -1}, "deslocamento_m": 6, "pv_nivel1": 3, "pv_por_nivel": 1, "sentidos": ["visao_escuro"],
@@ -137,9 +146,9 @@ ameacas = [
    {"nome": "Funda", "bonus": 9, "dano": "1d6+1", "margem": 20, "mult": 2, "alcance_q": 20, "distancia": True}],
    "atributos": {"for": 1, "des": 2, "con": 1, "int": 0, "sab": -1, "car": 0}, "pericias": {"furtividade": 6}}, BE, 43, 45),
  r("criatura.hiena", {"nome": "Hiena", "nd": "1", "tipo": "animal", "tamanho": "medio", "iniciativa": 5, "percepcao": 6, "defesa": 14,
-   "fort": 9, "ref": 6, "von": 1, "pv": 17, "deslocamento_m": 15, "ataques": [{"nome": "Mordida", "bonus": 9, "dano": "1d6+7", "margem": 20, "mult": 3, "alcance_q": 1}],
+   "fort": 9, "ref": 6, "von": 1, "pv": 17, "deslocamento_m": 15, "ataques": [{"nome": "Mordida", "bonus": 9, "dano": "1d6+7", "margem": 20, "mult": 3, "alcance_q": 1, "derrubar": 9}],
    "atributos": {"for": 3, "des": 3, "con": 3, "int": -4, "sab": 2, "car": -2}, "pericias": {"furtividade": 5, "sobrevivencia": 6}, "sentidos": ["faro", "visao_penumbra"],
-   "habilidades": ["oportunista: +2 dano contra quem sofreu dano nesta rodada"]}, BE, 120, 122, "PENDENTE_REVISAO", "Bloco extraído de layout em colunas; conferir valores."),
+   "habilidades": ["oportunista: +2 dano contra quem sofreu dano nesta rodada"]}, BE, 120, 122, nota="Reconferido com layout preservado (pdftotext -layout). ND pressupõe grupo de 4."),
 ]
 out = pathlib.Path(__file__).resolve().parent.parent / "data" / "rules"
 for name, data in [("core", core), ("equipamento", equip), ("personagem", personagem), ("fe", fe), ("ameacas", ameacas)]:

@@ -42,6 +42,21 @@ func km_per_day(route: Dictionary) -> float:
 	return kmd
 
 
+## Risco causal por dia: bando ativo na região => estrada mais perigosa. Guarda patrulhando reduz.
+func ambush_risk() -> float:
+	var risk := 0.05
+	var combat = world.module("combat")
+	if combat != null and not combat.creatures_of_faction("garras_de_cinza").is_empty():
+		risk = 0.2
+	if combat != null and combat.creatures_of_faction("salteadores").is_empty() and combat.creature_state.has("salteador_1") \
+			and not combat.creature_state.salteador_1.alive:
+		risk *= 0.5  # salteadores já derrotados
+	var dom = world.module("domain")
+	if dom != null and dom.owned and dom.policy.patrulha:
+		risk *= 0.5  # patrulha do domínio protege a estrada
+	return risk
+
+
 func validate(cmd: GameCommand) -> PackedStringArray:
 	var key: String = cmd.payload.get("route", "")
 	if not ROUTES.has(key) or ROUTES[key].from != current_region:
@@ -62,6 +77,11 @@ func execute(cmd: GameCommand) -> Array:
 	# km/dia já embute 8h de marcha (LB p.270); o resto do dia é descanso => dias de calendário
 	var hours := int(ceil(days * 24.0))
 	var out: Array = [fact("TRAVEL_STARTED", {"route": cmd.payload.route, "km": route.km, "days": days}, ["player"])]
+	# Emboscada TÁTICA na saída da vila (dia 1): vira combate real na estrada e a viagem não acontece.
+	if current_region == "vila" and route.road and world.rng.stream("world").randf() < ambush_risk() * 1.5:
+		out.append(fact("TRAVEL_AMBUSH", {"day": 1, "tactical": true, "cause": "salteadores", "pv_lost": 0, "gold_lost": 0}, ["player"]))
+		trips.append({"route": cmd.payload.route, "days": 0, "events": ["emboscada tática na partida"]})
+		return out
 	var s := world.player_sheet
 	var log := {"route": cmd.payload.route, "days": days, "events": []}
 	# Jornada pelos ermos (LB p.320): testes de Sobrevivência até N sucessos ou 3 falhas
@@ -79,11 +99,7 @@ func execute(cmd: GameCommand) -> Array:
 				s.pv = maxi(1, s.pv - loss)  # perda de vida por desgaste (não mata no protótipo)
 				log.events.append("desgaste -%d PV" % loss)
 		out.append(fact("JOURNEY_CHALLENGE", {"successes": ok, "failures": fails, "pv": s.pv}, ["player"]))
-	# Emboscada causal: bando presente e ativo => risco maior por dia na estrada leste
-	var risk := 0.05
-	var combat = world.module("combat")
-	if combat != null and not combat.creatures_of_faction("garras_de_cinza").is_empty():
-		risk = 0.2
+	var risk := ambush_risk()
 	var n_days := int(ceil(days))
 	for d in n_days:
 		if world.rng.stream("world").randf() < risk:

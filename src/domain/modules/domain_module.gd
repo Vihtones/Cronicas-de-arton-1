@@ -96,7 +96,8 @@ func on_tick(tick: int) -> Array:
 		morale -= 3
 	morale = clampi(morale, 0, 100)
 	security = clampi(security, 0, 100)
-	var rep := {"week": reports.size() + 1, "income": income, "upkeep": upkeep, "treasury": treasury, "morale": morale,
+	var food_out := production / 2 + (10 if policy.celeiro else 0)  # sacas de farinha para o estoque da vila
+	var rep := {"week": reports.size() + 1, "food_out": food_out, "income": income, "upkeep": upkeep, "treasury": treasury, "morale": morale,
 		"security": security, "policy": policy.duplicate(), "event": event, "delegated": delegated}
 	reports.append(rep)
 	var out: Array = [fact("DOMAIN_WEEK", rep, ["player"])]

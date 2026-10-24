@@ -953,6 +953,30 @@
    ]
   },
   {
+   "id": "salteador_1",
+   "name": "Salteador",
+   "rule": "criatura.bandido_comum",
+   "faction": "salteadores",
+   "spawn": [
+    63,
+    24
+   ],
+   "zone": "estrada",
+   "start_present": false
+  },
+  {
+   "id": "salteador_2",
+   "name": "Salteador Caolho",
+   "rule": "criatura.bandido_comum",
+   "faction": "salteadores",
+   "spawn": [
+    64,
+    27
+   ],
+   "zone": "estrada",
+   "start_present": false
+  },
+  {
    "id": "hiena_3",
    "name": "Hiena Jovem",
    "rule": "criatura.hiena",

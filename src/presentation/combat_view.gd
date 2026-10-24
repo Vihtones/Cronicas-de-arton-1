@@ -108,6 +108,16 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "":
 				return []
 			return [{"type": "coup", "target": target}]
+		"atirar":
+			if target == "" or not gs.is_enemy("player", target):
+				return []
+			var idx := -1
+			for i in gs.c("player").sheet.attacks.size():
+				if gs.c("player").sheet.attacks[i].get("distancia", false): idx = i
+			if idx < 0:
+				message.emit("Sem arma de ataque à distância equipada.")
+				return []
+			return [{"type": "attack", "target": target, "attack": idx, "special": special}]
 		"magia":
 			if target == "" or not gs.is_enemy("player", target):
 				return []
@@ -202,6 +212,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_3: mode = "misericordia"; _update_preview()
 			KEY_4: mode = "magia"; message.emit("Modo magia: clique no alvo (Seta Infalível, 1 PM)."); _update_preview()
 			KEY_5: drink_potion()
+			KEY_6: mode = "atirar"; message.emit("Modo tiro: clique no alvo (sem se mover)."); _update_preview()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()
 			KEY_L: stand_up()
 			_: return

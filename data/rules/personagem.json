@@ -60,6 +60,99 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "manobra.derrubar",
+   "valor": {
+    "teste": "manobra oposta (ataque corpo a corpo x Luta)",
+    "efeito": "alvo caído",
+    "vencer_por_5": "empurra 1 quadrado"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 234,
+   "pdf_page": 240,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.especializacao_arma",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "+2 dano com a arma escolhida",
+    "repetivel": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.valentao",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "+2 ataque e dano contra caídos, desprevenidos, flanqueados ou indefesos"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aumento_atributo",
+   "valor": {
+    "classe": "qualquer",
+    "efeito": "+1 em um atributo, uma vez por patamar por atributo"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_raspao",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "1/rodada ao errar: 2 PM, metade do dano"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.gatuno",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "+2 Atletismo; escala sem ficar desprevenido"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.truque_magico",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "aprende magia arcana de 1º círculo (Int)",
+    "prereq": {
+     "int": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.guerreiro.durao",
+   "valor": {
+    "nivel": 3,
+    "efeito": "3 PM: reduz dano sofrido à metade"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "progressao.xp_por_nivel",
    "valor": {
     "1": 0,

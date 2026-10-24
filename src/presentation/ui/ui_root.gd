@@ -334,7 +334,7 @@ func refresh_journal() -> void:
 	for it in w.modules.state.inventory:
 		inv.append("%s x%d" % [Game.db.items.get(it, {}).get("name", it), w.modules.state.inventory[it]])
 	journal_body.add_child(_label("Inventário: %s · Ouro: T$ %d" % [", ".join(inv) if not inv.is_empty() else "—", w.player.gold], 9))
-	var inv_row := HBoxContainer.new()
+	var inv_row := HFlowContainer.new()
 	for it in w.modules.state.inventory:
 		if ItemsModule.EQUIPPABLE.has(it):
 			inv_row.add_child(_button("Equipar " + Game.db.items.get(it, {}).get("name", it), func(): _cmd_log("Equip", {"item": it}); refresh_journal()))
@@ -347,13 +347,25 @@ func refresh_journal() -> void:
 		journal_body.add_child(inv_row)
 	var prog: ProgressionModule = w.modules.progression
 	if prog.enabled:
-		journal_body.add_child(_label("Experiência: %d XP · próximo nível em %d XP · poderes a escolher: %d (escolha de poderes ainda não implementada)" % [s.xp, prog.xp_to_next(), s.pending_powers], 9))
+		journal_body.add_child(_label("Experiência: %d XP · próximo nível em %d XP · modo de XP: %s · poderes: %s" % [s.xp, prog.xp_to_next(), prog.mode,
+			", ".join(s.powers.keys()) if not s.powers.is_empty() else "—"], 9))
+		var xrow := HFlowContainer.new()
+		xrow.add_child(_button("XP: " + ("dinâmica → livro" if prog.mode == "dinamica" else "livro → dinâmica"), func():
+			_cmd_log("SetXpMode", {"mode": "livro" if prog.mode == "dinamica" else "dinamica"}); refresh_journal()))
+		if s.pending_powers > 0:
+			for pw in prog.available_powers():
+				var opt := "for" if pw == "aumento_atributo" else ""
+				xrow.add_child(_button("Escolher: " + pw.replace("_", " ") + (" (+1 For)" if opt != "" else ""), func():
+					_cmd_log("ChoosePower", {"power": pw, "option": opt}); refresh_journal()))
+		journal_body.add_child(xrow)
+		for entry in prog.log.slice(maxi(0, prog.log.size() - 3)):
+			journal_body.add_child(_label("  +%d XP: %s" % [entry.xp, entry.reason], 8))
 	var dom: DomainModule = w.modules.domain
 	if dom.enabled and dom.owned:
 		journal_body.add_child(_h("Domínio — " + dom.domain_name))
 		journal_body.add_child(_label("Tesouro T$ %d · moral %d · segurança %d · imposto %s · patrulha %s · celeiro %s · %s" % [dom.treasury, dom.morale, dom.security,
 			dom.policy.imposto, "sim" if dom.policy.patrulha else "não", "sim" if dom.policy.celeiro else "não", "delegado aos conselheiros" if dom.delegated else "você decide"], 9))
-		var drow := HBoxContainer.new()
+		var drow := HFlowContainer.new()
 		for tax in ["baixo", "medio", "alto"]:
 			drow.add_child(_button("Imposto " + tax, func(): _cmd_log("SetPolicy", {"key": "imposto", "value": tax}); refresh_journal()))
 		drow.add_child(_button("Patrulha", func(): _cmd_log("SetPolicy", {"key": "patrulha", "value": not dom.policy.patrulha}); refresh_journal()))
@@ -427,7 +439,7 @@ func _build_combat_bar(root: Control) -> void:
 	v.add_child(row)
 	for spec in [["1 Mover/Atacar", func(): combat_view.mode = "mover"], ["2 Investida", func(): combat_view.mode = "investida"],
 			["3 Misericórdia", func(): combat_view.mode = "misericordia"], ["Q Especial", func(): combat_view.special = not combat_view.special],
-			["4 Magia", func(): combat_view.mode = "magia"], ["5 Poção", func(): combat_view.drink_potion()],
+			["4 Magia", func(): combat_view.mode = "magia"], ["5 Poção", func(): combat_view.drink_potion()], ["6 Atirar", func(): combat_view.mode = "atirar"],
 			["L Levantar", func(): combat_view.stand_up()], ["⌫ Desfazer", func(): combat_view.undo()],
 			["↵ Confirmar", func(): combat_view.confirm()], ["␣ Fim do turno", func(): combat_view.end_turn()]]:
 		var b := _button(spec[0], spec[1])
@@ -498,11 +510,8 @@ func _build_gameover(root: Control) -> void:
 	v.add_child(_h("Você morreu."))
 	v.add_child(_label("Arton não protege ninguém. O mundo segue sem você.", 9))
 	v.add_child(_button("Continuar como herdeiro (mesmo mundo)", func():
-		var r := Game.send("ContinueAsHeir")
-		if r.accepted:
-			Game.set_mode(Game.Mode.EXPLORE)
-			Game.world_reloaded.emit()
-		else: log_msg("✘ " + "; ".join(r.errors))))
+		_heir_mode = true
+		open_creation()))
 	v.add_child(_button("Carregar último salvamento", func(): request_load.emit("quicksave" if Game.has_save("quicksave") else "auto")))
 	v.add_child(_button("Carregar autosave", func(): request_load.emit("auto")))
 	v.add_child(_button("Voltar ao título", func(): Game.world = null; Game.set_mode(Game.Mode.TITLE)))
@@ -544,6 +553,7 @@ var panel_creation: PanelContainer
 var panel_hub: PanelContainer
 var debug_label: Label
 var _creation := {"race": "humano", "class": "guerreiro", "preset": 0, "feminine": false}
+var _heir_mode := false
 
 
 func _build_lab(root: Control) -> void:
@@ -635,6 +645,14 @@ Magias: " + ", ".join(Array(s.spells))) if not s.spells.is_empty() else ""], 8))
 	v.add_child(_button("Começar", func():
 		panel_creation.visible = false
 		var picks: Array = ["for", "des", "con"] if _creation["class"] == "guerreiro" else (["des", "int", "car"] if _creation["class"] == "ladino" else ["int", "des", "sab"])
+		if _heir_mode:
+			_heir_mode = false
+			var r := Game.send("ContinueAsHeir", {"build": {"race": _creation.race, "class": _creation["class"], "attrs": attrs, "human_picks": picks, "name": "Herdeiro"}})
+			if r.accepted:
+				Game.set_mode(Game.Mode.EXPLORE)
+				Game.world_reloaded.emit()
+			else: log_msg("✘ " + "; ".join(r.errors))
+			return
 		Game.new_game_with_build({"race": _creation.race, "class": _creation["class"], "attrs": attrs, "human_picks": picks,
 			"name": ("Aventureira" if _creation.feminine else "Aventureiro")}, _creation.feminine)))
 	v.add_child(_button("Cancelar", func(): panel_creation.visible = false))
@@ -668,6 +686,13 @@ func refresh_hub() -> void:
 	for p in adv.parties:
 		var mem: Array = p.members.map(func(m): return "%s (%s %d%s)" % [m.name, m["class"], m.level, "" if m.alive else ", morto"])
 		v.add_child(_label("%s: %s" % [p.name, ", ".join(mem)], 8))
+	if tr.current_region == "valkaria" and eco.enabled:
+		var srow := HFlowContainer.new()
+		for it in Game.db.economy.get("shops", {}).get("valkaria_mercado", []):
+			srow.add_child(_button("%s T$%d" % [Game.db.items[it].name, eco.price(it, "valkaria")], func():
+				_cmd_log("Buy", {"npc_id": "valkaria_mercado", "item": it}); refresh_hub()))
+		v.add_child(srow)
+		v.add_child(_label("Ouro: T$ %d" % Game.world.player.gold, 8))
 	v.add_child(_button("Descansar numa estalagem (8h)", func(): var r := Game.send("Rest"); refresh_hub()))
 	for route in tr.available_routes():
 		v.add_child(_button("Viajar: " + route.replace("->", " → ").replace("_", " "), func():

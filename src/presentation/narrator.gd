@@ -66,6 +66,7 @@ static func line(e: GameEvent) -> String:
 		"STOOD_UP": return "%s se levanta." % _name(p.actor)
 		"COMBAT_ENDED":
 			return {"vitoria": "O combate termina. Você venceu.", "fuga": "Você escapou.", "captura": "Tudo escurece...", "morte": ""}.get(p.outcome, "")
+		"PLAYER_ROBBED": return "Você acorda na beira da estrada, dolorido e de bolsos vazios."
 		"PLAYER_CAPTURED": return "Você acorda numa cela fria, sem a bolsa. Ainda vivo."
 		"PLAYER_DIED": return "Você morreu."
 		"CREATURE_DEFEATED": return ("%s foi derrotado." % p.name) if p.get("by", "") == "player" else ""
@@ -84,13 +85,22 @@ static func line(e: GameEvent) -> String:
 		"BECOME_DEVOTEE": return "Você agora é devoto(a) de %s." % p.god
 		"OBLIGATION_VIOLATED": return "Você causou dano letal. Seus votos a %s foram quebrados." % p.god
 		"DIALOGUE_TEST": return "Teste%s" % _check(p.check)
-		"XP_GAINED": return "+%d XP (%s). Total: %d." % [p.amount, p.reason, p.total]
-		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Poder de classe a escolher: %d (em breve)." % [p.level, p.pv_gain, p.pm_gain, p.pending_powers]
+		"XP_GAINED":
+			var parts: Array = []
+			for b in p.get("breakdown", []):
+				parts.append(("%s %+d%%" % [b[0], int(round(float(b[1]) * 100))]) if float(b[1]) != 0.0 else str(b[0]))
+			return "+%d XP (%s)%s. Total: %d." % [p.amount, p.reason, (" — " + "; ".join(parts)) if not parts.is_empty() else "", p.total]
+		"POWER_CHOSEN": return "Poder adquirido: %s%s." % [str(p.power).replace("_", " "), (" (" + p.option + ")") if p.option != "" else ""]
+		"MANEUVER_RESOLVED": return "%s tenta derrubar %s: %d vs %d — %s" % [_name(p.attacker), _name(p.target), p.attacker_total, p.target_total, "caído!" if p.success else "resiste."]
+		"LEVEL_UP": return "NÍVEL %d! +%d PV, +%d PM. Escolha um poder no diário (J)." % [p.level, p.pv_gain, p.pm_gain]
 		"SPELL_CAST": return "Magia: %s (−%d PM, resta %d)." % [str(p.spell).replace("_", " ").capitalize(), p.pm_cost, p.pm_after] if p.caster == "player" else ""
 		"HEALED": return "%s recupera %d PV." % [_name(p.target), p.amount]
 		"EQUIPPED": return "Equipado: %s (Defesa %d)." % [Game.db.items.get(p.item, {}).get("name", p.item), p.defense]
 		"TRAVEL_STARTED": return "Você parte: %d km, cerca de %.1f dias de marcha." % [p.km, p.days]
-		"TRAVEL_AMBUSH": return "Emboscada no dia %d! −%d PV, −T$ %d." % [p.day, p.pv_lost, p.gold_lost]
+		"AMBUSH_PERCEPTION": return "Emboscada! Percepção %d vs Furtividade %d: %s" % [p.player_total, p.enemy_total, "eles te pegaram desprevenido!" if p.player_surprised else "você os viu a tempo."]
+		"TRAVEL_AMBUSH":
+			if p.get("tactical", false): return "Salteadores saltam do mato na saída da estrada!"
+			return "Emboscada no dia %d! −%d PV, −T$ %d." % [p.day, p.pv_lost, p.gold_lost]
 		"JOURNEY_CHALLENGE": return "Jornada pelos ermos: %d sucessos, %d falhas." % [p.successes, p.failures]
 		"TRAVEL_ARRIVED": return "Você chega a %s." % {"valkaria": "Valkaria", "vila": "Vila Alvorada", "ermos_norte": "os Ermos do Norte"}.get(p.region, p.region)
 		"GRANT_DOMAIN": return "Você agora administra %s. (J > Domínio)" % p.domain

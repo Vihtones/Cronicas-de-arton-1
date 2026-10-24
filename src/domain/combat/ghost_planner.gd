@@ -78,7 +78,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var cost := int(sim.rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
-			var reach := 20 if sp.alcance == "medio" else (6 if sp.alcance == "curto" else 1)  # PENDENTE: alcance.metros
+			var reach := int(sim.rules.value("alcance.quadrados", {}).get(str(sp.alcance), 1))  # LB p.143
 			for tg in targets:
 				var T := sim.c(tg)
 				if T.is_empty(): return {"ok": false, "reason": "alvo inválido"}

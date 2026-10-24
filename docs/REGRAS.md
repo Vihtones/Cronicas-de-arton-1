@@ -7,14 +7,14 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| PENDENTE_REVISAO | 8 |
-| VERIFICADA | 67 |
+| PENDENTE_REVISAO | 6 |
+| VERIFICADA | 78 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
 | ameacas | `criatura.bandido_comum` | Bestiário Tormenta20 | 43 | 45 | VERIFICADA |  |
 | ameacas | `criatura.bandido_ligeiro` | Bestiário Tormenta20 | 43 | 45 | VERIFICADA |  |
-| ameacas | `criatura.hiena` | Bestiário Tormenta20 | 120 | 122 | PENDENTE_REVISAO | Bloco extraído de layout em colunas; conferir valores. |
+| ameacas | `criatura.hiena` | Bestiário Tormenta20 | 120 | 122 | VERIFICADA | Reconferido com layout preservado (pdftotext -layout). ND pressupõe grupo de 4. |
 | core | `teste.basico` | T20 Livro Básico | 220 | 226 | VERIFICADA |  |
 | core | `teste.oposto.empate` | T20 Livro Básico | 220 | 226 | VERIFICADA |  |
 | core | `pericia.valor` | T20 Livro Básico | 114 | 120 | VERIFICADA |  |
@@ -64,7 +64,8 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | equipamento | `armadura.gibao_peles` | T20 Livro Básico | 153 | 159 | VERIFICADA |  |
 | equipamento | `armadura.cota_malha` | T20 Livro Básico | 153 | 159 | VERIFICADA |  |
 | equipamento | `escudo.leve` | T20 Livro Básico | 153 | 159 | VERIFICADA |  |
-| equipamento | `alcance.metros` | T20 Livro Básico | 0 | 0 | PENDENTE_REVISAO | Valores de memória; conferir no livro antes de marcar VERIFICADA. |
+| equipamento | `alcance.metros` | T20 Livro Básico | 143 | 149 | VERIFICADA |  |
+| equipamento | `alcance.quadrados` | T20 Livro Básico | 143 | 149 | VERIFICADA |  |
 | fe | `panteao.nomes` | T20 Livro Básico | 96 | 102 | PENDENTE_REVISAO | Nomes conferidos por contagem no texto; obrigações individuais a extrair. |
 | fe | `deus.lena.obrigacao` | T20 Livro Básico | 100 | 106 | VERIFICADA |  |
 | fe | `deus.khalmyr.obrigacao` | T20 Livro Básico | 99 | 105 | VERIFICADA |  |
@@ -72,6 +73,14 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `classe.guerreiro` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
 | personagem | `raca.humano` | T20 Livro Básico | 19 | 25 | VERIFICADA |  |
 | personagem | `envelhecimento` | T20 Livro Básico | 108 | 114 | VERIFICADA |  |
+| personagem | `manobra.derrubar` | T20 Livro Básico | 234 | 240 | VERIFICADA |  |
+| personagem | `poder.especializacao_arma` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
+| personagem | `poder.valentao` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
+| personagem | `poder.aumento_atributo` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
+| personagem | `poder.golpe_raspao` | T20 Livro Básico | 65 | 71 | VERIFICADA |  |
+| personagem | `poder.gatuno` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
+| personagem | `poder.truque_magico` | T20 Livro Básico | 74 | 80 | VERIFICADA |  |
+| personagem | `classe.guerreiro.durao` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
 | personagem | `progressao.xp_por_nivel` | T20 Livro Básico | 35 | 41 | VERIFICADA |  |
 | personagem | `progressao.xp_desafio` | T20 Livro Básico | 326 | 332 | VERIFICADA |  |
 | personagem | `raca.anao` | T20 Livro Básico | 20 | 26 | VERIFICADA |  |

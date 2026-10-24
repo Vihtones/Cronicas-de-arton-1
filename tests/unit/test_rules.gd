@@ -19,7 +19,8 @@ func test_regra_sem_fonte_e_rejeitada() -> void:
 
 func test_pendentes_sao_reportados() -> void:
 	var r := RuleRegistry.load_default()
-	check(r.unverified_ids().has("criatura.hiena"), "hiena marcada como pendente")
+	check(not r.unverified_ids().has("criatura.hiena"), "hiena reconferida com layout (Bestiário p.120)")
+	check(r.unverified_ids().size() >= 1, "pendentes continuam reportados")
 
 
 func test_ficha_guerreiro_segue_regras() -> void:

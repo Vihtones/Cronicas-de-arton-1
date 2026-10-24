@@ -176,10 +176,23 @@
     "longo": 90
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
-   "pagina": 0,
-   "pdf_page": 0,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Valores de memória; conferir no livro antes de marcar VERIFICADA."
+   "pagina": 143,
+   "pdf_page": 149,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "alcance.quadrados",
+   "valor": {
+    "curto": 6,
+    "medio": 20,
+    "longo": 60,
+    "dobro_penalidade": -5,
+    "arremesso_sem_alcance": "curto com -5"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 143,
+   "pdf_page": 149,
+   "status": "VERIFICADA"
   }
  ]
 }

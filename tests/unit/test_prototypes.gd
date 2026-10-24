@@ -121,6 +121,7 @@ func test_ladino_causa_ataque_furtivo_em_alvo_surpreendido() -> void:
 func test_progressao_hiena_da_mil_xp_e_sobe_nivel() -> void:
 	var w := _w("progressao")
 	var prog: ProgressionModule = w.modules.progression
+	prog.mode = "livro"
 	eq(prog.xp_for(ProgressionModule.nd_value("1")), 1000, "ND 1 = 1.000 XP (LB p.326)")
 	eq(prog.xp_for(ProgressionModule.nd_value("1/4")), 250, "ND 1/4 = 250")
 	var out := prog.on_event(GameEvent.create("x", "CREATURE_DEFEATED", 0, {"creature": "hiena_1", "by": "player", "name": "Hiena"}))

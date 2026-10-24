@@ -86,6 +86,15 @@
   "ysolde": [
    "pocao_cura"
   ],
+  "valkaria_mercado": [
+   "pocao_cura",
+   "saco_de_dormir",
+   "arco_curto",
+   "cota_malha",
+   "espada_longa",
+   "tocha",
+   "corda"
+  ],
   "garrick": [
    "adaga",
    "espada_curta",

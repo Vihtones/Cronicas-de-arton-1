@@ -31,6 +31,7 @@ var spells: PackedStringArray = PackedStringArray()
 var equipment := {"weapon": "", "armor": ""}
 var pending_powers: int = 0
 var caster_attr: String = ""
+var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
 
 
 func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> int:
@@ -45,7 +46,20 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 	var v: int = level / 2 + int(attrs.get(attr_key, 0))
 	if trained.has(skill):
 		v += training_bonus()
+	if bool(info.get("armadura", false)):
+		v += armor_penalty(rules)  # LB p.115: penalidade de armadura nas perícias marcadas
+	if skill == "atletismo" and powers.has("gatuno"):
+		v += 2
 	return v + race_bonus
+
+
+func armor_penalty(rules: RuleRegistry) -> int:
+	var arm: String = equipment.get("armor", "")
+	return int(rules.value("armadura." + arm, {}).get("penalidade", 0)) if arm != "" else 0
+
+
+func has_power(p: String) -> bool:
+	return powers.has(p)
 
 
 func can_use_skill(skill: String, rules: RuleRegistry) -> bool:
@@ -143,7 +157,7 @@ func to_dict() -> Dictionary:
 		"attacks": attacks.duplicate(true), "conditions": Array(conditions), "senses": Array(senses), "habilidades": Array(habilidades), "stable": stable,
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
-		"pending_powers": pending_powers, "caster_attr": caster_attr,
+		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
 	}
 
 
@@ -166,6 +180,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.spells = PackedStringArray(d.get("spells", []))
 	s.equipment = d.get("equipment", {"weapon": "", "armor": ""}).duplicate()
 	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
+	s.powers = d.get("powers", {}).duplicate(true)
 	return s
 
 
@@ -212,6 +227,7 @@ static func from_creature(rules: RuleRegistry, rule_id: String, p_id: String) ->
 	for a in c.ataques:
 		var atk := {"nome": a.nome, "bonus_fixo": int(a.bonus), "dano": a.dano, "for_no_dano": false,
 			"margem": int(a.margem), "mult": int(a.mult), "alcance_q": int(a.alcance_q), "distancia": a.get("distancia", false)}
+		if a.has("derrubar"): atk["derrubar"] = int(a.derrubar)
 		s.attacks.append(atk)
 	s.is_important = false
 	s.senses = PackedStringArray(c.get("sentidos", []))

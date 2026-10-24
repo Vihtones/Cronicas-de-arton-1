@@ -1,7 +1,7 @@
 # Crônicas de Arton
 
 RPG single-player 2D top-down em pixel art, inspirado em Tormenta20. Projeto pessoal de fã, sem distribuição.
-**Versão 0.2.0: vertical slice jogável + Laboratório de protótipos (21 cenários, um por mecânica).** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
+**Versão 0.3.0: vertical slice jogável + Laboratório (22 cenários) + XP dinâmica (`docs/XP_DINAMICA.md`).** É uma vila viva, uma estrada, uma floresta, uma ruína com cripta, 25 NPCs em 5 famílias, 3 facções, um mistério e combate tático completo.
 
 Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_DE_EXECUCAO.md` · Regras e páginas: `docs/REGRAS.md`
 **Próximos passos, correções e revisões: `docs/ROADMAP.md`** · Mapa das mecânicas: `docs/PROTOTIPOS.md`.
@@ -20,7 +20,7 @@ Fontes de verdade: `docs/PLANO_MESTRE.md` (v1.2) · Plano e status: `docs/PLANO_
 | C | andar furtivo (metade da velocidade; teste de Furtividade ao se aproximar) |
 | R | descansar 8h (recupera PV/PM conforme o local, LB p.106) |
 | F5 / F9 | salvar / carregar · Esc: menu e opções · F3: depuração |
-| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · 4: magia · 5: poção · Q: Ataque Especial · L: levantar |
+| **Combate** | clique: planejar mover/atacar · botão direito/⌫: desfazer · Enter: confirmar · Espaço: fim do turno · 2: investida · 3: misericórdia · 4: magia · 5: poção · 6: atirar · Q: Ataque Especial · L: levantar |
 
 O tempo passa sozinho (2 s reais = 10 min de jogo). Os NPCs seguem suas rotinas, conversam entre si e espalham o que viram. Se você esperar demais, o bando parte no 12º dia e leva o rapaz.
 
@@ -40,7 +40,7 @@ Na tela de título, abra **Laboratório de protótipos…** para jogar um cenár
 ## Testes e ferramentas
 ```bash
 godot --headless --path . --import                          # 1ª vez
-godot --headless --path . -s res://tests/run_tests.gd       # 88 testes
+godot --headless --path . -s res://tests/run_tests.gd       # 112 testes
 python3 tools/validate_assets.py                            # pipeline de assets (§13)
 python3 tools/check_architecture.py                         # dependências entre camadas (R3)
 xvfb-run godot --path . -s res://tools/benchmark.gd         # desempenho por perfil gráfico

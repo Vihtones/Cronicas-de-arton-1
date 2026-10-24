@@ -150,10 +150,16 @@ func _name(id: String) -> String:
 	return d.get("name", id)
 
 
+const FORGET_TICKS := 30 * 144  # memórias não duráveis somem após 30 dias (ORIGINAL)
+
+
 ## Propagação de rumores de hora em hora entre NPCs co-localizados.
 func on_tick(tick: int) -> Array:
 	if tick % (60 / world.clock.tick_minutes) != 0:
 		return []
+	if tick % 144 == 0:
+		for id in memories:
+			memories[id] = memories[id].filter(func(m): return m.durable or tick - int(m.get("origin_tick", m.tick)) < FORGET_TICKS or m.key == "conheceu:player")
 	var npcs = world.module("npcs")
 	if npcs == null:
 		return []
@@ -175,7 +181,11 @@ func on_tick(tick: int) -> Array:
 			var shareable := list(speaker).filter(func(m): return m.reliability >= MIN_RELIABILITY and m.key != "conheceu:player")
 			if shareable.is_empty():
 				continue
-			shareable.sort_custom(func(a, b): return absi(int(a.valence)) + (10 if a.durable else 0) > absi(int(b.valence)) + (10 if b.durable else 0))
+			# conta o assunto mais relevante que ALGUÉM presente ainda não sabe (evita repetir o mesmo para sempre)
+			shareable = shareable.filter(func(mm): return present.any(func(l): return l != speaker and not knows_fact(l, mm.key)))
+			if shareable.is_empty():
+				continue
+			shareable.sort_custom(func(a, b): return _salience(a, tick) > _salience(b, tick))
 			var m: Dictionary = shareable[0]
 			for listener in present:
 				if listener == speaker or knows_fact(listener, m.key):
@@ -186,6 +196,7 @@ func on_tick(tick: int) -> Array:
 				copy.erase("id")
 				copy.reliability = float(m.reliability) * RELIABILITY_DECAY
 				copy.source = "rumor:" + speaker
+				copy["origin_tick"] = int(m.get("origin_tick", m.tick))  # data do fato original (esquecimento)
 				copy.tick = tick
 				copy.location = loc
 				# NPC mentiroso pode distorcer (NPCs não são oniscientes nem sempre honestos)
@@ -198,6 +209,11 @@ func on_tick(tick: int) -> Array:
 				add_memory(listener, copy)
 				out.append(fact("RUMOR_SPREAD", {"from": speaker, "to": listener, "key": m.key, "location": loc}))
 	return out
+
+
+func _salience(m: Dictionary, now: int) -> float:
+	var age_days := float(now - int(m.tick)) / 144.0
+	return absi(int(m.valence)) + (10.0 if m.durable else 0.0) + 8.0 / (1.0 + age_days)
 
 
 ## Reputação do jogador para um NPC: soma das crenças sobre ele.

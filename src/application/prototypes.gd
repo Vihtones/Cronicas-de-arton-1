@@ -11,7 +11,8 @@ const LIST := [
 	{"id": "magia", "nome": "Magia (Arcanista anã)", "desc": "Cripta à tarde, bandidos à frente. Tecla 4 + clique: Seta Infalível (1 PM, acerta sempre)."},
 	{"id": "ladino", "nome": "Ataque furtivo (Ladino)", "desc": "Ladino humano contra bandidos surpreendidos: +1d6 em alvo desprevenido."},
 	{"id": "criacao", "nome": "Criação de personagem", "desc": "Escolha raça, classe e distribuição de pontos (LB p.17-20)."},
-	{"id": "progressao", "nome": "Progressão e nível", "desc": "900 XP. Derrote uma hiena (ND 1 = 1.000 XP) e suba para o 2º nível."},
+	{"id": "progressao", "nome": "Progressão e XP dinâmica", "desc": "900 XP. Vença e veja a conta da XP (desempenho e circunstâncias). Suba de nível e escolha um poder (J)."},
+	{"id": "emboscada", "nome": "Emboscada na estrada", "desc": "Partindo para Valkaria com o bando ativo: salteadores atacam. Percepção decide quem surpreende."},
 	{"id": "equipamento", "nome": "Equipamento e loja", "desc": "T$ 200 na ferraria. Compre e equipe (J > Inventário). Garrick desconfia de estranhos."},
 	{"id": "rumores", "nome": "Memória e rumores", "desc": "Tomas acaba de ser resgatado. O tempo corre rápido: veja a notícia se espalhar (J > Reputação)."},
 	{"id": "crime", "nome": "Crime com testemunhas", "desc": "Mercado cheio às 10h. Pegue algo escondido (E) e veja quem viu."},
@@ -76,8 +77,8 @@ static func apply(id: String, w: WorldState) -> Dictionary:
 			out["ui"] = "criacao"
 		"progressao":
 			w.player_sheet.xp = 900
-			_hour(w, 0, 21)
-			_put(w, 72, 34)
+			_hour(w, 1, 14)
+			_put(w, 14, 56)
 		"equipamento":
 			w.player.gold = 200
 			_hour(w, 0, 9)
@@ -111,6 +112,10 @@ static func apply(id: String, w: WorldState) -> Dictionary:
 		"viagem":
 			_hour(w, 0, 8)
 			_put(w, 60, 26)
+		"emboscada":
+			_hour(w, 0, 8)
+			_put(w, 60, 26)
+			w.player.gold = 30
 		"dominio":
 			w.modules.exploration.mystery_state = "resolvido"
 			_cmd(w, "GrantDomain", {"by": "orin"})

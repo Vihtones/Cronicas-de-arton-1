@@ -8,7 +8,7 @@ var regions: Dictionary = {}
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED"])
 
 
 func _ensure() -> void:
@@ -38,25 +38,33 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	var item: String = cmd.payload.get("item", "")
 	if not world.db.economy.get("shops", {}).get(npc, []).has(item):
 		return PackedStringArray(["não vende isso"])
-	var npcs = world.module("npcs")
-	if npcs != null:
-		var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
-		if npcs.npc(npc).get("location", "") != loc:
-			return PackedStringArray(["o vendedor não está aqui"])
+	var region := "vila"
+	if npc == "valkaria_mercado":
+		var tr = world.module("travel")
+		if tr == null or tr.current_region != "valkaria":
+			return PackedStringArray(["o mercado da capital fica em Valkaria"])
+		region = "valkaria"
+	else:
+		var npcs = world.module("npcs")
+		if npcs != null:
+			var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
+			if npcs.npc(npc).get("location", "") != loc:
+				return PackedStringArray(["o vendedor não está aqui"])
 	var good: String = world.db.items[item].get("good", "")
-	if good != "" and int(regions.vila.stock[good]) <= 0:
+	if good != "" and int(regions[region].stock[good]) <= 0:
 		return PackedStringArray(["em falta"])
-	if int(world.player.gold) < price(item, "vila", npc):
+	if int(world.player.gold) < price(item, region, npc):
 		return PackedStringArray(["ouro insuficiente"])
 	return PackedStringArray()
 
 
 func execute(cmd: GameCommand) -> Array:
 	var item: String = cmd.payload.item
-	var p := price(item, "vila", cmd.payload.npc_id)
+	var region := "valkaria" if cmd.payload.npc_id == "valkaria_mercado" else "vila"
+	var p := price(item, region, cmd.payload.npc_id)
 	var good: String = world.db.items[item].get("good", "")
 	if good != "":
-		regions.vila.stock[good] = int(regions.vila.stock[good]) - 1
+		regions[region].stock[good] = int(regions[region].stock[good]) - 1
 	return [fact("GOLD_CHANGED", {"delta": -p, "reason": "compra"}), fact("ITEM_GAINED", {"item": item, "qty": 1}, ["player"]),
 		fact("ITEM_BOUGHT", {"item": item, "price": p, "seller": cmd.payload.npc_id}, ["player", cmd.payload.npc_id])]
 
@@ -75,6 +83,10 @@ func on_tick(tick: int) -> Array:
 func on_event(e: GameEvent) -> Array:
 	_ensure()
 	match e.event_type:
+		"DOMAIN_WEEK":
+			regions.vila.stock.comida = int(regions.vila.stock.comida) + int(e.payload.get("food_out", 0))
+		"SHEEP_KILLED":
+			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 4 * int(e.payload.get("count", 1)))
 		"DISTANT_EVENT":
 			var eff: Dictionary = e.payload.get("effect", {}).get("economy", {})
 			if not eff.is_empty() and regions.has(eff.region):

@@ -15,6 +15,7 @@ var stance_sneak := false
 var undetected_by: Dictionary = {}   # creature_id -> true (furtividade bem-sucedida nesta aproximação)
 var approach_rolled: Dictionary = {} # creature_id -> true (já rolou nesta aproximação)
 var enemy_faction := ""
+var stats: Dictionary = {}  # desempenho do combate atual (XP dinâmica, ORIGINAL_DO_JOGO)
 var log: Array = []
 
 
@@ -22,7 +23,7 @@ func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
 	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW"])
+	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "TRAVEL_AMBUSH"])
 
 
 func _ensure() -> void:
@@ -166,6 +167,24 @@ func execute(cmd: GameCommand) -> Array:
 func on_event(e: GameEvent) -> Array:
 	_ensure()
 	match e.event_type:
+		"TRAVEL_AMBUSH":
+			if not e.payload.get("tactical", false) or active:
+				return []
+			var group: Array = []
+			for id in ["salteador_1", "salteador_2"]:
+				if creature_state.has(id) and creature_state[id].alive:
+					creature_state[id].present = true
+					group.append(id)
+			if group.is_empty():
+				return []
+			# Percepção do jogador x Furtividade dos salteadores (LB p.231): quem percebe primeiro
+			var p := world.db.world_to_tile(world.player.position)
+			creature_state[group[0]].tile = [p.x + 3, p.y - 1]
+			if group.size() > 1: creature_state[group[1]].tile = [p.x - 2, p.y + 1]
+			var mine := Checks.skill(world.player_sheet, "percepcao", 0, world.rules, world.rng, "combat")
+			var theirs: int = world.rng.roll("combat", 1, 20)[0] + int(CharacterSheet.from_dict(creature_state[group[0]].sheet).skill_value("furtividade", world.rules))
+			var surprised: bool = int(mine.total) < theirs
+			return [fact("AMBUSH_PERCEPTION", {"player_total": mine.total, "enemy_total": theirs, "player_surprised": surprised}, ["player"])] + _start(group, false, surprised)
 		"PACK_GREW":
 			if creature_state.has(e.payload.creature):
 				creature_state[e.payload.creature].present = true
@@ -246,7 +265,7 @@ func _check_encounter() -> Array:
 			for gid in group:
 				var s := CharacterSheet.from_dict(creature_state[gid].sheet)
 				best = maxi(best, s.skill_value("percepcao", world.rules) - (10 if is_asleep(gid) else 0))
-			var mine := Checks.skill(world.player_sheet, "furtividade", 0, world.rules, world.rng, "world", _armor_penalty())
+			var mine := Checks.skill(world.player_sheet, "furtividade", 0, world.rules, world.rng, "world")
 			var theirs: int = world.rng.roll("world", 1, 20)[0] + best
 			var ok: bool = mine.total > theirs or (mine.total == theirs and mine.mod > best)
 			out.append(fact("STEALTH_CHECK", {"group": group, "player_total": mine.total, "enemy_total": theirs, "success": ok}, ["player"]))
@@ -284,6 +303,11 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	sim = _new_sim()
 	active = true
 	log.clear()
+	stats = {"rounds": 0, "dmg_dealt": 0, "dmg_taken": 0, "crits": 0, "tactics": {}, "adverse": {}, "pv_start": world.player_sheet.pv,
+		"pv_max": world.player_sheet.pv_max, "pm_spent": 0, "went_down": false, "enemies": enemy_ids.duplicate(), "player_surprised": player_surprised,
+		"enemies_surprised": enemies_surprised}
+	if enemies_surprised: stats.tactics["surpresa"] = true
+	if player_surprised: stats.adverse["surpreendido"] = true
 	enemy_faction = world.db.creature_def(enemy_ids[0]).faction
 	sim.combatants["player"] = {"id": "player", "side": "player", "tile": world.db.world_to_tile(world.player.position),
 		"sheet": world.player_sheet.duplicate_sheet(), "charge_turn": -99, "damaged_round": -1, "surprised": player_surprised, "flags": []}
@@ -441,6 +465,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var ts: CharacterSheet = sim.c(tgt).sheet
 			ts.pv = mini(ts.pv_max, ts.pv + int(r.total))
 			out.append(fact("HEALED", {"actor": id, "target": tgt, "amount": r.total, "pv_after": ts.pv, "source": a.spell, "tags": ["magia", "cura"]}, [id, tgt]))
+	if id == "player" and not stats.is_empty():
+		stats.tactics["magia"] = true
+		stats.pm_spent = int(stats.pm_spent) + int(v.cost)
+		for f in out:
+			if f.type == "ATTACK_RESOLVED": stats.dmg_dealt = int(stats.dmg_dealt) + int(f.payload.damage)
 	out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm}, [id]))
 	return out
 
@@ -461,8 +490,12 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	var dmg := 0
 	var rolls: Array = []
 	var tags: Array = ["ataque"]
+	# Valentão (LB p.66): +2 ataque e dano contra caído/desprevenido/flanqueado/indefeso
+	var bully: bool = v.mods.any(func(m): return m[0] == "valentão")
 	if hit:
 		var extra := int(A.sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0
+		if bully: extra += 2
+		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
 		if T.damaged_round == sim.round_no and Array(A.sheet.habilidades).any(func(h): return str(h).begins_with("oportunista")):
 			extra += 2
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
@@ -480,17 +513,59 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			tags.append("furtivo")
 		tags.append("impacto")
 		if crit: tags.append("critico")
+		# Durão (LB p.66, guerreiro 3º nível): 3 PM reduz o dano à metade — usado em golpes de 1/4 dos PV ou mais
+		if T.sheet.has_power("durao") and T.sheet.pm >= 3 and dmg >= maxi(4, T.sheet.pv_max / 4):
+			T.sheet.pm -= 3
+			dmg = maxi(1, dmg / 2)
+			tags.append("durao")
 		tags.append_array(sim.apply_damage(target, dmg))
 	else:
 		tags.append("esquiva" if not camo_miss else "falha")
+		# Golpe de Raspão (LB p.65): 1/rodada, 2 PM, metade do dano ao errar (automático se houver PM)
+		var gr_key := "raspao_%d" % sim.round_no
+		if A.sheet.has_power("golpe_raspao") and A.sheet.pm >= 2 and not A.flags.has(gr_key) and not camo_miss:
+			A.sheet.pm -= 2
+			A.flags.append(gr_key)
+			var extra2 := int(A.sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0
+			dmg = maxi(1, int(Dice.roll(atk.dano, world.rng, "combat", 1, extra2).total) / 2)
+			tags.append("raspao")
+			tags.append_array(sim.apply_damage(target, dmg))
 	var out: Array = [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": atk.nome, "d20": d20, "mod": v.mod,
 		"mods": v.mods, "total": total, "defense": v.defense, "camo_roll": camo_roll, "hit": hit, "crit": crit, "damage": dmg,
 		"rolls": rolls, "pv_after": T.sheet.pv, "special": special, "ranged": v.ranged, "tags": tags}, [attacker, target])]
 	if hit and attacker == "player" and T.side == "enemy":
 		out.append(fact("LETHAL_DAMAGE_DEALT", {"attacker": "player", "target": target, "creature_type": world.rules.value(T.sheet.source_rule, {}).get("tipo", "")}, ["player"]))
+	# Derrubar livre (Hiena, Bestiário p.120): manobra oposta x Luta do alvo (LB p.234)
+	if hit and atk.has("derrubar") and not T.sheet.is_down() and not T.sheet.conditions.has("caido"):
+		var mine: int = world.rng.roll("combat", 1, 20)[0] + int(atk.derrubar)
+		var theirs: int = world.rng.roll("combat", 1, 20)[0] + T.sheet.skill_value("luta", world.rules)
+		var ok := mine > theirs
+		if ok:
+			T.sheet.add_condition("caido")
+		out.append(fact("MANEUVER_RESOLVED", {"attacker": attacker, "target": target, "maneuver": "derrubar", "attacker_total": mine,
+			"target_total": theirs, "success": ok, "tags": ["queda"] if ok else []}, [attacker, target]))
+	_track_attack(attacker, target, v, special, hit, crit, dmg, tags)
 	log.append(out[0].payload)
 	if log.size() > 60: log.pop_front()
 	return out
+
+
+func _track_attack(attacker: String, target: String, v: Dictionary, special: bool, hit: bool, crit: bool, dmg: int, tags: Array) -> void:
+	if stats.is_empty():
+		return
+	if attacker == "player":
+		stats.dmg_dealt = int(stats.dmg_dealt) + dmg
+		if crit: stats.crits = int(stats.crits) + 1
+		for m in v.get("mods", []):
+			if m[0] in ["flanqueando", "investida", "ataque especial"]:
+				stats.tactics[m[0]] = true
+		if tags.has("furtivo"): stats.tactics["ataque furtivo"] = true
+		if special: stats.pm_spent = int(stats.pm_spent) + 1
+		if int(v.get("miss_chance", 0)) > 0: stats.adverse["visibilidade"] = true
+	elif target == "player":
+		stats.dmg_taken = int(stats.dmg_taken) + dmg
+		if sim.c("player").sheet.is_down(): stats.went_down = true
+		if int(v.get("miss_chance", 0)) > 0: stats.adverse["visibilidade"] = true
 
 
 func _coup(attacker: String, target: String) -> Array:
@@ -622,17 +697,26 @@ func _end_combat(outcome: String) -> Array:
 		"captura":
 			world.player_sheet.pv = 1
 			world.player_sheet.stable = true
-			var cell := world.db.location_spot("cripta_cela")
-			world.player.position = world.db.tile_to_world(cell + Vector2i(1, 1))
 			out.append(fact("GOLD_CHANGED", {"delta": -int(world.player.gold), "reason": "roubado pelos captores"}))
-			out.append(fact("PLAYER_CAPTURED", {"by": enemy_faction, "location": "cripta_cela", "witnesses": []}, ["player"]))
+			if enemy_faction == "garras_de_cinza":
+				var cell := world.db.location_spot("cripta_cela")
+				world.player.position = world.db.tile_to_world(cell + Vector2i(1, 1))
+				out.append(fact("PLAYER_CAPTURED", {"by": enemy_faction, "location": "cripta_cela", "witnesses": []}, ["player"]))
+			else:
+				# salteadores (ORIGINAL): roubam e somem; o jogador acorda onde caiu
+				out.append(fact("PLAYER_ROBBED", {"by": enemy_faction, "location": loc}, ["player"]))
+				for id in sim.combatants:
+					if id != "player": creature_state[id].present = false
 			for id in sim.combatants:
 				if id != "player" and sim.c(id).sheet.pv > 0:
 					creature_state[id].tile = world.db.creature_def(id).spawn.duplicate()
 		"morte":
 			out.append(fact("PLAYER_DIED", {"location": loc, "round": sim.round_no}, ["player"]))
 	var enemies: Array = sim.combatants.keys().filter(func(x): return x != "player")
-	out.append(fact("COMBAT_ENDED", {"outcome": outcome, "enemy_faction": enemy_faction, "rounds": sim.round_no, "location": loc, "enemies": enemies}, ["player"]))
+	stats.rounds = sim.round_no
+	stats.pv_end = maxi(0, P.sheet.pv)
+	stats.defeated = enemies.filter(func(x): return sim.c(x).sheet.is_down())
+	out.append(fact("COMBAT_ENDED", {"outcome": outcome, "enemy_faction": enemy_faction, "rounds": sim.round_no, "location": loc, "enemies": enemies, "stats": stats.duplicate(true)}, ["player"]))
 	active = false
 	undetected_by.clear()
 	approach_rolled.clear()

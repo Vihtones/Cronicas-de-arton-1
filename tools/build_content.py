@@ -296,6 +296,8 @@ creatures = [
  {"id": "hiena_1", "name": "Hiena", "rule": "criatura.hiena", "faction": "fauna", "spawn": [78, 34], "zone": "floresta", "active_hours": [18, 6],
   "signal": "Risadas agudas ecoam entre as árvores."},
  {"id": "hiena_2", "name": "Hiena Malhada", "rule": "criatura.hiena", "faction": "fauna", "spawn": [80, 36], "zone": "floresta", "active_hours": [18, 6]},
+ {"id": "salteador_1", "name": "Salteador", "rule": "criatura.bandido_comum", "faction": "salteadores", "spawn": [63, 24], "zone": "estrada", "start_present": False},
+ {"id": "salteador_2", "name": "Salteador Caolho", "rule": "criatura.bandido_comum", "faction": "salteadores", "spawn": [64, 27], "zone": "estrada", "start_present": False},
  {"id": "hiena_3", "name": "Hiena Jovem", "rule": "criatura.hiena", "faction": "fauna", "spawn": [82, 35], "zone": "floresta", "active_hours": [18, 6], "start_present": False},
  {"id": "hiena_4", "name": "Hiena Jovem", "rule": "criatura.hiena", "faction": "fauna", "spawn": [79, 38], "zone": "floresta", "active_hours": [18, 6], "start_present": False},
 ]
@@ -327,6 +329,7 @@ economy = {
  },
  "price_limits": [0.5, 3.0], "status": "ORIGINAL_DO_JOGO",
  "shops": {"rosana": ["pao", "cerveja"], "mara": ["corda", "tocha", "pao", "saco_de_dormir"], "ysolde": ["pocao_cura"],
+           "valkaria_mercado": ["pocao_cura", "saco_de_dormir", "arco_curto", "cota_malha", "espada_longa", "tocha", "corda"],
            "garrick": ["adaga", "espada_curta", "espada_longa", "machado_batalha", "arco_curto", "couro_batido", "cota_malha"]},
 }
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
