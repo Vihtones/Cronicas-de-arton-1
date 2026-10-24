@@ -161,3 +161,12 @@ func test_llm_fallback_e_validacao() -> void:
 	var off := LlmDialogueProvider.new({"enabled": false})
 	off.verbalize_async("x", "Oi.", {}, func(t): got[0] = t)
 	eq(got[0], "Oi.", "IA desligada não impede nada")
+
+
+func test_c11_ficha_de_npc_da_capita_pela_tabela_7_2() -> void:
+	var r := RuleRegistry.load_default()
+	var db := ContentDB.load_default()
+	eq(NpcStats.skill(r, db.npc_def("elsa"), "investigacao"), 8, "ND 2, perícia focada (LB p.323)")
+	eq(NpcStats.skill(r, db.npc_def("elsa"), "furtividade"), 2, "ND 2, demais perícias")
+	eq(NpcStats.skill(r, db.npc_def("tobias"), "investigacao"), 0, "guarda ND 1/2 sem foco em Investigação")
+	eq(NpcStats.skill(r, db.npc_def("otto"), "investigacao", -1), -1, "sem ficha: valor de reserva")

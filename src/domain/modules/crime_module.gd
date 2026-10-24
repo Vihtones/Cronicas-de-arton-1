@@ -112,23 +112,27 @@ func _near_npcs(loc: String) -> Array:
 
 
 ## Investigação diária (ORIGINAL): a Guarda que sabe de um crime sem autor tenta
-## identificá-lo. Teste de Investigação da capitã (PLACEHOLDER +4) contra CD 20 − 1 por pista.
+## identificá-lo. Teste de Investigação do melhor investigador da Guarda que sabe do crime
+## (ficha de NPC, LB Tabela 7-2: a capitã Elsa é ND 2 com Investigação focada, +8) contra CD 20 − 1 por pista.
 func _investigate() -> Array:
 	var mem = world.module("memory")
 	var out: Array = []
 	for r in records:
 		if r.known_by_authority or r.resolved or not r.witnesses.is_empty():
 			continue
-		var guard_knows := false
+		var best := -999
+		var investigator := ""
 		for g in ["elsa", "rurik", "tobias"]:
 			if mem.list(g).any(func(m): return str(m.key) == "crime:desconhecido:" + str(r.id)):
-				guard_knows = true
-		if not guard_knows:
+				var b := NpcStats.skill(world.rules, world.db.npc_def(g), "investigacao", 0)
+				if b > best: best = b; investigator = g
+		if investigator == "":
 			continue
 		var cd := 20 - mini(10, r.near.size())
-		var roll: int = world.rng.roll("world", 1, 20)[0] + 4
+		var roll: int = world.rng.roll("world", 1, 20)[0] + best
 		r.investigation = int(r.investigation) + 1
-		out.append(fact("CRIME_INVESTIGATED", {"crime_id": r.id, "roll": roll, "cd": cd, "success": roll >= cd, "day": r.investigation}))
+		out.append(fact("CRIME_INVESTIGATED", {"crime_id": r.id, "roll": roll, "cd": cd, "success": roll >= cd, "day": r.investigation,
+			"investigator": investigator, "bonus": best}))
 		if roll >= cd:
 			r.known_by_authority = true
 			out.append(fact("WARRANT_ISSUED", {"crime_id": r.id, "crime": r.act, "fine": r.fine, "by": "investigacao"}))

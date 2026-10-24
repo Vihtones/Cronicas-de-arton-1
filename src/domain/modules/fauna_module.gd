@@ -7,6 +7,8 @@ extends WorldModule
 const SLOTS := ["hiena_1", "hiena_2", "hiena_3", "hiena_4"]
 var food := 40          # 0..100
 var den := "toca_leste"
+## Centros das tocas (ORIGINAL_DO_JOGO). A toca funda fica mais longe da vila, no leste do Bosque Sombrio.
+const DENS := {"toca_leste": [80, 36], "toca_funda": [88, 44]}
 var attacks: Array[Dictionary] = []
 
 
@@ -53,7 +55,8 @@ func on_tick(tick: int) -> Array:
 func on_event(e: GameEvent) -> Array:
 	if e.event_type == "CREATURE_DEFEATED" and SLOTS.has(e.payload.creature) and pack_size() > 0 and den == "toca_leste":
 		den = "toca_funda"
-		return [fact("PACK_RELOCATED", {"from": "toca_leste", "to": "toca_funda", "reason": "perdeu um membro"})]
+		return [fact("PACK_RELOCATED", {"from": "toca_leste", "to": "toca_funda", "reason": "perdeu um membro",
+			"center": DENS.toca_funda, "old_center": DENS.toca_leste})]
 	return []
 
 

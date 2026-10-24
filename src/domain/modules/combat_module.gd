@@ -30,7 +30,7 @@ func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
 	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "TRAVEL_AMBUSH"])
+	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH"])
 
 
 func _ensure() -> void:
@@ -203,6 +203,21 @@ func on_event(e: GameEvent) -> Array:
 			if creature_state.has(e.payload.creature):
 				creature_state[e.payload.creature].present = true
 			return []
+		"PACK_RELOCATED":
+			# C10: a matilha muda de toca; cada hiena mantém a posição relativa ao centro, num tile andável
+			var oc := Vector2i(int(e.payload.old_center[0]), int(e.payload.old_center[1]))
+			var nc := Vector2i(int(e.payload.center[0]), int(e.payload.center[1]))
+			var moved: Array = []
+			for id in creature_state:
+				if not str(id).begins_with("hiena_") or not creature_state[id].alive:
+					continue
+				if active and sim.combatants.has(id):
+					continue
+				var sp: Array = world.db.creature_def(id).get("spawn", creature_state[id].tile)
+				var t := _nearest_walkable(nc + (Vector2i(int(sp[0]), int(sp[1])) - oc))
+				creature_state[id].tile = [t.x, t.y]
+				moved.append(id)
+			return [fact("CREATURES_MOVED", {"creatures": moved, "to": e.payload.to})] if not moved.is_empty() else []
 		"BANDITS_RELOCATED":
 			for id in e.payload.get("members", []):
 				if creature_state.has(id): creature_state[id].present = false
@@ -621,6 +636,16 @@ func _reflex_attack(r_id: String, target: String, at: Vector2i) -> Array:
 		out.append_array(_resolve_attack(r_id, target, v, false))
 	T.tile = now
 	return out
+
+
+func _nearest_walkable(t: Vector2i) -> Vector2i:
+	for r in 6:
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var c := t + Vector2i(dx, dy)
+				if world.db.static_walkable(c):
+					return c
+	return t
 
 
 func _raspao_wanted(attacker: String) -> bool:

@@ -273,6 +273,15 @@ npcs = [
  npc("fenna", "Fenna", 24, "pastora", "pastora", "casa_aldren", "estrada_leste", "aldren"),
  npc("dorn", "Dorn", 47, "bêbado", "bebado", "taverna", "taverna", None, "garras_de_cinza", traits=["mentiroso"]),
 ]
+# Fichas de ameaça dos NPCs que agem com regras (LB Tabela 7-2). O ND e o foco são escolhas de design (ORIGINAL_DO_JOGO).
+NPC_FICHAS = {
+    "elsa": {"nd": "2", "foco": ["investigacao", "intuicao", "percepcao", "luta", "intimidacao"]},
+    "rurik": {"nd": "1/2", "foco": ["percepcao", "luta"]},
+    "tobias": {"nd": "1/2", "foco": ["luta", "percepcao"]},
+}
+for _n in npcs:
+    if _n["id"] in NPC_FICHAS:
+        _n["ficha"] = NPC_FICHAS[_n["id"]]
 families = [
  {"id": "brandt", "name": "Brandt", "members": ["otto", "hilda", "tomas", "lisel"]},
  {"id": "ferro", "name": "Ferro", "members": ["garrick", "mara", "davi"]},

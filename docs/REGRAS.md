@@ -7,7 +7,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| VERIFICADA | 104 |
+| VERIFICADA | 105 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -90,6 +90,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `poder.magia_pungente` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
 | personagem | `poder.poder_magico` | T20 Livro Básico | 38 | 44 | VERIFICADA |  |
 | personagem | `poder.raio_arcano` | T20 Livro Básico | 39 | 45 | VERIFICADA |  |
+| personagem | `npc.estatisticas` | T20 Livro Básico | 323 | 329 | VERIFICADA | Tabela 7-2: perícias = [focadas, demais] (p.322). |
 | personagem | `classe.guerreiro.durao` | T20 Livro Básico | 66 | 72 | VERIFICADA |  |
 | personagem | `progressao.xp_por_nivel` | T20 Livro Básico | 35 | 41 | VERIFICADA |  |
 | personagem | `progressao.xp_desafio` | T20 Livro Básico | 326 | 332 | VERIFICADA |  |

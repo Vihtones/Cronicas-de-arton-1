@@ -375,3 +375,25 @@ func test_c20_politica_de_durao_e_persistencia() -> void:
 	var c2 := CombatModule.new()
 	c2.from_dict(c.to_dict())
 	eq(c2.power_policy.durao, "sempre", "salvo no save")
+
+
+func test_c10_matilha_muda_de_toca_e_as_hienas_vao_junto() -> void:
+	var w := WorldHelpers.world(5)
+	var c: CombatModule = w.modules.combat
+	var before: Array = c.creature_state.hiena_2.tile.duplicate()
+	var r: Array = c.on_event(GameEvent.create("pr", "PACK_RELOCATED", 0,
+		{"from": "toca_leste", "to": "toca_funda", "center": [88, 44], "old_center": [80, 36]}))
+	check(not r.is_empty() and r[0].type == "CREATURES_MOVED", "hienas se movem")
+	var t: Array = c.creature_state.hiena_2.tile
+	check(Vector2i(int(t[0]), int(t[1])).distance_to(Vector2i(88, 44)) <= 3.0, "hiena_2 perto da nova toca (%s)" % str(t))
+	check(t != before, "saiu da toca antiga")
+	check(w.db.static_walkable(Vector2i(int(t[0]), int(t[1]))), "tile andável")
+
+
+func test_c10_cadeia_completa_pelo_commit() -> void:
+	var w := WorldHelpers.world(5)
+	# um commit real com o fato de derrota: fauna → PACK_RELOCATED → combate move as hienas
+	var r := w._commit(GameCommand.create("t-c10", "player", "Teste", {}), [WorldModule.fact("CREATURE_DEFEATED", {"creature": "hiena_1", "by": "player"})])
+	check(WorldHelpers.events_of(r, "PACK_RELOCATED").size() == 1, "a toca muda")
+	check(WorldHelpers.events_of(r, "CREATURES_MOVED").size() == 1, "as hienas vão junto")
+	eq(w.modules.fauna.den, "toca_funda")

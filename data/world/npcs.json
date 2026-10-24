@@ -235,7 +235,17 @@
     "exige_provas"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "ficha": {
+    "nd": "2",
+    "foco": [
+     "investigacao",
+     "intuicao",
+     "percepcao",
+     "luta",
+     "intimidacao"
+    ]
+   }
   },
   {
    "id": "rurik",
@@ -250,7 +260,14 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "ficha": {
+    "nd": "1/2",
+    "foco": [
+     "percepcao",
+     "luta"
+    ]
+   }
   },
   {
    "id": "teodoro",
@@ -361,7 +378,14 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "ficha": {
+    "nd": "1/2",
+    "foco": [
+     "luta",
+     "percepcao"
+    ]
+   }
   },
   {
    "id": "fenna",

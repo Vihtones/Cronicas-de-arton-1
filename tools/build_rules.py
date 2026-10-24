@@ -122,6 +122,13 @@ personagem += [
  r("poder.poder_magico", {"classe": "arcanista", "pm_por_nivel": 1}, LB, 38, 44),
  r("poder.raio_arcano", {"classe": "arcanista", "acao": "padrao", "dano": "1d8", "dano_tipo": "essencia", "alcance": "curto",
    "resistencia": "reflexos_metade", "cd": "atributo-chave", "conta_como_magia": True}, LB, 39, 45),
+ r("npc.estatisticas", {
+   "1/2": {"ataque": 7, "dano": "1d6+3", "defesa": 15, "pv": 10, "pericias": [4, 0], "cd": 14},
+   "1": {"ataque": 9, "dano": "1d8+6", "defesa": 16, "pv": 20, "pericias": [6, 1], "cd": 15},
+   "2": {"ataque": 11, "dano": "1d10+10", "defesa": 18, "pv": 40, "pericias": [8, 2], "cd": 16},
+   "3": {"ataque": 13, "dano": "1d12+12", "defesa": 21, "pv": 70, "pericias": [10, 3], "cd": 17},
+   "4": {"ataque": 15, "dano": "2d6+14", "defesa": 24, "pv": 110, "pericias": [12, 4], "cd": 18}},
+   LB, 323, 329, nota="Tabela 7-2: perícias = [focadas, demais] (p.322)."),
  r("classe.guerreiro.durao", {"nivel": 3, "efeito": "3 PM: reduz dano sofrido à metade"}, LB, 66, 72),
  r("progressao.xp_por_nivel", {"1": 0, "2": 1000, "3": 3000, "4": 6000, "5": 10000, "6": 15000, "7": 21000, "8": 28000, "9": 36000, "10": 45000}, LB, 35, 41),
  r("progressao.xp_desafio", {"formula": "ND x 1000 / personagens", "empate": 0.5, "derrota": 0.25, "irrelevante_se_nd_menor_que_nivel_menos": 5}, LB, 326, 332),

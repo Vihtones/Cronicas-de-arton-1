@@ -296,6 +296,71 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "npc.estatisticas",
+   "valor": {
+    "1/2": {
+     "ataque": 7,
+     "dano": "1d6+3",
+     "defesa": 15,
+     "pv": 10,
+     "pericias": [
+      4,
+      0
+     ],
+     "cd": 14
+    },
+    "1": {
+     "ataque": 9,
+     "dano": "1d8+6",
+     "defesa": 16,
+     "pv": 20,
+     "pericias": [
+      6,
+      1
+     ],
+     "cd": 15
+    },
+    "2": {
+     "ataque": 11,
+     "dano": "1d10+10",
+     "defesa": 18,
+     "pv": 40,
+     "pericias": [
+      8,
+      2
+     ],
+     "cd": 16
+    },
+    "3": {
+     "ataque": 13,
+     "dano": "1d12+12",
+     "defesa": 21,
+     "pv": 70,
+     "pericias": [
+      10,
+      3
+     ],
+     "cd": 17
+    },
+    "4": {
+     "ataque": 15,
+     "dano": "2d6+14",
+     "defesa": 24,
+     "pv": 110,
+     "pericias": [
+      12,
+      4
+     ],
+     "cd": 18
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 323,
+   "pdf_page": 329,
+   "status": "VERIFICADA",
+   "nota": "Tabela 7-2: perícias = [focadas, demais] (p.322)."
+  },
+  {
    "id": "classe.guerreiro.durao",
    "valor": {
     "nivel": 3,

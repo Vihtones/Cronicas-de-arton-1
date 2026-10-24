@@ -92,6 +92,8 @@ func _on_event(e: GameEvent) -> void:
 				world_view.call_deferred("refresh_object", "porta_cela")
 			npc_layer.call_deferred("sync_all")
 			camera.call_deferred("reset_smoothing")
+		"CREATURES_MOVED":
+			npc_layer.call_deferred("sync_all")
 		"TRAVEL_ARRIVED":
 			call_deferred("_on_world_reloaded")
 		"DIALOGUE_CHOICE", "DIALOGUE_STARTED":
