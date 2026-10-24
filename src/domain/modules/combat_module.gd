@@ -317,11 +317,20 @@ func _new_sim() -> CombatSim:
 	var s := CombatSim.new()
 	s.rules = world.rules
 	s.db = world.db
-	var objs = world.module("objects")
-	s.walk_fn = func(t: Vector2i) -> bool: return objs.walkable(t) if objs != null else world.db.static_walkable(t)
-	var w = world.module("weather")
-	s.env_fn = func(t: Vector2i) -> Dictionary: return w.env_at(t) if w != null else {}
+	# C16: Callables de método (não lambdas) — uma lambda capturava o módulo e criava ciclo módulo → sim → lambda → módulo.
+	s.walk_fn = Callable(self, "_sim_walkable")
+	s.env_fn = Callable(self, "_sim_env")
 	return s
+
+
+func _sim_walkable(t: Vector2i) -> bool:
+	var objs = world.module("objects")
+	return objs.walkable(t) if objs != null else world.db.static_walkable(t)
+
+
+func _sim_env(t: Vector2i) -> Dictionary:
+	var w = world.module("weather")
+	return w.env_at(t) if w != null else {}
 
 
 func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -> Array:

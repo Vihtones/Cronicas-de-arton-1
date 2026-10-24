@@ -42,6 +42,8 @@ func candidates() -> Array:
 func on_tick(tick: int) -> Array:
 	if tick - last_tick < MIN_GAP_TICKS:
 		return []
+	if tick % 2 != 0:
+		return []   # C15: vinhetas avaliadas a cada 20 min de jogo, não a cada tick
 	var combat = world.module("combat")
 	if combat != null and combat.active:
 		return []

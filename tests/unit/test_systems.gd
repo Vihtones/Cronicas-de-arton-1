@@ -170,3 +170,12 @@ func test_c11_ficha_de_npc_da_capita_pela_tabela_7_2() -> void:
 	eq(NpcStats.skill(r, db.npc_def("elsa"), "furtividade"), 2, "ND 2, demais perícias")
 	eq(NpcStats.skill(r, db.npc_def("tobias"), "investigacao"), 0, "guarda ND 1/2 sem foco em Investigação")
 	eq(NpcStats.skill(r, db.npc_def("otto"), "investigacao", -1), -1, "sem ficha: valor de reserva")
+
+
+func test_c15_sete_dias_em_menos_de_um_segundo() -> void:
+	var w := WorldHelpers.world(5)
+	var t0 := Time.get_ticks_msec()
+	var r := WorldHelpers.cmd(w, "AdvanceTime", {"ticks": 1008})
+	var ms := Time.get_ticks_msec() - t0
+	check(r.accepted, "avançou")
+	check(ms < 1000, "7 dias em %d ms (meta < 1000 ms; medido ~150 ms em 24/10/2026)" % ms)
