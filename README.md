@@ -40,7 +40,7 @@ Na tela de título, abra **Laboratório de protótipos…** para jogar um cenár
 ## Testes e ferramentas
 ```bash
 godot --headless --path . --import                          # 1ª vez
-godot --headless --path . -s res://tests/run_tests.gd       # 120 testes
+python3 tools/run_tests.py godot                            # testes (reprova erro de script, C23)
 python3 tools/validate_assets.py                            # pipeline de assets (§13)
 python3 tools/check_art_direction.py                        # governador de arte (AD-01..07)
 python3 tools/check_architecture.py                         # dependências entre camadas (R3)

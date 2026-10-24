@@ -37,6 +37,7 @@ func _init() -> void:
 			if not n.begins_with("test_"):
 				continue
 			suite.failures.clear()
+			print("  RUN  %s::%s" % [path.get_file(), n])   # marcador para tools/run_tests.py (C23)
 			suite.call(n)
 			if suite.failures.is_empty():
 				passed += 1

@@ -25,6 +25,6 @@ jobs:
       - name: Importar e testar (headless)
         run: |
           ./godot --headless --path . --import || true
-          ./godot --headless --path . -s res://tests/run_tests.gd
+          python3 tools/run_tests.py ./godot
       - name: Cena principal sobe sem erros
         run: ./godot --headless --path . --quit-after 120 2>&1 | tee boot.log; ! grep -q "SCRIPT ERROR" boot.log
