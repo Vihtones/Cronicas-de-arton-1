@@ -20,7 +20,9 @@ func test_regra_sem_fonte_e_rejeitada() -> void:
 func test_pendentes_sao_reportados() -> void:
 	var r := RuleRegistry.load_default()
 	check(not r.unverified_ids().has("criatura.hiena"), "hiena reconferida com layout (Bestiário p.120)")
-	check(r.unverified_ids().size() >= 1, "pendentes continuam reportados")
+	eq(r.unverified_ids().size(), 0, "R1: nenhuma regra pendente após a conferência de 24/10/2026")
+	r.add({"id": "teste.pendente", "valor": 1, "fonte": "x", "pagina": 1, "pdf_page": 1, "status": "PENDENTE_REVISAO"})
+	check(r.unverified_ids().has("teste.pendente"), "uma regra nova pendente continua sendo reportada")
 
 
 func test_ficha_guerreiro_segue_regras() -> void:
@@ -64,3 +66,15 @@ func test_teste_de_pericia_e_d20_mais_mod() -> void:
 	eq(c.total, c.d20 + 3, "Percepção = 0 + Sab 1 + treino 2")
 	eq(c.success, c.total >= 15, "sucesso se >= CD")
 	eq(Checks.chance(5, 15), 0.55, "chance de 1d20+5 >= 15")
+
+
+func test_r1_regras_conferidas_no_livro() -> void:
+	var r := RuleRegistry.load_default()
+	for id in ["defesa.base", "descanso.duracao_horas", "arma.funda", "item.pocao_curar_ferimentos", "perigo.jornada_ermos.cd", "panteao.nomes"]:
+		eq(r.entry(id).status, "VERIFICADA", id)
+	eq(int(r.value("perigo.jornada_ermos.cd").floresta), 20, "floresta CD 20 (LB p.320)")
+	eq((r.value("panteao.nomes") as Array).size(), 20, "vinte deuses")
+	var s := CharacterSheet.new()
+	s.equipment = {"weapon": "funda", "armor": ""}
+	CharacterBuilder.apply_equipment(r, s)
+	check(s.attacks[0].for_no_dano, "funda soma Força no dano (LB p.148)")

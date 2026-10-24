@@ -154,7 +154,7 @@ static func apply_equipment(rules: RuleRegistry, s: CharacterSheet) -> void:
 	if not w.is_empty():
 		var ranged: bool = w.get("disparo", false)
 		s.attacks.append({"nome": w_id.capitalize().replace("_", " "), "skill": "pontaria" if ranged else "luta", "dano": w.dano,
-			"for_no_dano": not ranged, "margem": int(w.margem), "mult": int(w.mult),
+			"for_no_dano": (not ranged) or bool(w.get("soma_for", false)), "margem": int(w.margem), "mult": int(w.mult),
 			"alcance_q": int(rules.value("alcance.quadrados", {}).get(str(w.get("alcance", "medio")), 20)) if ranged else 1,
 			"distancia": ranged, "tipo": w.tipo, "leve": w.get("leve", false)})
 

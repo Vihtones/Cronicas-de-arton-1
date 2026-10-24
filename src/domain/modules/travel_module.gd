@@ -8,8 +8,8 @@ extends WorldModule
 const ROUTES := {
 	"vila->valkaria": {"from": "vila", "to": "valkaria", "km": 90, "road": true},
 	"valkaria->vila": {"from": "valkaria", "to": "vila", "km": 90, "road": true},
-	"vila->ermos_norte": {"from": "vila", "to": "ermos_norte", "km": 40, "road": false},
-	"ermos_norte->vila": {"from": "ermos_norte", "to": "vila", "km": 40, "road": false},
+	"vila->ermos_norte": {"from": "vila", "to": "ermos_norte", "km": 40, "road": false, "terreno": "floresta"},
+	"ermos_norte->vila": {"from": "ermos_norte", "to": "vila", "km": 40, "road": false, "terreno": "floresta"},
 }
 const DEPARTURE_LOCS := ["estrada_leste", "ponte"]
 
@@ -87,7 +87,8 @@ func execute(cmd: GameCommand) -> Array:
 	# Jornada pelos ermos (LB p.320): testes de Sobrevivência até N sucessos ou 3 falhas
 	if not route.road:
 		var j: Dictionary = world.rules.value("perigo.jornada_ermos")
-		var cd := int(world.rules.value("perigo.jornada_ermos.cd", 15))
+		# CD pelo terreno (LB p.320): planícies 15, florestas/pântanos 20, desertos/montanhas 25, Tormenta 30
+		var cd := int(world.rules.value("perigo.jornada_ermos.cd", {}).get(str(route.get("terreno", "planicie")), 15))
 		var ok := 0
 		var fails := 0
 		while ok < int(j.curta) and fails < int(j.limite_falhas):

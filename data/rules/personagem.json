@@ -508,13 +508,14 @@
    "id": "item.pocao_curar_ferimentos",
    "valor": {
     "efeito": "magia.curar_ferimentos",
-    "preco": 30
+    "preco": 30,
+    "categoria": "item mágico menor"
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
-   "pagina": 0,
-   "pdf_page": 0,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Preço e regra de poções a conferir no cap. de itens mágicos."
+   "pagina": 341,
+   "pdf_page": 347,
+   "status": "VERIFICADA",
+   "nota": "R1: tabela de poções, Curar Ferimentos (2d8+2 PV) T$ 30."
   },
   {
    "id": "viagem.velocidade",
@@ -564,12 +565,20 @@
   },
   {
    "id": "perigo.jornada_ermos.cd",
-   "valor": 15,
+   "valor": {
+    "planicie": 15,
+    "colina": 15,
+    "floresta": 20,
+    "pantano": 20,
+    "deserto": 25,
+    "montanha": 25,
+    "tormenta": 30
+   },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 320,
    "pdf_page": 326,
-   "status": "PENDENTE_REVISAO",
-   "nota": "CD da jornada não lida no trecho extraído."
+   "status": "VERIFICADA",
+   "nota": "R1: CD varia conforme o terreno."
   }
  ]
 }

@@ -7,8 +7,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| PENDENTE_REVISAO | 6 |
-| VERIFICADA | 87 |
+| VERIFICADA | 93 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -23,7 +22,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | core | `cd.tabela` | T20 Livro Básico | 220 | 226 | VERIFICADA |  |
 | core | `cd.resistencia` | T20 Livro Básico | 227 | 233 | VERIFICADA |  |
 | core | `atributos.compra_pontos` | T20 Livro Básico | 17 | 23 | VERIFICADA |  |
-| core | `defesa.base` | T20 Livro Básico | 106 | 112 | PENDENTE_REVISAO | Linha encontrada por busca; conferir parágrafo completo. |
+| core | `defesa.base` | T20 Livro Básico | 106 | 112 | VERIFICADA | R1: 'Sua Defesa é 10 + sua Destreza + seu bônus de armadura e escudo' (conferido em 24/10/2026). |
 | core | `ataque.teste` | T20 Livro Básico | 230 | 236 | VERIFICADA |  |
 | core | `dano.forca` | T20 Livro Básico | 230 | 236 | VERIFICADA |  |
 | core | `critico` | T20 Livro Básico | 230 | 237 | VERIFICADA |  |
@@ -48,7 +47,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | core | `ferimentos.morte` | T20 Livro Básico | 236 | 242 | VERIFICADA | Morre em -10 ou metade negativa dos PV totais, o que for mais baixo. |
 | core | `descanso.recuperacao` | T20 Livro Básico | 106 | 112 | VERIFICADA |  |
 | core | `descanso.ruim_relento` | T20 Livro Básico | 106 | 112 | VERIFICADA |  |
-| core | `descanso.duracao_horas` | T20 Livro Básico | 106 | 112 | PENDENTE_REVISAO | Duração de 'uma noite de sono' assumida como 8h; conferir texto. |
+| core | `descanso.duracao_horas` | T20 Livro Básico | 106 | 112 | VERIFICADA | R1: 'uma noite de descanso (pelo menos oito horas de sono)'. |
 | core | `descanso.minimo` | T20 Livro Básico | 106 | 112 | ADAPTADA | Metade do nível 1 arredonda para 0; o jogo usa mínimo 1. |
 | core | `dano.nao_letal` | T20 Livro Básico | 236 | 242 | VERIFICADA |  |
 | core | `condicoes` | T20 Livro Básico | 394 | 400 | VERIFICADA |  |
@@ -56,7 +55,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | equipamento | `arma.espada_curta` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.clava` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.lanca` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
-| equipamento | `arma.funda` | T20 Livro Básico | 144 | 150 | PENDENTE_REVISAO | Funda soma For no dano (regra específica da arma, p.148) — conferir. |
+| equipamento | `arma.funda` | T20 Livro Básico | 148 | 154 | VERIFICADA | R1: tabela p.144; 'você aplica sua Força a rolagens de dano com uma funda'; recarregar é ação de movimento (p.148). |
 | equipamento | `arma.arco_curto` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.espada_longa` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
 | equipamento | `arma.machado_batalha` | T20 Livro Básico | 144 | 150 | VERIFICADA |  |
@@ -66,7 +65,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | equipamento | `escudo.leve` | T20 Livro Básico | 153 | 159 | VERIFICADA |  |
 | equipamento | `alcance.metros` | T20 Livro Básico | 143 | 149 | VERIFICADA |  |
 | equipamento | `alcance.quadrados` | T20 Livro Básico | 143 | 149 | VERIFICADA |  |
-| fe | `panteao.nomes` | T20 Livro Básico | 96 | 102 | PENDENTE_REVISAO | Nomes conferidos por contagem no texto; obrigações individuais a extrair. |
+| fe | `panteao.nomes` | T20 Livro Básico | 96 | 102 | VERIFICADA | R1: 'Os vinte deuses do Panteão de Arton' (p.100); obrigações individuais só de Lena, Khalmyr e Allihanna. |
 | fe | `deus.lena.obrigacao` | T20 Livro Básico | 100 | 106 | VERIFICADA |  |
 | fe | `deus.khalmyr.obrigacao` | T20 Livro Básico | 99 | 105 | VERIFICADA |  |
 | fe | `deus.allihanna.obrigacao` | T20 Livro Básico | 97 | 103 | VERIFICADA |  |
@@ -101,11 +100,11 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `magia.curar_ferimentos` | T20 Livro Básico | 189 | 195 | VERIFICADA |  |
 | personagem | `acao.usar_item_pocao` | T20 Livro Básico | 234 | 240 | VERIFICADA |  |
 | personagem | `item.saco_de_dormir` | T20 Livro Básico | 156 | 162 | VERIFICADA |  |
-| personagem | `item.pocao_curar_ferimentos` | T20 Livro Básico | 0 | 0 | PENDENTE_REVISAO | Preço e regra de poções a conferir no cap. de itens mágicos. |
+| personagem | `item.pocao_curar_ferimentos` | T20 Livro Básico | 341 | 347 | VERIFICADA | R1: tabela de poções, Curar Ferimentos (2d8+2 PV) T$ 30. |
 | personagem | `viagem.velocidade` | T20 Livro Básico | 270 | 276 | VERIFICADA |  |
 | personagem | `viagem.marcha_forcada` | T20 Livro Básico | 270 | 276 | VERIFICADA |  |
 | personagem | `perigo.jornada_ermos` | T20 Livro Básico | 320 | 326 | VERIFICADA |  |
-| personagem | `perigo.jornada_ermos.cd` | T20 Livro Básico | 320 | 326 | PENDENTE_REVISAO | CD da jornada não lida no trecho extraído. |
+| personagem | `perigo.jornada_ermos.cd` | T20 Livro Básico | 320 | 326 | VERIFICADA | R1: CD varia conforme o terreno. |
 
 ## Mecânicas ORIGINAL_DO_JOGO e ADAPTADA (fora do catálogo de regras)
 

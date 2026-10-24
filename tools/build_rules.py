@@ -28,7 +28,7 @@ core = [
  r("cd.tabela", {"facil": 5, "media": 10, "dificil": 15, "desafiadora": 20, "formidavel": 25, "heroica": 30, "quase_impossivel": 40}, LB, 220, 226),
  r("cd.resistencia", {"formula": "10 + floor(nivel/2) + atributo"}, LB, 227, 233),
  r("atributos.compra_pontos", {"pontos": 10, "custo": {"-1": -1, "0": 0, "1": 1, "2": 2, "3": 4, "4": 7}}, LB, 17, 23),
- r("defesa.base", {"formula": "10 + Des + armadura + escudo"}, LB, 106, 112, "PENDENTE_REVISAO", "Linha encontrada por busca; conferir parágrafo completo."),
+ r("defesa.base", {"formula": "10 + Des + armadura + escudo"}, LB, 106, 112, nota="R1: 'Sua Defesa é 10 + sua Destreza + seu bônus de armadura e escudo' (conferido em 24/10/2026)."),
  r("ataque.teste", {"corpo_a_corpo": "luta", "distancia": "pontaria", "dificuldade": "Defesa do alvo", "acerta_se": ">="}, LB, 230, 236),
  r("dano.forca", {"corpo_a_corpo_e_arremesso": "dado + For", "disparo": "dado"}, LB, 230, 236),
  r("critico", {"margem_padrao": 20, "multiplicador_padrao": 2, "multiplica": "apenas dados da arma", "nao_multiplica": "bonus numericos e dados extras"}, LB, 230, 237),
@@ -53,7 +53,7 @@ core = [
  r("ferimentos.morte", {"limite": "min(-10, -floor(PV_max/2))"}, LB, 236, 242, nota="Morre em -10 ou metade negativa dos PV totais, o que for mais baixo."),
  r("descanso.recuperacao", {"ruim": 0.5, "normal": 1, "confortavel": 2, "luxuosa": 3, "base": "nivel", "recupera": ["PV", "PM"]}, LB, 106, 112),
  r("descanso.ruim_relento", {"condicao": "dormir ao relento sem saco de dormir e acampamento"}, LB, 106, 112),
- r("descanso.duracao_horas", 8, LB, 106, 112, "PENDENTE_REVISAO", "Duração de 'uma noite de sono' assumida como 8h; conferir texto."),
+ r("descanso.duracao_horas", 8, LB, 106, 112, nota="R1: 'uma noite de descanso (pelo menos oito horas de sono)'."),
  r("descanso.minimo", {"minimo": 1}, LB, 106, 112, "ADAPTADA", "Metade do nível 1 arredonda para 0; o jogo usa mínimo 1."),
  r("dano.nao_letal", {"penalidade_ataque_para_trocar": -5}, LB, 236, 242),
 ]
@@ -83,7 +83,7 @@ equip = [
  r("arma.espada_curta", {"dano": "1d6", "margem": 19, "mult": 2, "tipo": "perfuracao", "maos": 1, "leve": True}, LB, 144, 150),
  r("arma.clava", {"dano": "1d6", "margem": 20, "mult": 2, "tipo": "impacto", "maos": 1}, LB, 144, 150),
  r("arma.lanca", {"dano": "1d6", "margem": 20, "mult": 2, "alcance": "curto", "tipo": "perfuracao", "maos": 1}, LB, 144, 150),
- r("arma.funda", {"dano": "1d4", "margem": 20, "mult": 2, "alcance": "medio", "tipo": "impacto", "disparo": True}, LB, 144, 150, "PENDENTE_REVISAO", "Funda soma For no dano (regra específica da arma, p.148) — conferir."),
+ r("arma.funda", {"dano": "1d4", "margem": 20, "mult": 2, "alcance": "medio", "tipo": "impacto", "disparo": True, "soma_for": True, "recarga": "movimento"}, LB, 148, 154, nota="R1: tabela p.144; 'você aplica sua Força a rolagens de dano com uma funda'; recarregar é ação de movimento (p.148)."),
  r("arma.arco_curto", {"dano": "1d6", "margem": 20, "mult": 3, "alcance": "medio", "tipo": "perfuracao", "maos": 2, "disparo": True}, LB, 144, 150),
  r("arma.espada_longa", {"dano": "1d8", "margem": 19, "mult": 2, "tipo": "corte", "maos": 1}, LB, 144, 150),
  r("arma.machado_batalha", {"dano": "1d8", "margem": 20, "mult": 3, "tipo": "corte", "maos": 1}, LB, 144, 150),
@@ -144,13 +144,13 @@ personagem += [
  r("magia.curar_ferimentos", {"tipo": "divina", "circulo": 1, "escola": "evocacao", "execucao": "padrao", "alcance": "toque", "cura": "2d8+2"}, LB, 189, 195),
  r("acao.usar_item_pocao", {"acao": "padrao"}, LB, 234, 240),
  r("item.saco_de_dormir", {"preco": 1, "espacos": 1}, LB, 156, 162),
- r("item.pocao_curar_ferimentos", {"efeito": "magia.curar_ferimentos", "preco": 30}, LB, 0, 0, "PENDENTE_REVISAO", "Preço e regra de poções a conferir no cap. de itens mágicos."),
+ r("item.pocao_curar_ferimentos", {"efeito": "magia.curar_ferimentos", "preco": 30, "categoria": "item mágico menor"}, LB, 341, 347, nota="R1: tabela de poções, Curar Ferimentos (2d8+2 PV) T$ 30."),
  r("viagem.velocidade", {"9": {"km_hora": 4.5, "km_dia": 36}, "6": {"km_hora": 3, "km_dia": 24}, "terreno_dificil_ou_clima_ruim": 0.5}, LB, 270, 276),
  r("viagem.marcha_forcada", {"dobra_por_hora": True, "teste": "Fortitude CD 15 +1 por teste", "falha": "perde 1d6 PV"}, LB, 270, 276),
  r("perigo.jornada_ermos", {"nd": 2, "curta": 3, "media": 5, "longa": 7, "falha": "perde 2d6 PV", "limite_falhas": 3, "pericia": "sobrevivencia"}, LB, 320, 326),
- r("perigo.jornada_ermos.cd", 15, LB, 320, 326, "PENDENTE_REVISAO", "CD da jornada não lida no trecho extraído."),
+ r("perigo.jornada_ermos.cd", {"planicie": 15, "colina": 15, "floresta": 20, "pantano": 20, "deserto": 25, "montanha": 25, "tormenta": 30}, LB, 320, 326, nota="R1: CD varia conforme o terreno."),
 ]
-deuses = r("panteao.nomes", ["Aharadak","Allihanna","Arsenal","Azgher","Hyninn","Kallyadranoch","Khalmyr","Lena","Lin-Wu","Marah","Megalokk","Nimb","Oceano","Sszzaas","Tanna-Toh","Tenebra","Thwor","Thyatis","Valkaria","Wynna"], LB, 96, 102, "PENDENTE_REVISAO", "Nomes conferidos por contagem no texto; obrigações individuais a extrair.")
+deuses = r("panteao.nomes", ["Aharadak","Allihanna","Arsenal","Azgher","Hyninn","Kallyadranoch","Khalmyr","Lena","Lin-Wu","Marah","Megalokk","Nimb","Oceano","Sszzaas","Tanna-Toh","Tenebra","Thwor","Thyatis","Valkaria","Wynna"], LB, 96, 102, nota="R1: 'Os vinte deuses do Panteão de Arton' (p.100); obrigações individuais só de Lena, Khalmyr e Allihanna.")
 lena = r("deus.lena.obrigacao", {"proibido": ["dano_letal_a_vivos", "perda_pv_a_vivos"]}, LB, 100, 106)
 fe = [deuses, lena,
  r("deus.khalmyr.obrigacao", {"proibido": ["recusar_ajuda_a_inocentes"], "arma_preferida": "espada longa"}, LB, 99, 105),

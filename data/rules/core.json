@@ -249,8 +249,8 @@
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 106,
    "pdf_page": 112,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Linha encontrada por busca; conferir parágrafo completo."
+   "status": "VERIFICADA",
+   "nota": "R1: 'Sua Defesa é 10 + sua Destreza + seu bônus de armadura e escudo' (conferido em 24/10/2026)."
   },
   {
    "id": "ataque.teste",
@@ -543,8 +543,8 @@
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 106,
    "pdf_page": 112,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Duração de 'uma noite de sono' assumida como 8h; conferir texto."
+   "status": "VERIFICADA",
+   "nota": "R1: 'uma noite de descanso (pelo menos oito horas de sono)'."
   },
   {
    "id": "descanso.minimo",

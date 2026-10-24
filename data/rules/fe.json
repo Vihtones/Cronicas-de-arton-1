@@ -28,8 +28,8 @@
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 96,
    "pdf_page": 102,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Nomes conferidos por contagem no texto; obrigações individuais a extrair."
+   "status": "VERIFICADA",
+   "nota": "R1: 'Os vinte deuses do Panteão de Arton' (p.100); obrigações individuais só de Lena, Khalmyr e Allihanna."
   },
   {
    "id": "deus.lena.obrigacao",

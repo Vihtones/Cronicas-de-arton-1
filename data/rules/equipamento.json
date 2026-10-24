@@ -69,13 +69,15 @@
     "mult": 2,
     "alcance": "medio",
     "tipo": "impacto",
-    "disparo": true
+    "disparo": true,
+    "soma_for": true,
+    "recarga": "movimento"
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
-   "pagina": 144,
-   "pdf_page": 150,
-   "status": "PENDENTE_REVISAO",
-   "nota": "Funda soma For no dano (regra específica da arma, p.148) — conferir."
+   "pagina": 148,
+   "pdf_page": 154,
+   "status": "VERIFICADA",
+   "nota": "R1: tabela p.144; 'você aplica sua Força a rolagens de dano com uma funda'; recarregar é ação de movimento (p.148)."
   },
   {
    "id": "arma.arco_curto",
