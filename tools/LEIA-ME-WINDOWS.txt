@@ -1,0 +1,33 @@
+CRÔNICAS DE ARTON — build de teste para Windows (projeto pessoal)
+
+O QUE MUDOU EM RELAÇÃO AO PACOTE QUE DEU TELA AZUL
+- Antes: era o EDITOR da Godot renomeado, rodando o jogo pelo OpenGL nativo do driver de vídeo.
+- Agora: é o executável de jogo oficial (template de exportação da Godot 4.3, conferido por SHA-512).
+- O jogo desenha via ANGLE (Direct3D 11) em vez de OpenGL nativo — o caminho mais estável na
+  maioria das placas no Windows.
+- Vsync ligado e limite de 60 FPS (30 FPS no modo seguro), para não forçar a placa.
+- Este build foi verificado antes de ser entregue: novo jogo, 2 dias de jogo, salvar e carregar.
+  A verificação roda em Linux; ela NÃO prova que seu Windows não terá problema.
+
+IMPORTANTE (seja honesto comigo e com você mesmo)
+Uma tela azul é falha do sistema/driver, não de um programa comum. Não dá para garantir que não
+aconteça de novo. Para reduzir o risco:
+1. Salve e feche seus trabalhos antes de testar.
+2. Atualize o driver de vídeo pelo site do fabricante (Intel, AMD ou NVIDIA).
+3. Comece pelo "Jogar (modo seguro).bat".
+4. Se der tela azul de novo, anote o CÓDIGO DE PARADA (ex.: VIDEO_TDR_FAILURE) e me mande.
+   Não tente de novo antes disso.
+
+COMO ABRIR
+- Modo seguro (recomendado na primeira vez): dê dois cliques em "Jogar (modo seguro).bat".
+- Normal: dê dois cliques em CronicasDeArton.exe.
+- O Windows SmartScreen pode avisar "Windows protegeu o computador" porque o arquivo não é
+  assinado. Clique em "Mais informações" e depois em "Executar assim mesmo".
+- Se algo der errado sem tela azul, rode "Diagnostico (gera registro.txt).bat" e me mande o
+  arquivo registro.txt que aparece nesta pasta.
+
+CONFERÊNCIA
+O arquivo SHA256.txt traz a impressão digital do executável. Se você quiser conferir no
+PowerShell: Get-FileHash .\CronicasDeArton.exe
+
+CONTROLES: veja README do projeto ou a tela de opções (Esc).

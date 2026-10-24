@@ -7,6 +7,7 @@ config/name="Crônicas de Arton"
 config/description="RPG 2D top-down inspirado em Tormenta20 — vertical slice em construção."
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
+run/max_fps=60
 
 [autoload]
 Game="*res://src/application/game.gd"
@@ -18,6 +19,7 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
+window/vsync/vsync_mode=1
 
 [input]
 move_up={"deadzone":0.5,"events":[Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":87,"key_label":0,"unicode":119,"location":0,"echo":false,"script":null)]}
@@ -30,3 +32,8 @@ quick_load={"deadzone":0.5,"events":[Object(InputEventKey,"resource_local_to_sce
 [rendering]
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+; Segurança (tela azul relatada no Windows, D1): ANGLE traduz OpenGL para Direct3D 11,
+; caminho mais estável que o OpenGL nativo de muitos drivers de vídeo no Windows.
+gl_compatibility/driver.windows="opengl3_angle"
+gl_compatibility/fallback_to_angle=true

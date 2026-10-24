@@ -17,6 +17,7 @@ var db: ContentDB
 var world: WorldState
 var dialogue_provider: DialogueProvider
 var mode: Mode = Mode.TITLE
+var safe_mode := false
 var _cmd_seq := 0
 var _accum := 0.0
 var _last_autosave_tick := 0
@@ -36,6 +37,12 @@ const SETTINGS_PATH := "user://settings.json"
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_load_settings()
+	# Modo seguro (D1): "Jogar (modo seguro).bat" passa -- --modo-seguro. Gráficos mínimos e 30 FPS.
+	if OS.get_cmdline_user_args().has("--modo-seguro"):
+		safe_mode = true
+		settings.graphics = "baixo"
+		settings.reduce_flashes = true
+		Engine.max_fps = 30
 	rules = RuleRegistry.load_default()
 	db = ContentDB.load_default()
 	if not rules.errors.is_empty():
@@ -43,7 +50,21 @@ func _ready() -> void:
 	var ai := LlmDialogueProvider.load_config()
 	dialogue_provider = LlmDialogueProvider.new(ai, self) if ai.get("enabled", false) else DialogueProvider.new()
 	logger.info("Game", "boot", {"content_version": WorldState.CONTENT_VERSION, "rules": rules.size(),
-		"pendentes": rules.unverified_ids().size(), "ia": dialogue_provider.provider_id()})
+		"pendentes": rules.unverified_ids().size(), "ia": dialogue_provider.provider_id(),
+		"gpu": RenderingServer.get_video_adapter_name(), "modo_seguro": safe_mode})
+	if OS.get_cmdline_user_args().has("--autoteste"):
+		call_deferred("_self_test")
+
+
+## Autoteste do executável (usado para verificar o build exportado): novo jogo, 2 dias, salvar, carregar.
+func _self_test() -> void:
+	new_game(false, 7)
+	var r := send("AdvanceTime", {"ticks": 288})
+	var ok_save := save_game("autoteste") == OK
+	var ok_load := load_game("autoteste")
+	print("AUTOTESTE regras=%d npcs=%d avancou=%s save=%s load=%s versao=%s" % [rules.size(), world.all_npc_ids().size(),
+		r.accepted, ok_save, ok_load, WorldState.CONTENT_VERSION])
+	get_tree().quit(0 if r.accepted and ok_save and ok_load else 1)
 
 
 func new_game(feminine: bool = false, p_seed: int = -1) -> void:
