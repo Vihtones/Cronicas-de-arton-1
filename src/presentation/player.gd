@@ -24,6 +24,7 @@ func _ready() -> void:
 func sync_from_world() -> void:
 	global_position = Game.world.player.position
 	_last_tile = Game.player_tile()
+	view.apply_race(Game.world.player_sheet.race_id)
 
 
 func _physics_process(_delta: float) -> void:

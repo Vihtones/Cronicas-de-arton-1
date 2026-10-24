@@ -723,11 +723,17 @@ func _refresh_creation() -> void:
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(v)
 	v.add_child(_h("Criação de personagem (LB cap. 1)"))
-	var rr := HBoxContainer.new()
-	rr.add_child(_row_label("Raça:"))
+	v.add_child(_label("Raça (LB p.18-31):", 9))
+	var rr := HFlowContainer.new()
 	for r in CharacterBuilder.RACES:
-		rr.add_child(_button(("● " if _creation.race == r else "") + r.capitalize(), func(): _creation.race = r; _reset_picks(); _refresh_creation()))
+		var rb := _button(("● " if _creation.race == r else "") + CharacterBuilder.RACE_NAMES[r], func(): _creation.race = r; _reset_picks(); _refresh_creation())
+		rb.add_theme_font_size_override("font_size", 8)
+		rr.add_child(rb)
 	v.add_child(rr)
+	var rinfo: Dictionary = {} if _creation.race == "humano" else Game.rules.value("raca." + _creation.race, {})
+	var pend: Array = rinfo.get("pendente", [])
+	if not pend.is_empty():
+		v.add_child(_label("Ainda sem sistema nesta raça: " + ", ".join(pend) + " (ver ROADMAP).", 7))
 	var cr := HBoxContainer.new()
 	cr.add_child(_row_label("Classe:"))
 	for c in CharacterBuilder.CLASSES:
@@ -789,7 +795,7 @@ func _refresh_creation() -> void:
 		v.add_child(_label("✘ " + "; ".join(errs), 8))
 	if _creation["class"] == "arcanista" and _creation.path == "mago":
 		v.add_child(_label("O Mago começa com 4 magias (LB p.37); só 3 estão implementadas — a 4ª fica pendente.", 7))
-	v.add_child(_label("Elfo, goblin, minotauro e demais raças/classes: ainda não implementados (ver ROADMAP).", 7))
+	v.add_child(_label("Aparência das raças é provisória (tinta e escala). Outras classes: ver ROADMAP.", 7))
 	v.add_child(_button("Começar", func():
 		if not errs.is_empty():
 			log_msg("✘ " + "; ".join(errs)); return

@@ -429,6 +429,454 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "tamanho.modificadores",
+   "valor": {
+    "minusculo": {
+     "furtividade": 5,
+     "manobra": -5
+    },
+    "pequeno": {
+     "furtividade": 2,
+     "manobra": -2
+    },
+    "medio": {
+     "furtividade": 0,
+     "manobra": 0
+    },
+    "grande": {
+     "furtividade": -2,
+     "manobra": 2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 107,
+   "pdf_page": 113,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.dahllan",
+   "valor": {
+    "atributos": {
+     "sab": 2,
+     "des": 1,
+     "int": -1
+    },
+    "habilidades": [
+     "amiga_das_plantas",
+     "armadura_de_allihanna",
+     "empatia_selvagem"
+    ],
+    "ativa": {
+     "armadura_de_allihanna": {
+      "custo_pm": 1,
+      "acao": "movimento",
+      "defesa": 2,
+      "duracao": "cena"
+     }
+    },
+    "pendente": [
+     "Controlar Plantas",
+     "Empatia Selvagem"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 21,
+   "pdf_page": 27,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.elfo",
+   "valor": {
+    "atributos": {
+     "int": 2,
+     "des": 1,
+     "con": -1
+    },
+    "deslocamento_m": 12,
+    "pm_por_nivel": 1,
+    "sentidos": [
+     "visao_penumbra"
+    ],
+    "pericias": {
+     "misticismo": 2,
+     "percepcao": 2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 22,
+   "pdf_page": 28,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.goblin",
+   "valor": {
+    "atributos": {
+     "des": 2,
+     "int": 1,
+     "car": -1
+    },
+    "tamanho": "pequeno",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "pericias": {
+     "fortitude": 2
+    },
+    "recuperacao_minima_nivel": true,
+    "pendente": [
+     "Engenhoso (ferramentas)",
+     "escalada"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 23,
+   "pdf_page": 29,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.lefou",
+   "valor": {
+    "atributos_livres": {
+     "quantidade": 3,
+     "excecao": [
+      "car"
+     ],
+     "penalidade": {
+      "car": -1
+     }
+    },
+    "tipo": "monstro",
+    "resistencia_tormenta": 5,
+    "deformidade_pericias": 2,
+    "pendente": [
+     "poderes da Tormenta"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 24,
+   "pdf_page": 30,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.minotauro",
+   "valor": {
+    "atributos": {
+     "for": 2,
+     "con": 1,
+     "sab": -1
+    },
+    "defesa": 1,
+    "arma_natural": {
+     "nome": "Chifres",
+     "dano": "1d6",
+     "mult": 2,
+     "tipo": "perfuracao"
+    },
+    "faro": true,
+    "pendente": [
+     "ataque extra com chifres (1 PM)",
+     "Medo de Altura"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 25,
+   "pdf_page": 31,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.qareen",
+   "valor": {
+    "atributos": {
+     "car": 2,
+     "int": 1,
+     "sab": -1
+    },
+    "rd_escolha": {
+     "valor": 10,
+     "padrao": "fogo"
+    },
+    "magia_inata": "seta_infalivel",
+    "atributo_chave_magia": "car",
+    "pendente": [
+     "Desejos"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 26,
+   "pdf_page": 32,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.golem",
+   "valor": {
+    "atributos": {
+     "for": 2,
+     "con": 1,
+     "car": -1
+    },
+    "deslocamento_m": 6,
+    "defesa": 2,
+    "penalidade_armadura_extra": -2,
+    "tipo": "construto",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "imune": [
+     "cansaco",
+     "metabolico",
+     "veneno"
+    ],
+    "imunidade_elemental_padrao": "fogo",
+    "pendente": [
+     "recarga de 8h",
+     "Sem Origem"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 27,
+   "pdf_page": 33,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.hynne",
+   "valor": {
+    "atributos": {
+     "des": 2,
+     "car": 1,
+     "for": -1
+    },
+    "tamanho": "pequeno",
+    "deslocamento_m": 6,
+    "pericias": {
+     "enganacao": 2
+    },
+    "atletismo_por_des": true,
+    "arremessador": true,
+    "ativa": {
+     "sorte_salvadora": {
+      "custo_pm": 1
+     }
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 28,
+   "pdf_page": 34,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.kliren",
+   "valor": {
+    "atributos": {
+     "int": 2,
+     "car": 1,
+     "for": -1
+    },
+    "pericia_extra": 1,
+    "ossos_frageis": 1,
+    "pericias_oficio": 2,
+    "ativa": {
+     "engenhosidade": {
+      "custo_pm": 2
+     }
+    },
+    "pendente": [
+     "armas de fogo"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 28,
+   "pdf_page": 34,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.medusa",
+   "valor": {
+    "atributos": {
+     "des": 2,
+     "car": 1
+    },
+    "tipo": "monstro",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "resistencia_veneno": 5,
+    "ativa": {
+     "olhar_atordoante": {
+      "custo_pm": 1,
+      "acao": "movimento",
+      "teste": "fortitude"
+     }
+    },
+    "pendente": [
+     "Natureza Venenosa"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 29,
+   "pdf_page": 35,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.osteon",
+   "valor": {
+    "atributos_livres": {
+     "quantidade": 3,
+     "excecao": [
+      "con"
+     ],
+     "penalidade": {
+      "con": -1
+     }
+    },
+    "tipo": "morto-vivo",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "rd": {
+     "corte": 5,
+     "frio": 5,
+     "perfuracao": 5
+    },
+    "pericia_extra": 1,
+    "imune": [
+     "cansaco",
+     "metabolico",
+     "trevas",
+     "veneno"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 29,
+   "pdf_page": 35,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.sereia",
+   "valor": {
+    "atributos_livres": {
+     "quantidade": 3,
+     "excecao": [],
+     "penalidade": {}
+    },
+    "natacao_m": 12,
+    "dano_lanca_tridente": 2,
+    "pendente": [
+     "Canção dos Mares (magias)"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 30,
+   "pdf_page": 36,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.silfide",
+   "valor": {
+    "atributos": {
+     "car": 2,
+     "des": 1,
+     "for": -2
+    },
+    "tamanho": "minusculo",
+    "paira": true,
+    "tipo": "espirito",
+    "sentidos": [
+     "visao_penumbra"
+    ],
+    "pendente": [
+     "Magia das Fadas",
+     "voo (1 PM/rodada)"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 30,
+   "pdf_page": 36,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.aggelus",
+   "valor": {
+    "atributos": {
+     "sab": 2,
+     "car": 1
+    },
+    "tipo": "espirito",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "pericias": {
+     "diplomacia": 2,
+     "intuicao": 2
+    },
+    "nome": "Suraggel (aggelus)",
+    "pendente": [
+     "Luz"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 31,
+   "pdf_page": 37,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.sulfure",
+   "valor": {
+    "atributos": {
+     "des": 2,
+     "int": 1
+    },
+    "tipo": "espirito",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "pericias": {
+     "enganacao": 2,
+     "furtividade": 2
+    },
+    "nome": "Suraggel (sulfure)",
+    "pendente": [
+     "Escuridão"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 31,
+   "pdf_page": 37,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.trog",
+   "valor": {
+    "atributos": {
+     "con": 2,
+     "for": 1,
+     "int": -1
+    },
+    "tipo": "monstro",
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "defesa": 1,
+    "furtividade_sem_armadura": 5,
+    "arma_natural": {
+     "nome": "Mordida",
+     "dano": "1d6",
+     "mult": 2,
+     "tipo": "perfuracao"
+    },
+    "vulneravel": {
+     "frio": 1
+    },
+    "pendente": [
+     "Mau Cheiro",
+     "ataque extra com mordida (1 PM)"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 31,
+   "pdf_page": 37,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "racas.tabela",
    "valor": {
     "humano": "+1 em três",

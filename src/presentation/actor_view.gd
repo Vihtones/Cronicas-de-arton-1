@@ -42,6 +42,13 @@ func setup(id: String, sheet_path: String, display_name: String = "") -> void:
 	add_child(hp_back); add_child(hp_bar)
 
 
+## Aparência provisória por raça (RaceLook): tinta no sprite e escala a partir dos pés.
+func apply_race(race: String) -> void:
+	var l := RaceLook.of(race)
+	sprite.self_modulate = l.tint
+	sprite.scale = Vector2.ONE * float(l.scale)
+
+
 func show_name(v: bool) -> void:
 	if label: label.visible = v
 

@@ -31,6 +31,13 @@ var spells: PackedStringArray = PackedStringArray()
 var equipment := {"weapon": "", "armor": ""}
 var pending_powers: int = 0
 var caster_attr: String = ""
+var size: String = "medio"         # LB p.107 (Tabela 1-21)
+var creature_type: String = "humanoide"
+var dr: Dictionary = {}            # redução de dano por tipo (osteon, qareen, golem)
+var vuln: Dictionary = {}          # dano adicional por dado, por tipo (kliren: impacto; trog: frio)
+var race_skills: Dictionary = {}   # bônus de perícia da raça e do tamanho
+var race_defense: int = 0          # Couro Rígido, Reptiliano, Chassi
+var extra_armor_penalty: int = 0   # Chassi do golem
 var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37)
 var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
@@ -50,6 +57,11 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 		v += training_bonus()
 	if bool(info.get("armadura", false)):
 		v += armor_penalty(rules)  # LB p.115: penalidade de armadura nas perícias marcadas
+	v += int(race_skills.get(skill, 0))
+	if skill == "atletismo" and race_id == "hynne":
+		v += maxi(0, int(attrs.des) - int(attrs["for"]))   # Pequeno e Rechonchudo: Des no lugar de For (LB p.28)
+	if skill == "furtividade" and race_id == "trog" and str(equipment.get("armor", "")) == "":
+		v += 5   # Reptiliano (LB p.31)
 	if skill == "atletismo" and powers.has("gatuno"):
 		v += 2
 	if skill == "furtividade" and powers.has("sombra"):
@@ -59,7 +71,7 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 
 func armor_penalty(rules: RuleRegistry) -> int:
 	var arm: String = equipment.get("armor", "")
-	return int(rules.value("armadura." + arm, {}).get("penalidade", 0)) if arm != "" else 0
+	return (int(rules.value("armadura." + arm, {}).get("penalidade", 0)) if arm != "" else 0) + extra_armor_penalty
 
 
 func has_power(p: String) -> bool:
@@ -93,7 +105,7 @@ func training_bonus() -> int:
 
 func defense(rules: RuleRegistry, vs_melee: bool = true) -> int:
 	var d := defense_fixed if defense_fixed >= 0 else defense_base + int(attrs.des)
-	d += condition_mod(rules, "defesa") + scene_defense
+	d += condition_mod(rules, "defesa") + scene_defense + (race_defense if defense_fixed < 0 else 0)
 	if has_effective_condition(rules, "caido"):
 		d += -5 if vs_melee else 5
 	return d
@@ -162,7 +174,9 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"arcane_path": arcane_path, "scene_defense": scene_defense,
+		"arcane_path": arcane_path, "scene_defense": scene_defense, "size": size, "creature_type": creature_type,
+		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
+		"extra_armor_penalty": extra_armor_penalty,
 	}
 
 
@@ -187,6 +201,9 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
 	s.powers = d.get("powers", {}).duplicate(true)
 	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0))
+	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
+	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()
+	s.race_defense = int(d.get("race_defense", 0)); s.extra_armor_penalty = int(d.get("extra_armor_penalty", 0))
 	return s
 
 

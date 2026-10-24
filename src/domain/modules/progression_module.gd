@@ -198,9 +198,9 @@ func _level_up() -> Dictionary:
 	var c: Dictionary = world.rules.value("classe." + (s.class_id if s.class_id != "" else "guerreiro"))
 	s.level += 1
 	var pv_gain := int(c.pv_nivel) + int(s.attrs.con)
-	if s.race_id == "anao":
-		pv_gain += int(world.rules.value("raca.anao").pv_por_nivel)
-	var pm_gain := int(c.pm_nivel) + (1 if s.has_power("poder_magico") else 0)
+	var race: Dictionary = {} if s.race_id in ["", "humano"] else world.rules.value("raca." + s.race_id, {})
+	pv_gain += int(race.get("pv_por_nivel", 0))
+	var pm_gain := int(c.pm_nivel) + (1 if s.has_power("poder_magico") else 0) + int(race.get("pm_por_nivel", 0))
 	s.pv_max += pv_gain
 	s.pv += pv_gain
 	s.pm_max += pm_gain

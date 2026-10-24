@@ -4,7 +4,16 @@ extends RefCounted
 ## (LB p.18-20), classes Guerreiro/Ladino/Arcanista (LB p.37, 65, 73).
 ## Raças e classes não listadas ainda não estão implementadas (ver ROADMAP).
 
-const RACES := ["humano", "anao"]
+## Todas as raças jogáveis do Livro Básico (LB p.18-31). Suraggel aparece como aggelus e sulfure.
+const RACES := ["humano", "anao", "dahllan", "elfo", "goblin", "lefou", "minotauro", "qareen", "golem", "hynne", "kliren",
+	"medusa", "osteon", "sereia", "silfide", "aggelus", "sulfure", "trog"]
+const RACE_NAMES := {"humano": "Humano", "anao": "Anão", "dahllan": "Dahllan", "elfo": "Elfo", "goblin": "Goblin", "lefou": "Lefou",
+	"minotauro": "Minotauro", "qareen": "Qareen", "golem": "Golem", "hynne": "Hynne", "kliren": "Kliren", "medusa": "Medusa",
+	"osteon": "Osteon", "sereia": "Sereia/Tritão", "silfide": "Sílfide", "aggelus": "Aggelus", "sulfure": "Sulfure", "trog": "Trog"}
+## Raças com "+1 em três atributos diferentes" (com exceção e penalidade): humano, lefou, osteon, sereia.
+const FREE_ATTR_RACES := ["humano", "lefou", "osteon", "sereia"]
+## Deformidade do lefou: +2 em duas perícias à escolha. Padrão provisório até haver tela de escolha.
+const LEFOU_DEFAULT := ["intimidacao", "sobrevivencia"]
 const CLASSES := ["guerreiro", "ladino", "arcanista"]
 const WEAPON_BY_CLASS := {"guerreiro": "espada_longa", "ladino": "espada_curta", "arcanista": "adaga"}
 const ARMOR_BY_CLASS := {"guerreiro": "couro_batido", "ladino": "couro_batido", "arcanista": ""}
@@ -29,7 +38,20 @@ static func class_list(rules: RuleRegistry, p_class: String) -> Array:
 ## Quantas perícias livres a criação pede (LB p.114): da classe + Int (qualquer) + Versátil (humano, qualquer).
 static func skill_slots(rules: RuleRegistry, p_class: String, p_race: String, attrs_final: Dictionary) -> Dictionary:
 	return {"classe": int(rules.value("classe." + p_class).pericias_escolha),
-		"livres": maxi(0, int(attrs_final.get("int", 0))) + (int(rules.value("pericias.escolha").versatil_humano) if p_race == "humano" else 0)}
+		"livres": maxi(0, int(attrs_final.get("int", 0))) + (int(rules.value("pericias.escolha").versatil_humano) if p_race == "humano" else 0)
+			+ int(rules.value("raca." + p_race, {}).get("pericia_extra", 0))}
+
+
+## Escolhas de "+1 em três atributos": remove a exceção da raça e completa até três.
+static func free_attr_picks(rules: RuleRegistry, p_race: String, picks: Array) -> Array:
+	var ex: Array = [] if p_race == "humano" else rules.value("raca." + p_race).atributos_livres.excecao
+	var out: Array = []
+	for k in picks + ["for", "des", "con", "int", "sab", "car"]:
+		if not ex.has(k) and not out.has(k):
+			out.append(k)
+		if out.size() == 3:
+			break
+	return out
 
 
 ## Valida a escolha: class_picks vêm da lista da classe; free_picks de qualquer perícia; sem repetir as fixas.
@@ -83,21 +105,21 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	s.attrs = {}
 	for k in ["for", "des", "con", "int", "sab", "car"]:
 		s.attrs[k] = int(attrs_base.get(k, 0))
-	var race: Dictionary = {}
-	if p_race == "humano":
-		for k in human_picks.slice(0, 3):
+	var race: Dictionary = {} if p_race == "humano" else rules.value("raca." + p_race)
+	if FREE_ATTR_RACES.has(p_race):
+		for k in free_attr_picks(rules, p_race, human_picks):
 			s.attrs[k] += 1
+		if p_race != "humano":
+			for k in race.atributos_livres.penalidade:
+				s.attrs[k] += int(race.atributos_livres.penalidade[k])
 	else:
-		race = rules.value("raca." + p_race)
 		for k in race.atributos:
 			s.attrs[k] += int(race.atributos[k])
-		s.speed_m = float(race.get("deslocamento_m", 9))
-		for sense in race.get("sentidos", []):
-			s.senses.append(sense)
+	_apply_race(rules, s, race)
 	var c: Dictionary = rules.value("classe." + p_class)
 	s.pv_max = int(c.pv_inicial) + int(s.attrs.con) + int(race.get("pv_nivel1", 0))
 	s.pv = s.pv_max
-	s.pm_max = int(c.pm_nivel)
+	s.pm_max = int(c.pm_nivel) + int(race.get("pm_por_nivel", 0))
 	if p_class == "arcanista":
 		# Caminho do Arcanista (LB p.37): define o atributo-chave; o PM soma esse atributo.
 		var path: String = p_path if ARCANE_PATHS.has(p_path) else "bruxo"
@@ -118,6 +140,9 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	for k in extra_trained:  # Versátil (humano) / Inteligência
 		if not s.trained.has(k):
 			s.trained.append(k)
+	if p_race == "qareen" and not s.spells.has(str(race.magia_inata)):
+		s.spells.append(str(race.magia_inata))   # Tatuagem Mística (LB p.26): magia de 1º círculo com Carisma
+		if s.caster_attr == "": s.caster_attr = "car"
 	if p_race == "humano" and extra_trained.is_empty():
 		for k in ["intuicao", "furtividade", "sobrevivencia", "diplomacia"]:
 			if not s.trained.has(k) and s.trained.size() < int(c.pericias_escolha) + 4:
@@ -126,6 +151,36 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	apply_equipment(rules, s)
 	s.source_rule = "builder:%s_%s" % [p_race, p_class]
 	return s
+
+
+## Características da raça que não são atributos (LB p.19-31). O que não tem sistema ainda fica em "pendente" na regra.
+static func _apply_race(rules: RuleRegistry, s: CharacterSheet, race: Dictionary) -> void:
+	s.speed_m = float(race.get("deslocamento_m", 9))
+	for sense in race.get("sentidos", []):
+		if not s.senses.has(sense): s.senses.append(sense)
+	s.size = str(race.get("tamanho", "medio"))
+	s.creature_type = str(race.get("tipo", "humanoide"))
+	s.race_defense = int(race.get("defesa", 0))
+	s.extra_armor_penalty = int(race.get("penalidade_armadura_extra", 0))
+	s.race_skills = {}
+	for k in race.get("pericias", {}):
+		s.race_skills[k] = int(race.pericias[k])
+	var sz: Dictionary = rules.value("tamanho.modificadores", {}).get(s.size, {})
+	if int(sz.get("furtividade", 0)) != 0:
+		s.race_skills["furtividade"] = int(s.race_skills.get("furtividade", 0)) + int(sz.furtividade)
+	if s.race_id == "kliren":
+		s.race_skills["oficio"] = int(s.race_skills.get("oficio", 0)) + int(race.pericias_oficio)
+	if s.race_id == "lefou":
+		for k in LEFOU_DEFAULT:
+			s.race_skills[k] = int(s.race_skills.get(k, 0)) + int(race.deformidade_pericias)
+	s.dr = race.get("rd", {}).duplicate()
+	if race.has("rd_escolha"):
+		s.dr[str(race.rd_escolha.padrao)] = int(race.rd_escolha.valor)
+	if race.has("imunidade_elemental_padrao"):
+		s.dr[str(race.imunidade_elemental_padrao)] = 999   # Fonte Elemental do golem: imune ao tipo
+	s.vuln = race.get("vulneravel", {}).duplicate()
+	if race.has("ossos_frageis"):
+		s.vuln["impacto"] = int(race.ossos_frageis)
 
 
 ## Monta a partir do dicionário da tela de criação / sucessão. Escolhas inválidas de perícia caem no padrão.
@@ -146,8 +201,9 @@ static func apply_equipment(rules: RuleRegistry, s: CharacterSheet) -> void:
 	var arm_id: String = s.equipment.get("armor", "")
 	var arm: Dictionary = rules.value("armadura." + arm_id, {}) if arm_id != "" else {}
 	s.defense_base = 10 + int(arm.get("defesa", 0))
-	if s.race_id != "anao":
-		s.speed_m = float(rules.value("deslocamento.padrao_m", 9)) if s.race_id != "" else s.speed_m
+	if s.race_id != "":
+		var rc: Dictionary = {} if s.race_id == "humano" else rules.value("raca." + s.race_id, {})
+		s.speed_m = float(rc.get("deslocamento_m", rules.value("deslocamento.padrao_m", 9)))
 	var w_id: String = s.equipment.get("weapon", "")
 	var w: Dictionary = rules.value("arma." + w_id, {})
 	s.attacks.clear()
@@ -157,6 +213,11 @@ static func apply_equipment(rules: RuleRegistry, s: CharacterSheet) -> void:
 			"for_no_dano": (not ranged) or bool(w.get("soma_for", false)), "margem": int(w.margem), "mult": int(w.mult),
 			"alcance_q": int(rules.value("alcance.quadrados", {}).get(str(w.get("alcance", "medio")), 20)) if ranged else 1,
 			"distancia": ranged, "tipo": w.tipo, "leve": w.get("leve", false)})
+	# Arma natural da raça (Chifres do minotauro, Mordida do trog — LB p.25, 31)
+	var rn: Dictionary = {} if s.race_id in ["", "humano"] else rules.value("raca." + s.race_id, {}).get("arma_natural", {})
+	if not rn.is_empty():
+		s.attacks.append({"nome": rn.nome, "skill": "luta", "dano": rn.dano, "for_no_dano": true, "margem": 20, "mult": int(rn.mult),
+			"alcance_q": 1, "distancia": false, "tipo": rn.tipo, "leve": true, "natural": true})
 
 
 ## Três presets de atributos (10 pontos) por classe para a tela de criação rápida.

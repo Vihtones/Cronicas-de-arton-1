@@ -21,6 +21,7 @@ const SUITES := [
 	"res://tests/unit/test_art_governor.gd",
 	"res://tests/unit/test_arcanista.gd",
 	"res://tests/unit/test_powers.gd",
+	"res://tests/unit/test_racas.gd",
 ]
 
 

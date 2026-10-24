@@ -713,6 +713,13 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			rolls.append_array(sa.rolls)
 			A.flags.append(sa_key)
 			tags.append("furtivo")
+		# Raças: redução de dano por tipo (Armadura Óssea, Resistência Elemental) e dano extra por dado (Ossos Frágeis)
+		var dtype := str(atk.get("tipo", ""))
+		if T.sheet.vuln.has(dtype):
+			dmg += int(T.sheet.vuln[dtype]) * maxi(1, rolls.size())
+		if T.sheet.dr.has(dtype):
+			dmg = maxi(0, dmg - int(T.sheet.dr[dtype]))
+			tags.append("reducao")
 		tags.append("impacto")
 		if crit: tags.append("critico")
 		# Durão (LB p.66, guerreiro 3º nível): 3 PM reduz o dano à metade — usado em golpes de 1/4 dos PV ou mais

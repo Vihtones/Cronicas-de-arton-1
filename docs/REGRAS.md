@@ -7,7 +7,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | Status | Quantidade |
 |---|---|
 | ADAPTADA | 1 |
-| VERIFICADA | 105 |
+| VERIFICADA | 122 |
 
 | Arquivo | Regra | Fonte | Pág. | PDF | Status | Nota |
 |---|---|---|---|---|---|---|
@@ -95,6 +95,23 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | personagem | `progressao.xp_por_nivel` | T20 Livro Básico | 35 | 41 | VERIFICADA |  |
 | personagem | `progressao.xp_desafio` | T20 Livro Básico | 326 | 332 | VERIFICADA |  |
 | personagem | `raca.anao` | T20 Livro Básico | 20 | 26 | VERIFICADA |  |
+| personagem | `tamanho.modificadores` | T20 Livro Básico | 107 | 113 | VERIFICADA |  |
+| personagem | `raca.dahllan` | T20 Livro Básico | 21 | 27 | VERIFICADA |  |
+| personagem | `raca.elfo` | T20 Livro Básico | 22 | 28 | VERIFICADA |  |
+| personagem | `raca.goblin` | T20 Livro Básico | 23 | 29 | VERIFICADA |  |
+| personagem | `raca.lefou` | T20 Livro Básico | 24 | 30 | VERIFICADA |  |
+| personagem | `raca.minotauro` | T20 Livro Básico | 25 | 31 | VERIFICADA |  |
+| personagem | `raca.qareen` | T20 Livro Básico | 26 | 32 | VERIFICADA |  |
+| personagem | `raca.golem` | T20 Livro Básico | 27 | 33 | VERIFICADA |  |
+| personagem | `raca.hynne` | T20 Livro Básico | 28 | 34 | VERIFICADA |  |
+| personagem | `raca.kliren` | T20 Livro Básico | 28 | 34 | VERIFICADA |  |
+| personagem | `raca.medusa` | T20 Livro Básico | 29 | 35 | VERIFICADA |  |
+| personagem | `raca.osteon` | T20 Livro Básico | 29 | 35 | VERIFICADA |  |
+| personagem | `raca.sereia` | T20 Livro Básico | 30 | 36 | VERIFICADA |  |
+| personagem | `raca.silfide` | T20 Livro Básico | 30 | 36 | VERIFICADA |  |
+| personagem | `raca.aggelus` | T20 Livro Básico | 31 | 37 | VERIFICADA |  |
+| personagem | `raca.sulfure` | T20 Livro Básico | 31 | 37 | VERIFICADA |  |
+| personagem | `raca.trog` | T20 Livro Básico | 31 | 37 | VERIFICADA |  |
 | personagem | `racas.tabela` | T20 Livro Básico | 18 | 24 | VERIFICADA |  |
 | personagem | `classe.ladino` | T20 Livro Básico | 73 | 79 | VERIFICADA |  |
 | personagem | `classe.arcanista` | T20 Livro Básico | 37 | 43 | VERIFICADA |  |
