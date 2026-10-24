@@ -25,6 +25,8 @@ const EVENT_MEMORY := {
 	"FINE_PAID": {"fact": "pagou_multa", "valence": 10, "emotion": "neutro", "durable": false},
 	"DOMAIN_UNREST": {"fact": "impostos_altos", "valence": -15, "emotion": "raiva", "durable": false},
 	"NPC_DIED": {"fact": "luto", "valence": 0, "emotion": "tristeza", "durable": true},
+	"NPC_BORN": {"fact": "nascimento", "valence": 0, "emotion": "alegria", "durable": true},
+	"NPC_MARRIED": {"fact": "casamento", "valence": 0, "emotion": "alegria", "durable": true},
 }
 
 
@@ -138,6 +140,8 @@ func _describe(type: String, actor: String, subject: String, p: Dictionary) -> S
 		"CREATURE_DEFEATED": return "%s derrotou %s." % [who.capitalize(), str(p.get("name", "uma ameaça"))]
 		"OBLIGATION_VIOLATED": return "%s desonrou os votos a %s." % [who.capitalize(), str(p.get("god", ""))]
 		"NPC_DIED": return "%s morreu." % _name(subject)
+		"NPC_BORN": return "Nasceu %s, filho de %s." % [str(p.get("name", "uma criança")), " e ".join((p.get("parents", []) as Array).map(func(x): return _name(x)))]
+		"NPC_MARRIED": return "%s e %s se casaram." % [_name(str(p.a)), _name(str(p.b))]
 		"DOMAIN_UNREST": return "Os impostos do moinho estão pesados demais."
 		"FINE_PAID": return "%s pagou sua multa." % who.capitalize()
 	return type
@@ -146,7 +150,7 @@ func _describe(type: String, actor: String, subject: String, p: Dictionary) -> S
 func _name(id: String) -> String:
 	if id == "player": return "o forasteiro"
 	if id == "guarda_vila": return "a Guarda"
-	var d := world.db.npc_def(id)
+	var d := world.npc_def(id)
 	return d.get("name", id)
 
 
@@ -200,11 +204,11 @@ func on_tick(tick: int) -> Array:
 				copy.tick = tick
 				copy.location = loc
 				# NPC mentiroso pode distorcer (NPCs não são oniscientes nem sempre honestos)
-				if world.db.npc_def(speaker).get("traits", []).has("mentiroso") and world.rng.stream("world").randf() < 0.3:
+				if world.npc_def(speaker).get("traits", []).has("mentiroso") and world.rng.stream("world").randf() < 0.3:
 					copy.valence = -int(copy.valence)
 					copy.text = "(distorcido) " + str(copy.text)
 					copy.reliability *= 0.5
-				if world.db.npc_def(listener).get("family", "") != "" and world.db.npc_def(listener).family == world.db.npc_def(str(copy.subject)).get("family", "-") and int(copy.valence) > 0:
+				if world.npc_def(listener).get("family", "") != "" and world.npc_def(listener).family == world.npc_def(str(copy.subject)).get("family", "-") and int(copy.valence) > 0:
 					copy.valence = int(copy.valence) * 2
 				add_memory(listener, copy)
 				out.append(fact("RUMOR_SPREAD", {"from": speaker, "to": listener, "key": m.key, "location": loc}))
@@ -229,7 +233,7 @@ func reputation(npc_id: String, about: String = "player") -> float:
 func bias(npc_id: String, about: String) -> float:
 	if about != "player":
 		return 0.0
-	var traits: Array = world.db.npc_def(npc_id).get("traits", [])
+	var traits: Array = world.npc_def(npc_id).get("traits", [])
 	if traits.has("desconfia_de_estrangeiros"):
 		var known := list(npc_id).filter(func(m): return m.about == about).size()
 		return -10.0 if known < 3 else 0.0

@@ -94,6 +94,8 @@ func _on_event(e: GameEvent) -> void:
 			camera.call_deferred("reset_smoothing")
 		"CREATURES_MOVED":
 			npc_layer.call_deferred("sync_all")
+		"NPC_BORN":
+			npc_layer.call_deferred("rebuild")
 		"TRAVEL_ARRIVED":
 			call_deferred("_on_world_reloaded")
 		"DIALOGUE_CHOICE", "DIALOGUE_STARTED":
@@ -107,7 +109,7 @@ func build_actions() -> Array:
 	var pt := Game.player_tile()
 	var npc := npc_layer.npc_near(pt, 1)
 	if npc != "":
-		out.append({"label": "Conversar com " + Game.db.npc_def(npc).name, "cmd": "StartDialogue", "payload": {"npc_id": npc}})
+		out.append({"label": "Conversar com " + Game.world.npc_def(npc).name, "cmd": "StartDialogue", "payload": {"npc_id": npc}})
 	var objs: ObjectsModule = w.modules.objects
 	for o in Game.db.all_objects():
 		if not objs.is_adjacent(o.id):
@@ -141,7 +143,7 @@ func build_actions() -> Array:
 				out.append({"label": "%s: %s" % [t.name, labels.get(a, a)], "cmd": "InspectTarget", "payload": {"target_id": t.id, "approach": a}})
 	var loc := Game.db.location_at(pt)
 	for owner in Game.db.economy.get("shops", {}):
-		if Game.db.npc_def(owner).get("work", "") == loc:
+		if Game.world.npc_def(owner).get("work", "") == loc:
 			for it in Game.db.economy.shops[owner]:
 				out.append({"label": "Pegar escondido: %s (furto)" % Game.db.items[it].name, "cmd": "StealFromStall", "payload": {"owner": owner, "item": it}})
 	var tr: TravelModule = w.modules.travel

@@ -195,6 +195,30 @@ func from_snapshot(s: Dictionary) -> void:
 		journal.append(j)
 
 
+## NPCs do catálogo + NPCs dinâmicos (nascidos no jogo) e mudanças de casa (casamentos). C7/C8.
+func npc_def(id: String) -> Dictionary:
+	var d := db.npc_def(id)
+	var lin = modules.get("lineage")
+	if lin == null:
+		return d
+	if d.is_empty():
+		return lin.dynamic_npcs.get(id, {})
+	if lin.home_override.has(id):
+		d = d.duplicate()
+		d.home = lin.home_override[id]
+		if str(d.get("work", "")) == str(db.npc_def(id).home): d.work = d.home
+	return d
+
+
+func all_npc_ids() -> Array:
+	var ids: Array = db.all_npc_ids().duplicate()
+	var lin = modules.get("lineage")
+	if lin != null:
+		for id in lin.dynamic_npcs:
+			if not ids.has(id): ids.append(id)
+	return ids
+
+
 ## Helpers para módulos
 func hour() -> int:
 	return clock.calendar().hour

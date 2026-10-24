@@ -24,10 +24,11 @@ func rebuild() -> void:
 		c.queue_free()
 	npc_views.clear()
 	creature_views.clear()
-	for id in Game.db.all_npc_ids():
-		var arche: String = ARCHETYPE.get(id, "aldeao")
+	for id in Game.world.all_npc_ids():
+		var arche: String = ARCHETYPE.get(id, "crianca" if Game.world.npc_def(id).get("dynamic", false) else "aldeao")
 		var v := ActorView.new()
-		v.setup(id, "res://assets/chars/%s.png" % arche, Game.db.npc_def(id).name.get_slice(" ", 0) if not Game.db.npc_def(id).name.begins_with("Capitã") else "Elsa")
+		var nm: String = Game.world.npc_def(id).get("name", id)
+		v.setup(id, "res://assets/chars/%s.png" % arche, nm.get_slice(" ", 0) if not nm.begins_with("Capitã") else "Elsa")
 		add_child(v)
 		npc_views[id] = v
 	for id in Game.db.all_creature_ids():

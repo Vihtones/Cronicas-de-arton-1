@@ -41,7 +41,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var item: String = cmd.payload.get("item", "")
 			if not shops[npc].has(item): return PackedStringArray(["item não está à venda aqui"])
 			var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
-			if loc != world.db.npc_def(npc).work: return PackedStringArray(["a barraca não está aqui"])
+			if loc != world.npc_def(npc).work: return PackedStringArray(["a barraca não está aqui"])
 		"PayFine":
 			var fines := total_fines()
 			if fines <= 0: return PackedStringArray(["nenhuma multa pendente"])
@@ -124,7 +124,7 @@ func _investigate() -> Array:
 		var investigator := ""
 		for g in ["elsa", "rurik", "tobias"]:
 			if mem.list(g).any(func(m): return str(m.key) == "crime:desconhecido:" + str(r.id)):
-				var b := NpcStats.skill(world.rules, world.db.npc_def(g), "investigacao", 0)
+				var b := NpcStats.skill(world.rules, world.npc_def(g), "investigacao", 0)
 				if b > best: best = b; investigator = g
 		if investigator == "":
 			continue

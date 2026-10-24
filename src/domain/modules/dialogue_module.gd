@@ -41,7 +41,7 @@ func _start_node(npc: String) -> String:
 
 ## Nós gerados a partir do estado (rumores, saudação genérica).
 func _dynamic_node(npc: String, node_id: String) -> Dictionary:
-	var d := world.db.npc_def(npc)
+	var d := world.npc_def(npc)
 	match node_id:
 		"__generic":
 			var rep := _rep(npc)
@@ -108,7 +108,7 @@ func _conds_ok(npc: String, conds: Array) -> bool:
 				"devotion":
 					if world.player_sheet.devotion != str(v): return false
 				"faction_member":
-					if world.db.npc_def(npc).get("faction", "") != str(v): return false
+					if world.npc_def(npc).get("faction", "") != str(v): return false
 				"shop":
 					if world.db.economy.get("shops", {}).has(npc) != bool(v): return false
 	return true
@@ -142,7 +142,7 @@ func view() -> Dictionary:
 		if o.has("test"):
 			label += "  [%s CD %d]" % [str(o.test.skill).capitalize(), int(o.test.cd)]
 		opts.append({"index": i, "text": label})
-	return {"npc": npc, "name": world.db.npc_def(npc).get("name", npc), "node": session.node, "text": node.get("text", ""), "options": opts}
+	return {"npc": npc, "name": world.npc_def(npc).get("name", npc), "node": session.node, "text": node.get("text", ""), "options": opts}
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:

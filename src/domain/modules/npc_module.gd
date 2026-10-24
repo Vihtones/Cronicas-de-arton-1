@@ -9,14 +9,14 @@ var state: Dictionary = {}  # id -> {location, alive, captive, age, wounded_unti
 func module_id() -> String: return "npcs"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["RescueNPC"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["NPC_RESCUED", "BANDITS_RELOCATED", "NPC_WOUNDED", "NPC_CAPTURED", "NPC_DIED"])
+	return PackedStringArray(["NPC_RESCUED", "BANDITS_RELOCATED", "NPC_WOUNDED", "NPC_CAPTURED", "NPC_DIED", "NPC_BORN"])
 
 
 func _ensure() -> void:
 	if not state.is_empty():
 		return
-	for id in world.db.all_npc_ids():
-		var d := world.db.npc_def(id)
+	for id in world.all_npc_ids():
+		var d := world.npc_def(id)
 		state[id] = {"location": d.home, "alive": true, "captive": false, "age": int(d.age), "wounded_until": -1}
 	if state.has("tomas"):
 		state.tomas.captive = true
@@ -60,13 +60,15 @@ func npc_tile(id: String) -> Vector2i:
 
 func desired_location(id: String) -> String:
 	var s: Dictionary = state[id]
-	var d := world.db.npc_def(id)
+	var d := world.npc_def(id)
 	if not s.alive:
 		return ""
 	if s.captive:
 		return s.location
 	if int(s.wounded_until) > world.clock.tick:
 		return d.home
+	if int(s.get("age", 99)) < 6:
+		return d.home   # C7: crianças pequenas ficam em casa
 	# mensageiro entre regiões (LOD L3)
 	for r in world.db.distant.get("regions", []):
 		if r.get("courier", "") == id:
@@ -125,8 +127,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	var id: String = cmd.payload.get("npc_id", "")
 	var s := npc(id)
 	if s.is_empty(): return PackedStringArray(["NPC inexistente"])
-	if not s.alive: return PackedStringArray(["%s está morto" % world.db.npc_def(id).name])
-	if not s.captive: return PackedStringArray(["%s não está preso" % world.db.npc_def(id).name])
+	if not s.alive: return PackedStringArray(["%s está morto" % world.npc_def(id).name])
+	if not s.captive: return PackedStringArray(["%s não está preso" % world.npc_def(id).name])
 	var t := npc_tile(id)
 	var p := world.db.world_to_tile(world.player.position)
 	if absi(p.x - t.x) > 1 or absi(p.y - t.y) > 1:
@@ -147,11 +149,16 @@ func execute(cmd: GameCommand) -> Array:
 func on_event(e: GameEvent) -> Array:
 	_ensure()
 	match e.event_type:
+		"NPC_BORN":
+			var nid: String = e.payload.id
+			if not state.has(nid):
+				state[nid] = {"location": str(e.payload.location), "alive": true, "captive": false, "age": 0, "wounded_until": -1}
+			return []
 		"NPC_RESCUED":
 			var id: String = e.payload.npc
 			if state.has(id) and state[id].captive:
 				state[id].captive = false
-				state[id].location = world.db.npc_def(id).home
+				state[id].location = world.npc_def(id).home
 				state[id].wounded_until = world.clock.tick + 6 * 24 * 2
 		"BANDITS_RELOCATED":
 			for id in state:

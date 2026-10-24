@@ -179,3 +179,52 @@ func test_c15_sete_dias_em_menos_de_um_segundo() -> void:
 	var ms := Time.get_ticks_msec() - t0
 	check(r.accepted, "avançou")
 	check(ms < 1000, "7 dias em %d ms (meta < 1000 ms; medido ~150 ms em 24/10/2026)" % ms)
+
+
+func _year_later(w: WorldState) -> Array:
+	var lin: LineageModule = w.modules.lineage
+	w.clock.tick += 144 * 365   # pula para o ano seguinte
+	return lin.on_tick(w.clock.tick)
+
+
+func test_c7_nascimento_vira_npc_com_agenda_familia_e_save() -> void:
+	var born := ""
+	for seed in range(1, 40):
+		var w := WorldHelpers.world(seed)
+		var lin: LineageModule = w.modules.lineage
+		for y in 4:
+			for f in _year_later(w):
+				if f.type == "NPC_BORN":
+					w._commit(GameCommand.create("b", "player", "Teste", {}), [f])
+					born = f.payload.id
+			if born != "": break
+		if born == "": continue
+		var d := w.npc_def(born)
+		check(not d.is_empty() and d.dynamic, "definição dinâmica")
+		check(w.all_npc_ids().has(born), "listado entre os NPCs")
+		check(w.modules.npcs.state.has(born), "tem estado L1")
+		eq(w.modules.npcs.desired_location(born), d.home, "bebê fica em casa")
+		check(lin._family(d.parents[0]).has(born), "entra na família")
+		check(w.modules.memory.list(d.parents[0]).any(func(m): return str(m.key).begins_with("nascimento")), "os pais lembram")
+		var w2 := WorldHelpers.world(seed)
+		w2.from_snapshot(JSON.parse_string(JSON.stringify(w.to_snapshot())))
+		check(w2.all_npc_ids().has(born), "sobrevive ao save")
+		eq(w2.npc_def(born).name, d.name, "mesmo nome após carregar")
+		return
+	check(false, "nenhum nascimento em 40 seeds × 4 anos")
+
+
+func test_c8_casamento_forma_casal_e_muda_casa() -> void:
+	for seed in range(1, 80):
+		var w := WorldHelpers.world(seed)
+		var lin: LineageModule = w.modules.lineage
+		var out := lin._marriages(2)
+		if out.is_empty(): continue
+		var p: Dictionary = out[0].payload
+		check(lin.couples.size() == 1, "casal registrado")
+		check(w.npc_def(p.a).get("family", "") != w.npc_def(p.b).get("family", "") or str(w.npc_def(p.a).get("family", "")) == "", "famílias diferentes")
+		eq(w.npc_def(p.moved).home, p.home, "quem casou mudou de casa")
+		check(lin._married(p.a) and lin._married(p.b), "ambos casados")
+		eq(lin._marriages(3).filter(func(f): return f.payload.a == p.a or f.payload.b == p.a).size(), 0, "não casa de novo")
+		return
+	check(false, "nenhum casamento em 80 seeds")

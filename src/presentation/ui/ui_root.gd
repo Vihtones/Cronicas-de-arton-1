@@ -254,7 +254,7 @@ func refresh_dialogue() -> void:
 	if base != _dlg_shown_text:
 		_dlg_shown_text = base
 		dlg_text.text = base
-		var d := Game.db.npc_def(view.npc)
+		var d := Game.world.npc_def(view.npc)
 		Game.dialogue_provider.verbalize_async(view.npc, base, {"name": d.get("name", ""), "profession": d.get("profession", ""),
 			"allowed_names": ["Tomas", "Hilda", "Otto", "Lena", "Valkaria", "Khalmyr", "Kael", "Dorn", "Elsa", "Rosana"]},
 			func(t: String): if _dlg_shown_text == base: dlg_text.text = t)
@@ -395,7 +395,7 @@ func refresh_journal() -> void:
 	if lin.enabled and (not lin.deaths.is_empty() or not lin.newborns.is_empty() or not lin.heroes.is_empty()):
 		journal_body.add_child(_h("Gerações"))
 		for d in lin.deaths:
-			journal_body.add_child(_label("✝ %s (%d anos) — herdeiro: %s" % [Game.db.npc_def(d.npc).name, d.age, Game.db.npc_def(d.heir).get("name", "ninguém")], 8))
+			journal_body.add_child(_label("✝ %s (%d anos) — herdeiro: %s" % [Game.world.npc_def(d.npc).name, d.age, Game.world.npc_def(d.heir).get("name", "ninguém")], 8))
 		for b in lin.newborns:
 			journal_body.add_child(_label("✦ %s, ano %d" % [b.name, b.born_year], 8))
 		for hh in lin.heroes:

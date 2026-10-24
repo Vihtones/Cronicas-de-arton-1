@@ -35,7 +35,7 @@ func candidates() -> Array:
 	if lin != null and not lin.deaths.is_empty():
 		var d: Dictionary = lin.deaths[-1]
 		if world.clock.calendar().year == int(d.year) and present.has(d.get("heir", "-")):
-			out.append({"id": "luto_" + str(d.npc), "text": "%s está de luto por %s." % [world.db.npc_def(d.heir).name, world.db.npc_def(d.npc).name]})
+			out.append({"id": "luto_" + str(d.npc), "text": "%s está de luto por %s." % [world.npc_def(d.heir).name, world.npc_def(d.npc).name]})
 	return out
 
 

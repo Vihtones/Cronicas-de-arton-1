@@ -9,7 +9,7 @@ const SKILL_NAMES := {"percepcao": "Percepção", "investigacao": "Investigaçã
 
 static func _name(id: String) -> String:
 	if id == "player": return "Você"
-	var n := Game.db.npc_def(id)
+	var n := Game.world.npc_def(id)
 	if not n.is_empty(): return n.name
 	var c := Game.db.creature_def(id)
 	if not c.is_empty(): return c.name
@@ -121,7 +121,8 @@ static func line(e: GameEvent) -> String:
 		"DOMAIN_UNREST": return "Há murmúrios contra os impostos no moinho."
 		"NPC_DIED": return "%s morreu (%s, %d anos)." % [_name(p.npc), p.cause, p.age]
 		"INHERITANCE": return "%s herda a casa e as economias de %s." % [_name(p.to), _name(p.from)]
-		"NPC_BORN": return "Nasce uma criança na família %s." % str(p.family).capitalize()
+		"NPC_BORN": return "Nasce %s, na família %s." % [str(p.get("name", "uma criança")), str(p.family).capitalize()]
+		"NPC_MARRIED": return "%s e %s se casam." % [_name(p.a), _name(p.b)]
 		"HERO_SUCCEEDED": return "%s assume o legado de %s. O mundo lembra do outro, não de você." % [p.new_name, p.previous_name]
 		"SHEEP_KILLED":
 			return "Gritos de Fenna na estrada: uma ovelha morta." if Game.db.zone_at(Game.player_tile()) != "cripta" else ""
