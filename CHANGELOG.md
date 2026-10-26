@@ -14,6 +14,7 @@
 - Fase 2 (sociedade): família paga a refeição de criança sem ouro (`FAMILY_SUPPORT`). Consequência por grupo: a reputação da facção do vendedor muda o preço de todos os seus vendedores (templo hostil cobra 25% a mais; amigo, 10% de desconto).
 - Prólogo (Fase 3): ao criar o personagem, abre-se o questionário do passado (seis perguntas); "Deixar o Destino Decidir" sorteia a semente. O começo move o jogador para o lugar do passado. Verificado por `tools/playtest_prologo.gd`.
 - Fase 4 (economia): crise de escassez explícita por bem da vila, com histerese (`SHORTAGE_STARTED`, `SHORTAGE_ENDED`), recuperação pela produção e registro no diário. O diário (J) ganha a seção "Crônica da vila", que antes não aparecia na interface.
+- Menu de debug (F2): teleporte para qualquer local ou morador, e ajuste de hora, ouro, tesouro, estoque da vila, clima e de ouro, fome e cansaço de cada morador. Tudo passa por comandos validados (`DebugModule`). `DebugMenu.ENABLED` esconde o menu em builds de jogador.
 - Carroças de entrega: `CartsModule` (domínio). Nascem de dia, levam a mercadoria que falta na vila, descarregam no mercado (estoque sobe) e voltam. A apresentação só desenha a posição. Salvam e carregam.
 
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2

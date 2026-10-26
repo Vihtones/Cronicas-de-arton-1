@@ -10,6 +10,7 @@ var fx: FxLayer
 var cine: CinematicDirector
 var combat_view: CombatView
 var ui: UiRoot
+var debug_menu: DebugMenu
 var art: ArtGovernor
 var vegetation: VegetationLayer
 var paths: PathDressing
@@ -48,6 +49,14 @@ func _ready() -> void:
 	combat_view.npc_layer = npc_layer; combat_view.player_view = player; combat_view.camera = camera
 	combat_view.cine = cine; combat_view.fx_post = fx.post; combat_view.fx_glow = fx.glow
 	ui = UiRoot.new(); ui.name = "UI"; add_child(ui)
+	# menu de debug (F2) numa camada acima da interface
+	var debug_layer := CanvasLayer.new()
+	debug_layer.layer = 20
+	add_child(debug_layer)
+	debug_menu = DebugMenu.new()
+	debug_menu.name = "DebugMenu"
+	debug_menu.theme = ui.theme_res
+	debug_layer.add_child(debug_menu)
 	ui.combat_view = combat_view
 	cine.started.connect(ui.set_cinematic.bind(true))
 	cine.finished.connect(ui.set_cinematic.bind(false))
@@ -207,6 +216,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if k == KEY_F3:
 		ui.toggle_debug()
+		return
+	if k == KEY_F2:
+		debug_menu.toggle()
+		get_viewport().set_input_as_handled()
 		return
 	if k == KEY_F5:
 		ui.log_msg("Jogo salvo." if Game.save_game() == OK else "Não é possível salvar agora.")

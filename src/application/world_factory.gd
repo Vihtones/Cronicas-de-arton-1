@@ -17,7 +17,7 @@ static func create(p_seed: int = 20261023, disabled: Array = [], rules: RuleRegi
 	for m in [StateModule.new(), ObjectsModule.new(), TownEventsModule.new(), CartsModule.new(), NpcLifeModule.new(), NpcNeedsModule.new(), NpcModule.new(), WeatherModule.new(), ExplorationModule.new(),
 			MemoryModule.new(), RelationsModule.new(), PrologueModule.new(), PartyModule.new(), FactionModule.new(), CombatModule.new(), DialogueModule.new(), CrimeModule.new(),
 			EconomyModule.new(), CitiesModule.new(), TormentaModule.new(), HomebrewModule.new(), ChronicleModule.new(), RegionSimModule.new(), ReligionModule.new(), ProgressionModule.new(), ItemsModule.new(),
-			TravelModule.new(), DomainModule.new(), LineageModule.new(), AdventurersModule.new(), FaunaModule.new(), PacingModule.new()]:
+			TravelModule.new(), DomainModule.new(), LineageModule.new(), AdventurersModule.new(), FaunaModule.new(), PacingModule.new(), DebugModule.new()]:
 		w.register(m)
 	for id in disabled:
 		if OPTIONAL.has(id):
