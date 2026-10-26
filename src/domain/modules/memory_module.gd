@@ -115,6 +115,7 @@ func on_event(e: GameEvent) -> Array:
 	var subject: String = e.payload.get("npc", e.payload.get("victim", ""))
 	var key := "%s:%s:%s" % [spec.fact, actor, subject]
 	var text := _describe(e.event_type, actor, subject, e.payload)
+	var out: Array = []
 	for w in _witnesses(e):
 		if w == actor:
 			continue
@@ -123,12 +124,14 @@ func on_event(e: GameEvent) -> Array:
 			val *= 2
 		add_memory(w, {"key": key, "about": actor, "subject": subject, "valence": val, "location": e.payload.get("location", ""),
 			"tick": e.world_tick, "emotion": spec.emotion, "reliability": 1.0, "source": "testemunha", "durable": spec.durable, "text": text})
+		# a relação do morador com o ator muda por este fato (RelationsModule)
+		out.append(fact("MEMORY_FORMED", {"npc": w, "about": actor, "subject": subject, "valence": val, "emotion": spec.emotion}, [w]))
 	# vítima de crime sem testemunhas: sabe que algo aconteceu, não sabe quem
 	if e.event_type == "CRIME_COMMITTED" and e.payload.get("victim", "") != "" and not _witnesses(e).has(e.payload.victim):
 		add_memory(e.payload.victim, {"key": "crime:desconhecido:" + str(e.payload.get("crime_id", "")), "about": "desconhecido", "subject": e.payload.victim,
 			"valence": 0, "location": e.payload.get("location", ""), "tick": e.world_tick, "emotion": "raiva", "reliability": 1.0,
 			"source": "evidencia", "durable": true, "text": "Alguém me roubou. Não sei quem."})
-	return []
+	return out
 
 
 func _describe(type: String, actor: String, subject: String, p: Dictionary) -> String:

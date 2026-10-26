@@ -15,7 +15,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 | Decisão autônoma (utilidade) | Parcial | Decisão por utilidade entre necessidades acima do limite (a de maior valor vence). Sem utilidade para ações da agenda |
 | Atividades e humor | **Validado (0.7.1)** | `NpcLifeModule`: medo, alegria e atividade no rótulo |
 | Memória social | **Validado** | `MemoryModule`: testemunhas, rumores no mesmo local, reputação, esquecimento |
-| Relações multidimensionais | Parcial | Só reputação (`reputation`, `bias`) e família/facção. Sem confiança, afeto, medo separados |
+| Relações multidimensionais | **Validado (Fase 2)** | `RelationsModule`: confiança, afeto, respeito, medo, ressentimento, admiração, lealdade, interesse e familiaridade por par; alimentadas por `MEMORY_FORMED` e convivência |
 | Família como agentes reais | Parcial | Família existe (`family`), com residência e atividades. Sem objetivos próprios |
 | Moralidade e reputação localizada | Parcial | Reputação por morador, família e facção. Sem reputação por cidade ou reino |
 | Rumores | **Validado** | `MemoryModule`, com perda de confiabilidade |
@@ -42,7 +42,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 
 - **Fase 0 (auditoria):** feita — esta matriz. Riscos: o `NpcModule` concentra localização e agenda, e já recebe várias influências (eventos da vila, medo, necessidades, chuva). Novas camadas devem entrar por um ponto único de decisão (`desired_location`) e não por cópias.
 - **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro); refeição paga na taverna consome comida da vila e leva o ouro ao tesouro (`MEAL_SERVED`). Falta: o trabalho dos moradores ainda não produz mercadoria na economia da vila.
-- **Fase 2 (memória e sociedade):** parte já existe (memória, rumores, reputação). Falta: relações multidimensionais e reações por personalidade.
+- **Fase 2 (memória e sociedade):** relações multidimensionais feitas (`RelationsModule`, com traços: teimoso, memória longa, exige provas) e reações por rótulo (confia, amigável, indiferente, teme, guarda rancor). Falta: diálogos ligados a essas reações e família com objetivos próprios.
 - **Fases 3 a 9:** não iniciadas.
 
 ## Regras de execução (da spec) aplicadas
