@@ -69,6 +69,12 @@ func desired_location(id: String) -> String:
 		return d.home
 	if int(s.get("age", 99)) < 6:
 		return d.home   # C7: crianças pequenas ficam em casa
+	# necessidades (Arton Viva, Fase 1): fome e cansaço viram objetivo e mudam o caminho
+	var needs = world.module("npc_needs")
+	if needs != null:
+		var goal_loc: String = needs.location_override(id, d)
+		if goal_loc != "":
+			return goal_loc
 	# medo: quem presenciou violência se recolhe até acalmar (guardas ficam)
 	var life = world.module("npc_life")
 	if life != null:

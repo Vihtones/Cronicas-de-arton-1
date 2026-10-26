@@ -1,14 +1,15 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `fa74658`. **Não edite à mão**: rode os dois scripts.
-Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `eee4f0d`. **Não edite à mão**: rode os dois scripts.
+Grafo: 623 nós, 1756 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
 | Documento | Assunto | Seções | Cita código/regras |
 |---|---|---|---|
-| `CHANGELOG.md` | Changelog | 10 | 26 |
+| `CHANGELOG.md` | Changelog | 10 | 27 |
 | `README.md` | Crônicas de Arton | 6 | 7 |
+| `docs/ARTON_VIVA.md` | Arton Viva — auditoria (Fase 0) e andamento | 3 | 11 |
 | `docs/ART_BIBLE.md` | Art Bible (provisória) | 1 | 1 |
 | `docs/GOVERNADOR_DE_ARTE.md` | Governador de Direção de Arte | 7 | 3 |
 | `docs/ORGANIZACAO.md` | Organização do projeto a partir do grafo (Graphify) | 3 | 13 |
@@ -18,7 +19,7 @@ Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | `docs/PROTOTIPOS.md` | Protótipos por mecânica (v0.3.0) | 0 | 6 |
 | `docs/REFERENCIAS_VISUAIS.md` | Referências visuais e de sensação de jogo (pesquisa de 24/10/2026) | 3 | 0 |
 | `docs/REGRAS.md` | Regras usadas pelo jogo e sua proveniência | 1 | 91 |
-| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 5 | 13 |
+| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 6 | 14 |
 | `docs/XP_DINAMICA.md` | XP dinâmica (ORIGINAL_DO_JOGO) | 5 | 1 |
 | `docs/adr/ADR-0001-fundacao.md` | ADR-0001 — Decisões de fundação | 0 | 0 |
 | `docs/adr/ADR-0002-modulos-eventos.md` | ADR-0002: Módulos do mundo, comandos e eventos | 2 | 4 |
@@ -32,7 +33,7 @@ Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **DialogueProvider** (`src/application/dialogue_provider.gd`, 4 ligações) — Porta de verbalização (§4, §6 Fase 6).
 - **Prototypes** (`src/application/prototypes.gd`, 22 ligações) — Laboratório de protótipos: um cenário pequeno e jogável por mecânica, montado sobre o MESMO mundo do jogo (sem atalhos de regra).
 - **Telemetry** (`src/application/telemetry.gd`, 1 ligações) — Métricas de desempenho (§15): p50/p95 de frame, tempo de comando/tick, save/load.
-- **WorldFactory** (`src/application/world_factory.gd`, 33 ligações) — Monta o mundo com todos os módulos.
+- **WorldFactory** (`src/application/world_factory.gd`, 34 ligações) — Monta o mundo com todos os módulos.
 - **game** (`src/application/game.gd`, 23 ligações) — Autoload "Game": composição da aplicação.
 
 ### `src/core`
@@ -50,8 +51,8 @@ Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **DialogueVoice** (`src/domain/dialogue_voice.gd`, 12 ligações) — Voz dos moradores: monta falas a partir do ESTADO do mundo (hora, clima, evento da vila, reputação do jogador, mistério, quantas vezes já conversaram) e dos tex
 - **RngStreams** (`src/domain/rng_streams.gd`, 5 ligações) — Fluxos de RNG separados e rastreáveis (§7): combate, clima, mundo, visual.
 - **WorldClock** (`src/domain/world_clock.gd`, 4 ligações) — Relógio canônico do mundo (Plano Mestre §7).
-- **WorldModule** (`src/domain/world_module.gd`, 32 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
-- **WorldState** (`src/domain/world_state.gd`, 39 ligações) — Estado mutável do mundo.
+- **WorldModule** (`src/domain/world_module.gd`, 33 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
+- **WorldState** (`src/domain/world_state.gd`, 40 ligações) — Estado mutável do mundo.
 
 ### `src/domain/combat`
 
@@ -61,24 +62,25 @@ Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 ### `src/domain/modules`
 
 - **AdventurersModule** (`src/domain/modules/adventurers_module.gd`, 8 ligações) — Aventureiros NPC em LOD L3 (§8): progridem por atividades plausíveis, usando a MESMA regra de XP do jogador (ND × 1000 / grupo, LB p.326).
-- **CartsModule** (`src/domain/modules/carts_module.gd`, 11 ligações) — Carroças de entrega (mundo vivo).
+- **CartsModule** (`src/domain/modules/carts_module.gd`, 12 ligações) — Carroças de entrega (mundo vivo).
 - **CombatModule** (`src/domain/modules/combat_module.gd`, 103 ligações) — Combate tático híbrido (§9).
-- **CrimeModule** (`src/domain/modules/crime_module.gd`, 23 ligações) — Crime (§11): ato real, evidência, testemunhas, conhecimento das autoridades, lei local, mandado, multa e resolução.
+- **CrimeModule** (`src/domain/modules/crime_module.gd`, 24 ligações) — Crime (§11): ato real, evidência, testemunhas, conhecimento das autoridades, lei local, mandado, multa e resolução.
 - **DialogueModule** (`src/domain/modules/dialogue_module.gd`, 35 ligações) — Diálogo estruturado (§6, §8).
 - **DomainModule** (`src/domain/modules/domain_module.gd`, 18 ligações) — Administração de domínio (§11): decisões de alto nível, conselheiros e delegação.
-- **EconomyModule** (`src/domain/modules/economy_module.gd`, 29 ligações) — Economia agregada por região (§11): produção/consumo diários e preços com limites.
+- **EconomyModule** (`src/domain/modules/economy_module.gd`, 30 ligações) — Economia agregada por região (§11): produção/consumo diários e preços com limites.
 - **ExplorationModule** (`src/domain/modules/exploration_module.gd`, 40 ligações) — Exploração ativa e mistérios (§10).
-- **FactionModule** (`src/domain/modules/faction_module.gd`, 20 ligações) — Facções com objetivos, recursos e reações causais (§11).
-- **FaunaModule** (`src/domain/modules/fauna_module.gd`, 14 ligações) — Criaturas com território e recursos, custo limitado (§11).
+- **FactionModule** (`src/domain/modules/faction_module.gd`, 21 ligações) — Facções com objetivos, recursos e reações causais (§11).
+- **FaunaModule** (`src/domain/modules/fauna_module.gd`, 15 ligações) — Criaturas com território e recursos, custo limitado (§11).
 - **ItemsModule** (`src/domain/modules/items_module.gd`, 21 ligações) — Equipamento e consumíveis (protótipo).
 - **LineageModule** (`src/domain/modules/lineage_module.gd`, 22 ligações) — Gerações (§8, §20.8): longevidade 70+2d20 rolada uma vez (LB p.108), morte por velhice, herança para o parente mais velho, nascimentos em casais e sucessão do h
-- **MemoryModule** (`src/domain/modules/memory_module.gd`, 35 ligações) — Memória estruturada, rumores e reputação (§8, §11).
-- **NpcLifeModule** (`src/domain/modules/npc_life_module.gd`, 17 ligações) — Vida dos moradores: o que cada um ESTÁ FAZENDO agora e COMO se sente.
-- **NpcModule** (`src/domain/modules/npc_module.gd`, 43 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
+- **MemoryModule** (`src/domain/modules/memory_module.gd`, 36 ligações) — Memória estruturada, rumores e reputação (§8, §11).
+- **NpcLifeModule** (`src/domain/modules/npc_life_module.gd`, 18 ligações) — Vida dos moradores: o que cada um ESTÁ FAZENDO agora e COMO se sente.
+- **NpcModule** (`src/domain/modules/npc_module.gd`, 47 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
+- **NpcNeedsModule** (`src/domain/modules/npc_needs_module.gd`, 8 ligações) — Necessidades e objetivos de curto prazo dos moradores (Arton Viva, Fase 1).
 - **ObjectsModule** (`src/domain/modules/objects_module.gd`, 28 ligações) — Portas, baús, escadas e barracas.
 - **PacingModule** (`src/domain/modules/pacing_module.gd`, 9 ligações) — WorldPacingDirector (§7): decide QUANDO apresentar conteúdo opcional que JÁ é verdadeiro no estado (vinhetas).
 - **ProgressionModule** (`src/domain/modules/progression_module.gd`, 31 ligações) — Progressão.
-- **RegionSimModule** (`src/domain/modules/region_sim_module.gd`, 5 ligações) — Regiões distantes em LOD L3 (§7): um sorteio agregado por dia, nunca simulação passo a passo.
+- **RegionSimModule** (`src/domain/modules/region_sim_module.gd`, 6 ligações) — Regiões distantes em LOD L3 (§7): um sorteio agregado por dia, nunca simulação passo a passo.
 - **ReligionModule** (`src/domain/modules/religion_module.gd`, 15 ligações) — Fé (§11): devoção segue o panteão e as obrigações verificadas no LB.
 - **StateModule** (`src/domain/modules/state_module.gd`, 32 ligações) — Flags do mundo e inventário do jogador.
 - **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 14 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
@@ -139,8 +141,8 @@ Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `tests`
 
-- **TestCase** (`tests/unit/test_case.gd`, 24 ligações) — 
-- **WorldHelpers** (`tests/unit/world_helpers.gd`, 22 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
+- **TestCase** (`tests/unit/test_case.gd`, 25 ligações) — 
+- **WorldHelpers** (`tests/unit/world_helpers.gd`, 23 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
 - **run_tests** (`tests/run_tests.gd`, 0 ligações) — Executor de testes headless, sem dependências externas.
 - **test_arcanista** (`tests/unit/test_arcanista.gd`, 13 ligações) — C17 (perícias), C4 (Arcanista: caminhos e 3 magias) e C5 (concentração e armadura ao lançar).
 - **test_art_governor** (`tests/unit/test_art_governor.gd`, 4 ligações) — Governador de Direção de Arte: só assets aprovados entram, nas zonas certas, sem mexer na colisão.
@@ -153,6 +155,7 @@ Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **test_falas_ambiente** (`tests/unit/test_falas_ambiente.gd`, 4 ligações) — Falas de ambiente: escolha por contexto (hora, clima, evento, mistério), conversas de verdade e latidos.
 - **test_interactions** (`tests/unit/test_interactions.gd`, 48 ligações) — XP dinâmica, poderes e interações entre sistemas (quando a ligação é óbvia).
 - **test_mundo_vivo** (`tests/unit/test_mundo_vivo.gd`, 10 ligações) — Mundo vivo: feira semanal, festa da vila, agendas redirecionadas, economia e clima gradual.
+- **test_necessidades** (`tests/unit/test_necessidades.gd`, 5 ligações) — Arton Viva, Fase 1: o morador identifica uma necessidade, escolhe uma ação, executa e muda seu estado.
 - **test_powers** (`tests/unit/test_powers.gd`, 13 ligações) — C21: poderes de classe do LB (guerreiro p.65-66, ladino p.73-74, arcanista p.38-39) e reações.
 - **test_prototypes** (`tests/unit/test_prototypes.gd`, 48 ligações) — Uma "build" funcional por mecânica: cada protótipo sobe e demonstra a mecânica.
 - **test_racas** (`tests/unit/test_racas.gd`, 7 ligações) — Todas as raças jogáveis do Livro Básico (p.18-31): atributos, deslocamento, tamanho, sentidos e traços com sistema.

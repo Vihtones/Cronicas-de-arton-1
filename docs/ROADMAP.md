@@ -131,3 +131,9 @@ Fato (relato do usuário) e proposta separados. Nada abaixo foi iniciado, exceto
 5. **PAUSADO (decisão do usuário, 25/10/2026):** mapa e viagem de Valkyria — trocar de cenário de verdade. Retomar quando o usuário pedir.
 6. **FEITO (0.7.1):** **Carruagens:** `CartsModule` — nascem na estrada leste de dia, levam a carga que mais falta na vila, descarregam no mercado (o estoque da vila sobe) e voltam. Só o domínio decide; a apresentação desenha. **Falta:** passageiros (viajantes com nome) e assalto na estrada.
 7. **Casas e lugares:** design aprovado como "legalzinho"; refinar depois dos itens acima.
+
+
+## F. Arton Viva (spec CDA-WORLD-001 v1.0)
+Auditoria, matriz e andamento em `docs/ARTON_VIVA.md`.
+- **FEITO (0.7.1):** Fase 0 (auditoria). Fase 1 parcial: necessidades de fome, cansaço e ouro; objetivo urgente; comer na taverna; descansar em casa (`NpcNeedsModule`, 8 testes).
+- **Próximo:** objetivos de médio prazo e decisão por utilidade (Fase 1); relações multidimensionais (Fase 2); vertical slice do aprendiz (Fase 9 da spec, prova de integração).

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.7.1 (em andamento)
+- Arton Viva, Fase 0 (auditoria em `docs/ARTON_VIVA.md`) e Fase 1 parcial: necessidades dos moradores (fome, cansaço, ouro) com objetivo urgente, comer na taverna e descansar em casa (`NpcNeedsModule`).
 - Fuga e captura não rendem mais XP; evasão furtiva rende uma vez por criatura (fecha o exploit de entrar/sair da visão).
 - Combate: fantasma do jogador (`GhostActor`) ensaia o plano em laço — anda o caminho, recua e investe, dispara ou conjura — antes de confirmar. Verificação: `tools/ghost_check.gd`.
 - Diálogos: voz dos moradores (`DialogueVoice`, `data/dialogue/voices.json`, gerado por `tools/build_voices.py`) — saudação por registro, hora, clima, evento da vila, reputação e mistério; memória da conversa (primeira vez, mesmo dia, retorno, assunto repetido); novo submenu de papo com opinião sobre cada morador. Saves antigos carregam.
