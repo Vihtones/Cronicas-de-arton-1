@@ -6,6 +6,7 @@
 - Diálogos: voz dos moradores (`DialogueVoice`, `data/dialogue/voices.json`, gerado por `tools/build_voices.py`) — saudação por registro, hora, clima, evento da vila, reputação e mistério; memória da conversa (primeira vez, mesmo dia, retorno, assunto repetido); novo submenu de papo com opinião sobre cada morador. Saves antigos carregam.
 - Falas de ambiente: `AmbientTalk` + `data/dialogue/ambient.json`. Balões em conversas reais (turnos entre dois figurantes), pregões por mercadoria, falas por clima/hora/evento/mistério; moradores reconhecem o jogador que passa. Balão do tamanho do texto. Verificação: `tools/falas_check.gd`.
 - Moradores: `NpcLifeModule` — humor (medo e alegria) e atividade (trabalho, descanso, festa, feira, ferido, preso). Violência na vila assusta família e vizinhos, que se recolhem até acalmar; guardas não saem do posto. Humor é salvo com o jogo; saves antigos carregam. O rótulo do morador mais próximo mostra a atividade.
+- Carroças de entrega: `CartsModule` (domínio). Nascem de dia, levam a mercadoria que falta na vila, descarregam no mercado (estoque sobe) e voltam. A apresentação só desenha a posição. Salvam e carregam.
 
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2
 ### Mudou

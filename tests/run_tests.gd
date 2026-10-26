@@ -26,6 +26,7 @@ const SUITES := [
 	"res://tests/unit/test_dialogo_voz.gd",
 	"res://tests/unit/test_falas_ambiente.gd",
 	"res://tests/unit/test_vida_moradores.gd",
+	"res://tests/unit/test_carrocas.gd",
 	"res://tests/unit/test_arvore_poderes.gd",
 ]
 

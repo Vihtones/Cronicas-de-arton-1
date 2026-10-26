@@ -1,13 +1,13 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `6043205`. **Não edite à mão**: rode os dois scripts.
-Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `fa74658`. **Não edite à mão**: rode os dois scripts.
+Grafo: 616 nós, 1730 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
 | Documento | Assunto | Seções | Cita código/regras |
 |---|---|---|---|
-| `CHANGELOG.md` | Changelog | 10 | 25 |
+| `CHANGELOG.md` | Changelog | 10 | 26 |
 | `README.md` | Crônicas de Arton | 6 | 7 |
 | `docs/ART_BIBLE.md` | Art Bible (provisória) | 1 | 1 |
 | `docs/GOVERNADOR_DE_ARTE.md` | Governador de Direção de Arte | 7 | 3 |
@@ -18,7 +18,7 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | `docs/PROTOTIPOS.md` | Protótipos por mecânica (v0.3.0) | 0 | 6 |
 | `docs/REFERENCIAS_VISUAIS.md` | Referências visuais e de sensação de jogo (pesquisa de 24/10/2026) | 3 | 0 |
 | `docs/REGRAS.md` | Regras usadas pelo jogo e sua proveniência | 1 | 91 |
-| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 5 | 12 |
+| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 5 | 13 |
 | `docs/XP_DINAMICA.md` | XP dinâmica (ORIGINAL_DO_JOGO) | 5 | 1 |
 | `docs/adr/ADR-0001-fundacao.md` | ADR-0001 — Decisões de fundação | 0 | 0 |
 | `docs/adr/ADR-0002-modulos-eventos.md` | ADR-0002: Módulos do mundo, comandos e eventos | 2 | 4 |
@@ -32,14 +32,14 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **DialogueProvider** (`src/application/dialogue_provider.gd`, 4 ligações) — Porta de verbalização (§4, §6 Fase 6).
 - **Prototypes** (`src/application/prototypes.gd`, 22 ligações) — Laboratório de protótipos: um cenário pequeno e jogável por mecânica, montado sobre o MESMO mundo do jogo (sem atalhos de regra).
 - **Telemetry** (`src/application/telemetry.gd`, 1 ligações) — Métricas de desempenho (§15): p50/p95 de frame, tempo de comando/tick, save/load.
-- **WorldFactory** (`src/application/world_factory.gd`, 32 ligações) — Monta o mundo com todos os módulos.
+- **WorldFactory** (`src/application/world_factory.gd`, 33 ligações) — Monta o mundo com todos os módulos.
 - **game** (`src/application/game.gd`, 23 ligações) — Autoload "Game": composição da aplicação.
 
 ### `src/core`
 
 - **EventBus** (`src/core/event_bus.gd`, 6 ligações) — Barramento de eventos sem dependência de Node.
 - **GameCommand** (`src/core/game_command.gd`, 26 ligações) — Pedido de mudança de estado (Plano Mestre §6).
-- **GameEvent** (`src/core/game_event.gd`, 32 ligações) — Fato consumado e imutável (Plano Mestre §6).
+- **GameEvent** (`src/core/game_event.gd`, 33 ligações) — Fato consumado e imutável (Plano Mestre §6).
 - **GameLogger** (`src/core/game_logger.gd`, 1 ligações) — Logger estruturado com níveis e buffer em memória (para telemetria/depuração).
 
 ### `src/domain`
@@ -50,8 +50,8 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **DialogueVoice** (`src/domain/dialogue_voice.gd`, 12 ligações) — Voz dos moradores: monta falas a partir do ESTADO do mundo (hora, clima, evento da vila, reputação do jogador, mistério, quantas vezes já conversaram) e dos tex
 - **RngStreams** (`src/domain/rng_streams.gd`, 5 ligações) — Fluxos de RNG separados e rastreáveis (§7): combate, clima, mundo, visual.
 - **WorldClock** (`src/domain/world_clock.gd`, 4 ligações) — Relógio canônico do mundo (Plano Mestre §7).
-- **WorldModule** (`src/domain/world_module.gd`, 31 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
-- **WorldState** (`src/domain/world_state.gd`, 38 ligações) — Estado mutável do mundo.
+- **WorldModule** (`src/domain/world_module.gd`, 32 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
+- **WorldState** (`src/domain/world_state.gd`, 39 ligações) — Estado mutável do mundo.
 
 ### `src/domain/combat`
 
@@ -61,11 +61,12 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 ### `src/domain/modules`
 
 - **AdventurersModule** (`src/domain/modules/adventurers_module.gd`, 8 ligações) — Aventureiros NPC em LOD L3 (§8): progridem por atividades plausíveis, usando a MESMA regra de XP do jogador (ND × 1000 / grupo, LB p.326).
+- **CartsModule** (`src/domain/modules/carts_module.gd`, 11 ligações) — Carroças de entrega (mundo vivo).
 - **CombatModule** (`src/domain/modules/combat_module.gd`, 103 ligações) — Combate tático híbrido (§9).
 - **CrimeModule** (`src/domain/modules/crime_module.gd`, 23 ligações) — Crime (§11): ato real, evidência, testemunhas, conhecimento das autoridades, lei local, mandado, multa e resolução.
 - **DialogueModule** (`src/domain/modules/dialogue_module.gd`, 35 ligações) — Diálogo estruturado (§6, §8).
 - **DomainModule** (`src/domain/modules/domain_module.gd`, 18 ligações) — Administração de domínio (§11): decisões de alto nível, conselheiros e delegação.
-- **EconomyModule** (`src/domain/modules/economy_module.gd`, 26 ligações) — Economia agregada por região (§11): produção/consumo diários e preços com limites.
+- **EconomyModule** (`src/domain/modules/economy_module.gd`, 29 ligações) — Economia agregada por região (§11): produção/consumo diários e preços com limites.
 - **ExplorationModule** (`src/domain/modules/exploration_module.gd`, 40 ligações) — Exploração ativa e mistérios (§10).
 - **FactionModule** (`src/domain/modules/faction_module.gd`, 20 ligações) — Facções com objetivos, recursos e reações causais (§11).
 - **FaunaModule** (`src/domain/modules/fauna_module.gd`, 14 ligações) — Criaturas com território e recursos, custo limitado (§11).
@@ -82,7 +83,7 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **StateModule** (`src/domain/modules/state_module.gd`, 32 ligações) — Flags do mundo e inventário do jogador.
 - **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 14 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
 - **TravelModule** (`src/domain/modules/travel_module.gd`, 26 ligações) — Viagens entre regiões (LB p.270, Tabela 6-4): km/dia pelo deslocamento, metade em terreno difícil ou clima ruim.
-- **WeatherModule** (`src/domain/modules/weather_module.gd`, 29 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
+- **WeatherModule** (`src/domain/modules/weather_module.gd`, 30 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
 
 ### `src/domain/rules`
 
@@ -102,7 +103,7 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 ### `src/presentation`
 
 - **ActorView** (`src/presentation/actor_view.gd`, 8 ligações) — Figura animada (spritesheet 3x4: parado/passo1/passo2 x baixo/esq/dir/cima).
-- **AmbientLife** (`src/presentation/ambient_life.gd`, 10 ligações) — Figurantes da vila (L0, só apresentação): gente andando, correndo da chuva, trabalhando, conversando, vendendo, crianças brincando de pega-pega, carroças na est
+- **AmbientLife** (`src/presentation/ambient_life.gd`, 11 ligações) — Figurantes da vila (L0, só apresentação): gente andando, correndo da chuva, trabalhando, conversando, vendendo, crianças brincando de pega-pega, carroças na est
 - **CameraDirector** (`src/presentation/camera_director.gd`, 3 ligações) — Câmera cinematográfica (§9): responde a tags de eventos (ataque, impacto, crítico, queda, morte...).
 - **CombatView** (`src/presentation/combat_view.gd`, 34 ligações) — Combate na tela: grade, planejamento com projeção fantasma, confirmação e reprodução cinematográfica dos eventos.
 - **GhostActor** (`src/presentation/ghost_actor.gd`, 2 ligações) — Fantasma do jogador no combate: um sprite translúcido que ENSAIA o plano em laço — anda o caminho, investe contra o alvo, dispara ou conjura — para o jogador ve
@@ -138,12 +139,13 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `tests`
 
-- **TestCase** (`tests/unit/test_case.gd`, 23 ligações) — 
-- **WorldHelpers** (`tests/unit/world_helpers.gd`, 21 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
+- **TestCase** (`tests/unit/test_case.gd`, 24 ligações) — 
+- **WorldHelpers** (`tests/unit/world_helpers.gd`, 22 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
 - **run_tests** (`tests/run_tests.gd`, 0 ligações) — Executor de testes headless, sem dependências externas.
 - **test_arcanista** (`tests/unit/test_arcanista.gd`, 13 ligações) — C17 (perícias), C4 (Arcanista: caminhos e 3 magias) e C5 (concentração e armadura ao lançar).
 - **test_art_governor** (`tests/unit/test_art_governor.gd`, 4 ligações) — Governador de Direção de Arte: só assets aprovados entram, nas zonas certas, sem mexer na colisão.
 - **test_arvore_poderes** (`tests/unit/test_arvore_poderes.gd`, 11 ligações) — Árvore de poderes: poderes gerais do LB (p.124-131) com pré-requisitos encadeados e efeitos.
+- **test_carrocas** (`tests/unit/test_carrocas.gd`, 7 ligações) — Carroças de entrega: nascem de dia, levam a carga que falta, descarregam no estoque da vila e somem.
 - **test_combat** (`tests/unit/test_combat.gd`, 16 ligações) — 
 - **test_dialogo_voz** (`tests/unit/test_dialogo_voz.gd`, 12 ligações) — Voz dos moradores: saudação por registro/hora/reputação, memória da conversa, papo e opiniões.
 - **test_event_bus** (`tests/unit/test_event_bus.gd`, 3 ligações) — 
@@ -170,6 +172,7 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **art_test_runner** (`tools/art_test_runner.gd`, 2 ligações) — Teste visual do acervo Tormenta20 (NÃO aprovado) dentro do cenário real do jogo.
 - **atividade_check** (`tools/atividade_check.gd`, 1 ligações) — Captura: rótulo de um morador perto do jogador mostra a atividade.
 - **benchmark** (`tools/benchmark.gd`, 4 ligações) — Benchmark da cena típica (§15): anda pela vila em cada perfil gráfico e mede p50/p95 de frame, tempo de comando, save e load.
+- **carrocas_check** (`tools/carrocas_check.gd`, 1 ligações) — Captura: carroças de entrega seguem o domínio (CartsModule).
 - **combat_fx_check** (`tools/combat_fx_check.gd`, 3 ligações) — Verificação ponta a ponta da encenação de combate: um golpe que derruba o alvo (momento "ABATIDO!") pelo caminho real (ExecutePlan → eventos → reprodução).
 - **falas_check** (`tools/falas_check.gd`, 2 ligações) — Capturas do mundo vivo: casas com telhado, caminhos, figurantes, feira, festa, chuva chegando, telhado abrindo ao entrar, HUD e árvore de poderes.
 - **fx_runner** (`tools/fx_runner.gd`, 6 ligações) — Capturas dos sistemas visuais (luz, sombras, desfoque, cinematográfico, retratos, rastros e impacto).
@@ -220,6 +223,7 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | BECOME_DEVOTEE | — | ReligionModule | Narrator, test_interactions, test_prototypes, test_systems |
 | BLEED_CHECK | CombatModule | — | CombatView, Narrator, test_combat |
 | BUFF_APPLIED | CombatModule | — | CombatView, Narrator, test_arcanista |
+| CART_DELIVERED | CartsModule | EconomyModule | test_carrocas |
 | CHECK_FAILED | ObjectsModule | — | Narrator |
 | COMBAT_ENDED | CombatModule | FactionModule, ProgressionModule | CombatView, Narrator, NpcLayer, game, main, test_interactions … |
 | COMBAT_MOVED | CombatModule | — | CombatView |
@@ -306,7 +310,7 @@ Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | STOLEN_GOODS_RECOVERED | ObjectsModule | — | — |
 | STOOD_UP | CombatModule | — | CombatView, Narrator |
 | TARGET_INSPECTED | ExplorationModule | ProgressionModule | Narrator, test_interactions |
-| TIME_ADVANCED | — | FactionModule | WorldState |
+| TIME_ADVANCED | — | CartsModule, FactionModule | WorldState |
 | TOWN_EVENT_ENDED | TownEventsModule | NpcLifeModule | Narrator, test_mundo_vivo |
 | TOWN_EVENT_STARTED | TownEventsModule | EconomyModule, NpcLifeModule | Narrator, UiRoot, test_mundo_vivo, test_vida_moradores |
 | TRADE_DELIVERED | EconomyModule | — | Narrator, test_prototypes |

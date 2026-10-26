@@ -355,32 +355,45 @@ func _bubble(v: ActorView, txt: String) -> void:
 
 
 # --- Carroças -----------------------------------------------------------------------------------
-func _tick_carts(delta: float, raining: bool) -> void:
-	var h := Game.world.hour()
-	_cart_t -= delta
-	if _cart_t <= 0.0 and _in_vila() and h >= 6 and h < 20 and carts.size() < 2:
-		_cart_t = _rng.randf_range(18.0, 40.0) * (2.0 if raining else 1.0)
-		var east := _rng.randf() < 0.5
-		var node := Cart.new()
-		node.name = "Carroca"
-		node.add_to_group("figurantes")
-		node.dir = -1.0 if east else 1.0
-		node.position = Vector2((47 if east else 0) * TILE, (25 if east else 26) * TILE + 16)
-		node.cargo = _rng.randi() % 3
-		add_child(node)
-		carts.append({"node": node, "speed": _rng.randf_range(34, 44), "stop": _rng.randf() < 0.5, "stopped": 0.0})
+func _tick_carts(_delta: float, _raining: bool) -> void:
+	# as carroças são do domínio (CartsModule): a apresentação só desenha a posição de cada uma
+	var cm = Game.world.module("carts")
+	var show := _in_vila() and cm != null
+	var live := {}
+	if show:
+		for c in cm.carts:
+			live[c.id] = c
 	for c in carts.duplicate():
-		var n: Cart = c.node
-		var mx: float = 19.5 * TILE
-		if c.stop and absf(n.position.x - mx) < 4.0 and c.stopped < 5.0:
-			c.stopped += delta   # para no mercado, descarrega e segue
-			n.moving = false
-			continue
-		n.moving = true
-		n.position.x += n.dir * c.speed * delta
-		if n.position.x < -40 or n.position.x > 48 * TILE:
+		if not live.has(c.id) or not show:
+			(c.node as Node).queue_free()
 			carts.erase(c)
-			n.queue_free()
+	for id in live:
+		var d: Dictionary = live[id]
+		var found: Dictionary = {}
+		for c in carts:
+			if c.id == id: found = c
+		if found.is_empty():
+			var node := Cart.new()
+			node.name = "Carroca"
+			node.add_to_group("figurantes")
+			node.dir = -1.0
+			node.cargo = _cargo_kind(d.cargo)
+			add_child(node)
+			found = {"id": id, "node": node}
+			carts.append(found)
+		var n: Cart = found.node
+		var east := 47.0 * TILE
+		var stop := 19.5 * TILE
+		var frac: float = cm.position_of(d)
+		n.position = Vector2(lerpf(east, stop, frac), 25 * TILE + 16)
+		n.dir = -1.0 if d.phase == "chegando" else 1.0
+		n.moving = d.phase != "descarregando"
+
+
+func _cargo_kind(cargo: Dictionary) -> int:
+	if cargo.has("comida"): return 0
+	if cargo.has("ferramentas"): return 1
+	return 2
 
 
 # --- Decoração de eventos ---------------------------------------------------------------------
