@@ -9,7 +9,7 @@ OUT = pathlib.Path(__file__).resolve().parent.parent / "data" / "dialogue" / "vo
 # profissão -> registro
 registro = {
     "guarda": "seco", "guarda aposentado": "idoso", "capitã da guarda": "seco", "alcaide": "seco", "ferreiro": "seco", "caçador": "seco",
-    "taverneira": "caloroso", "cozinheiro": "caloroso", "clériga de Lena": "sereno", "mercadora": "caloroso", "mercadora viajante": "caloroso",
+    "taverneira": "caloroso", "cozinheiro": "caloroso", "clériga de Lena": "sereno", "mercadora": "caloroso", "mercadora viajante": "caloroso", "mensageiro": "seco",
     "fiandeira": "caloroso", "pastora": "simples", "lavrador": "simples", "lavradora": "simples", "moleiro": "simples", "ajudante de moleiro": "jovem",
     "criança": "jovem", "aprendiz": "jovem", "acólito": "jovem", "bêbado": "bebado",
 }
@@ -126,6 +126,7 @@ trabalho = {   # como vai o trabalho, por profissão
     "clériga de Lena": "Cuidar de corpos e almas é um ofício sem fim. Mas é o meu chamado.",
     "mercadora": "Negócio é paciência: comprar barato, vender honesto, e nunca confiar em quem jura demais.",
     "mercadora viajante": "A estrada paga e cobra. Eu levo notícias junto com mercadorias.",
+    "mensageiro": "Estrada longa, pouca conversa. Levo recado e volto antes que esfrie a notícia.",
     "fiandeira": "Fio a fio, o dia passa. Tecer acalma a cabeça, ainda que o coração não aquiete.",
     "pastora": "Cuido do rebanho. Ovelhas são mais sinceras que gente.",
     "lavrador": "Plantar é fé. A gente joga a semente e reza.",
@@ -141,7 +142,7 @@ trabalho = {   # como vai o trabalho, por profissão
 nota_profissao = {   # como os outros veem alguém por profissão
     "guarda": "faz a ronda", "guarda aposentado": "já foi guarda", "capitã da guarda": "comanda a guarda", "alcaide": "cuida das leis",
     "ferreiro": "trabalha o ferro", "caçador": "vive na mata", "taverneira": "toca a taverna", "cozinheiro": "cuida da cozinha",
-    "clériga de Lena": "cuida dos fiéis e dos doentes", "mercadora": "negocia na vila", "mercadora viajante": "traz notícias de longe",
+    "clériga de Lena": "cuida dos fiéis e dos doentes", "mercadora": "negocia na vila", "mercadora viajante": "traz notícias de longe", "mensageiro": "leva recados entre as cidades",
     "fiandeira": "trabalha com fios e tecidos", "pastora": "cuida do rebanho", "lavrador": "trabalha a terra", "lavradora": "trabalha a terra",
     "moleiro": "toca o moinho", "ajudante de moleiro": "ajuda no moinho", "criança": "ainda é criança", "aprendiz": "está aprendendo o ofício",
     "acólito": "serve no templo", "bêbado": "bebe mais do que deveria",

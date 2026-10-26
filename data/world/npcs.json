@@ -334,6 +334,23 @@
    "gold": 5
   },
   {
+   "id": "tarso",
+   "name": "Tarso Pedrada",
+   "age": 28,
+   "profession": "mensageiro",
+   "schedule": "viajante",
+   "home": "taverna",
+   "work": "mercado",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "traz_noticias"
+   ],
+   "beliefs": {},
+   "gold": 30
+  },
+  {
    "id": "saria",
    "name": "Saria das Estradas",
    "age": 33,

@@ -13,18 +13,6 @@
    "base": 1.0
   }
  },
- "producao_trabalho": {
-  "_nota": "Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho (ORIGINAL_DO_JOGO).",
-  "lavrador": "comida",
-  "lavradora": "comida",
-  "pastora": "comida",
-  "moleiro": "comida",
-  "cozinheiro": "comida",
-  "caçador": "comida",
-  "taverneira": "bebida",
-  "ferreiro": "ferramentas",
-  "clériga de Lena": "remedio"
- },
  "regions": {
   "vila": {
    "stock": {
@@ -77,6 +65,32 @@
     "ferramentas": 2000,
     "remedio": 300
    }
+  },
+  "samburdia": {
+   "stock": {
+    "comida": 800,
+    "bebida": 300,
+    "ferramentas": 300,
+    "remedio": 400
+   },
+   "production": {
+    "comida": 60,
+    "bebida": 30,
+    "ferramentas": 25,
+    "remedio": 30
+   },
+   "consumption": {
+    "comida": 40,
+    "bebida": 20,
+    "ferramentas": 20,
+    "remedio": 10
+   },
+   "target": {
+    "comida": 800,
+    "bebida": 300,
+    "ferramentas": 300,
+    "remedio": 400
+   }
   }
  },
  "price_limits": [
@@ -118,6 +132,18 @@
    "cota_malha"
   ]
  },
+ "producao_trabalho": {
+  "_nota": "Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho (ORIGINAL_DO_JOGO).",
+  "lavrador": "comida",
+  "lavradora": "comida",
+  "pastora": "comida",
+  "moleiro": "comida",
+  "cozinheiro": "comida",
+  "caçador": "comida",
+  "taverneira": "bebida",
+  "ferreiro": "ferramentas",
+  "clériga de Lena": "remedio"
+ },
  "ferramenta_de_oficio": {
   "_nota": "Arton Viva, Fase 1: quem exerce o ofício precisa de ferramenta própria. Quem começou há 2 anos ou mais (a partir de idade_inicio_oficio) já tem; os outros compram do vendedor no tempo livre.",
   "item": "ferramenta_oficio",
@@ -134,5 +160,17 @@
    "caçador",
    "pastora"
   ]
+ },
+ "routes": {
+  "valkaria_vila": {
+   "from": "valkaria",
+   "to": "vila",
+   "open": true
+  },
+  "samburdia_vila": {
+   "from": "samburdia",
+   "to": "vila",
+   "open": true
+  }
  }
 }

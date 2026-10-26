@@ -52,6 +52,51 @@
    "courier_cycle_days": 5,
    "courier_present_days": 2,
    "status": "ORIGINAL_DO_JOGO"
+  },
+  {
+   "id": "samburdia",
+   "name": "Sambúrdia",
+   "lod": "L3",
+   "events": [
+    {
+     "id": "estrada_bloqueada",
+     "chance": 0.03,
+     "effect": {
+      "route": {
+       "id": "samburdia_vila",
+       "open": false
+      }
+     },
+     "news": "Bandidos bloquearam a estrada de Sambúrdia; nenhum carro passa por ali."
+    },
+    {
+     "id": "estrada_reaberta",
+     "chance": 0.03,
+     "effect": {
+      "route": {
+       "id": "samburdia_vila",
+       "open": true
+      }
+     },
+     "news": "A estrada de Sambúrdia foi reaberta depois da escolta da cidade."
+    },
+    {
+     "id": "epidemia_leve",
+     "chance": 0.05,
+     "effect": {
+      "economy": {
+       "region": "samburdia",
+       "good": "remedio",
+       "delta": -60
+      }
+     },
+     "news": "Uma tosse se espalhou pelos becos de Sambúrdia; as boticas gastam remédio."
+    }
+   ],
+   "courier": "tarso",
+   "courier_cycle_days": 6,
+   "courier_present_days": 2,
+   "status": "ORIGINAL_DO_JOGO"
   }
  ]
 }

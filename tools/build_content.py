@@ -268,6 +268,7 @@ npcs = [
  npc("ysolde", "Irmã Ysolde", 41, "clériga de Lena", "sacerdote", "templo", "templo", None, "templo_lena", "Lena"),
  npc("lucan", "Lucan", 19, "acólito", "sacerdote", "templo", "templo", None, "templo_lena", "Lena"),
  npc("quill", "Velho Quill", 63, "caçador", "cacador", "cabana_quill", "floresta", None, traits=["recluso"]),
+ npc("tarso", "Tarso Pedrada", 28, "mensageiro", "viajante", "taverna", "mercado", None, traits=["traz_noticias"], gold=30),
  npc("saria", "Saria das Estradas", 33, "mercadora viajante", "viajante", "taverna", "mercado", None, traits=["traz_noticias"], gold=60),
  npc("orin", "Mestre Orin", 55, "alcaide", "alcaide", "prefeitura", "prefeitura", None, "guarda_vila", "Khalmyr", gold=50),
  npc("tobias", "Tobias", 28, "guarda", "guarda_dia", "quartel", "quartel", None, "guarda_vila"),
@@ -330,6 +331,7 @@ items = {
  "arco_curto": {"name": "Arco curto", "price": 30, "good": "ferramentas", "rule": "arma.arco_curto"},
  "couro_batido": {"name": "Couro batido", "price": 35, "good": "ferramentas", "rule": "armadura.couro_batido"},
  "cota_malha": {"name": "Cota de malha", "price": 150, "good": "ferramentas", "rule": "armadura.cota_malha"},
+ "ferramenta_oficio": {"name": "Ferramenta de ofício", "price": 8, "good": "ferramentas"},
 }
 economy = {
  "goods": {"comida": {"base": 1.0}, "bebida": {"base": 1.0}, "ferramentas": {"base": 1.0}, "remedio": {"base": 1.0}},
@@ -344,6 +346,27 @@ economy = {
            "valkaria_mercado": ["pocao_cura", "saco_de_dormir", "arco_curto", "cota_malha", "espada_longa", "tocha", "corda"],
            "garrick": ["adaga", "espada_curta", "espada_longa", "machado_batalha", "arco_curto", "couro_batido", "cota_malha"]},
 }
+# Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho.
+economy["producao_trabalho"] = {
+ "_nota": "Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho (ORIGINAL_DO_JOGO).",
+ "lavrador": "comida", "lavradora": "comida", "pastora": "comida", "moleiro": "comida", "cozinheiro": "comida",
+ "caçador": "comida", "taverneira": "bebida", "ferreiro": "ferramentas", "clériga de Lena": "remedio"}
+# Arton Viva, Fase 1: quem começou o ofício há 2 anos ou mais já tem a ferramenta; os outros compram no tempo livre.
+economy["ferramenta_de_oficio"] = {
+ "_nota": "Arton Viva, Fase 1: quem exerce o ofício precisa de ferramenta própria. Quem começou há 2 anos ou mais (a partir de idade_inicio_oficio) já tem; os outros compram do vendedor no tempo livre.",
+ "item": "ferramenta_oficio", "vendedor": "mara", "idade_inicio_oficio": 16, "anos_para_ter": 2,
+ "profissoes": ["ferreiro", "aprendiz", "lavrador", "lavradora", "moleiro", "ajudante de moleiro", "caçador", "pastora"]}
+economy["shops"]["mara"].append("ferramenta_oficio")
+# Arton Viva, Fase 4: segunda região, com remédio em excesso (o bem mais escasso da vila).
+economy["regions"]["samburdia"] = {
+ "stock": {"comida": 800, "bebida": 300, "ferramentas": 300, "remedio": 400},
+ "production": {"comida": 60, "bebida": 30, "ferramentas": 25, "remedio": 30},
+ "consumption": {"comida": 40, "bebida": 20, "ferramentas": 20, "remedio": 10},
+ "target": {"comida": 800, "bebida": 300, "ferramentas": 300, "remedio": 400}}
+# Rotas comerciais entre regiões (cada uma com a região de origem, destino e se está aberta).
+economy["routes"] = {
+ "valkaria_vila": {"from": "valkaria", "to": "vila", "open": True},
+ "samburdia_vila": {"from": "samburdia", "to": "vila", "open": True}}
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
 distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "events": [
@@ -351,7 +374,12 @@ distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "even
    {"id": "colheita_ruim", "chance": 0.08, "effect": {"economy": {"region": "valkaria", "good": "comida", "delta": -800}}, "news": "Dizem que a colheita foi ruim nas fazendas ao redor de Valkaria."},
    {"id": "festival", "chance": 0.05, "effect": {"economy": {"region": "valkaria", "good": "bebida", "delta": -400}}, "news": "Houve um festival na capital; o vinho acabou em dois dias."},
    {"id": "patrulha", "chance": 0.1, "effect": {}, "news": "Patrulhas da capital foram vistas nas estradas do sul."}],
-  "courier": "saria", "courier_cycle_days": 5, "courier_present_days": 2, "status": "ORIGINAL_DO_JOGO"}]}
+  "courier": "saria", "courier_cycle_days": 5, "courier_present_days": 2, "status": "ORIGINAL_DO_JOGO"},
+  {"id": "samburdia", "name": "Sambúrdia", "lod": "L3", "events": [
+   {"id": "estrada_bloqueada", "chance": 0.03, "effect": {"route": {"id": "samburdia_vila", "open": False}}, "news": "Bandidos bloquearam a estrada de Sambúrdia; nenhum carro passa por ali."},
+   {"id": "estrada_reaberta", "chance": 0.03, "effect": {"route": {"id": "samburdia_vila", "open": True}}, "news": "A estrada de Sambúrdia foi reaberta depois da escolta da cidade."},
+   {"id": "epidemia_leve", "chance": 0.05, "effect": {"economy": {"region": "samburdia", "good": "remedio", "delta": -60}}, "news": "Uma tosse se espalhou pelos becos de Sambúrdia; as boticas gastam remédio."}],
+  "courier": "tarso", "courier_cycle_days": 6, "courier_present_days": 2, "status": "ORIGINAL_DO_JOGO"}]}
 
 # Barranco na floresta (desnível): só quem voa atravessa; a ponte é a passagem a pé.
 for y in range(4, 16):

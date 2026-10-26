@@ -50,10 +50,13 @@ func test_carroca_some_depois_do_ciclo() -> void:
 	var w := WorldHelpers.world(3, ["weather"])
 	_to_hour(w, 9)
 	_run_ticks(w, 2)
-	var n: int = w.modules.carts.carts.size()
-	check(n >= 1, "uma carroça nasceu")
+	var primeira: Array = w.modules.carts.carts.map(func(c): return c.id)
+	check(primeira.size() >= 1, "uma carroça nasceu")
 	_run_ticks(w, CartsModule.TRAVEL_TICKS * 2 + CartsModule.UNLOAD_TICKS + 4)
-	check(w.modules.carts.carts.is_empty() or w.modules.carts.carts.size() < n + 1, "a carroça sai de cena no fim do ciclo")
+	# a carroça original some; outra pode nascer depois, dentro do limite de MAX_CARTS
+	var ainda_na_estrada: Array = w.modules.carts.carts.filter(func(c): return primeira.has(c.id))
+	check(ainda_na_estrada.is_empty(), "a carroça original sai de cena no fim do ciclo")
+	check(w.modules.carts.carts.size() <= CartsModule.MAX_CARTS, "nunca passa do limite de carroças")
 
 
 func test_posicao_vai_da_estrada_ao_mercado_e_volta() -> void:
