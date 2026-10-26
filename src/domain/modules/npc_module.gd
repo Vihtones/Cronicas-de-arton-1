@@ -95,6 +95,10 @@ func desired_location(id: String) -> String:
 			if entry.size() > 3 and world.day_index() % int(entry[3]) != 0:
 				continue
 			result = _resolve_slot(str(entry[2]), d)
+	# utilidade da agenda: no horário de trabalho, quem junta ouro troca o lazer previsto pelo posto
+	var agenda_needs = world.module("npc_needs")
+	if agenda_needs != null:
+		result = agenda_needs.agenda_override(id, d, result, h)
 	var te = world.module("town_events")
 	if te != null:
 		var ov: String = te.location_override(id, d, int(s.get("age", 99)))

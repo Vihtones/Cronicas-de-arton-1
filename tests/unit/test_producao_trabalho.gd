@@ -94,3 +94,29 @@ func test_turno_sobrevive_a_salvar_e_carregar() -> void:
 	var c := WorldHelpers.world(1)
 	c.from_snapshot(snap)
 	eq(int(c.modules.npc_needs.state.garrick.shift), 4, "horas do turno sobrevivem ao salvar")
+
+
+func test_juntando_ouro_o_almoco_fica_no_posto() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	w.clock.tick = 12 * 6  # almoço: a agenda do moleiro manda para a taverna
+	nd.state.otto = {"hunger": 0.1, "tired": 0.1, "gold": 2, "goal": "", "medium": "", "long": "", "shift": 0}
+	eq(w.modules.npcs.desired_location("otto"), "moinho", "sem urgência, o morador que junta ouro segue no posto")
+
+
+func test_fome_no_almoco_ainda_leva_a_taverna() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	w.clock.tick = 12 * 6
+	nd.state.otto = {"hunger": 0.9, "tired": 0.1, "gold": 5, "goal": "", "medium": "", "long": "", "shift": 0}
+	nd.on_tick(w.clock.tick)
+	eq(w.modules.npcs.desired_location("otto"), "taverna", "urgência de comer vence a utilidade do posto")
+
+
+func test_meta_de_ouro_batida_volta_a_agenda_normal() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	w.clock.tick = 12 * 6
+	nd.state.otto = {"hunger": 0.1, "tired": 0.1, "gold": 20, "goal": "", "medium": "", "long": "", "shift": 0}
+	nd.on_tick(w.clock.tick)
+	eq(w.modules.npcs.desired_location("otto"), "taverna", "sem objetivo de ouro, segue a agenda (almoço)")

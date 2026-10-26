@@ -131,6 +131,20 @@ func on_tick(tick: int) -> Array:
 	return out
 
 
+## Utilidade para a agenda (Arton Viva, Fase 1): num horário de trabalho, sem urgência e juntando ouro, o
+## morador prefere o posto a um lugar de lazer previsto (almoço, pausa). Necessidades urgentes não passam por
+## aqui: comer e descansar seguem depois, em location_override. Devolve o lugar escolhido.
+func agenda_override(id: String, d: Dictionary, planned: String, h: int) -> String:
+	if not enabled or STAY_PUT.has(str(d.get("schedule", ""))):
+		return planned
+	var work := str(d.get("work", ""))
+	if planned == work or planned == str(d.get("home", "")):
+		return planned
+	if h < WORK_START or h >= WORK_END or goal(id) != "" or medium_goal_for(id) != "juntar_ouro":
+		return planned
+	return work
+
+
 ## Bem que a profissão do morador produz num turno completo ("" se não produz nada). Vem de economy.json.
 func work_good(id: String) -> String:
 	var prof := str(world.npc_def(id).get("profession", ""))
