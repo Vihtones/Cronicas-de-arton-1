@@ -3,7 +3,7 @@
 O padrão do jogo é a XP dinâmica. O modo do livro (LB p.326) pode ser ligado a qualquer momento no diário (J), com o botão "XP: dinâmica → livro". Código: `src/domain/modules/progression_module.gd`.
 
 ## Princípio
-A **base é sempre a do livro**: ND × 1.000 por inimigo, ½ na fuga (empate), ¼ na captura (derrota) e 0 para ameaças com ND 5 ou mais abaixo do nível. Sobre essa base entram **multiplicadores de desempenho e circunstância**, e cada um aparece na mensagem do jogo. A XP nunca é inventada do nada nem escondida.
+A **base é sempre a do livro**: ND × 1.000 por inimigo, **0 na fuga e 0 na captura** (decisão do usuário: fugir não é recompensado, e isso fecha o exploit de entrar e sair da visão) e 0 para ameaças com ND 5 ou mais abaixo do nível. Sobre essa base entram **multiplicadores de desempenho e circunstância**, e cada um aparece na mensagem do jogo. A XP nunca é inventada do nada nem escondida.
 
 ## Combate
 `XP = Σ(base_por_inimigo × novidade) × clamp(1 + bônus, 0,5, 2,0)`

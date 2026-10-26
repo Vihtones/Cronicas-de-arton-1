@@ -1,7 +1,7 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `a1f71e9`. **Não edite à mão**: rode os dois scripts.
-Grafo: 597 nós, 1642 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `deeb808`. **Não edite à mão**: rode os dois scripts.
+Grafo: 598 nós, 1643 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
@@ -18,7 +18,7 @@ Grafo: 597 nós, 1642 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | `docs/PROTOTIPOS.md` | Protótipos por mecânica (v0.3.0) | 0 | 6 |
 | `docs/REFERENCIAS_VISUAIS.md` | Referências visuais e de sensação de jogo (pesquisa de 24/10/2026) | 3 | 0 |
 | `docs/REGRAS.md` | Regras usadas pelo jogo e sua proveniência | 1 | 91 |
-| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 4 | 11 |
+| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 5 | 11 |
 | `docs/XP_DINAMICA.md` | XP dinâmica (ORIGINAL_DO_JOGO) | 5 | 1 |
 | `docs/adr/ADR-0001-fundacao.md` | ADR-0001 — Decisões de fundação | 0 | 0 |
 | `docs/adr/ADR-0002-modulos-eventos.md` | ADR-0002: Módulos do mundo, comandos e eventos | 2 | 4 |

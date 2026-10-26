@@ -30,8 +30,29 @@ func test_xp_dinamica_base_do_livro_e_multiplicadores() -> void:
 	# base 250+250+500 = 1000; bônus: +20% (3 inimigos) +10% adversa +10% táticas +10% quase ileso +10% rápida = ×1.6
 	eq(hard, 1600, "conta transparente: 1000 × 1,6")
 	var w3 := WorldHelpers.world(1)
-	eq(_xp(_end(w3, ["bandido_1"], "fuga")), 125, "fuga = metade (empate do LB)")
-	eq(_xp(_end(w3, ["bandido_1"], "captura")), 62, "captura = um quarto (derrota do LB)")
+	# Decisão do usuário: fuga e captura não rendem XP (antes a fuga valia metade e dava para farmar).
+	eq(_xp(_end(w3, ["bandido_1"], "fuga")), 0, "fuga não rende XP")
+	eq(_xp(_end(w3, ["bandido_1"], "captura")), 0, "captura não rende XP")
+
+
+func test_fugir_repetidamente_nao_rende_xp() -> void:
+	var w := WorldHelpers.world(1)
+	var total := 0
+	for i in 20:
+		total += _xp(_end(w, ["bandido_1", "bandido_2"], "fuga"))
+	eq(total, 0, "20 fugas seguidas = 0 XP")
+	WorldHelpers.cmd(w, "SetXpMode", {"mode": "livro"})
+	eq(_xp(_end(w, ["bandido_1"], "fuga")), 0, "no modo livro também")
+
+
+func test_furtividade_nao_reabre_xp_com_grupo_diferente() -> void:
+	var w := WorldHelpers.world(1)
+	var prog: ProgressionModule = w.modules.progression
+	var first := _xp(prog.on_event(GameEvent.create("a", "STEALTH_CHECK", 0, {"group": ["bandido_1", "bandido_2"], "success": true})))
+	check(first > 0, "primeira evasão rende")
+	var again := _xp(prog.on_event(GameEvent.create("b", "STEALTH_CHECK", 0, {"group": ["bandido_1"], "success": true})))
+	var again2 := _xp(prog.on_event(GameEvent.create("c", "STEALTH_CHECK", 0, {"group": ["bandido_2", "bandido_1"], "success": true})))
+	eq(again + again2, 0, "mesmas criaturas em outro agrupamento não rendem de novo")
 
 
 func test_xp_dinamica_retorno_decrescente_por_repeticao() -> void:

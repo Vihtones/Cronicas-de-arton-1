@@ -140,10 +140,14 @@ func on_event(e: GameEvent) -> Array:
 		"STEALTH_CHECK":
 			if mode != "dinamica" or not e.payload.get("success", false):
 				return []
-			var key := ",".join(e.payload.group)
-			if evaded.has(key):
+			# Uma vez por criatura (não por grupo): o grupo muda conforme quem está perto, e isso reabria o XP.
+			var fresh := false
+			for id in e.payload.group:
+				if not evaded.has(str(id)):
+					fresh = true
+				evaded[str(id)] = true
+			if not fresh:
 				return []
-			evaded[key] = true
 			var nd := 0.0
 			for id in e.payload.group: nd += _nd_of(id)
 			return _award(int(xp_for(nd) * 0.25), "passou despercebido", [])
@@ -155,12 +159,11 @@ func _combat_xp(p: Dictionary) -> Array:
 	if outcome == "morte":
 		return []
 	var stats: Dictionary = p.get("stats", {})
-	var result: String = {"vitoria": "vitoria", "fuga": "empate", "captura": "derrota"}.get(outcome, "vitoria")
+	# Fugir e ser capturado NÃO rendem XP: recompensar a fuga permitia entrar e sair da visão do inimigo para farmar XP.
+	if outcome in ["fuga", "captura"]:
+		return []
+	var result := "vitoria"
 	if mode == "livro":
-		if outcome in ["fuga", "captura"]:
-			var total := 0.0
-			for id in p.get("enemies", []): total += _nd_of(id)
-			return _award(xp_for(total, result), outcome, [])
 		return []
 	# dinâmica: base do livro por inimigo (com novidade) × multiplicador de desempenho
 	var base := 0.0

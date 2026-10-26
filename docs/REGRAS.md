@@ -167,7 +167,7 @@ Página = página impressa do livro; PDF = página do arquivo PDF, para conferê
 | 1 tick = 10 min; 2 s reais por tick | `WorldClock`, `Game.settings` | PLACEHOLDER (§20.7) | sim |
 | Mistério 'O Filho do Moleiro', vila, NPCs, facções, diálogos | `data/world`, `data/dialogue` | ORIGINAL_DO_JOGO | — |
 | XP de mistério resolvido = ND 1 ('XP alternativo', LB p.326) | `ProgressionModule.MYSTERY_ND` | ORIGINAL | constante |
-| Fuga conta como empate (½ XP); captura como derrota (¼ XP) | `ProgressionModule` | ADAPTADA | — |
+| Fuga e captura não rendem XP (decisão do usuário: fugir não se recompensa; antes era ½ e ¼ do livro) | `ProgressionModule` | ADAPTADA | — |
 | Presets de atributos e perícias padrão por classe | `CharacterBuilder` | ORIGINAL (dentro das regras) | — |
 | Bruxo: o foco é considerado empunhado; sem PV/RD do foco | `CharacterBuilder`, `CombatModule._cast` | ADAPTADA (simplificação) | LB p.37 |
 | Feiticeiro sem linhagem; Mago sem memorização e com 3 magias em vez de 4 | `CharacterBuilder` | ADAPTADA (pendente) | LB p.37 |
