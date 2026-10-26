@@ -117,8 +117,23 @@ func _clamp(x: float) -> float:
 	return clampf(x, -MAX_VALUE, MAX_VALUE)
 
 
+## Só grava pares com alguma dimensão sensível (|valor| >= 0,5), com uma casa decimal.
+## Sem isso, todo par de moradores que já dividiu um local entra no save, e ele cresce sem limite.
 func to_dict() -> Dictionary:
-	return {"rel": rel.duplicate(true)}
+	var out := {}
+	for who in rel:
+		for about in rel[who]:
+			var r: Dictionary = rel[who][about]
+			var kept := {}
+			for d in DIMS:
+				var v := float(r.get(d, 0.0))
+				if absf(v) >= 0.5:
+					kept[d] = snappedf(v, 0.1)
+			if not kept.is_empty():
+				if not out.has(who):
+					out[who] = {}
+				out[who][about] = kept
+	return {"rel": out}
 
 
 func from_dict(d: Dictionary) -> void:

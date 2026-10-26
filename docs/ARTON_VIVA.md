@@ -64,7 +64,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 | Medida | Antes (0.7.0) | Agora |
 |---|---|---|
 | Comando p95 | 1,1 ms | 3,4 ms |
-| Save (p50/p95) | 8 ms | 41 ms / 56 ms |
-| Load | 31 ms | 163 ms (p95 26 ms na telemetria) |
+| Save (medido) | 8 ms | 24 ms (save p95 56 ms antes do ajuste de relações) |
+| Load | 31 ms | 151 ms no benchmark (p95 17 ms na telemetria) |
 
-O quadro aparece em 16,7 ms porque o modo headless fica preso a 60 quadros por segundo; ele não mede GPU. O salvamento e o carregamento cresceram com os novos módulos (relações, diário e rotas). Vale investigar o load de 163 ms antes da build de avaliação. A medição em hardware real continua pendente (§15).
+O quadro aparece em 16,7 ms porque o modo headless fica preso a 60 quadros por segundo; ele não mede GPU. O maior peso do save eram as relações entre todos os pares de moradores: 78 KB. Agora só grava pares com alguma dimensão sensível, e o bloco caiu para 15 KB. O load do benchmark ainda inclui a primeira carga, por isso o p95 da telemetria é o número a acompanhar. A medição em hardware real continua pendente (§15).
