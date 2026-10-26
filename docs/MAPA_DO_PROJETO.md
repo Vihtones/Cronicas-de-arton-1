@@ -1,7 +1,7 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `8563698`. **Não edite à mão**: rode os dois scripts.
-Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `5ab4cce`. **Não edite à mão**: rode os dois scripts.
+Grafo: 611 nós, 1708 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
@@ -32,14 +32,14 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **DialogueProvider** (`src/application/dialogue_provider.gd`, 4 ligações) — Porta de verbalização (§4, §6 Fase 6).
 - **Prototypes** (`src/application/prototypes.gd`, 22 ligações) — Laboratório de protótipos: um cenário pequeno e jogável por mecânica, montado sobre o MESMO mundo do jogo (sem atalhos de regra).
 - **Telemetry** (`src/application/telemetry.gd`, 1 ligações) — Métricas de desempenho (§15): p50/p95 de frame, tempo de comando/tick, save/load.
-- **WorldFactory** (`src/application/world_factory.gd`, 31 ligações) — Monta o mundo com todos os módulos.
+- **WorldFactory** (`src/application/world_factory.gd`, 32 ligações) — Monta o mundo com todos os módulos.
 - **game** (`src/application/game.gd`, 23 ligações) — Autoload "Game": composição da aplicação.
 
 ### `src/core`
 
 - **EventBus** (`src/core/event_bus.gd`, 6 ligações) — Barramento de eventos sem dependência de Node.
 - **GameCommand** (`src/core/game_command.gd`, 26 ligações) — Pedido de mudança de estado (Plano Mestre §6).
-- **GameEvent** (`src/core/game_event.gd`, 30 ligações) — Fato consumado e imutável (Plano Mestre §6).
+- **GameEvent** (`src/core/game_event.gd`, 32 ligações) — Fato consumado e imutável (Plano Mestre §6).
 - **GameLogger** (`src/core/game_logger.gd`, 1 ligações) — Logger estruturado com níveis e buffer em memória (para telemetria/depuração).
 
 ### `src/domain`
@@ -50,7 +50,7 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **DialogueVoice** (`src/domain/dialogue_voice.gd`, 12 ligações) — Voz dos moradores: monta falas a partir do ESTADO do mundo (hora, clima, evento da vila, reputação do jogador, mistério, quantas vezes já conversaram) e dos tex
 - **RngStreams** (`src/domain/rng_streams.gd`, 5 ligações) — Fluxos de RNG separados e rastreáveis (§7): combate, clima, mundo, visual.
 - **WorldClock** (`src/domain/world_clock.gd`, 4 ligações) — Relógio canônico do mundo (Plano Mestre §7).
-- **WorldModule** (`src/domain/world_module.gd`, 30 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
+- **WorldModule** (`src/domain/world_module.gd`, 31 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
 - **WorldState** (`src/domain/world_state.gd`, 38 ligações) — Estado mutável do mundo.
 
 ### `src/domain/combat`
@@ -72,14 +72,15 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **ItemsModule** (`src/domain/modules/items_module.gd`, 21 ligações) — Equipamento e consumíveis (protótipo).
 - **LineageModule** (`src/domain/modules/lineage_module.gd`, 22 ligações) — Gerações (§8, §20.8): longevidade 70+2d20 rolada uma vez (LB p.108), morte por velhice, herança para o parente mais velho, nascimentos em casais e sucessão do h
 - **MemoryModule** (`src/domain/modules/memory_module.gd`, 35 ligações) — Memória estruturada, rumores e reputação (§8, §11).
-- **NpcModule** (`src/domain/modules/npc_module.gd`, 39 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
+- **NpcLifeModule** (`src/domain/modules/npc_life_module.gd`, 14 ligações) — Vida dos moradores: o que cada um ESTÁ FAZENDO agora e COMO se sente.
+- **NpcModule** (`src/domain/modules/npc_module.gd`, 42 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
 - **ObjectsModule** (`src/domain/modules/objects_module.gd`, 28 ligações) — Portas, baús, escadas e barracas.
 - **PacingModule** (`src/domain/modules/pacing_module.gd`, 9 ligações) — WorldPacingDirector (§7): decide QUANDO apresentar conteúdo opcional que JÁ é verdadeiro no estado (vinhetas).
 - **ProgressionModule** (`src/domain/modules/progression_module.gd`, 31 ligações) — Progressão.
 - **RegionSimModule** (`src/domain/modules/region_sim_module.gd`, 5 ligações) — Regiões distantes em LOD L3 (§7): um sorteio agregado por dia, nunca simulação passo a passo.
 - **ReligionModule** (`src/domain/modules/religion_module.gd`, 15 ligações) — Fé (§11): devoção segue o panteão e as obrigações verificadas no LB.
 - **StateModule** (`src/domain/modules/state_module.gd`, 32 ligações) — Flags do mundo e inventário do jogador.
-- **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 13 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
+- **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 14 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
 - **TravelModule** (`src/domain/modules/travel_module.gd`, 26 ligações) — Viagens entre regiões (LB p.270, Tabela 6-4): km/dia pelo deslocamento, metade em terreno difícil ou clima ruim.
 - **WeatherModule** (`src/domain/modules/weather_module.gd`, 29 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
 
@@ -137,8 +138,8 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `tests`
 
-- **TestCase** (`tests/unit/test_case.gd`, 22 ligações) — 
-- **WorldHelpers** (`tests/unit/world_helpers.gd`, 20 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
+- **TestCase** (`tests/unit/test_case.gd`, 23 ligações) — 
+- **WorldHelpers** (`tests/unit/world_helpers.gd`, 21 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
 - **run_tests** (`tests/run_tests.gd`, 0 ligações) — Executor de testes headless, sem dependências externas.
 - **test_arcanista** (`tests/unit/test_arcanista.gd`, 13 ligações) — C17 (perícias), C4 (Arcanista: caminhos e 3 magias) e C5 (concentração e armadura ao lançar).
 - **test_art_governor** (`tests/unit/test_art_governor.gd`, 4 ligações) — Governador de Direção de Arte: só assets aprovados entram, nas zonas certas, sem mexer na colisão.
@@ -160,6 +161,7 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **test_social** (`tests/unit/test_social.gd`, 18 ligações) — 
 - **test_systems** (`tests/unit/test_systems.gd`, 31 ligações) — Crime, economia, clima, fé, diálogo, persistência e módulos opcionais.
 - **test_vertical_slice** (`tests/unit/test_vertical_slice.gd`, 21 ligações) — Gates do vertical slice jogados só por comandos (sem atalhos internos).
+- **test_vida_moradores** (`tests/unit/test_vida_moradores.gd`, 7 ligações) — Vida dos moradores: atividade, humor (medo/alegria), recolhimento e persistência.
 - **test_world_clock** (`tests/unit/test_world_clock.gd`, 2 ligações) — 
 - **test_world_state** (`tests/unit/test_world_state.gd`, 6 ligações) — 
 
@@ -220,7 +222,7 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | CHECK_FAILED | ObjectsModule | — | Narrator |
 | COMBAT_ENDED | CombatModule | FactionModule, ProgressionModule | CombatView, Narrator, NpcLayer, game, main, test_interactions … |
 | COMBAT_MOVED | CombatModule | — | CombatView |
-| COMBAT_STARTED | CombatModule | — | CombatView, Narrator, game |
+| COMBAT_STARTED | CombatModule | NpcLifeModule | CombatView, Narrator, game |
 | COUP_DE_GRACE | CombatModule | — | CombatView, Narrator |
 | CREATURES_MOVED | CombatModule | — | main, test_interactions |
 | CREATURE_DEFEATED | — | CombatModule, ExplorationModule, FactionModule, FaunaModule, ProgressionModule | MemoryModule, Narrator, NpcLayer, test_combat, test_interactions, test_prototypes |
@@ -262,13 +264,13 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | NOISE_UNHEARD | CombatModule | — | Narrator |
 | NPC_BORN | LineageModule | NpcModule | MemoryModule, Narrator, main, test_systems |
 | NPC_CAME_OF_AGE | LineageModule | — | Narrator, test_systems |
-| NPC_CAPTURED | — | NpcModule | — |
-| NPC_DIED | LineageModule | NpcModule | MemoryModule, Narrator, test_prototypes |
+| NPC_CAPTURED | — | NpcLifeModule, NpcModule | — |
+| NPC_DIED | LineageModule | NpcLifeModule, NpcModule | MemoryModule, Narrator, test_prototypes, test_vida_moradores |
 | NPC_MARRIED | LineageModule | — | MemoryModule, Narrator |
 | NPC_MOVED | NpcModule | EconomyModule | NpcLayer, WorldState |
-| NPC_RESCUED | FactionModule | ExplorationModule, NpcModule | MemoryModule, Narrator, NpcLayer |
+| NPC_RESCUED | FactionModule | ExplorationModule, NpcLifeModule, NpcModule | MemoryModule, Narrator, NpcLayer |
 | NPC_RESCUED_BY_OTHER | — | MemoryModule | — |
-| NPC_WOUNDED | FactionModule | NpcModule | — |
+| NPC_WOUNDED | FactionModule | NpcLifeModule, NpcModule | — |
 | OBJECT_BROKEN | ObjectsModule | CrimeModule | Narrator, main |
 | OBJECT_CLOSED | ObjectsModule | — | Narrator, main |
 | OBJECT_DAMAGED | ObjectsModule | CombatModule | Narrator |
@@ -304,8 +306,8 @@ Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | STOOD_UP | CombatModule | — | CombatView, Narrator |
 | TARGET_INSPECTED | ExplorationModule | ProgressionModule | Narrator, test_interactions |
 | TIME_ADVANCED | — | FactionModule | WorldState |
-| TOWN_EVENT_ENDED | TownEventsModule | — | Narrator, test_mundo_vivo |
-| TOWN_EVENT_STARTED | TownEventsModule | EconomyModule | Narrator, UiRoot, test_mundo_vivo |
+| TOWN_EVENT_ENDED | TownEventsModule | NpcLifeModule | Narrator, test_mundo_vivo |
+| TOWN_EVENT_STARTED | TownEventsModule | EconomyModule, NpcLifeModule | Narrator, UiRoot, test_mundo_vivo, test_vida_moradores |
 | TRADE_DELIVERED | EconomyModule | — | Narrator, test_prototypes |
 | TRAVEL_AMBUSH | TravelModule | CombatModule | Narrator |
 | TRAVEL_ARRIVED | TravelModule | — | Narrator, main |

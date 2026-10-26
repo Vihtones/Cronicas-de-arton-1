@@ -69,6 +69,12 @@ func desired_location(id: String) -> String:
 		return d.home
 	if int(s.get("age", 99)) < 6:
 		return d.home   # C7: crianças pequenas ficam em casa
+	# medo: quem presenciou violência se recolhe até acalmar (guardas ficam)
+	var life = world.module("npc_life")
+	if life != null:
+		var scared: String = life.location_override(id, d, int(s.get("age", 99)))
+		if scared != "":
+			return scared
 	# mensageiro entre regiões (LOD L3)
 	for r in world.db.distant.get("regions", []):
 		if r.get("courier", "") == id:

@@ -5,6 +5,7 @@
 - Combate: fantasma do jogador (`GhostActor`) ensaia o plano em laço — anda o caminho, recua e investe, dispara ou conjura — antes de confirmar. Verificação: `tools/ghost_check.gd`.
 - Diálogos: voz dos moradores (`DialogueVoice`, `data/dialogue/voices.json`, gerado por `tools/build_voices.py`) — saudação por registro, hora, clima, evento da vila, reputação e mistério; memória da conversa (primeira vez, mesmo dia, retorno, assunto repetido); novo submenu de papo com opinião sobre cada morador. Saves antigos carregam.
 - Falas de ambiente: `AmbientTalk` + `data/dialogue/ambient.json`. Balões em conversas reais (turnos entre dois figurantes), pregões por mercadoria, falas por clima/hora/evento/mistério; moradores reconhecem o jogador que passa. Balão do tamanho do texto. Verificação: `tools/falas_check.gd`.
+- Moradores: `NpcLifeModule` — humor (medo e alegria) e atividade (trabalho, descanso, festa, feira, ferido, preso). Violência na vila assusta família e vizinhos, que se recolhem até acalmar; guardas não saem do posto. Humor é salvo com o jogo; saves antigos carregam.
 
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2
 ### Mudou
