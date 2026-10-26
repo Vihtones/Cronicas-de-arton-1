@@ -110,7 +110,7 @@ static func line(e: GameEvent) -> String:
 		"POWER_USED": return "%s usa %s (−%d PM)." % [_name(p.actor), {"impeto": "Ímpeto", "velocidade_ladina": "Velocidade Ladina", "emboscar": "Emboscar", "ataque_extra": "Ataque Extra", "trespassar": "Trespassar"}.get(p.power, p.power), p.pm_cost]
 		"REACTION": return "Ataque Reflexo: %s golpeia %s, que saiu do alcance!" % [_name(p.actor), _name(p.target)]
 		"SPELL_FAILED": return "%s perde a magia: %s CD %d (%s) — tirou %d." % [_name(p.caster), "Vontade" if p.check == "vontade" else "Misticismo", p.cd, p.reason, p.total]
-		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ""
+		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ("Armadura de Allihanna: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_de_allihanna" else "")
 		"SPELL_CAST": return "Magia: %s (−%d PM, resta %d)." % [str(p.spell).replace("_", " ").capitalize(), p.pm_cost, p.pm_after] if p.caster == "player" else ""
 		"HEALED": return "%s recupera %d PV." % [_name(p.target), p.amount]
 		"EQUIPPED": return "Equipado: %s (Defesa %d)." % [Game.db.items.get(p.item, {}).get("name", p.item), p.defense]

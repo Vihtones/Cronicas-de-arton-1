@@ -507,6 +507,11 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_coup(id, a.target))
 		"cast":
 			out.append_array(_cast(id, a, v))
+		"allihanna":
+			var sh_a: CharacterSheet = sim.c(id).sheet
+			sh_a.pm -= 1
+			sh_a.allihanna_ativa = true
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "armadura_de_allihanna", "defense": sh_a.allihanna_defense(true), "pm_after": sh_a.pm, "tags": ["racial"]}, [id]))
 		"drink":
 			var heal := Dice.roll(str(world.rules.value("magia.curar_ferimentos").cura), world.rng, "combat")
 			var sh: CharacterSheet = sim.c(id).sheet
@@ -962,6 +967,7 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet = P.sheet
 	world.player_sheet.remove_condition("surpreendido")
 	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
+	world.player_sheet.allihanna_ativa = false
 	world.player.position = world.db.tile_to_world(P.tile)
 	for id in sim.combatants:
 		if id == "player":

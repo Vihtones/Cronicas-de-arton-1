@@ -130,6 +130,20 @@ func test_superficie_inteira_alcancavel_a_pe() -> void:
 	eq(falta, 0, "todo chão da superfície liga ao início (bolsões abertos em build_content)")
 
 
+func test_armadura_de_allihanna_custa_pm_da_defesa_e_nao_ativa_duas_vezes() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var P := sim.c("player")
+	P.sheet.race_id = "dahllan"
+	P.sheet.pm = 3
+	var antes: int = P.sheet.defense(sim.rules)
+	check(GhostPlanner.validate_action(sim, "player", {"type": "allihanna"}).ok, "dahllan ativa a armadura")
+	w.modules.combat._execute_action("player", {"type": "allihanna"}, {"ok": true, "kind": "movimento", "cost": 0})
+	eq(P.sheet.pm, 2, "custa 1 PM")
+	eq(P.sheet.defense(sim.rules) - antes, 2, "+2 de Defesa (LB, dahllan)")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "allihanna"}).ok, "não ativa duas vezes na cena")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:

@@ -111,6 +111,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
 			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}
 			return {"ok": true, "kind": "padrao"}
+		"allihanna":
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
+			if A.sheet.race_id != "dahllan": return {"ok": false, "reason": "só dahllan tem Armadura de Allihanna"}
+			if A.sheet.allihanna_ativa: return {"ok": false, "reason": "já ativa nesta cena"}
+			if A.sheet.pm < 1: return {"ok": false, "reason": "PM insuficiente"}
+			return {"ok": true, "kind": "movimento", "cost": 0}
 		"impeto", "velocidade_ladina", "emboscar":
 			return validate_power_action(sim, actor, t)
 	return {"ok": false, "reason": "ação desconhecida: " + t}
