@@ -154,6 +154,14 @@ func on_tick(tick: int) -> Array:
 				if good != "":
 					out.append(fact("WORK_DONE", {"npc": id, "good": good, "amount": 1}, [id]))
 			s.shift = 0
+		# família: criança com fome e sem ouro recebe a refeição de um adulto da família que possa pagar
+		if s.goal == "comer" and float(s.hunger) >= HUNGRY_AT and int(s.gold) < MEAL_COST:
+			var payer := family_payer(id)
+			if payer != "":
+				var ps := _s(payer)
+				ps.gold = int(ps.gold) - MEAL_COST
+				s.gold = int(s.gold) + MEAL_COST
+				out.append(fact("FAMILY_SUPPORT", {"from": payer, "to": id, "amount": MEAL_COST}, [payer, id]))
 		# ferramenta de ofício: quem não tem (pela história) compra no mercado, no tempo livre, com ouro
 		if not at_work and not bool(s.get("tools", true)) and loc == tool_shop_location() and int(s.gold) >= tool_price():
 			s.gold = int(s.gold) - tool_price()
@@ -212,6 +220,31 @@ func visit_target(id: String, d: Dictionary) -> String:
 		var afeto: float = rel.dims(id, other).afeto
 		if afeto > best_affection:
 			best_affection = afeto
+			best = other
+	return best
+
+
+## Família: quem paga a refeição de uma criança sem ouro. Só adulto da mesma família, vivo e fora de cativeiro,
+## com ouro para pagar e sobrar reserva (duas refeições). "" se ninguém pode.
+func family_payer(id: String) -> String:
+	var d := world.npc_def(id)
+	var fam := str(d.get("family", ""))
+	if str(d.get("profession", "")) != "criança" or fam == "":
+		return ""
+	var npcs = world.module("npcs")
+	var best := ""
+	var best_gold := MEAL_COST * 2
+	for other in world.all_npc_ids():
+		if other == id:
+			continue
+		var od := world.npc_def(other)
+		if str(od.get("family", "")) != fam or str(od.get("profession", "")) == "criança":
+			continue
+		var st: Dictionary = npcs.state.get(other, {}) if npcs != null else {}
+		if not st.get("alive", true) or st.get("captive", false):
+			continue
+		if int(_s(other).gold) >= best_gold:
+			best_gold = int(_s(other).gold)
 			best = other
 	return best
 

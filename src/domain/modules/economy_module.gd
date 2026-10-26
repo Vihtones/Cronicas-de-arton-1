@@ -4,6 +4,8 @@ extends WorldModule
 ## Não simula cada moeda. O mensageiro leva mercadoria entre regiões. ORIGINAL_DO_JOGO.
 
 var regions: Dictionary = {}
+const FACTION_HOSTILE_AT := -20.0   # facção com reputação abaixo disso cobra 25% a mais de todos os seus vendedores
+const FACTION_FRIENDLY_AT := 30.0   # acima disso, 10% de desconto
 var treasury := 0  # ouro pago em refeições da vila (circulação monetária, ORIGINAL_DO_JOGO)
 var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regiões (Arton Viva, Fase 4)
 
@@ -27,6 +29,15 @@ func price(item_id: String, region: String = "vila", seller: String = "") -> int
 	var mem = world.module("memory")
 	if seller != "" and mem != null and mem.bias(seller, "player") < 0:
 		base = int(ceil(base * 1.2))  # vendedor desconfiado cobra mais de estranhos (ORIGINAL)
+	# consequência por grupo: a reputação da facção do vendedor muda o preço de todos os seus vendedores
+	var fac = world.npc_def(seller).get("faction") if seller != "" else null
+	if fac != null and mem != null:
+		var fr: Dictionary = mem.faction_reputation(str(fac), "player")
+		if int(fr.known_by) >= 1:
+			if float(fr.value) <= FACTION_HOSTILE_AT:
+				base = int(ceil(base * 1.25))
+			elif float(fr.value) >= FACTION_FRIENDLY_AT:
+				base = maxi(1, int(floor(base * 0.9)))
 	var good: String = it.get("good", "")
 	if good == "" or not regions.has(region):
 		return base

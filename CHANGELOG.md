@@ -11,6 +11,7 @@
 - Utilidade na agenda: no horário de trabalho, quem junta ouro fica no posto em vez do almoço ou da pausa previstos; fome e cansaço urgentes continuam vencendo.
 - Visita por utilidade: no tempo livre, o morador vai à casa de quem gosta dele (afeto acima de 30) se essa pessoa estiver em casa.
 - Ferramenta de ofício pela história: quem começou o ofício há 2 anos ou mais já tem a ferramenta; aprendizes e ajudantes recentes compram na Mara no tempo livre, quando têm ouro.
+- Fase 2 (sociedade): família paga a refeição de criança sem ouro (`FAMILY_SUPPORT`). Consequência por grupo: a reputação da facção do vendedor muda o preço de todos os seus vendedores (templo hostil cobra 25% a mais; amigo, 10% de desconto).
 - Carroças de entrega: `CartsModule` (domínio). Nascem de dia, levam a mercadoria que falta na vila, descarregam no mercado (estoque sobe) e voltam. A apresentação só desenha a posição. Salvam e carregam.
 
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2
