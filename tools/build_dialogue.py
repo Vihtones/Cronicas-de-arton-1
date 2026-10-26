@@ -5,8 +5,7 @@ back = {"text": "Mudar de assunto.", "next": "__generic"}
 bye = {"text": "Até mais.", "next": "end"}
 generic = {
  "topics": [
-  {"text": "O que se conta por aí?", "next": "__rumor"},
-  {"text": "Fale um pouco de você.", "next": "__bio"},
+  {"text": "Conversar sobre outra coisa.", "next": "__papo"},
   {"text": "Você viu Tomas Brandt?", "cond": [{"fact": "f_tomas_sumiu"}, {"mystery": "ativo"}], "next": "g_tomas"},
   {"text": "Quero comprar algo.", "cond": [{"shop": True}], "effects": [{"event": "OPEN_SHOP"}], "next": "__generic"},
   {"text": "Vim pagar minhas multas.", "cond": [{"warrant": True}, {"faction_member": "guarda_vila"}], "effects": [{"pay_fine": True}], "next": "g_multa_paga"},

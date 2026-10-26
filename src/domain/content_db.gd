@@ -10,6 +10,7 @@ var economy: Dictionary = {}
 var laws: Dictionary = {}
 var distant: Dictionary = {}
 var dialogue: Dictionary = {}
+var voices: Dictionary = {}   # vozes dos moradores (data/dialogue/voices.json)
 var mysteries: Array = []          # todos os mistérios (principal + secundários)
 
 var grid: PackedStringArray
@@ -27,6 +28,7 @@ static func load_default() -> ContentDB:
 	var db := ContentDB.new()
 	db.load_dir("res://data/world")
 	db.dialogue = _read("res://data/dialogue/dialogue.json")
+	db.voices = _read("res://data/dialogue/voices.json")
 	return db
 
 

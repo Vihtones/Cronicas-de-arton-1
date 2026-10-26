@@ -1,13 +1,13 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `bd9c92b`. **Não edite à mão**: rode os dois scripts.
-Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `1cb515e`. **Não edite à mão**: rode os dois scripts.
+Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
 | Documento | Assunto | Seções | Cita código/regras |
 |---|---|---|---|
-| `CHANGELOG.md` | Changelog | 10 | 21 |
+| `CHANGELOG.md` | Changelog | 10 | 22 |
 | `README.md` | Crônicas de Arton | 6 | 7 |
 | `docs/ART_BIBLE.md` | Art Bible (provisória) | 1 | 1 |
 | `docs/GOVERNADOR_DE_ARTE.md` | Governador de Direção de Arte | 7 | 3 |
@@ -38,7 +38,7 @@ Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 ### `src/core`
 
 - **EventBus** (`src/core/event_bus.gd`, 6 ligações) — Barramento de eventos sem dependência de Node.
-- **GameCommand** (`src/core/game_command.gd`, 25 ligações) — Pedido de mudança de estado (Plano Mestre §6).
+- **GameCommand** (`src/core/game_command.gd`, 26 ligações) — Pedido de mudança de estado (Plano Mestre §6).
 - **GameEvent** (`src/core/game_event.gd`, 30 ligações) — Fato consumado e imutável (Plano Mestre §6).
 - **GameLogger** (`src/core/game_logger.gd`, 1 ligações) — Logger estruturado com níveis e buffer em memória (para telemetria/depuração).
 
@@ -46,10 +46,11 @@ Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 - **Biography** (`src/domain/biography.gd`, 3 ligações) — Biografia prévia gerada como HISTÓRICO RESUMIDO consistente (§8), nunca simulada dia a dia.
 - **ContentDB** (`src/domain/content_db.gd`, 22 ligações) — Catálogos estáticos (definições) separados do estado mutável (§14).
+- **DialogueVoice** (`src/domain/dialogue_voice.gd`, 9 ligações) — Voz dos moradores: monta falas a partir do ESTADO do mundo (hora, clima, evento da vila, reputação do jogador, mistério, quantas vezes já conversaram) e dos tex
 - **RngStreams** (`src/domain/rng_streams.gd`, 5 ligações) — Fluxos de RNG separados e rastreáveis (§7): combate, clima, mundo, visual.
 - **WorldClock** (`src/domain/world_clock.gd`, 4 ligações) — Relógio canônico do mundo (Plano Mestre §7).
 - **WorldModule** (`src/domain/world_module.gd`, 30 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
-- **WorldState** (`src/domain/world_state.gd`, 35 ligações) — Estado mutável do mundo.
+- **WorldState** (`src/domain/world_state.gd`, 37 ligações) — Estado mutável do mundo.
 
 ### `src/domain/combat`
 
@@ -61,25 +62,25 @@ Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **AdventurersModule** (`src/domain/modules/adventurers_module.gd`, 8 ligações) — Aventureiros NPC em LOD L3 (§8): progridem por atividades plausíveis, usando a MESMA regra de XP do jogador (ND × 1000 / grupo, LB p.326).
 - **CombatModule** (`src/domain/modules/combat_module.gd`, 103 ligações) — Combate tático híbrido (§9).
 - **CrimeModule** (`src/domain/modules/crime_module.gd`, 23 ligações) — Crime (§11): ato real, evidência, testemunhas, conhecimento das autoridades, lei local, mandado, multa e resolução.
-- **DialogueModule** (`src/domain/modules/dialogue_module.gd`, 33 ligações) — Diálogo estruturado (§6, §8).
+- **DialogueModule** (`src/domain/modules/dialogue_module.gd`, 35 ligações) — Diálogo estruturado (§6, §8).
 - **DomainModule** (`src/domain/modules/domain_module.gd`, 18 ligações) — Administração de domínio (§11): decisões de alto nível, conselheiros e delegação.
 - **EconomyModule** (`src/domain/modules/economy_module.gd`, 26 ligações) — Economia agregada por região (§11): produção/consumo diários e preços com limites.
-- **ExplorationModule** (`src/domain/modules/exploration_module.gd`, 39 ligações) — Exploração ativa e mistérios (§10).
+- **ExplorationModule** (`src/domain/modules/exploration_module.gd`, 40 ligações) — Exploração ativa e mistérios (§10).
 - **FactionModule** (`src/domain/modules/faction_module.gd`, 20 ligações) — Facções com objetivos, recursos e reações causais (§11).
 - **FaunaModule** (`src/domain/modules/fauna_module.gd`, 14 ligações) — Criaturas com território e recursos, custo limitado (§11).
 - **ItemsModule** (`src/domain/modules/items_module.gd`, 21 ligações) — Equipamento e consumíveis (protótipo).
 - **LineageModule** (`src/domain/modules/lineage_module.gd`, 22 ligações) — Gerações (§8, §20.8): longevidade 70+2d20 rolada uma vez (LB p.108), morte por velhice, herança para o parente mais velho, nascimentos em casais e sucessão do h
-- **MemoryModule** (`src/domain/modules/memory_module.gd`, 33 ligações) — Memória estruturada, rumores e reputação (§8, §11).
-- **NpcModule** (`src/domain/modules/npc_module.gd`, 37 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
+- **MemoryModule** (`src/domain/modules/memory_module.gd`, 35 ligações) — Memória estruturada, rumores e reputação (§8, §11).
+- **NpcModule** (`src/domain/modules/npc_module.gd`, 39 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
 - **ObjectsModule** (`src/domain/modules/objects_module.gd`, 28 ligações) — Portas, baús, escadas e barracas.
 - **PacingModule** (`src/domain/modules/pacing_module.gd`, 9 ligações) — WorldPacingDirector (§7): decide QUANDO apresentar conteúdo opcional que JÁ é verdadeiro no estado (vinhetas).
 - **ProgressionModule** (`src/domain/modules/progression_module.gd`, 31 ligações) — Progressão.
 - **RegionSimModule** (`src/domain/modules/region_sim_module.gd`, 5 ligações) — Regiões distantes em LOD L3 (§7): um sorteio agregado por dia, nunca simulação passo a passo.
 - **ReligionModule** (`src/domain/modules/religion_module.gd`, 15 ligações) — Fé (§11): devoção segue o panteão e as obrigações verificadas no LB.
 - **StateModule** (`src/domain/modules/state_module.gd`, 32 ligações) — Flags do mundo e inventário do jogador.
-- **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 11 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
+- **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 13 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
 - **TravelModule** (`src/domain/modules/travel_module.gd`, 26 ligações) — Viagens entre regiões (LB p.270, Tabela 6-4): km/dia pelo deslocamento, metade em terreno difícil ou clima ruim.
-- **WeatherModule** (`src/domain/modules/weather_module.gd`, 26 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
+- **WeatherModule** (`src/domain/modules/weather_module.gd`, 27 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
 
 ### `src/domain/rules`
 
@@ -134,13 +135,14 @@ Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `tests`
 
-- **TestCase** (`tests/unit/test_case.gd`, 20 ligações) — 
-- **WorldHelpers** (`tests/unit/world_helpers.gd`, 18 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
+- **TestCase** (`tests/unit/test_case.gd`, 21 ligações) — 
+- **WorldHelpers** (`tests/unit/world_helpers.gd`, 19 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
 - **run_tests** (`tests/run_tests.gd`, 0 ligações) — Executor de testes headless, sem dependências externas.
 - **test_arcanista** (`tests/unit/test_arcanista.gd`, 13 ligações) — C17 (perícias), C4 (Arcanista: caminhos e 3 magias) e C5 (concentração e armadura ao lançar).
 - **test_art_governor** (`tests/unit/test_art_governor.gd`, 4 ligações) — Governador de Direção de Arte: só assets aprovados entram, nas zonas certas, sem mexer na colisão.
 - **test_arvore_poderes** (`tests/unit/test_arvore_poderes.gd`, 11 ligações) — Árvore de poderes: poderes gerais do LB (p.124-131) com pré-requisitos encadeados e efeitos.
 - **test_combat** (`tests/unit/test_combat.gd`, 16 ligações) — 
+- **test_dialogo_voz** (`tests/unit/test_dialogo_voz.gd`, 12 ligações) — Voz dos moradores: saudação por registro/hora/reputação, memória da conversa, papo e opiniões.
 - **test_event_bus** (`tests/unit/test_event_bus.gd`, 3 ligações) — 
 - **test_exploration** (`tests/unit/test_exploration.gd`, 11 ligações) — 
 - **test_interactions** (`tests/unit/test_interactions.gd`, 48 ligações) — XP dinâmica, poderes e interações entre sistemas (quando a ligação é óbvia).
@@ -175,11 +177,11 @@ Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 |---|---|---|---|
 | Buy | EconomyModule | UiRoot | test_interactions, test_prototypes |
 | CastSpell | ItemsModule | UiRoot | **sem teste** |
-| ChooseOption | DialogueModule | UiRoot, screenshot_runner | test_systems, test_vertical_slice |
+| ChooseOption | DialogueModule | UiRoot, screenshot_runner | test_dialogo_voz, test_systems, test_vertical_slice |
 | ChoosePower | ProgressionModule | UiRoot | test_arvore_poderes, test_interactions, test_powers |
 | ContinueAsHeir | LineageModule | UiRoot | test_prototypes |
 | Delegate | DomainModule | UiRoot | test_prototypes |
-| EndDialogue | DialogueModule | screenshot_runner | test_vertical_slice |
+| EndDialogue | DialogueModule | screenshot_runner | test_dialogo_voz, test_vertical_slice |
 | EndTurn | CombatModule | CombatView | test_combat, test_interactions, test_prototypes, test_vertical_slice |
 | Equip | ItemsModule | UiRoot | test_interactions, test_prototypes |
 | ExecutePlan | CombatModule | CombatView | test_combat, test_interactions, test_prototypes, test_vertical_slice |
@@ -194,7 +196,7 @@ Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | SetStance | CombatModule | UiRoot, main | test_combat |
 | SetXpMode | ProgressionModule | UiRoot | test_interactions |
 | StartCombat | CombatModule | main | test_prototypes |
-| StartDialogue | DialogueModule | main, screenshot_runner | test_social, test_systems, test_vertical_slice |
+| StartDialogue | DialogueModule | main, screenshot_runner | test_dialogo_voz, test_social, test_systems, test_vertical_slice |
 | StealFromStall | CrimeModule | Prototypes, main | test_systems |
 | Travel | TravelModule | UiRoot, lab_runner, main | test_interactions, test_prototypes |
 | UseItem | ItemsModule | UiRoot | **sem teste** |

@@ -4,12 +4,8 @@
  "generic": {
   "topics": [
    {
-    "text": "O que se conta por aí?",
-    "next": "__rumor"
-   },
-   {
-    "text": "Fale um pouco de você.",
-    "next": "__bio"
+    "text": "Conversar sobre outra coisa.",
+    "next": "__papo"
    },
    {
     "text": "Você viu Tomas Brandt?",

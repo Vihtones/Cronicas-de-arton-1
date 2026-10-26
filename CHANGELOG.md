@@ -3,6 +3,7 @@
 ## 0.7.1 (em andamento)
 - Fuga e captura não rendem mais XP; evasão furtiva rende uma vez por criatura (fecha o exploit de entrar/sair da visão).
 - Combate: fantasma do jogador (`GhostActor`) ensaia o plano em laço — anda o caminho, recua e investe, dispara ou conjura — antes de confirmar. Verificação: `tools/ghost_check.gd`.
+- Diálogos: voz dos moradores (`DialogueVoice`, `data/dialogue/voices.json`, gerado por `tools/build_voices.py`) — saudação por registro, hora, clima, evento da vila, reputação e mistério; memória da conversa (primeira vez, mesmo dia, retorno, assunto repetido); novo submenu de papo com opinião sobre cada morador. Saves antigos carregam.
 
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2
 ### Mudou

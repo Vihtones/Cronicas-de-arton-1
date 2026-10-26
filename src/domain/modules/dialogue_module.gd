@@ -4,7 +4,10 @@ extends WorldModule
 ## viram fatos. A IA opcional (DialogueProvider) só reescreve o TEXTO exibido;
 ## opções, testes e efeitos são sempre decididos aqui.
 
-var session: Dictionary = {}  # {npc, node}
+var session: Dictionary = {}  # {npc, node, visit, repeat}
+## Memória da conversa por morador: {count, last_day, seen:{nó dinâmico: dia}}. Só texto (não muda regras):
+## serve para o morador reconhecer que já se falaram hoje, que o jogador voltou depois de dias e que o assunto repete.
+var talks: Dictionary = {}
 
 
 func module_id() -> String: return "dialogue"
@@ -39,18 +42,44 @@ func _start_node(npc: String) -> String:
 	return t.get("start", "__generic")
 
 
-## Nós gerados a partir do estado (rumores, saudação genérica).
+## Nós gerados a partir do estado (saudação, papo, rumores, opiniões). A voz vem de DialogueVoice.
 func _dynamic_node(npc: String, node_id: String) -> Dictionary:
 	var d := world.npc_def(npc)
-	match node_id:
+	var back := {"text": "Mudar de assunto.", "next": "__papo"}
+	var again := "Já lhe falei disso hoje. " if bool(session.get("repeat", false)) else ""
+	var key := node_id.get_slice(":", 0)
+	match key:
 		"__generic":
-			var rep := _rep(npc)
-			var greet := "Bom dia." if world.hour() < 12 else ("Boa tarde." if world.hour() < 18 else "Boa noite.")
-			if rep >= 30: greet = "Ah, é você! Sempre bem-vindo."
-			elif rep <= -20: greet = "...O que você quer?"
-			return {"text": "%s Sou %s, %s." % [greet, d.name, d.profession], "options": []}
+			var visit: Dictionary = session.get("visit", {"kind": "conhecido", "count": 1})
+			var text := DialogueVoice.greeting(world, npc, visit)
+			if str(visit.get("kind", "")) == "primeira":
+				text += " Sou %s, %s." % [d.name, d.profession]
+			return {"text": text, "options": []}
+		"__papo":
+			var opts: Array = [{"text": "O que se conta por aí?", "next": "__rumor"}, {"text": "Como vai o trabalho?", "next": "__trabalho"},
+				{"text": "Que tempo, não?", "next": "__tempo"}]
+			for ev in DialogueVoice.active_event_ids(world):
+				opts.append({"text": "O que acha da %s?" % ev, "next": "__evento:" + str(ev)})
+			opts.append({"text": "Fale-me da gente da vila.", "next": "__gente"})
+			opts.append({"text": "Fale um pouco de você.", "next": "__bio"})
+			opts.append({"text": "Voltar.", "next": "__generic"})
+			return {"text": "Sobre o que quer conversar?", "options": opts}
+		"__trabalho":
+			return {"text": again + DialogueVoice.work(world, npc), "options": [back]}
+		"__tempo":
+			return {"text": again + DialogueVoice.weather(world, npc), "options": [back]}
+		"__evento":
+			return {"text": again + DialogueVoice.event(world, npc, node_id.get_slice(":", 1)), "options": [back]}
+		"__gente":
+			var opts2: Array = []
+			for id in DialogueVoice.people_of_interest(world, npc):
+				opts2.append({"text": "E %s?" % str(world.npc_def(id).get("name", id)).split(" ")[0], "next": "__opiniao:" + str(id)})
+			opts2.append({"text": "Voltar.", "next": "__papo"})
+			return {"text": "Gente não falta por aqui. De quem quer saber?", "options": opts2}
+		"__opiniao":
+			return {"text": again + DialogueVoice.opinion(world, npc, node_id.get_slice(":", 1)), "options": [{"text": "E os outros?", "next": "__gente"}, back]}
 		"__bio":
-			return {"text": Biography.for_npc(d, int(world.rng.world_seed)), "options": [{"text": "Entendo.", "next": "__generic"}]}
+			return {"text": again + Biography.for_npc(d, int(world.rng.world_seed)), "options": [back]}
 		"__rumor":
 			var mem = world.module("memory")
 			var best: Dictionary = {}
@@ -59,9 +88,9 @@ func _dynamic_node(npc: String, node_id: String) -> Dictionary:
 				arr.sort_custom(func(a, b): return a.tick > b.tick)
 				if not arr.is_empty(): best = arr[0]
 			if best.is_empty():
-				return {"text": "Nada de novo. A vida segue.", "options": [{"text": "Entendo.", "next": "__generic"}]}
+				return {"text": again + "Nada de novo. A vida segue.", "options": [back]}
 			var prefix := "Eu vi com estes olhos: " if best.source == "testemunha" else ("Contaram-me que " if str(best.source).begins_with("rumor") else "")
-			return {"text": prefix + str(best.text), "options": [{"text": "Interessante.", "next": "__generic"}]}
+			return {"text": again + prefix + str(best.text), "options": [back]}
 	return {}
 
 
@@ -186,7 +215,7 @@ func execute(cmd: GameCommand) -> Array:
 	match cmd.type:
 		"StartDialogue":
 			var id: String = cmd.payload.npc_id
-			session = {"npc": id, "node": _start_node(id)}
+			session = {"npc": id, "node": _start_node(id), "visit": _register_visit(id), "repeat": false}
 			return [fact("DIALOGUE_STARTED", {"npc": id, "node": session.node,
 				"location": world.db.location_at(world.db.world_to_tile(world.player.position))}, ["player", id])]
 		"EndDialogue":
@@ -207,6 +236,13 @@ func execute(cmd: GameCommand) -> Array:
 				effects.append_array(o.test.get("ok_effects" if r.success else "fail_effects", []))
 				next = o.test.get("ok_next" if r.success else "fail_next", next)
 			out.append_array(_apply_effects(effects))
+			session["repeat"] = false
+			if next.begins_with("__") and next not in ["__generic", "__papo", "__gente"]:
+				if not talks.has(session.npc):
+					talks[session.npc] = {"count": 1, "last_day": world.day_index(), "seen": {}}
+				var seen: Dictionary = talks[session.npc].seen
+				session["repeat"] = int(seen.get(next, -1)) == world.day_index()
+				seen[next] = world.day_index()
 			if next == "end":
 				var id: String = session.npc
 				session = {}
@@ -247,5 +283,30 @@ func _apply_effects(effects: Array) -> Array:
 	return out
 
 
-func to_dict() -> Dictionary: return {"session": session.duplicate()}
-func from_dict(d: Dictionary) -> void: session = d.get("session", {}).duplicate()
+## Registra a visita (quantas vezes já falaram, se foi hoje ou depois de dias) e devolve como ela conta para a saudação.
+func _register_visit(npc: String) -> Dictionary:
+	var today := world.day_index()
+	var t: Dictionary = talks.get(npc, {"count": 0, "last_day": today, "seen": {}})
+	var kind := "conhecido"
+	if int(t.count) == 0:
+		kind = "primeira"
+	elif int(t.last_day) == today:
+		kind = "mesmo_dia"
+	elif today - int(t.last_day) >= 2:
+		kind = "retorno"
+	var visit := {"kind": kind, "gap": today - int(t.last_day), "count": int(t.count)}
+	t.count = int(t.count) + 1
+	t.last_day = today
+	talks[npc] = t
+	return visit
+
+
+func to_dict() -> Dictionary: return {"session": session.duplicate(true), "talks": talks.duplicate(true)}
+func from_dict(d: Dictionary) -> void:
+	session = d.get("session", {}).duplicate(true)
+	talks = d.get("talks", {}).duplicate(true)
+	for k in talks:   # JSON devolve números como float: normaliza para o que o código compara
+		talks[k].count = int(talks[k].count)
+		talks[k].last_day = int(talks[k].last_day)
+		for n in talks[k].seen:
+			talks[k].seen[n] = int(talks[k].seen[n])
