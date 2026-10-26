@@ -7,6 +7,10 @@ var regions: Dictionary = {}
 const FACTION_HOSTILE_AT := -20.0   # facção com reputação abaixo disso cobra 25% a mais de todos os seus vendedores
 const FACTION_FRIENDLY_AT := 30.0   # acima disso, 10% de desconto
 var treasury := 0  # ouro pago em refeições da vila (circulação monetária, ORIGINAL_DO_JOGO)
+const SHORTAGE_AT := 0.3        # estoque da vila abaixo de 30% da meta: falta do bem (crise de escassez)
+const SHORTAGE_END_AT := 0.7    # só acaba acima de 70% (histerese: não oscila em torno do limite)
+const GOOD_NAMES := {"comida": "comida", "bebida": "bebida", "ferramentas": "ferramentas", "remedio": "remédios"}
+var shortage: Dictionary = {}   # bem -> true enquanto a vila está em falta (Fase 4)
 var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regiões (Arton Viva, Fase 4)
 
 
@@ -92,7 +96,29 @@ func on_tick(tick: int) -> Array:
 		var r: Dictionary = regions[rid]
 		for g in r.stock:
 			r.stock[g] = maxi(0, int(r.stock[g]) + int(r.production[g]) - int(r.consumption[g]))
-	return [fact("ECONOMY_DAY", {"vila": regions.vila.stock.duplicate(), "treasury": treasury})]
+	var out: Array = [fact("ECONOMY_DAY", {"vila": regions.vila.stock.duplicate(), "treasury": treasury})]
+	out.append_array(_shortage_facts())
+	return out
+
+
+## Crise de escassez com histerese: começa abaixo de SHORTAGE_AT da meta e termina acima de SHORTAGE_END_AT.
+## Recuperação vem da própria produção (sem intervenção do jogador).
+func _shortage_facts() -> Array:
+	var out: Array = []
+	var v: Dictionary = regions.vila
+	var goods: Array = v.stock.keys()
+	goods.sort()
+	for g in goods:
+		var target := maxf(1.0, float(v.target.get(g, 1)))
+		var ratio := float(v.stock[g]) / target
+		var em_falta := bool(shortage.get(g, false))
+		if not em_falta and ratio < SHORTAGE_AT:
+			shortage[g] = true
+			out.append(fact("SHORTAGE_STARTED", {"good": g, "stock": int(v.stock[g]), "target": int(target)}))
+		elif em_falta and ratio >= SHORTAGE_END_AT:
+			shortage.erase(g)
+			out.append(fact("SHORTAGE_ENDED", {"good": g, "stock": int(v.stock[g])}))
+	return out
 
 
 func on_event(e: GameEvent) -> Array:
@@ -170,13 +196,14 @@ func _route_open(from_region: String) -> bool:
 
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"regions": regions.duplicate(true), "treasury": treasury, "routes": routes.duplicate(true)}
+	return {"regions": regions.duplicate(true), "treasury": treasury, "routes": routes.duplicate(true), "shortage": shortage.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
 	regions = d.get("regions", {}).duplicate(true)
 	treasury = int(d.get("treasury", 0))
 	routes = d.get("routes", {}).duplicate(true)
+	shortage = d.get("shortage", {}).duplicate()
 	for id in routes:
 		routes[id].open = bool(routes[id].get("open", true))
 	for rid in regions:

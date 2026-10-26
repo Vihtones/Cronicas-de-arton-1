@@ -656,6 +656,15 @@ func refresh_journal() -> void:
 	var cr: CrimeModule = w.modules.crime
 	if cr.enabled and cr.total_fines() > 0:
 		journal_body.add_child(_label("Multas pendentes: T$ %d (pague à Guarda)." % cr.total_fines(), 9))
+	# crônica da vila: o que aconteceu no mundo, mais recente primeiro (Arton Viva, Fase 9)
+	journal_body.add_child(_h("Crônica da vila"))
+	var diario_mundo = w.modules.chronicle
+	var recentes: Array = diario_mundo.entries.duplicate()
+	recentes.reverse()
+	if recentes.is_empty():
+		journal_body.add_child(_label("Nada digno de registro ainda.", 9))
+	for entrada in recentes.slice(0, 10):
+		journal_body.add_child(_label("• %s" % str(entrada.text), 9))
 	journal_body.add_child(_h("Regras"))
 	journal_body.add_child(_label("%d regras com fonte e página; %d pendentes de revisão humana. Mecânicas originais do jogo estão marcadas." % [w.rules.size(), w.rules.unverified_ids().size()], 8))
 

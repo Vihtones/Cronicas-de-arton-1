@@ -15,7 +15,7 @@ func module_id() -> String: return "chronicle"
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["LEADERSHIP_CHANGED", "CITY_STATUS_CHANGED", "TORMENTA_STAGE_CHANGED", "ROUTE_CHANGED",
 		"GUILD_CREATED", "PARTY_LOST", "NPC_DIED",
-		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED"])
+		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED", "SHORTAGE_STARTED", "SHORTAGE_ENDED"])
 
 
 func on_event(e: GameEvent) -> Array:
@@ -31,6 +31,12 @@ func on_event(e: GameEvent) -> Array:
 		"TORMENTA_STAGE_CHANGED":
 			cat = "tormenta"
 			text = "A corrupção da Tormenta chegou ao estágio %d." % int(e.payload.stage)
+		"SHORTAGE_STARTED":
+			cat = "economia"
+			text = "Está faltando %s na vila: o estoque caiu bem abaixo do normal." % _bem(str(e.payload.good))
+		"SHORTAGE_ENDED":
+			cat = "economia"
+			text = "O estoque de %s na vila voltou ao normal." % _bem(str(e.payload.good))
 		"ROUTE_CHANGED":
 			cat = "economia"
 			text = "A rota %s foi reaberta." % e.payload.route if bool(e.payload.open) else "A rota %s foi fechada." % e.payload.route
@@ -59,6 +65,10 @@ func on_event(e: GameEvent) -> Array:
 	if entries.size() > CAP:
 		entries = entries.slice(entries.size() - CAP)
 	return []
+
+
+func _bem(good: String) -> String:
+	return str(EconomyModule.GOOD_NAMES.get(good, good))
 
 
 func _nome(id: String) -> String:
