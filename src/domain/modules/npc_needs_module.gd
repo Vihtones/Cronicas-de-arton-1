@@ -38,10 +38,38 @@ func _ensure() -> void:
 	for id in world.all_npc_ids():
 		var d := world.npc_def(id)
 		state[id] = _fresh(int(d.get("gold", 0)))
+		state[id].tools = _history_tools(d)
 
 
 func _fresh(gold: int) -> Dictionary:
-	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": "", "long": "", "shift": 0}
+	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": "", "long": "", "shift": 0, "tools": true}
+
+
+## Ferramenta de ofício pela história: quem exerce a profissão e começou há anos o bastante já tem a sua.
+## Quem não tem (aprendiz, ajudante recente) precisa comprar. Profissão sem ferramenta própria: tem por padrão.
+func _history_tools(d: Dictionary) -> bool:
+	var r := _tool_rule()
+	var profs: Array = r.get("profissoes", [])
+	if not profs.has(str(d.get("profession", ""))):
+		return true
+	var anos := int(d.get("age", 0)) - int(r.get("idade_inicio_oficio", 16))
+	return anos >= int(r.get("anos_para_ter", 2))
+
+
+func _tool_rule() -> Dictionary:
+	return world.db.economy.get("ferramenta_de_oficio", {})
+
+
+func owns_tools(id: String) -> bool:
+	return bool(_s(id).get("tools", true))
+
+
+func tool_shop_location() -> String:
+	return str(world.npc_def(str(_tool_rule().get("vendedor", ""))).get("work", ""))
+
+
+func tool_price() -> int:
+	return int(world.db.items.get(str(_tool_rule().get("item", "")), {}).get("price", 0))
 
 
 func _s(id: String) -> Dictionary:
@@ -126,6 +154,11 @@ func on_tick(tick: int) -> Array:
 				if good != "":
 					out.append(fact("WORK_DONE", {"npc": id, "good": good, "amount": 1}, [id]))
 			s.shift = 0
+		# ferramenta de ofício: quem não tem (pela história) compra no mercado, no tempo livre, com ouro
+		if not at_work and not bool(s.get("tools", true)) and loc == tool_shop_location() and int(s.gold) >= tool_price():
+			s.gold = int(s.gold) - tool_price()
+			s.tools = true
+			out.append(fact("TOOL_BOUGHT", {"npc": id, "price": tool_price()}, [id]))
 		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
 		if s.goal == "comer" and loc == "taverna" and eat(id):
 			out.append(fact("MEAL_SERVED", {"npc": id, "cost": MEAL_COST}, [id]))
@@ -140,10 +173,15 @@ func agenda_override(id: String, d: Dictionary, planned: String, h: int) -> Stri
 		return planned
 	var work := str(d.get("work", ""))
 	var home := str(d.get("home", ""))
-	if planned == work or planned == home or goal(id) != "":
+	if planned == work or goal(id) != "":
 		return planned
 	if h >= WORK_START and h < WORK_END and medium_goal_for(id) == "juntar_ouro":
 		return work
+	# sem ferramenta própria e com ouro para ela: vai ao mercado no tempo livre
+	if not owns_tools(id) and gold(id) >= tool_price() and tool_shop_location() != "":
+		return tool_shop_location()
+	if planned == home:
+		return planned
 	# tempo livre: visita quem gosta do morador e está em casa (Fase 1, utilidade da agenda)
 	var visit := visit_target(id, d)
 	if visit != "":
@@ -223,3 +261,5 @@ func from_dict(d: Dictionary) -> void:
 		state[id].medium = str(state[id].get("medium", ""))
 		state[id].long = str(state[id].get("long", ""))
 		state[id].shift = int(state[id].get("shift", 0))
+		if state[id].has("tools"):
+			state[id].tools = bool(state[id].tools)

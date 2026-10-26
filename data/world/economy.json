@@ -93,7 +93,8 @@
    "corda",
    "tocha",
    "pao",
-   "saco_de_dormir"
+   "saco_de_dormir",
+   "ferramenta_oficio"
   ],
   "ysolde": [
    "pocao_cura"
@@ -115,6 +116,23 @@
    "arco_curto",
    "couro_batido",
    "cota_malha"
+  ]
+ },
+ "ferramenta_de_oficio": {
+  "_nota": "Arton Viva, Fase 1: quem exerce o ofício precisa de ferramenta própria. Quem começou há 2 anos ou mais (a partir de idade_inicio_oficio) já tem; os outros compram do vendedor no tempo livre.",
+  "item": "ferramenta_oficio",
+  "vendedor": "mara",
+  "idade_inicio_oficio": 16,
+  "anos_para_ter": 2,
+  "profissoes": [
+   "ferreiro",
+   "aprendiz",
+   "lavrador",
+   "lavradora",
+   "moleiro",
+   "ajudante de moleiro",
+   "caçador",
+   "pastora"
   ]
  }
 }

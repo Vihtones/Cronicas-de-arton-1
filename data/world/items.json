@@ -81,5 +81,10 @@
   "price": 150,
   "good": "ferramentas",
   "rule": "armadura.cota_malha"
+ },
+ "ferramenta_oficio": {
+  "name": "Ferramenta de ofício",
+  "price": 8,
+  "good": "ferramentas"
  }
 }

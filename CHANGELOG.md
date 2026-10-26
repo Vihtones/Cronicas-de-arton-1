@@ -10,6 +10,7 @@
 - Trabalho produz mercadoria (Arton Viva, Fase 1): um turno cumprido (6 horas no posto, 8h às 18h) gera `WORK_DONE` com o bem da profissão (`producao_trabalho` em `economy.json`: lavrador, moleiro e cozinheiro produzem comida; taverneira, bebida; ferreiro, ferramentas; clériga de Lena, remédio). A economia soma uma unidade ao estoque da vila. Turno curto e profissão sem bem não produzem. Salva e carrega.
 - Utilidade na agenda: no horário de trabalho, quem junta ouro fica no posto em vez do almoço ou da pausa previstos; fome e cansaço urgentes continuam vencendo.
 - Visita por utilidade: no tempo livre, o morador vai à casa de quem gosta dele (afeto acima de 30) se essa pessoa estiver em casa.
+- Ferramenta de ofício pela história: quem começou o ofício há 2 anos ou mais já tem a ferramenta; aprendizes e ajudantes recentes compram na Mara no tempo livre, quando têm ouro.
 - Carroças de entrega: `CartsModule` (domínio). Nascem de dia, levam a mercadoria que falta na vila, descarregam no mercado (estoque sobe) e voltam. A apresentação só desenha a posição. Salvam e carregam.
 
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2

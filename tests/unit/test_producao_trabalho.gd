@@ -148,3 +148,46 @@ func test_amigo_fora_de_casa_nao_recebe_visita() -> void:
 	w.modules.npcs.state.bento.location = "taverna"
 	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 0, "goal": "", "medium": "", "long": "", "shift": 0}
 	eq(nd.agenda_override("garrick", w.npc_def("garrick"), "praca", 20), "praca", "quem não está em casa não recebe visita")
+
+
+func test_ferramenta_pela_historia_do_oficio() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.gold("garrick")  # força a criação do estado
+	eq(nd.owns_tools("garrick"), true, "ferreiro de 40 anos, há 24 no ofício, já tem as ferramentas")
+	eq(nd.owns_tools("joran"), true, "lavrador de 60 anos tem as ferramentas")
+	eq(nd.owns_tools("davi"), false, "aprendiz de 15 anos ainda não tem")
+	eq(nd.owns_tools("tomas"), false, "ajudante de 17 anos (um ano no ofício) ainda não tem")
+
+
+func test_aprendiz_com_ouro_vai_ao_mercado_no_tempo_livre() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.davi = {"hunger": 0.1, "tired": 0.1, "gold": 8, "goal": "", "medium": "", "long": "", "shift": 0, "tools": false}
+	eq(nd.agenda_override("davi", w.npc_def("davi"), "praca", 20), nd.tool_shop_location(), "sem ferramenta e com ouro, vai ao mercado")
+
+
+func test_sem_ouro_suficiente_nao_vai_ao_mercado() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.davi = {"hunger": 0.1, "tired": 0.1, "gold": 5, "goal": "", "medium": "", "long": "", "shift": 0, "tools": false}
+	eq(nd.agenda_override("davi", w.npc_def("davi"), "praca", 20), "praca", "com ouro abaixo do preço, segue o lazer")
+
+
+func test_compra_no_mercado_tira_ouro_e_passa_a_ter_ferramenta() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var eco: EconomyModule = w.modules.economy
+	eco._ensure()
+	var estoque := int(eco.regions.vila.stock.ferramentas)
+	nd.state.davi = {"hunger": 0.1, "tired": 0.1, "gold": 8, "goal": "", "medium": "", "long": "", "shift": 0, "tools": false}
+	w.modules.npcs.state.davi.location = nd.tool_shop_location()
+	w.clock.tick = 20 * 6
+	var facts := nd.on_tick(w.clock.tick)
+	var compra := facts.filter(func(f): return f.type == "TOOL_BOUGHT")
+	eq(compra.size(), 1, "comprar gera TOOL_BOUGHT")
+	eq(nd.gold("davi"), 0, "o ouro é gasto")
+	check(nd.owns_tools("davi"), "passa a ter a ferramenta")
+	for f in compra:
+		eco.on_event(GameEvent.create("tb", "TOOL_BOUGHT", 0, f.payload))
+	eq(int(eco.regions.vila.stock.ferramentas), estoque - 1, "a vila perde uma ferramenta do estoque")
