@@ -29,6 +29,16 @@ func _shot(name: String) -> void:
 	print("shot ", name)
 
 
+## Espera a vila terminar de montar (a tela "Preparando a vila" some quando os desenhos ficam prontos).
+func _espera_vila() -> void:
+	for i in 600:
+		var carregando: bool = main.ui._loading != null and main.ui._loading.visible
+		if main._bakes_left <= 0 and not carregando:
+			break
+		await process_frame
+	await _frames(5)
+
+
 func _game() -> Node:
 	return root.get_node("Game")
 
@@ -53,7 +63,7 @@ func _run() -> void:
 	main.npc_layer.sync_all()
 	main.camera.reset_smoothing()
 	G.send("AdvanceTime", {"ticks": 1})
-	await _frames(20)
+	await _espera_vila()
 	await _shot("02_vila_dia")
 	# diálogo com Hilda
 	var t: Vector2i = G.world.modules.npcs.npc_tile("hilda")

@@ -55,6 +55,7 @@ func _ready() -> void:
 	_build_credits(root)
 	_build_xp_summary(root)
 	_build_creation(root)
+	_build_prologo(root)
 	_build_hub(root)
 	_build_debug(root)
 	_build_tree(root)
@@ -916,6 +917,10 @@ var panel_hub: PanelContainer
 var debug_label: Label
 var _creation := {"race": "humano", "class": "guerreiro", "preset": 0, "feminine": false, "class_picks": [], "free_picks": [], "path": "bruxo"}
 var _heir_mode := false
+var panel_prologo: PanelContainer
+var _prologo: Dictionary = {}   # respostas do questionário (id da pergunta -> opção)
+const PROLOGO_TITULOS := {"onde_cresceu": "Onde cresceu", "condicao": "Condição", "vinculo": "Vínculos",
+	"ocupacao": "Ofício", "recente": "Algo recente", "comeco": "Onde começa"}
 
 
 func _build_lab(root: Control) -> void:
@@ -1110,8 +1115,58 @@ func _refresh_creation() -> void:
 				Game.world_reloaded.emit()
 			else: log_msg("✘ " + "; ".join(r.errors))
 			return
-		Game.new_game_with_build(b_dict, _creation.feminine)))
+		Game.new_game_with_build(b_dict, _creation.feminine)
+		open_prologo()))
+	if not _heir_mode:
+		v.add_child(_button("Deixar o Destino Decidir", func():
+			if not errs.is_empty():
+				log_msg("✘ " + "; ".join(errs)); return
+			panel_creation.visible = false
+			Game.new_game_with_build(b_dict, _creation.feminine)
+			Game.start_prologue_from_seed(randi())))
 	v.add_child(_button("Cancelar", func(): panel_creation.visible = false))
+
+
+# --- Prólogo vivo (Arton Viva, Fase 3) --------------------------------------------------------
+func _build_prologo(root: Control) -> void:
+	panel_prologo = _panel(root, Control.PRESET_CENTER)
+	panel_prologo.position = Vector2(80, 16)
+	panel_prologo.custom_minimum_size = Vector2(460, 0)
+	panel_prologo.visible = false
+
+
+func open_prologo() -> void:
+	_prologo = {}
+	_refresh_prologo()
+	panel_prologo.visible = true
+
+
+func _refresh_prologo() -> void:
+	for c in panel_prologo.get_children():
+		c.queue_free()
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	panel_prologo.add_child(v)
+	v.add_child(_label("Seu passado", 12))
+	v.add_child(_label("Respostas curtas. Elas definem de onde você vem: ouro, casa, quem você conhece e o que faz. Não há resposta certa.", 8))
+	for q in Prologue.QUESTIONS:
+		var row := HFlowContainer.new()
+		row.add_child(_row_label(str(PROLOGO_TITULOS[q])))
+		var cur: String = str(_prologo.get(q, Prologue.OPTIONS[q][0]))
+		for opt in Prologue.OPTIONS[q]:
+			var on: bool = cur == opt
+			row.add_child(_button(("● " if on else "") + str(opt).replace("_", " "), func(): _prologo[q] = opt; _refresh_prologo()))
+		v.add_child(row)
+	v.add_child(_button("Começar com este passado", func():
+		var r := Game.start_prologue(Prologue.from_answers(_prologo))
+		if r.accepted:
+			panel_prologo.visible = false
+		else:
+			log_msg("✘ " + "; ".join(r.errors))))
+	v.add_child(_button("Deixar o Destino Decidir", func():
+		panel_prologo.visible = false
+		Game.start_prologue_from_seed(randi())))
+	v.add_child(_button("Pular (sem passado)", func(): panel_prologo.visible = false))
 
 
 # --- Valkaria (região distante, LOD L3, sem mapa) --------------------------------------------
