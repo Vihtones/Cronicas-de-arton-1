@@ -37,6 +37,7 @@ const SUITES := [
 	"res://tests/unit/test_homebrew.gd",
 	"res://tests/unit/test_cronica.gd",
 	"res://tests/unit/test_aprendiz.gd",
+	"res://tests/unit/test_comandos.gd",
 	"res://tests/unit/test_arvore_poderes.gd",
 ]
 
