@@ -10,7 +10,7 @@ var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regi
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "MEAL_SERVED", "TORMENTA_DAY"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "WORK_DONE", "MEAL_SERVED", "TORMENTA_DAY"])
 
 
 func _ensure() -> void:
@@ -100,6 +100,11 @@ func on_event(e: GameEvent) -> Array:
 			for g in e.payload.get("goods", {}):
 				if regions.vila.stock.has(g):
 					regions.vila.stock[g] = int(regions.vila.stock[g]) + int(e.payload.goods[g])
+		"WORK_DONE":
+			# turno cumprido: o morador produz um bem da profissão (Arton Viva, Fase 1)
+			var g := str(e.payload.get("good", ""))
+			if regions.vila.stock.has(g):
+				regions.vila.stock[g] = int(regions.vila.stock[g]) + int(e.payload.get("amount", 1))
 		"TORMENTA_DAY":
 			# corrupção em estágio de crise ou pior estraga a comida da vila (ORIGINAL_DO_JOGO)
 			var est := int(e.payload.get("stage", 0))

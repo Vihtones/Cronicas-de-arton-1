@@ -28,6 +28,7 @@ const SUITES := [
 	"res://tests/unit/test_vida_moradores.gd",
 	"res://tests/unit/test_carrocas.gd",
 	"res://tests/unit/test_necessidades.gd",
+	"res://tests/unit/test_producao_trabalho.gd",
 	"res://tests/unit/test_relacoes.gd",
 	"res://tests/unit/test_prologo.gd",
 	"res://tests/unit/test_economia_regional.gd",

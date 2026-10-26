@@ -6,7 +6,8 @@ extends WorldModule
 ##   prazo ("comer", "descansar"). Sem urgência, o objetivo de médio prazo ("juntar_ouro") orienta o morador,
 ##   e ele segue a agenda normal.
 ## - Ação: comer na taverna custa ouro e reduz a fome; descansar em casa reduz o cansaço; trabalhar rende ouro
-##   enquanto o morador junta para a meta de médio prazo.
+##   enquanto o morador junta para a meta de médio prazo, e cada turno cumprido (WORK_DONE) produz o bem da
+##   profissão, que a economia da vila recebe.
 ## Determinístico (sem sorteio). Não decide combate nem regras de T20: só onde o morador está e o que ele consome.
 
 const HUNGER_PER_HOUR := 0.03
@@ -22,8 +23,9 @@ const WORK_INCOME := 1          # ouro por hora de trabalho enquanto junta
 const WORK_START := 8
 const WORK_END := 18
 const LONG_TARGET_GOLD := 40    # longo prazo: depois de juntar, abrir o próprio negócio
+const SHIFT_MIN_HOURS := 6      # horas no posto para cumprir o turno e produzir o bem da profissão
 
-var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium, long}
+var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium, long, shift}
 
 
 func module_id() -> String: return "npc_needs"
@@ -38,7 +40,7 @@ func _ensure() -> void:
 
 
 func _fresh(gold: int) -> Dictionary:
-	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": "", "long": ""}
+	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": "", "long": "", "shift": 0}
 
 
 func _s(id: String) -> Dictionary:
@@ -111,12 +113,28 @@ func on_tick(tick: int) -> Array:
 		# médio prazo: sem urgência, junta ouro; o trabalho rende ouro no horário
 		s.medium = medium_goal_for(id)
 		s.long = long_goal_for(id)
-		if s.goal == "" and s.medium == "juntar_ouro" and loc == str(d.get("work", "")) and h >= WORK_START and h < WORK_END:
+		var at_work := loc == str(d.get("work", "")) and h >= WORK_START and h < WORK_END
+		if s.goal == "" and s.medium == "juntar_ouro" and at_work:
 			s.gold = int(s.gold) + WORK_INCOME
+		# turno: conta as horas no posto; ao fim do expediente, um turno cumprido produz o bem da profissão
+		if at_work:
+			s.shift = int(s.get("shift", 0)) + 1
+		if h == WORK_END:
+			if int(s.get("shift", 0)) >= SHIFT_MIN_HOURS:
+				var good := work_good(id)
+				if good != "":
+					out.append(fact("WORK_DONE", {"npc": id, "good": good, "amount": 1}, [id]))
+			s.shift = 0
 		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
 		if s.goal == "comer" and loc == "taverna" and eat(id):
 			out.append(fact("MEAL_SERVED", {"npc": id, "cost": MEAL_COST}, [id]))
 	return out
+
+
+## Bem que a profissão do morador produz num turno completo ("" se não produz nada). Vem de economy.json.
+func work_good(id: String) -> String:
+	var prof := str(world.npc_def(id).get("profession", ""))
+	return str(world.db.economy.get("producao_trabalho", {}).get(prof, ""))
 
 
 ## Lugar que o objetivo pede agora ("" se nenhum). Usado pela agenda do morador.
@@ -157,3 +175,4 @@ func from_dict(d: Dictionary) -> void:
 		state[id].goal = str(state[id].goal)
 		state[id].medium = str(state[id].get("medium", ""))
 		state[id].long = str(state[id].get("long", ""))
+		state[id].shift = int(state[id].get("shift", 0))

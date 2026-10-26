@@ -1,6 +1,6 @@
 # Arton Viva — auditoria (Fase 0) e andamento
 
-Documento-base: `CDA-WORLD-001` v1.0 (25/10/2026). Este arquivo registra o que o repositório realmente tem, o que falta e o andamento de cada fase. Estado verificado em 25/10/2026: 199 testes, 0 violações de arquitetura, 0 apontamentos de estilo.
+Documento-base: `CDA-WORLD-001` v1.0 (25/10/2026). Este arquivo registra o que o repositório realmente tem, o que falta e o andamento de cada fase. Estado verificado em 26/10/2026: 273 testes, 0 violações de arquitetura, 0 apontamentos de estilo.
 
 ## Matriz de requisitos
 
@@ -11,7 +11,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 | Agentes (WorldAgent, dados principais) | Parcial | Cada morador é um registro em `data/world/npcs.json` + estado em `NpcModule`. Não há um modelo comum `WorldAgent` |
 | Personalidade | Parcial | `traits` (10 traços, ex.: teimoso, curioso, mentiroso). Sem as 10 dimensões numéricas da spec |
 | Necessidades (fome, cansaço, dinheiro) | **Validado (Fase 1)** | `NpcNeedsModule`: fome, cansaço e ouro; comer na taverna e descansar em casa mudam o caminho |
-| Objetivos curto/médio/longo prazo | Parcial | Curto prazo ("comer", "descansar"), médio prazo ("juntar_ouro", meta de 15 de ouro, trabalho rende ouro) e longo prazo ("abrir_negocio", meta de 40 de ouro). Sem agir sobre a economia |
+| Objetivos curto/médio/longo prazo | Parcial | Curto prazo ("comer", "descansar"), médio prazo ("juntar_ouro", meta de 15 de ouro, trabalho rende ouro) e longo prazo ("abrir_negocio", meta de 40 de ouro). Trabalho produz o bem da profissão na economia da vila (`WORK_DONE`) |
 | Decisão autônoma (utilidade) | Parcial | Decisão por utilidade entre necessidades acima do limite (a de maior valor vence). Sem utilidade para ações da agenda |
 | Atividades e humor | **Validado (0.7.1)** | `NpcLifeModule`: medo, alegria e atividade no rótulo |
 | Memória social | **Validado** | `MemoryModule`: testemunhas, rumores no mesmo local, reputação, esquecimento |
@@ -41,7 +41,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 ## Andamento por fase
 
 - **Fase 0 (auditoria):** feita — esta matriz. Riscos: o `NpcModule` concentra localização e agenda, e já recebe várias influências (eventos da vila, medo, necessidades, chuva). Novas camadas devem entrar por um ponto único de decisão (`desired_location`) e não por cópias.
-- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro); refeição paga na taverna consome comida da vila e leva o ouro ao tesouro (`MEAL_SERVED`). Falta: o trabalho dos moradores ainda não produz mercadoria na economia da vila.
+- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro); refeição paga na taverna consome comida da vila e leva o ouro ao tesouro (`MEAL_SERVED`). Feito também: um turno cumprido (6 horas no posto) produz o bem da profissão (`WORK_DONE`), somado ao estoque da vila (`producao_trabalho` em `economy.json`). Falta: utilidade para ações da agenda (decidir trabalhar, comprar ou visitar por utilidade), que ainda segue a agenda fixa.
 - **Fase 2 (memória e sociedade):** relações multidimensionais feitas (`RelationsModule`, com traços: teimoso, memória longa, exige provas) e reações por rótulo (confia, amigável, indiferente, teme, guarda rancor). Diálogos ligados à reação na primeira conversa do dia (`reacao` em `voices.json`). Falta: família com objetivos próprios.
 - **Fase 3 (Prólogo Vivo):** parcial. Feito: perguntas A a F, gerador de começo (`Prologue`), destino por semente reproduzível, validação contra o mundo, comando `StartPrologue` (uma vez), ouro e vínculos iniciais. Falta: a tela do questionário, a posição inicial aplicada pela apresentação e a opção "Deixar o Destino Decidir" na criação.
 - **Fase 4 (economia regional):** parcial. Feito: rota comercial (`valkaria_vila`) que pode ser fechada e reaberta por DISTANT_EVENT, com fato `ROUTE_CHANGED`; com a rota fechada o mensageiro não entrega; reaberta, a entrega volta sem perda. Falta: crises de preço e recuperação explícitas, mais rotas e mercadorias de outras regiões.

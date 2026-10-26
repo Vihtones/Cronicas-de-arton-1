@@ -13,6 +13,18 @@
    "base": 1.0
   }
  },
+ "producao_trabalho": {
+  "_nota": "Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho (ORIGINAL_DO_JOGO).",
+  "lavrador": "comida",
+  "lavradora": "comida",
+  "pastora": "comida",
+  "moleiro": "comida",
+  "cozinheiro": "comida",
+  "caçador": "comida",
+  "taverneira": "bebida",
+  "ferreiro": "ferramentas",
+  "clériga de Lena": "remedio"
+ },
  "regions": {
   "vila": {
    "stock": {
