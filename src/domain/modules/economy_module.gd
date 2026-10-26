@@ -10,7 +10,7 @@ var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regi
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "MEAL_SERVED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "MEAL_SERVED", "TORMENTA_DAY"])
 
 
 func _ensure() -> void:
@@ -100,6 +100,11 @@ func on_event(e: GameEvent) -> Array:
 			for g in e.payload.get("goods", {}):
 				if regions.vila.stock.has(g):
 					regions.vila.stock[g] = int(regions.vila.stock[g]) + int(e.payload.goods[g])
+		"TORMENTA_DAY":
+			# corrupção em estágio de crise ou pior estraga a comida da vila (ORIGINAL_DO_JOGO)
+			var est := int(e.payload.get("stage", 0))
+			if est >= 3:
+				regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 5 * (est - 2))
 		"MEAL_SERVED":
 			# refeição paga na taverna: consome comida da vila e leva o ouro ao tesouro local
 			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 1)
