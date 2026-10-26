@@ -10,10 +10,6 @@ extends Node2D
 const TILE := 32
 const SHEETS := ["aldeao", "artesao", "idoso", "aldeao", "artesao"]
 const TINTS := [Color(1, 1, 1), Color(0.92, 0.85, 0.8), Color(0.85, 0.92, 1.0), Color(1.0, 0.95, 0.82), Color(0.9, 1.0, 0.9), Color(0.95, 0.85, 0.95)]
-const CHATTER := ["…", "Hm.", "Sim, sim.", "Ouviu essa?", "Ha!", "Será?", "Bom dia!", "Que calor.", "E a colheita?", "Dizem que...", "Psiu!"]
-const SHOUTS := ["Pão fresco!", "Maçãs!", "Panos de Valkaria!", "Facas afiadas!", "Mel puro!", "Ervas!", "Barato hoje!", "Peixe do rio!"]
-const KID_TALK := ["Pega!", "Hihi!", "Tá com você!", "Corre!", "Não vale!"]
-const FEST_TALK := ["♪", "Saúde!", "♪♪", "Hurra!", "Mais uma!", "Dança!"]
 
 var world_view: WorldView
 var fx: FxLayer
@@ -185,7 +181,8 @@ func _spawn_one(kind: String, at: Vector2i, group: Dictionary = {}) -> Dictionar
 	v.position = Game.db.tile_to_world(at) + Vector2(_rng.randf_range(-6, 6), _rng.randf_range(-6, 6))
 	var a := {"view": v, "kind": kind, "state": "chegando", "t": 0.0, "speed": _rng.randf_range(38, 52), "bubble": null,
 		"bubble_t": _rng.randf_range(1.0, 5.0), "group": group, "phase": _rng.randf() * TAU, "trips": 2 + _rng.randi() % 3,
-		"prop": ["", "saco", "vassoura", "cesto", "lenha"][_rng.randi() % 5] if kind == "ocupado" else ""}
+		"prop": ["", "saco", "vassoura", "cesto", "lenha"][_rng.randi() % 5] if kind == "ocupado" else "",
+		"ware": ["comida", "comida", "ferramenta", "remedio", "tecido"][_rng.randi() % 5] if kind == "vendedor" else ""}
 	agents.append(a)
 	if a.prop != "":
 		var p := Prop.new()
@@ -204,10 +201,13 @@ func _spawn_group(kind: String, n: int) -> void:
 	var center: Vector2i = _pick("praca")
 	if kind == "crianca" and _rng.randf() < 0.4:
 		center = _pick("rua")
-	var g := {"center": Game.db.tile_to_world(center), "kind": kind}
+	var g := {"center": Game.db.tile_to_world(center), "kind": kind, "turn": 0, "wait": _rng.randf_range(1.0, 3.0), "script": []}
+	if kind == "conversa":
+		g.script = AmbientTalk.conversation(Game.db.ambient, AmbientTalk.context(Game.world), _rng.randi())
 	for i in n:
 		var a := _spawn_one(kind, _pick("portas") if kind != "danca" else _pick("praca"), g)
 		a.phase = TAU * i / n
+		a["seat"] = i
 
 
 func _next_goal(a: Dictionary, leave: bool) -> void:
@@ -307,43 +307,51 @@ func _tick_agent(a: Dictionary, delta: float, raining: bool, events: Array) -> v
 	if a.kind in ["conversa", "vendedor"] and a.state in ["parado", "trabalhando"]:
 		if a.kind == "conversa" and not a.group.is_empty():
 			v.face_towards(a.group.center + Vector2(16, 0))
-	# balões de fala
+	# balões de fala: conversas de verdade, pregões da mercadoria, falas por contexto
 	if a.bubble_t <= 0.0 and v.modulate.a > 0.5:
+		var ctx := AmbientTalk.context(Game.world)
 		var txt := ""
+		var data := Game.db.ambient
 		match a.kind:
-			"conversa": if a.state == "parado": txt = CHATTER[_rng.randi() % CHATTER.size()]
-			"vendedor": if a.state == "parado": txt = SHOUTS[_rng.randi() % SHOUTS.size()]
-			"crianca": if a.state == "brincando": txt = KID_TALK[_rng.randi() % KID_TALK.size()]
-			"danca": txt = FEST_TALK[_rng.randi() % FEST_TALK.size()]
-			"passante": if _rng.randf() < 0.15: txt = CHATTER[_rng.randi() % CHATTER.size()]
+			"conversa": txt = _conversation_line(a)
+			"vendedor": if a.state == "parado": txt = AmbientTalk.vendedor(data, a.ware, ctx, _rng.randi())
+			"crianca": if a.state == "brincando": txt = AmbientTalk.crianca(data, ctx, _rng.randi())
+			"danca": txt = AmbientTalk.danca(data, _rng.randi())
+			"ocupado": if a.state == "trabalhando": txt = AmbientTalk.ocupado(data, a.prop, _rng.randi())
+			"passante": if _rng.randf() < 0.18: txt = AmbientTalk.passante(data, ctx, _rng.randi())
 		if txt != "":
 			_bubble(v, txt)
-		a.bubble_t = _rng.randf_range(2.5, 6.0)
+		a.bubble_t = _rng.randf_range(0.6, 1.0) if a.kind == "conversa" and txt == "" else _rng.randf_range(2.5, 6.0)
+
+
+## Fala da vez na conversa do grupo: só começa quando os dois chegaram, alterna entre os dois e, ao fim do
+## roteiro, espera um tempo e puxa outro assunto (do contexto de agora).
+func _conversation_line(a: Dictionary) -> String:
+	var g: Dictionary = a.group
+	if g.is_empty() or a.state != "parado":
+		return ""
+	for o in agents:
+		if is_same(o.group, g) and o.state != "parado":
+			return ""
+	var script: Array = g.script
+	if script.is_empty():
+		return ""
+	var turn := int(g.turn)
+	if turn >= script.size():
+		g.wait = float(g.wait) - 1.0
+		if float(g.wait) <= -6.0:
+			g.script = AmbientTalk.conversation(Game.db.ambient, AmbientTalk.context(Game.world), _rng.randi())
+			g.turn = 0
+			g.wait = 0.0
+		return ""
+	if turn % 2 != int(a.get("seat", 0)) % 2:
+		return ""
+	g.turn = turn + 1
+	return str(script[turn])
 
 
 func _bubble(v: ActorView, txt: String) -> void:
-	var l := Label.new()
-	l.text = txt
-	l.add_theme_font_size_override("font_size", 7)
-	l.add_theme_color_override("font_color", Color(0.15, 0.12, 0.1))
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.97, 0.94, 0.86, 0.92)
-	sb.set_corner_radius_all(3)
-	sb.set_content_margin_all(2)
-	sb.content_margin_left = 3; sb.content_margin_right = 3
-	l.add_theme_stylebox_override("normal", sb)
-	l.position = Vector2(-20, -44)
-	l.size = Vector2(40, 10)
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.modulate.a = 0.0
-	l.z_index = 5
-	v.add_child(l)
-	var tw := create_tween()
-	tw.tween_property(l, "modulate:a", 1.0, 0.15)
-	tw.parallel().tween_property(l, "position:y", -48.0, 0.2)
-	tw.tween_interval(1.6)
-	tw.tween_property(l, "modulate:a", 0.0, 0.3)
-	tw.tween_callback(l.queue_free)
+	SpeechBubble.show(self, v, txt)
 
 
 # --- Carroças -----------------------------------------------------------------------------------

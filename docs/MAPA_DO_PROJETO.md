@@ -1,13 +1,13 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `1cb515e`. **Não edite à mão**: rode os dois scripts.
-Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `8563698`. **Não edite à mão**: rode os dois scripts.
+Grafo: 609 nós, 1688 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
 | Documento | Assunto | Seções | Cita código/regras |
 |---|---|---|---|
-| `CHANGELOG.md` | Changelog | 10 | 22 |
+| `CHANGELOG.md` | Changelog | 10 | 24 |
 | `README.md` | Crônicas de Arton | 6 | 7 |
 | `docs/ART_BIBLE.md` | Art Bible (provisória) | 1 | 1 |
 | `docs/GOVERNADOR_DE_ARTE.md` | Governador de Direção de Arte | 7 | 3 |
@@ -44,13 +44,14 @@ Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `src/domain`
 
+- **AmbientTalk** (`src/domain/ambient_talk.gd`, 7 ligações) — Escolha das falas de ambiente (balões dos figurantes e latidos dos moradores) a partir do CONTEXTO da vila.
 - **Biography** (`src/domain/biography.gd`, 3 ligações) — Biografia prévia gerada como HISTÓRICO RESUMIDO consistente (§8), nunca simulada dia a dia.
 - **ContentDB** (`src/domain/content_db.gd`, 22 ligações) — Catálogos estáticos (definições) separados do estado mutável (§14).
-- **DialogueVoice** (`src/domain/dialogue_voice.gd`, 9 ligações) — Voz dos moradores: monta falas a partir do ESTADO do mundo (hora, clima, evento da vila, reputação do jogador, mistério, quantas vezes já conversaram) e dos tex
+- **DialogueVoice** (`src/domain/dialogue_voice.gd`, 12 ligações) — Voz dos moradores: monta falas a partir do ESTADO do mundo (hora, clima, evento da vila, reputação do jogador, mistério, quantas vezes já conversaram) e dos tex
 - **RngStreams** (`src/domain/rng_streams.gd`, 5 ligações) — Fluxos de RNG separados e rastreáveis (§7): combate, clima, mundo, visual.
 - **WorldClock** (`src/domain/world_clock.gd`, 4 ligações) — Relógio canônico do mundo (Plano Mestre §7).
 - **WorldModule** (`src/domain/world_module.gd`, 30 ligações) — Contrato de módulo (§5): interface, eventos, versão de esquema, desativação.
-- **WorldState** (`src/domain/world_state.gd`, 37 ligações) — Estado mutável do mundo.
+- **WorldState** (`src/domain/world_state.gd`, 38 ligações) — Estado mutável do mundo.
 
 ### `src/domain/combat`
 
@@ -80,7 +81,7 @@ Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **StateModule** (`src/domain/modules/state_module.gd`, 32 ligações) — Flags do mundo e inventário do jogador.
 - **TownEventsModule** (`src/domain/modules/town_events_module.gd`, 13 ligações) — Eventos da vila (mundo vivo): feira semanal e festa da vila.
 - **TravelModule** (`src/domain/modules/travel_module.gd`, 26 ligações) — Viagens entre regiões (LB p.270, Tabela 6-4): km/dia pelo deslocamento, metade em terreno difícil ou clima ruim.
-- **WeatherModule** (`src/domain/modules/weather_module.gd`, 27 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
+- **WeatherModule** (`src/domain/modules/weather_module.gd`, 29 ligações) — WeatherRegion (§12): muda em passos espaçados (de hora em hora) por cadeia de Markov no fluxo RNG "weather".
 
 ### `src/domain/rules`
 
@@ -99,14 +100,15 @@ Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `src/presentation`
 
-- **ActorView** (`src/presentation/actor_view.gd`, 7 ligações) — Figura animada (spritesheet 3x4: parado/passo1/passo2 x baixo/esq/dir/cima).
-- **AmbientLife** (`src/presentation/ambient_life.gd`, 8 ligações) — Figurantes da vila (L0, só apresentação): gente andando, correndo da chuva, trabalhando, conversando, vendendo, crianças brincando de pega-pega, carroças na est
+- **ActorView** (`src/presentation/actor_view.gd`, 8 ligações) — Figura animada (spritesheet 3x4: parado/passo1/passo2 x baixo/esq/dir/cima).
+- **AmbientLife** (`src/presentation/ambient_life.gd`, 10 ligações) — Figurantes da vila (L0, só apresentação): gente andando, correndo da chuva, trabalhando, conversando, vendendo, crianças brincando de pega-pega, carroças na est
 - **CameraDirector** (`src/presentation/camera_director.gd`, 3 ligações) — Câmera cinematográfica (§9): responde a tags de eventos (ataque, impacto, crítico, queda, morte...).
 - **CombatView** (`src/presentation/combat_view.gd`, 34 ligações) — Combate na tela: grade, planejamento com projeção fantasma, confirmação e reprodução cinematográfica dos eventos.
 - **GhostActor** (`src/presentation/ghost_actor.gd`, 2 ligações) — Fantasma do jogador no combate: um sprite translúcido que ENSAIA o plano em laço — anda o caminho, investe contra o alvo, dispara ou conjura — para o jogador ve
 - **Narrator** (`src/presentation/narrator.gd`, 78 ligações) — Converte eventos em texto para o registro.
-- **NpcLayer** (`src/presentation/npc_layer.gd`, 14 ligações) — Materializa (L0) NPCs e criaturas da zona do jogador a partir do estado L1.
+- **NpcLayer** (`src/presentation/npc_layer.gd`, 17 ligações) — Materializa (L0) NPCs e criaturas da zona do jogador a partir do estado L1.
 - **PlayerView** (`src/presentation/player.gd`, 6 ligações) — Jogador: input -> movimento físico -> comando MovePlayer quando muda de tile.
+- **SpeechBubble** (`src/presentation/speech_bubble.gd`, 3 ligações) — Balão de fala sobre um ator (apresentação).
 - **WorldView** (`src/presentation/world_view.gd`, 5 ligações) — Desenha o mapa a partir do catálogo (TileMapLayer) com colisão para tiles bloqueados e portas fechadas.
 - **main** (`src/presentation/main.gd`, 39 ligações) — Cena principal: monta mapa, atores, câmera, efeitos, combate e interface.
 
@@ -135,8 +137,8 @@ Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `tests`
 
-- **TestCase** (`tests/unit/test_case.gd`, 21 ligações) — 
-- **WorldHelpers** (`tests/unit/world_helpers.gd`, 19 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
+- **TestCase** (`tests/unit/test_case.gd`, 22 ligações) — 
+- **WorldHelpers** (`tests/unit/world_helpers.gd`, 20 ligações) — Utilidades de teste: cria mundo e posiciona o jogador.
 - **run_tests** (`tests/run_tests.gd`, 0 ligações) — Executor de testes headless, sem dependências externas.
 - **test_arcanista** (`tests/unit/test_arcanista.gd`, 13 ligações) — C17 (perícias), C4 (Arcanista: caminhos e 3 magias) e C5 (concentração e armadura ao lançar).
 - **test_art_governor** (`tests/unit/test_art_governor.gd`, 4 ligações) — Governador de Direção de Arte: só assets aprovados entram, nas zonas certas, sem mexer na colisão.
@@ -145,6 +147,7 @@ Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **test_dialogo_voz** (`tests/unit/test_dialogo_voz.gd`, 12 ligações) — Voz dos moradores: saudação por registro/hora/reputação, memória da conversa, papo e opiniões.
 - **test_event_bus** (`tests/unit/test_event_bus.gd`, 3 ligações) — 
 - **test_exploration** (`tests/unit/test_exploration.gd`, 11 ligações) — 
+- **test_falas_ambiente** (`tests/unit/test_falas_ambiente.gd`, 4 ligações) — Falas de ambiente: escolha por contexto (hora, clima, evento, mistério), conversas de verdade e latidos.
 - **test_interactions** (`tests/unit/test_interactions.gd`, 48 ligações) — XP dinâmica, poderes e interações entre sistemas (quando a ligação é óbvia).
 - **test_mundo_vivo** (`tests/unit/test_mundo_vivo.gd`, 10 ligações) — Mundo vivo: feira semanal, festa da vila, agendas redirecionadas, economia e clima gradual.
 - **test_powers** (`tests/unit/test_powers.gd`, 13 ligações) — C21: poderes de classe do LB (guerreiro p.65-66, ladino p.73-74, arcanista p.38-39) e reações.
@@ -165,6 +168,7 @@ Grafo: 605 nós, 1672 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **art_test_runner** (`tools/art_test_runner.gd`, 2 ligações) — Teste visual do acervo Tormenta20 (NÃO aprovado) dentro do cenário real do jogo.
 - **benchmark** (`tools/benchmark.gd`, 4 ligações) — Benchmark da cena típica (§15): anda pela vila em cada perfil gráfico e mede p50/p95 de frame, tempo de comando, save e load.
 - **combat_fx_check** (`tools/combat_fx_check.gd`, 3 ligações) — Verificação ponta a ponta da encenação de combate: um golpe que derruba o alvo (momento "ABATIDO!") pelo caminho real (ExecutePlan → eventos → reprodução).
+- **falas_check** (`tools/falas_check.gd`, 2 ligações) — Capturas do mundo vivo: casas com telhado, caminhos, figurantes, feira, festa, chuva chegando, telhado abrindo ao entrar, HUD e árvore de poderes.
 - **fx_runner** (`tools/fx_runner.gd`, 6 ligações) — Capturas dos sistemas visuais (luz, sombras, desfoque, cinematográfico, retratos, rastros e impacto).
 - **ghost_check** (`tools/ghost_check.gd`, 3 ligações) — Verificação ponta a ponta da encenação de combate: um golpe que derruba o alvo (momento "ABATIDO!") pelo caminho real (ExecutePlan → eventos → reprodução).
 - **lab_runner** (`tools/lab_runner.gd`, 4 ligações) — Capturas dos protótipos do laboratório.

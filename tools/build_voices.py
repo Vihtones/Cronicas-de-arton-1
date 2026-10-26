@@ -166,3 +166,89 @@ data = {"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "registro": registro,
 OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
 n = sum(len(v) for g in (primeiro, conhecido) for r in g.values() for v in r.values())
 print("voices.json:", len(registro), "profissões,", n, "saudações de apresentação/relação,", len(trabalho), "falas de trabalho")
+
+
+# ---------------------------------------------------------------------------------------------
+# Falas ambiente (balões dos figurantes e latidos dos moradores): data/dialogue/ambient.json
+AMB = OUT.parent / "ambient.json"
+
+conversas = [
+    {"quando": {"clima": ["chuva", "tempestade"]}, "falas": [
+        ["Que chuvarada, hein?", "Pelo menos o poço enche.", "E o telhado do Joran?", "Já pingava antes de chover."],
+        ["Essa lama vai até o joelho.", "Mande as galochas que eu compro.", "Você não tem galochas!", "Por isso mesmo."]]},
+    {"quando": {"clima": ["limpo"], "periodo": ["manha", "tarde"]}, "falas": [
+        ["Dia bonito pra colheita.", "Deus queira que o trigo aguente.", "Lena há de proteger.", "E o moinho gira, e a gente come."],
+        ["O preço da lã subiu.", "De novo? Sempre sobe, nunca desce.", "Culpa dos mercadores de fora.", "Culpa de quem compra, isso sim."]]},
+    {"quando": {"misterio": True}, "prioridade": 3, "falas": [
+        ["Soube do filho do moleiro?", "Sumiu, dizem. Desde a madrugada.", "A capitã está de olho, mas não acha nada.", "Tem gente que não dorme mais."],
+        ["Luzes na Torre Partida, de novo.", "Não devia dizer isso alto.", "Mas foi o que o Tomas dizia...", "Pois olha onde foi parar."],
+        ["Fecharam a porta mais cedo hoje.", "Eu também. Não custa.", "Algo está errado nessa vila.", "Arton é grande. Mas nada some do nada."]]},
+    {"quando": {"evento": ["feira"]}, "prioridade": 3, "falas": [
+        ["Viu as barracas? Tem pano novo.", "E os preços, viu os preços?", "Tudo pela hora da morte.", "Mas a gente compra mesmo assim."],
+        ["Vou levar mel pra casa.", "Só se for pelo dobro.", "Eita feira cara!", "É feira, é pra gastar."]]},
+    {"quando": {"evento": ["festa"], "periodo": ["tarde", "noite"]}, "prioridade": 3, "falas": [
+        ["Hoje tem dança até o amanhecer!", "Se a bebida durar.", "Rosana prometeu barris.", "Então dura!"],
+        ["Quem vai tocar?", "O pessoal de sempre.", "Ainda bem, não há melhor.", "Nem pior."]]},
+    {"quando": {"periodo": ["noite"]}, "falas": [
+        ["Já é tarde pra estar na rua.", "A taverna ainda está aberta.", "Pois então...", "Uma só, prometo."],
+        ["Ouviu aquele barulho?", "É só o vento.", "O vento não anda de botas.", "Pare com isso."]]},
+    {"quando": {}, "falas": [
+        ["E a família, como vai?", "Todos bem, graças aos deuses.", "E o filho mais velho?", "Aprendendo o ofício, devagar."],
+        ["Viu a capitã Elsa passar?", "Passou rápida, como sempre.", "Nunca sorri aquela mulher.", "Também, com esse trabalho..."],
+        ["O ferreiro não gosta de forasteiro.", "O ferreiro não gosta de ninguém.", "Mas faz ferradura boa.", "Isso faz."]]},
+]
+
+vendedor = {
+    "comida": ["Pão fresco, saindo do forno!", "Maçãs doces, doces!", "Peixe do rio, fresquinho!", "Queijo curado da Fenna!", "Mel puro, prova só!"],
+    "ferramenta": ["Facas afiadas!", "Foices e enxadas, preço justo!", "Ferradura nova, garantida!", "Machado bom não quebra!"],
+    "remedio": ["Ervas para a tosse!", "Unguento de Lena, cura tudo!", "Chá de camomila, alivia a alma!"],
+    "tecido": ["Panos de Valkaria!", "Lã macia, linho fino!", "Fio de Hilda, o melhor da vila!"],
+}
+vendedor_noite = ["Última chamada! Leve tudo!", "Hoje faço preço de custo!"]
+
+crianca = {
+    "geral": ["Pega!", "Tá com você!", "Corre!", "Não vale!", "Hihi!", "Me pega se for capaz!"],
+    "chuva": ["Olha a poça!", "Eba, lama!", "Mamãe vai brigar!"],
+    "noite": ["Só mais um pouquinho!", "Não tô com sono!", "Eu vi um vulto!"],
+    "feira": ["Quero doce!", "Compra pra mim!", "Olha o malabarista!"],
+    "festa": ["Vai ter fogos?", "Eu dançei três vezes!", "Quero ficar até tarde!"],
+}
+
+danca = ["♪", "♪♪", "Saúde!", "Hurra!", "Mais uma!", "Dança comigo!", "Toca de novo!", "Que noite!"]
+
+ocupado = {
+    "saco": ["Pesado, ai, ai.", "Mais um e acabo.", "Quem enche esses sacos?"],
+    "vassoura": ["Essa poeira não acaba.", "Varrer, varrer...", "Já limpei isso ontem."],
+    "cesto": ["Ovos frescos!", "Cuidado com o cesto!", "Hoje a galinha botou três."],
+    "lenha": ["Racha, racha.", "Lenha pro inverno.", "Esse machado já viu dias melhores."],
+    "": ["Tanta coisa pra fazer.", "Não paro um minuto.", "Daqui a pouco eu descanso."],
+}
+
+passante = {
+    "manha": ["Bom dia, vizinho!", "Já de pé, hein?", "O dia promete."],
+    "tarde": ["Boa tarde!", "Calorzão, né?", "Bora que ainda tem serviço."],
+    "noite": ["Já vou me recolher.", "Boa noite!", "Noite fria."],
+    "chuva": ["Que chuvarada!", "Corre, corre!", "Vou me molhar todo!"],
+    "tempestade": ["Pra dentro, pra dentro!", "Isso é castigo!", "Tem raio caindo!"],
+    "neblina": ["Não enxergo dois passos...", "Cuidado com a ponte!", "Névoa de arrepiar."],
+    "misterio": ["Cuidado na estrada à noite.", "Soube do filho do moleiro?", "Tempos estranhos..."],
+    "feira": ["Vai à feira?", "Tá cheia a feira!", "Vou ver os preços."],
+    "festa": ["Te vejo na festa!", "Vai ter música!", "Hoje é dia de dançar!"],
+}
+
+# latidos: o morador reconhece o jogador que passa (registro x relação)
+latido = {
+    "seco": {"amigo": ["Forasteiro. Bom te ver.", "Ei. Tudo em ordem?"], "neutro": ["Hm.", "Siga seu caminho."], "frio": ["Estou de olho.", "..."]},
+    "caloroso": {"amigo": ["Olá, amigo!", "Passe lá depois!"], "neutro": ["Bom dia!", "Olá!"], "frio": ["...", "Hmpf."]},
+    "sereno": {"amigo": ["Que Lena o guarde.", "A paz esteja contigo."], "neutro": ["Seja bem-vindo.", "Boa jornada."], "frio": ["Tenha cuidado.", "..."]},
+    "simples": {"amigo": ["Ô, amigo!", "Passa por aqui!"], "neutro": ["Dia.", "Opa."], "frio": ["Hum.", "..."]},
+    "jovem": {"amigo": ["Oi, oi!", "Você voltou!"], "neutro": ["Oi!", "Olha ele!"], "frio": ["Hmpf.", "Mãe, olha ele."]},
+    "idoso": {"amigo": ["Ah, o forasteiro.", "Venha, venha."], "neutro": ["Eh.", "Cuide-se."], "frio": ["Hm.", "Já vi tipos assim."]},
+    "bebado": {"amigo": ["Amigo! Hic!", "Senta aqui!"], "neutro": ["Hic.", "Ei, você."], "frio": ["Não... não quero briga.", "..."]},
+}
+
+amb = {"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "conversas": conversas, "vendedor": vendedor, "vendedor_noite": vendedor_noite,
+       "crianca": crianca, "danca": danca, "ocupado": ocupado, "passante": passante, "latido": latido}
+AMB.write_text(json.dumps(amb, ensure_ascii=False, indent=1), encoding="utf-8")
+print("ambient.json:", len(conversas), "temas de conversa,", sum(len(c["falas"]) for c in conversas), "diálogos,",
+      sum(len(v) for v in vendedor.values()), "pregões")

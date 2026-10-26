@@ -126,7 +126,7 @@ Fato (relato do usuário) e proposta separados. Nada abaixo foi iniciado, exceto
 0. **FEITO:** exploit de XP por fuga (entrar/sair da visão). Fuga e captura = 0 XP; evasão furtiva rende uma vez por criatura. Testes novos.
 1. **FEITO (0.7.1):** **Combate dinâmico:** pré-visualização "fantasma" do sprite do jogador andando até o alvo e executando a ação (atacar) antes de confirmar.
 2. **Diálogos (parcial, 0.7.1):** FEITO: voz por registro (7 registros, 21 profissões) com hora, clima, feira/festa, reputação e mistério; memória de conversa (primeira vez, mesmo dia, retorno após dias, assunto repetido); submenu "Conversar sobre outra coisa" (rumores, trabalho, tempo, eventos, opinião sobre cada morador, biografia). **Falta:** árvores autorais para os 13 moradores que só têm a voz genérica; reação a feitos do jogador (resgate, crime, dívida); falas com consequência (favores, segredos).
-3. **Falas em balão:** genéricas e falhas; ligar ao papel, humor, hora e evento do NPC.
+3. **FEITO (0.7.1):** **Falas em balão:** conversas de 4 falas que alternam entre os dois figurantes e seguem o contexto (chuva, mistério, feira, festa, noite); pregões por mercadoria; crianças, ocupados e passantes por contexto; moradores reconhecem o jogador que passa (latido por registro e reputação, uma vez por dia).
 4. **Comportamento dos NPCs:** simplório; rotinas com objetivos, necessidades e reações.
 5. **Mapa e viagem:** mapa limitado; a viagem de Valkyria não troca de cenário (precisa de cenários/regiões reais).
 6. **Carruagens:** hoje só cruzam a tela; dar origem, destino, passageiros e efeito no mundo.

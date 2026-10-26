@@ -168,3 +168,21 @@ func _process(_d: float) -> void:
 			bd = d; best = id
 	for id in npc_views:
 		(npc_views[id] as ActorView).show_name(id == best)
+	if best != "" and bd < 56.0 and Game.mode == Game.Mode.EXPLORE:
+		_bark(best)
+
+
+## O morador reconhece o jogador que passa por perto (uma vez por dia): fala curta conforme registro,
+## relação e hora. Pura apresentação; não cria memória nem muda reputação.
+func _bark(id: String) -> void:
+	var v: ActorView = npc_views[id]
+	var today := Game.world.day_index()
+	if int(v.get_meta("bark_day", -1)) == today or not v.visible or v.walking:
+		return
+	var st: Dictionary = Game.world.modules.npcs.state.get(id, {})
+	if not st.get("alive", true) or st.get("captive", false):
+		return
+	v.set_meta("bark_day", today)
+	var seed_value := ("%s|%d" % [id, today]).hash()
+	var txt := AmbientTalk.latido(Game.db.ambient, DialogueVoice.register(Game.world, id), DialogueVoice.tier(Game.world, id), seed_value)
+	SpeechBubble.show(self, v, txt)
