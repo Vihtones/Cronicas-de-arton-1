@@ -24,3 +24,13 @@ func test_cronica_sobrevive_ao_salvamento() -> void:
 	w2.from_snapshot(w.to_snapshot())
 	eq(w2.modules.chronicle.entries.size(), 1, "a crônica é salva")
 	eq(w2.modules.chronicle.entries[0].category, "tormenta", "com a categoria")
+
+
+func test_fatos_antes_sem_consumidor_viram_registro() -> void:
+	var w := _world()
+	var c: ChronicleModule = w.modules.chronicle
+	c.on_event(GameEvent.create("o2a", "MYSTERY_LOST", 1, {}))
+	c.on_event(GameEvent.create("o2b", "FACTION_ALERTED", 2, {"faction": "garras_de_cinza"}))
+	c.on_event(GameEvent.create("o2c", "STOLEN_GOODS_RECOVERED", 3, {}))
+	eq(c.entries.size(), 3, "os três fatos que ninguém escutava agora ficam no diário")
+	eq(c.by_category("politica").size(), 2, "pista perdida e alerta entram na política")

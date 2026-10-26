@@ -14,7 +14,8 @@ var _seq := 0
 func module_id() -> String: return "chronicle"
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["LEADERSHIP_CHANGED", "CITY_STATUS_CHANGED", "TORMENTA_STAGE_CHANGED", "ROUTE_CHANGED",
-		"GUILD_CREATED", "PARTY_LOST", "NPC_DIED"])
+		"GUILD_CREATED", "PARTY_LOST", "NPC_DIED",
+		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED"])
 
 
 func on_event(e: GameEvent) -> Array:
@@ -42,6 +43,15 @@ func on_event(e: GameEvent) -> Array:
 		"NPC_DIED":
 			cat = "vida"
 			text = "%s morreu." % _nome(str(e.payload.npc))
+		"MYSTERY_LOST":
+			cat = "politica"
+			text = "Uma pista do mistério se perdeu para sempre."
+		"FACTION_ALERTED":
+			cat = "politica"
+			text = "A facção %s se pôs em alerta." % str(e.payload.get("faction", ""))
+		"STOLEN_GOODS_RECOVERED":
+			cat = "economia"
+			text = "Mercadoria roubada foi recuperada e voltou ao estoque."
 	if cat == "":
 		return []
 	_seq += 1
