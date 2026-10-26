@@ -56,3 +56,15 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 - Nenhum executável novo até juntar mudanças relevantes (Regra 10, e a diretriz D2).
 - Nada de IA generativa na simulação (Regra 6).
 - Vilas, mistério 2 e viagem entre mapas seguem adiados (Regra 9).
+
+## Desempenho medido (26/10/2026, contêiner sem GPU)
+
+`tools/benchmark.gd` headless, 24 moradores em L0, após os módulos de Arton Viva:
+
+| Medida | Antes (0.7.0) | Agora |
+|---|---|---|
+| Comando p95 | 1,1 ms | 3,4 ms |
+| Save (p50/p95) | 8 ms | 41 ms / 56 ms |
+| Load | 31 ms | 163 ms (p95 26 ms na telemetria) |
+
+O quadro aparece em 16,7 ms porque o modo headless fica preso a 60 quadros por segundo; ele não mede GPU. O salvamento e o carregamento cresceram com os novos módulos (relações, diário e rotas). Vale investigar o load de 163 ms antes da build de avaliação. A medição em hardware real continua pendente (§15).
