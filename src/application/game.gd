@@ -90,6 +90,20 @@ func new_game_with_build(build: Dictionary, feminine: bool) -> void:
 
 
 ## Laboratório: novo mundo (seed fixa) configurado pelo cenário do protótipo.
+## Começo do prólogo (questionário ou "Deixar o Destino Decidir"): o jogador vai para o lugar do passado
+## escolhido e a cena é recarregada para refletir a posição.
+func start_prologue(start: Dictionary) -> GameCommand.Result:
+	var r := send("StartPrologue", {"start": start})
+	if r.accepted:
+		world_reloaded.emit()
+	return r
+
+
+## "Deixar o Destino Decidir": a mesma semente gera sempre o mesmo começo (Prologue.from_seed).
+func start_prologue_from_seed(p_seed: int) -> GameCommand.Result:
+	return start_prologue(Prologue.from_seed(p_seed))
+
+
 func start_prototype(id: String) -> Dictionary:
 	new_game(false, 7)
 	var info := Prototypes.apply(id, world)

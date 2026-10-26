@@ -25,6 +25,10 @@ func execute(cmd: GameCommand) -> Array:
 	started = true
 	var delta := int(start.gold) - int(world.player.gold)
 	var contacts := Prologue.resolve_contacts(start, world.db)
+	# o jogador começa no lugar do passado escolhido (a apresentação só reflete a posição)
+	var spot: Vector2i = world.db.location_spot(str(start.start_location))
+	if spot != Vector2i(-1, -1):
+		world.player.position = world.db.tile_to_world(spot)
 	return [
 		fact("GOLD_CHANGED", {"delta": delta, "reason": "prólogo"}),
 		fact("PROLOGUE_STARTED", {"start_location": start.start_location, "home": start.home, "profession": start.profession,

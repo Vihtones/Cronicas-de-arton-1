@@ -62,3 +62,21 @@ func test_comando_aplica_o_comeco_uma_vez() -> void:
 	eq(w.modules.relations.dims("garrick", "player").familiaridade, 12.0, "família começa com familiaridade")
 	var de_novo := WorldHelpers.cmd(w, "StartPrologue", {"start": s})
 	check(not de_novo.accepted, "o prólogo só é escolhido uma vez")
+
+
+func test_comeco_leva_o_jogador_ao_lugar_do_passado() -> void:
+	var w := WorldHelpers.world(3)
+	var start := Prologue.from_answers({"comeco": "no_trabalho", "ocupacao": "ferreiro"})
+	var r := WorldHelpers.cmd(w, "StartPrologue", {"start": start})
+	check(r.accepted, "começo aceito")
+	var spot: Vector2i = w.db.location_spot(str(start.start_location))
+	eq(w.db.world_to_tile(w.player.position), spot, "o jogador começa no local de trabalho do ferreiro (%s)" % start.start_location)
+
+
+func test_destino_decidido_por_semente_leva_ao_mesmo_lugar() -> void:
+	var a := WorldHelpers.world(3)
+	var b := WorldHelpers.world(3)
+	var ra := WorldHelpers.cmd(a, "StartPrologue", {"start": Prologue.from_seed(42)})
+	var rb := WorldHelpers.cmd(b, "StartPrologue", {"start": Prologue.from_seed(42)})
+	check(ra.accepted and rb.accepted, "as duas semeadas começam")
+	eq(a.player.position, b.player.position, "mesma semente, mesma posição inicial")
