@@ -15,6 +15,8 @@ var pm: int = 0
 var defense_base: int = 10        # 10 + armadura/escudo (sem Des) ou valor fixo de criatura
 var defense_fixed: int = -1       # se >= 0, Defesa total do bloco (criaturas)
 var speed_m: float = 9.0
+var fly_m: float = 0.0             # deslocamento de voo (0 = não voa; atravessa desníveis)
+var swim_m: float = 0.0           # deslocamento de natação (0 = não nada; Heróis: natação = base)
 var attacks: Array[Dictionary] = []
 var conditions: PackedStringArray = PackedStringArray()
 var senses: PackedStringArray = PackedStringArray()
@@ -40,6 +42,9 @@ var race_defense: int = 0          # Couro Rígido, Reptiliano, Chassi
 var extra_armor_penalty: int = 0   # Chassi do golem
 var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37)
 var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
+var sorte_usada: bool = false        # Sorte Salvadora (hynne): uma vez por rodada; zera ao começar a rodada
+var olhar_usado: bool = false          # Olhar Atordoante (medusa): uma vez por cena; zera no fim do combate
+var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
 
 
@@ -83,6 +88,39 @@ func has_power(p: String) -> bool:
 	return powers.has(p)
 
 
+func can_swim() -> bool:
+	return swim_m > 0.0
+
+
+func can_fly() -> bool:
+	return fly_m > 0.0
+
+
+## Olhar Atordoante (medusa): ação de movimento, 1 PM, uma vez por cena.
+func can_olhar_atordoante() -> bool:
+	return race_id == "medusa" and pm >= 1 and not olhar_usado
+
+
+## Sorte Salvadora (hynne, Bestiário): reação de 1 PM, uma vez por rodada, para rolar de novo um teste de resistência.
+func can_sorte_salvadora() -> bool:
+	return race_id == "hynne" and pm >= 1 and not sorte_usada
+
+
+## Patamar (Heróis, Arsenal de Lisandra): iniciante 1-4, veterano 5-10, experiente 11-16, campeão 17-20.
+func patamar() -> int:
+	if level <= 4: return 1
+	if level <= 10: return 2
+	if level <= 16: return 3
+	return 4
+
+
+## Defesa da Armadura de Allihanna (dahllan, LB): +2 ao ativar. Com Arsenal de Lisandra soma +1 por patamar (Heróis).
+func allihanna_defense(ativa: bool) -> int:
+	if not ativa or race_id != "dahllan":
+		return 0
+	return 2 + (patamar() if has_power("arsenal_de_lisandra") else 0)
+
+
 func can_use_skill(skill: String, rules: RuleRegistry) -> bool:
 	if flat_skills.has(skill):
 		return true
@@ -110,7 +148,7 @@ func training_bonus() -> int:
 
 func defense(rules: RuleRegistry, vs_melee: bool = true) -> int:
 	var d := defense_fixed if defense_fixed >= 0 else defense_base + int(attrs.des)
-	d += condition_mod(rules, "defesa") + scene_defense + (race_defense if defense_fixed < 0 else 0)
+	d += condition_mod(rules, "defesa") + scene_defense + allihanna_defense(allihanna_ativa) + (race_defense if defense_fixed < 0 else 0)
 	if powers.has("esquiva"): d += 2   # Esquiva (LB p.125)
 	if has_effective_condition(rules, "caido"):
 		d += -5 if vs_melee else 5
@@ -180,7 +218,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"arcane_path": arcane_path, "scene_defense": scene_defense, "size": size, "creature_type": creature_type,
+		"arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -206,7 +244,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.equipment = d.get("equipment", {"weapon": "", "armor": ""}).duplicate()
 	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
 	s.powers = d.get("powers", {}).duplicate(true)
-	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0))
+	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()
 	s.race_defense = int(d.get("race_defense", 0)); s.extra_armor_penalty = int(d.get("extra_armor_penalty", 0))

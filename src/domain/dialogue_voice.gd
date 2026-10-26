@@ -67,6 +67,12 @@ static func greeting(world: WorldState, npc: String, visit: Dictionary) -> Strin
 	# a vila está inquieta: de vez em quando o morador comenta (não na repetição do mesmo dia)
 	if kind != "mesmo_dia" and mystery_open(world) and absi(("%s|%d|w" % [npc, count]).hash()) % 2 == 0:
 		text += " " + str(v.preocupado.get(reg, ""))
+	# relação com o jogador (RelationsModule): a reação aparece na primeira conversa do dia
+	var rel = world.module("relations")
+	if kind != "mesmo_dia" and rel != null:
+		var line := str(v.get("reacao", {}).get(rel.reaction(npc, "player"), ""))
+		if line != "":
+			text += " " + line
 	return text.strip_edges()
 
 

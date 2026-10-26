@@ -156,6 +156,7 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 ## Características da raça que não são atributos (LB p.19-31). O que não tem sistema ainda fica em "pendente" na regra.
 static func _apply_race(rules: RuleRegistry, s: CharacterSheet, race: Dictionary) -> void:
 	s.speed_m = float(race.get("deslocamento_m", 9))
+	s.swim_m = float(race.get("natacao_m", 0))
 	for sense in race.get("sentidos", []):
 		if not s.senses.has(sense): s.senses.append(sense)
 	s.size = str(race.get("tamanho", "medio"))

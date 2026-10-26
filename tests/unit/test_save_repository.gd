@@ -46,3 +46,20 @@ func test_checksum_adulterado_rejeitado() -> void:
 
 func test_slot_inexistente() -> void:
 	eq(_repo().load_slot("nada"), {}, "vazio")
+
+
+func test_save_anterior_a_arton_viva_carrega_sem_perder_nada() -> void:
+	## Migração: um save da 0.7.0 não tem os módulos novos. Carregar deve preencher o padrão, sem erro.
+	var w := WorldHelpers.world(9)
+	WorldHelpers.advance_hours(w, 10)
+	var antigo := w.to_snapshot()
+	for novo in ["relations", "prologue", "party", "cities", "tormenta", "homebrew", "chronicle"]:
+		antigo.modules.world_modules.erase(novo)
+	var w2 := WorldHelpers.world(1)
+	w2.from_snapshot(antigo)
+	eq(w2.modules.relations.rel.size(), 0, "sem relações salvas, começa vazio")
+	eq(w2.modules.tormenta.stage, 0, "sem Tormenta salva, começa estável")
+	eq(w2.modules.party.members.size(), 0, "sem party salva, começa sem membros")
+	eq(w2.player.gold, w.player.gold, "o ouro do jogador é preservado")
+	WorldHelpers.advance_hours(w2, 5)
+	check(true, "o jogo continua rodando depois de carregar um save antigo")

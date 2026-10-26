@@ -90,6 +90,87 @@ func test_diagonal_custa_dobro_e_terreno_dificil() -> void:
 	eq(sim.speed_squares("player"), 6, "9m = 6 quadrados")
 
 
+func test_nadar_atravessa_rio_so_quem_nada() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var agua := _primeira_agua(sim.db)
+	check(agua != Vector2i(-1, -1), "mapa tem rio")
+	check(not sim.passable(agua, "player"), "sem natação, o rio bloqueia (LB p.238)")
+	sim.c("player").sheet.swim_m = 9.0
+	check(sim.passable(agua, "player"), "com natação, atravessa o rio (Heróis: natação = base)")
+
+
+func test_barranco_so_quem_voa_atravessa_e_ponte_passa_a_pe() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	check(not sim.passable(Vector2i(60, 5), "player"), "barranco bloqueia a pé")
+	check(sim.passable(Vector2i(60, 9), "player"), "ponte é passagem a pé")
+	sim.c("player").sheet.fly_m = 9.0
+	check(sim.passable(Vector2i(60, 5), "player"), "voo atravessa o barranco (Heróis, Voo)")
+
+
+func test_superficie_inteira_alcancavel_a_pe() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var start := Vector2i(23, 27)
+	var seen := {start: true}
+	var fila: Array[Vector2i] = [start]
+	while not fila.is_empty():
+		var t: Vector2i = fila.pop_back()
+		for n in [t + Vector2i.RIGHT, t + Vector2i.LEFT, t + Vector2i.DOWN, t + Vector2i.UP]:
+			if not seen.has(n) and n.y < 49 and sim.db.static_walkable(n):
+				seen[n] = true
+				fila.append(n)
+	var falta := 0
+	for y in range(49):
+		for x in range(sim.db.size.x):
+			var t := Vector2i(x, y)
+			if sim.db.static_walkable(t) and not seen.has(t):
+				falta += 1
+	eq(falta, 0, "todo chão da superfície liga ao início (bolsões abertos em build_content)")
+
+
+func test_armadura_de_allihanna_custa_pm_da_defesa_e_nao_ativa_duas_vezes() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var P := sim.c("player")
+	P.sheet.race_id = "dahllan"
+	P.sheet.pm = 3
+	var antes: int = P.sheet.defense(sim.rules)
+	check(GhostPlanner.validate_action(sim, "player", {"type": "allihanna"}).ok, "dahllan ativa a armadura")
+	w.modules.combat._execute_action("player", {"type": "allihanna"}, {"ok": true, "kind": "movimento", "cost": 0})
+	eq(P.sheet.pm, 2, "custa 1 PM")
+	eq(P.sheet.defense(sim.rules) - antes, 2, "+2 de Defesa (LB, dahllan)")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "allihanna"}).ok, "não ativa duas vezes na cena")
+
+
+func test_olhar_atordoante_e_uma_vez_por_cena_e_so_medusa() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var P := sim.c("player")
+	var B := sim.c("bandido_1")
+	B.tile = Vector2i(P.tile.x + 2, P.tile.y)
+	P.sheet.race_id = "medusa"
+	P.sheet.pm = 3
+	var a := {"type": "olhar_atordoante", "target": "bandido_1"}
+	check(GhostPlanner.validate_action(sim, "player", a).ok, "medusa usa o olhar em alvo no alcance curto")
+	w.modules.combat._execute_action("player", a, {"ok": true, "kind": "movimento", "cost": 1})
+	eq(P.sheet.pm, 2, "custa 1 PM")
+	check(P.sheet.olhar_usado, "marca uso da cena")
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "não usa duas vezes na cena")
+	P.sheet.race_id = "humano"
+	P.sheet.olhar_usado = false
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "só medusa")
+
+
+func _primeira_agua(db) -> Vector2i:
+	for y in db.size.y:
+		for x in db.size.x:
+			if db.is_water(Vector2i(x, y)):
+				return Vector2i(x, y)
+	return Vector2i(-1, -1)
+
+
 func test_investida_exige_linha_reta() -> void:
 	var w := _crypt_fight()
 	var c: CombatModule = w.modules.combat

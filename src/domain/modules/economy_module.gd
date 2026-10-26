@@ -4,16 +4,20 @@ extends WorldModule
 ## Não simula cada moeda. O mensageiro leva mercadoria entre regiões. ORIGINAL_DO_JOGO.
 
 var regions: Dictionary = {}
+var treasury := 0  # ouro pago em refeições da vila (circulação monetária, ORIGINAL_DO_JOGO)
+var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regiões (Arton Viva, Fase 4)
 
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "MEAL_SERVED", "TORMENTA_DAY"])
 
 
 func _ensure() -> void:
 	if regions.is_empty():
 		regions = world.db.economy.get("regions", {}).duplicate(true)
+	if routes.is_empty():
+		routes = {"valkaria_vila": {"from": "valkaria", "to": "vila", "open": true}}
 
 
 func price(item_id: String, region: String = "vila", seller: String = "") -> int:
@@ -77,7 +81,7 @@ func on_tick(tick: int) -> Array:
 		var r: Dictionary = regions[rid]
 		for g in r.stock:
 			r.stock[g] = maxi(0, int(r.stock[g]) + int(r.production[g]) - int(r.consumption[g]))
-	return [fact("ECONOMY_DAY", {"vila": regions.vila.stock.duplicate()})]
+	return [fact("ECONOMY_DAY", {"vila": regions.vila.stock.duplicate(), "treasury": treasury})]
 
 
 func on_event(e: GameEvent) -> Array:
@@ -96,6 +100,15 @@ func on_event(e: GameEvent) -> Array:
 			for g in e.payload.get("goods", {}):
 				if regions.vila.stock.has(g):
 					regions.vila.stock[g] = int(regions.vila.stock[g]) + int(e.payload.goods[g])
+		"TORMENTA_DAY":
+			# corrupção em estágio de crise ou pior estraga a comida da vila (ORIGINAL_DO_JOGO)
+			var est := int(e.payload.get("stage", 0))
+			if est >= 3:
+				regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 5 * (est - 2))
+		"MEAL_SERVED":
+			# refeição paga na taverna: consome comida da vila e leva o ouro ao tesouro local
+			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 1)
+			treasury += int(e.payload.get("cost", 0))
 		"SHEEP_KILLED":
 			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 4 * int(e.payload.get("count", 1)))
 		"DISTANT_EVENT":
@@ -103,10 +116,17 @@ func on_event(e: GameEvent) -> Array:
 			if not eff.is_empty() and regions.has(eff.region):
 				var r: Dictionary = regions[eff.region]
 				r.stock[eff.good] = maxi(0, int(r.stock[eff.good]) + int(eff.delta))
+			# rota fechada ou reaberta (guerra, bloqueio, reabertura): reversível, sem perda de dados
+			var rt: Dictionary = e.payload.get("effect", {}).get("route", {})
+			if rt.has("id") and routes.has(rt.id):
+				routes[rt.id].open = bool(rt.get("open", true))
+				return [fact("ROUTE_CHANGED", {"route": rt.id, "open": routes[rt.id].open})]
 		"NPC_MOVED":
 			# Mensageiro chegando de Valkaria traz mercadoria que falta na vila.
 			for reg in world.db.distant.get("regions", []):
 				if e.payload.npc == reg.courier and e.payload.from == reg.id:
+					if not _route_open(reg.id):
+						return []  # rota fechada: o mensageiro chega sem carga
 					var moved := {}
 					for g in regions.vila.stock:
 						var deficit := int(regions.vila.target[g]) - int(regions.vila.stock[g])
@@ -121,13 +141,24 @@ func on_event(e: GameEvent) -> Array:
 	return []
 
 
+func _route_open(from_region: String) -> bool:
+	for id in routes:
+		if routes[id].from == from_region and routes[id].open:
+			return true
+	return false
+
+
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"regions": regions.duplicate(true)}
+	return {"regions": regions.duplicate(true), "treasury": treasury, "routes": routes.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
 	regions = d.get("regions", {}).duplicate(true)
+	treasury = int(d.get("treasury", 0))
+	routes = d.get("routes", {}).duplicate(true)
+	for id in routes:
+		routes[id].open = bool(routes[id].get("open", true))
 	for rid in regions:
 		for f in ["stock", "production", "consumption", "target"]:
 			for g in regions[rid][f]:

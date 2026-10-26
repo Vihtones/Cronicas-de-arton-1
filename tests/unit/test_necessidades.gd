@@ -77,3 +77,119 @@ func test_necessidades_salvam_e_carregam() -> void:
 	w2.from_snapshot(snap)
 	eq(w2.modules.npc_needs.gold("garrick"), 7, "ouro salvo")
 	eq(w2.modules.npc_needs.hunger("garrick"), 0.5, "fome salva")
+
+
+func test_utilidade_escolhe_a_necessidade_mais_forte() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.95, "tired": 0.82, "gold": 10, "goal": "", "medium": ""}
+	nd.on_tick(12 * 6)
+	eq(nd.goal("garrick"), "comer", "com fome maior que o cansaço, comer vence")
+
+
+func test_cansaco_maior_que_fome_vence() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.72, "tired": 0.95, "gold": 10, "goal": "", "medium": ""}
+	nd.on_tick(12 * 6)
+	eq(nd.goal("garrick"), "descansar", "com cansaço maior que a fome, descansar vence")
+
+
+func test_sem_urgencia_o_objetivo_de_medio_prazo_e_juntar_ouro() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 3, "goal": "", "medium": ""}
+	nd.on_tick(12 * 6)
+	eq(nd.medium_goal("garrick"), "juntar_ouro", "pouco ouro e sem urgência, junta ouro")
+	eq(nd.goal("garrick"), "", "o médio prazo não vira objetivo de curto prazo")
+
+
+func test_meta_de_ouro_atingida_encerra_o_objetivo_de_medio_prazo() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": NpcNeedsModule.MEDIUM_TARGET_GOLD, "goal": "", "medium": "juntar_ouro"}
+	nd.on_tick(12 * 6)
+	eq(nd.medium_goal("garrick"), "", "com a meta batida, o objetivo de médio prazo some")
+
+
+func test_trabalho_no_horario_rende_ouro_enquanto_junta() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var npcs: NpcModule = w.modules.npcs
+	var d := w.npc_def("garrick")
+	npcs.state.garrick.location = str(d.work)
+	w.clock.tick = 10 * 6
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 3, "goal": "", "medium": ""}
+	nd.on_tick(w.clock.tick)
+	eq(nd.gold("garrick"), 3 + NpcNeedsModule.WORK_INCOME, "trabalhar às 10h rende ouro")
+
+
+func test_fora_do_horario_de_trabalho_nao_rende_ouro() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var npcs: NpcModule = w.modules.npcs
+	var d := w.npc_def("garrick")
+	npcs.state.garrick.location = str(d.work)
+	w.clock.tick = 20 * 6
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 3, "goal": "", "medium": ""}
+	nd.on_tick(w.clock.tick)
+	eq(nd.gold("garrick"), 3, "às 20h o trabalho não rende ouro")
+
+
+func test_objetivo_de_medio_prazo_salva_e_carrega() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 3, "goal": "", "medium": "juntar_ouro"}
+	var w2 := WorldHelpers.world(1)
+	w2.from_snapshot(w.to_snapshot())
+	eq(w2.modules.npc_needs.medium_goal("garrick"), "juntar_ouro", "médio prazo salvo")
+
+
+func test_meta_de_medio_prazo_abre_objetivo_de_longo_prazo() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": NpcNeedsModule.MEDIUM_TARGET_GOLD, "goal": "", "medium": "", "long": ""}
+	nd.on_tick(12 * 6)
+	eq(nd.long_goal("garrick"), "abrir_negocio", "com a meta de médio prazo, o longo prazo se abre")
+
+
+func test_objetivo_de_longo_prazo_conclui_ao_bater_a_meta() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": NpcNeedsModule.LONG_TARGET_GOLD, "goal": "", "medium": "", "long": "abrir_negocio"}
+	nd.on_tick(12 * 6)
+	eq(nd.long_goal("garrick"), "concluido", "com a meta de longo prazo batida, o objetivo conclui")
+
+
+func test_longo_prazo_salva_e_carrega() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 20, "goal": "", "medium": "", "long": "abrir_negocio"}
+	var w2 := WorldHelpers.world(1)
+	w2.from_snapshot(w.to_snapshot())
+	eq(w2.modules.npc_needs.long_goal("garrick"), "abrir_negocio", "longo prazo salvo")
+
+
+func test_refeicao_paga_consome_comida_da_vila_e_leva_ouro_ao_tesouro() -> void:
+	var w := _world()
+	var eco: EconomyModule = w.modules.economy
+	var comida_antes := int(eco.regions.vila.stock.comida)
+	var tesouro_antes := eco.treasury
+	eco.on_event(GameEvent.create("refeicao_1", "MEAL_SERVED", 0, {"npc": "garrick", "cost": NpcNeedsModule.MEAL_COST}))
+	eq(int(eco.regions.vila.stock.comida), comida_antes - 1, "a refeição consome uma comida da vila")
+	eq(eco.treasury, tesouro_antes + NpcNeedsModule.MEAL_COST, "o ouro da refeição vai ao tesouro")
+
+
+func test_morador_que_come_na_taverna_gera_fato_de_refeicao() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var npcs: NpcModule = w.modules.npcs
+	npcs.state.garrick.location = "taverna"
+	nd.state.garrick = {"hunger": 0.9, "tired": 0.0, "gold": 5, "goal": "comer", "medium": "", "long": ""}
+	w.clock.tick = 12 * 6
+	var facts := nd.on_tick(w.clock.tick)
+	var achou := false
+	for f in facts:
+		if f.type == "MEAL_SERVED":
+			achou = true
+	check(achou, "comer na taverna emite MEAL_SERVED")

@@ -4,7 +4,7 @@ extends RefCounted
 ## sem impedir o boot (§5, §16).
 
 const OPTIONAL := ["weather", "memory", "factions", "crime", "economy", "region_sim", "religion",
-	"progression", "items", "travel", "domain", "lineage", "adventurers", "fauna", "pacing", "npc_needs"]
+	"progression", "items", "travel", "domain", "lineage", "adventurers", "fauna", "pacing", "npc_needs", "relations", "prologue", "cities", "party", "tormenta", "homebrew", "chronicle"]
 
 
 static func create(p_seed: int = 20261023, disabled: Array = [], rules: RuleRegistry = null, db: ContentDB = null) -> WorldState:
@@ -15,8 +15,8 @@ static func create(p_seed: int = 20261023, disabled: Array = [], rules: RuleRegi
 	w.player.position = d.tile_to_world(Vector2i(int(d.map.player_start[0]), int(d.map.player_start[1])))
 	# Ordem importa para listeners: estado primeiro; memória antes de crime.
 	for m in [StateModule.new(), ObjectsModule.new(), TownEventsModule.new(), CartsModule.new(), NpcLifeModule.new(), NpcNeedsModule.new(), NpcModule.new(), WeatherModule.new(), ExplorationModule.new(),
-			MemoryModule.new(), FactionModule.new(), CombatModule.new(), DialogueModule.new(), CrimeModule.new(),
-			EconomyModule.new(), RegionSimModule.new(), ReligionModule.new(), ProgressionModule.new(), ItemsModule.new(),
+			MemoryModule.new(), RelationsModule.new(), PrologueModule.new(), PartyModule.new(), FactionModule.new(), CombatModule.new(), DialogueModule.new(), CrimeModule.new(),
+			EconomyModule.new(), CitiesModule.new(), TormentaModule.new(), HomebrewModule.new(), ChronicleModule.new(), RegionSimModule.new(), ReligionModule.new(), ProgressionModule.new(), ItemsModule.new(),
 			TravelModule.new(), DomainModule.new(), LineageModule.new(), AdventurersModule.new(), FaunaModule.new(), PacingModule.new()]:
 		w.register(m)
 	for id in disabled:

@@ -1,10 +1,12 @@
 class_name NpcNeedsModule
 extends WorldModule
-## Necessidades e objetivos de curto prazo dos moradores (Arton Viva, Fase 1). ORIGINAL_DO_JOGO.
+## Necessidades e objetivos dos moradores (Arton Viva, Fase 1). ORIGINAL_DO_JOGO.
 ## - Necessidades: fome e cansaço sobem com o tempo e caem ao comer/descansar; dinheiro é o ouro do morador.
-## - Decisão: a cada hora, a necessidade mais urgente vira objetivo ("comer", "descansar") se passar do limite.
-##   Sem urgência, o morador segue a agenda normal.
-## - Ação: comer na taverna custa ouro e reduz a fome; descansar em casa reduz o cansaço.
+## - Decisão por utilidade: a cada hora, a necessidade de maior valor acima do limite vira objetivo de curto
+##   prazo ("comer", "descansar"). Sem urgência, o objetivo de médio prazo ("juntar_ouro") orienta o morador,
+##   e ele segue a agenda normal.
+## - Ação: comer na taverna custa ouro e reduz a fome; descansar em casa reduz o cansaço; trabalhar rende ouro
+##   enquanto o morador junta para a meta de médio prazo.
 ## Determinístico (sem sorteio). Não decide combate nem regras de T20: só onde o morador está e o que ele consome.
 
 const HUNGER_PER_HOUR := 0.03
@@ -15,8 +17,13 @@ const MEAL_COST := 2            # ouro de uma refeição na taverna
 const MEAL_RELIEF := 0.6
 const REST_RELIEF_PER_HOUR := 0.15
 const STAY_PUT := ["guarda_dia", "guarda_noite"]
+const MEDIUM_TARGET_GOLD := 15  # médio prazo: juntar ouro até esta meta
+const WORK_INCOME := 1          # ouro por hora de trabalho enquanto junta
+const WORK_START := 8
+const WORK_END := 18
+const LONG_TARGET_GOLD := 40    # longo prazo: depois de juntar, abrir o próprio negócio
 
-var state: Dictionary = {}      # id -> {hunger, tired, gold, goal}
+var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium, long}
 
 
 func module_id() -> String: return "npc_needs"
@@ -27,13 +34,17 @@ func _ensure() -> void:
 		return
 	for id in world.all_npc_ids():
 		var d := world.npc_def(id)
-		state[id] = {"hunger": 0.2, "tired": 0.1, "gold": int(d.get("gold", 0)), "goal": ""}
+		state[id] = _fresh(int(d.get("gold", 0)))
+
+
+func _fresh(gold: int) -> Dictionary:
+	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": "", "long": ""}
 
 
 func _s(id: String) -> Dictionary:
 	_ensure()
 	if not state.has(id):
-		state[id] = {"hunger": 0.2, "tired": 0.1, "gold": 0, "goal": ""}
+		state[id] = _fresh(0)
 	return state[id]
 
 
@@ -41,23 +52,49 @@ func hunger(id: String) -> float: return float(_s(id).hunger)
 func tired(id: String) -> float: return float(_s(id).tired)
 func gold(id: String) -> int: return int(_s(id).gold)
 func goal(id: String) -> String: return str(_s(id).goal)
+func medium_goal(id: String) -> String: return str(_s(id).medium)
+func long_goal(id: String) -> String: return str(_s(id).long)
 
 
-## Objetivo atual da necessidade (puro para quem consulta): "comer", "descansar" ou "".
+## Objetivo de curto prazo por utilidade (puro para quem consulta): "comer", "descansar" ou "".
+## Só entra a necessidade acima do limite; entre as duas, vence a de maior valor (empate: comer).
 func urgent_goal(id: String) -> String:
 	var s := _s(id)
-	if float(s.tired) >= TIRED_AT: return "descansar"
-	if float(s.hunger) >= HUNGRY_AT: return "comer"
+	var hunger_ok := float(s.hunger) >= HUNGRY_AT
+	var tired_ok := float(s.tired) >= TIRED_AT
+	if hunger_ok and tired_ok:
+		return "descansar" if float(s.tired) > float(s.hunger) else "comer"
+	if tired_ok: return "descansar"
+	if hunger_ok: return "comer"
 	return ""
+
+
+## Objetivo de médio prazo: juntar ouro enquanto o morador tiver menos que a meta.
+func medium_goal_for(id: String) -> String:
+	return "juntar_ouro" if gold(id) < MEDIUM_TARGET_GOLD else ""
+
+
+## Objetivo de longo prazo: abrir negócio, a partir de a meta de médio prazo ser batida.
+## Fica ativo até o ouro bater a meta de longo prazo; depois, o morador segue a vida normal.
+func long_goal_for(id: String) -> String:
+	var current := str(_s(id).get("long", ""))
+	if current == "abrir_negocio" and gold(id) >= LONG_TARGET_GOLD:
+		return "concluido"
+	if current == "abrir_negocio" or current == "concluido":
+		return current
+	return "abrir_negocio" if gold(id) >= MEDIUM_TARGET_GOLD else ""
 
 
 func on_tick(tick: int) -> Array:
 	_ensure()
+	var out: Array = []
 	if tick % (60 / world.clock.tick_minutes) != 0:
-		return []
+		return out
 	var npcs = world.module("npcs")
 	var h := world.hour()
-	for id in state:
+	var ids := state.keys()
+	ids.sort()  # ordem estável: eventos saem sempre na mesma sequência, com ou sem salvamento
+	for id in ids:
 		var s: Dictionary = state[id]
 		var d := world.npc_def(id)
 		if npcs == null or not npcs.npc(id).get("alive", false) or npcs.npc(id).get("captive", false):
@@ -69,12 +106,17 @@ func on_tick(tick: int) -> Array:
 		s.tired = minf(1.0, float(s.tired) + (0.0 if asleep else TIRED_PER_HOUR))
 		if asleep:
 			s.tired = maxf(0.0, float(s.tired) - REST_RELIEF_PER_HOUR)
-		# decisão: a necessidade urgente vira objetivo; sem urgência, o objetivo é vazio
+		# decisão: a necessidade de maior utilidade vira objetivo de curto prazo
 		s.goal = urgent_goal(id)
-		# ação: chegou à taverna querendo comer, come
-		if s.goal == "comer" and loc == "taverna":
-			eat(id)
-	return []
+		# médio prazo: sem urgência, junta ouro; o trabalho rende ouro no horário
+		s.medium = medium_goal_for(id)
+		s.long = long_goal_for(id)
+		if s.goal == "" and s.medium == "juntar_ouro" and loc == str(d.get("work", "")) and h >= WORK_START and h < WORK_END:
+			s.gold = int(s.gold) + WORK_INCOME
+		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
+		if s.goal == "comer" and loc == "taverna" and eat(id):
+			out.append(fact("MEAL_SERVED", {"npc": id, "cost": MEAL_COST}, [id]))
+	return out
 
 
 ## Lugar que o objetivo pede agora ("" se nenhum). Usado pela agenda do morador.
@@ -91,13 +133,14 @@ func location_override(id: String, d: Dictionary) -> String:
 
 
 ## Ação de comer: cobra na taverna e reduz a fome. Chamado quando o morador chega à taverna.
-func eat(id: String) -> void:
+## Devolve true só se a refeição foi paga.
+func eat(id: String) -> bool:
 	var s := _s(id)
-	if float(s.hunger) < 0.1:
-		return
-	if int(s.gold) >= MEAL_COST:
-		s.gold = int(s.gold) - MEAL_COST
-		s.hunger = maxf(0.0, float(s.hunger) - MEAL_RELIEF)
+	if float(s.hunger) < 0.1 or int(s.gold) < MEAL_COST:
+		return false
+	s.gold = int(s.gold) - MEAL_COST
+	s.hunger = maxf(0.0, float(s.hunger) - MEAL_RELIEF)
+	return true
 
 
 func to_dict() -> Dictionary:
@@ -112,3 +155,5 @@ func from_dict(d: Dictionary) -> void:
 		state[id].tired = float(state[id].tired)
 		state[id].gold = int(state[id].gold)
 		state[id].goal = str(state[id].goal)
+		state[id].medium = str(state[id].get("medium", ""))
+		state[id].long = str(state[id].get("long", ""))

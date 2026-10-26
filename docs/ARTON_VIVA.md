@@ -11,11 +11,11 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 | Agentes (WorldAgent, dados principais) | Parcial | Cada morador é um registro em `data/world/npcs.json` + estado em `NpcModule`. Não há um modelo comum `WorldAgent` |
 | Personalidade | Parcial | `traits` (10 traços, ex.: teimoso, curioso, mentiroso). Sem as 10 dimensões numéricas da spec |
 | Necessidades (fome, cansaço, dinheiro) | **Validado (Fase 1)** | `NpcNeedsModule`: fome, cansaço e ouro; comer na taverna e descansar em casa mudam o caminho |
-| Objetivos curto/médio/longo prazo | Parcial | Só o objetivo de curto prazo ("comer", "descansar"). Sem médio e longo prazo |
-| Decisão autônoma (utilidade) | Parcial | Decisão por limiar (necessidade urgente vence a agenda). Sem comparação de utilidades |
+| Objetivos curto/médio/longo prazo | Parcial | Curto prazo ("comer", "descansar"), médio prazo ("juntar_ouro", meta de 15 de ouro, trabalho rende ouro) e longo prazo ("abrir_negocio", meta de 40 de ouro). Sem agir sobre a economia |
+| Decisão autônoma (utilidade) | Parcial | Decisão por utilidade entre necessidades acima do limite (a de maior valor vence). Sem utilidade para ações da agenda |
 | Atividades e humor | **Validado (0.7.1)** | `NpcLifeModule`: medo, alegria e atividade no rótulo |
 | Memória social | **Validado** | `MemoryModule`: testemunhas, rumores no mesmo local, reputação, esquecimento |
-| Relações multidimensionais | Parcial | Só reputação (`reputation`, `bias`) e família/facção. Sem confiança, afeto, medo separados |
+| Relações multidimensionais | **Validado (Fase 2)** | `RelationsModule`: confiança, afeto, respeito, medo, ressentimento, admiração, lealdade, interesse e familiaridade por par; alimentadas por `MEMORY_FORMED` e convivência |
 | Família como agentes reais | Parcial | Família existe (`family`), com residência e atividades. Sem objetivos próprios |
 | Moralidade e reputação localizada | Parcial | Reputação por morador, família e facção. Sem reputação por cidade ou reino |
 | Rumores | **Validado** | `MemoryModule`, com perda de confiabilidade |
@@ -41,12 +41,30 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 ## Andamento por fase
 
 - **Fase 0 (auditoria):** feita — esta matriz. Riscos: o `NpcModule` concentra localização e agenda, e já recebe várias influências (eventos da vila, medo, necessidades, chuva). Novas camadas devem entrar por um ponto único de decisão (`desired_location`) e não por cópias.
-- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente, ação de comer e descansar, persistência. Falta: objetivos de médio prazo, utilidade comparativa e atividades com consequências na economia.
-- **Fase 2 (memória e sociedade):** parte já existe (memória, rumores, reputação). Falta: relações multidimensionais e reações por personalidade.
-- **Fases 3 a 9:** não iniciadas.
+- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro); refeição paga na taverna consome comida da vila e leva o ouro ao tesouro (`MEAL_SERVED`). Falta: o trabalho dos moradores ainda não produz mercadoria na economia da vila.
+- **Fase 2 (memória e sociedade):** relações multidimensionais feitas (`RelationsModule`, com traços: teimoso, memória longa, exige provas) e reações por rótulo (confia, amigável, indiferente, teme, guarda rancor). Diálogos ligados à reação na primeira conversa do dia (`reacao` em `voices.json`). Falta: família com objetivos próprios.
+- **Fase 3 (Prólogo Vivo):** parcial. Feito: perguntas A a F, gerador de começo (`Prologue`), destino por semente reproduzível, validação contra o mundo, comando `StartPrologue` (uma vez), ouro e vínculos iniciais. Falta: a tela do questionário, a posição inicial aplicada pela apresentação e a opção "Deixar o Destino Decidir" na criação.
+- **Fase 4 (economia regional):** parcial. Feito: rota comercial (`valkaria_vila`) que pode ser fechada e reaberta por DISTANT_EVENT, com fato `ROUTE_CHANGED`; com a rota fechada o mensageiro não entrega; reaberta, a entrega volta sem perda. Falta: crises de preço e recuperação explícitas, mais rotas e mercadorias de outras regiões.
+- **Fase 5 (cidades e organizações):** parcial. Feito: abastecimento da vila (média de estoque sobre meta); decadência após dias seguidos de escassez e recuperação sem o jogador (`CITY_STATUS_CHANGED`); sucessão de líder por morte, com o membro vivo mais velho, ou organização fragmentada (`LEADERSHIP_CHANGED`). Indicadores urbanos (`indicators`: abastecimento, saúde, prosperidade, estabilidade). Falta: segurança e moradia, desenvolvimento por construção e influência política.
+- **Fase 6 (party e guildas):** parcial. Feito: recrutamento com consentimento (confiança e familiaridade, ou pagamento que cubra o risco; reputação sozinha não recruta), ordens guardadas, lealdade diária, perda por morte (`PARTY_LOST`) e guilda (dois membros e 50 de ouro, criada uma vez). Falta: ordens no combate, contratos da guilda e administração.
+- **Fase 7 (magia e Tormenta):** parcial. Feito: três variáveis separadas (pressão, corrupção, contenção); pressão só vem de incidente sobrenatural (`MAGIC_INCIDENT`); corrupção acumula e não some; estágios 0 a 4 com fato `TORMENTA_STAGE_CHANGED`; contenção pela Guarda gasta soldados (`ContainTormenta`); crise tira comida da vila. Falta: magia integrada ao combate e à economia além da comida, e ganchos narrativos (desaparecimentos, cultos).
+- **Fase 8 (homebrews e combate em equipe):** parcial. Feito: sete regras homebrew opcionais com id, versão, justificativa, dependências e conflitos (`HomebrewModule`, comando `SetHomebrew`); Party Tática e Parceiro T20 não se somam. Padrão: tudo desligado. Falta: efeito das regras no combate (ações de empurrar, desarmar, ordens) e balanceamento (decisão humana).
+- **Fase 9 (história e integração):** parcial. Feito: diário vivo por categoria (`ChronicleModule`), que consome fatos antes sem consumidor (liderança, cidade, Tormenta, rota, guilda, perdas); salvo com o jogo. Vertical slice "O futuro do aprendiz" coberto em `tests/unit/test_aprendiz.gd`: junta ouro, rota cortada encarece ferramentas, jogador protege a rota, ajuda muda a reação, e o ciclo sobrevive a salvar e carregar. Notícias por canal (`news_via`: mercador, mensageiro, taverneiro). Falta: rumores históricos que se espalham entre moradores, a Crônica do Reino na interface e a build de avaliação.
 
 ## Regras de execução (da spec) aplicadas
 
 - Nenhum executável novo até juntar mudanças relevantes (Regra 10, e a diretriz D2).
 - Nada de IA generativa na simulação (Regra 6).
 - Vilas, mistério 2 e viagem entre mapas seguem adiados (Regra 9).
+
+## Desempenho medido (26/10/2026, contêiner sem GPU)
+
+`tools/benchmark.gd` headless, 24 moradores em L0, após os módulos de Arton Viva:
+
+| Medida | Antes (0.7.0) | Agora |
+|---|---|---|
+| Comando p95 | 1,1 ms | 3,4 ms |
+| Save (medido) | 8 ms | 24 ms (save p95 56 ms antes do ajuste de relações) |
+| Load | 31 ms | 151 ms no benchmark (p95 17 ms na telemetria) |
+
+O quadro aparece em 16,7 ms porque o modo headless fica preso a 60 quadros por segundo; ele não mede GPU. O maior peso do save eram as relações entre todos os pares de moradores: 78 KB. Agora só grava pares com alguma dimensão sensível, e o bloco caiu para 15 KB. O load do benchmark ainda inclui a primeira carga, por isso o p95 da telemetria é o número a acompanhar. A medição em hardware real continua pendente (§15).

@@ -13,7 +13,7 @@ var alert_level: int = 0
 
 func module_id() -> String: return "factions"
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["SCHEDULED_BANDITS_RELOCATE", "SCHEDULED_GUARD_RAID", "REPORT_TO_GUARD", "COMBAT_ENDED", "CREATURE_DEFEATED", "TIME_ADVANCED"])
+	return PackedStringArray(["SCHEDULED_BANDITS_RELOCATE", "SCHEDULED_GUARD_RAID", "REPORT_TO_GUARD", "COMBAT_ENDED", "CREATURE_DEFEATED", "TIME_ADVANCED", "TORMENTA_CONTAINED"])
 
 
 func _ensure() -> void:
@@ -43,6 +43,12 @@ func bandits_alive() -> Array:
 
 
 func on_event(e: GameEvent) -> Array:
+	if e.event_type == "TORMENTA_CONTAINED":
+		_ensure()
+		var fid := str(e.payload.get("faction", ""))
+		if resources.has(fid):
+			resources[fid].soldados = maxi(0, int(resources[fid].get("soldados", 0)) - int(e.payload.get("soldiers_spent", 0)))
+		return []
 	_ensure()
 	match e.event_type:
 		"REPORT_TO_GUARD":

@@ -159,9 +159,18 @@ relacao = {
     "vila": "Conheço, claro. Todo mundo se conhece aqui. {nota}",
 }
 
+# reação do morador ao jogador (RelationsModule.reaction): a mesma pessoa fala de outro jeito conforme a relação
+reacao = {
+    "guarda_rancor": "Ainda não esqueci o que você fez.",
+    "teme": "Fique longe de mim, por favor.",
+    "respeita_mas_nao_confia": "Respeito o que você faz, mas não confio em você.",
+    "amigavel": "Sempre bom te ver por aqui.",
+    "confia": "Pode contar comigo para o que precisar.",
+}
+
 data = {"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "registro": registro, "periodos": periodos, "primeiro": primeiro, "conhecido": conhecido,
         "mesmo_dia": mesmo_dia, "retorno": retorno, "preocupado": preocupado, "clima": clima, "evento": evento, "trabalho": trabalho,
-        "nota_profissao": nota_profissao, "nota_traco": nota_traco, "relacao": relacao}
+        "nota_profissao": nota_profissao, "nota_traco": nota_traco, "relacao": relacao, "reacao": reacao}
 
 OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
 n = sum(len(v) for g in (primeiro, conhecido) for r in g.values() for v in r.values())
