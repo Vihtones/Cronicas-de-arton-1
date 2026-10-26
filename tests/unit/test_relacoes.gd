@@ -51,3 +51,15 @@ func test_relacoes_salvam_e_carregam() -> void:
 	w2.from_snapshot(w.to_snapshot())
 	eq(w2.modules.relations.dims("garrick", "player").confianca, 12.0, "confiança salva e carregada")
 	eq(w2.modules.relations.reaction("garrick", "player"), "indiferente", "reação salva e carregada")
+
+
+func test_saudacao_muda_com_a_relacao_do_morador() -> void:
+	var w := _world()
+	var rl: RelationsModule = w.modules.relations
+	var visita := {"kind": "conhecido", "gap": 0, "count": 0}
+	rl.rel = {"garrick": {"player": {"ressentimento": 60.0}}}
+	var frase := DialogueVoice.greeting(w, "garrick", visita)
+	check(frase.find("Ainda não esqueci") >= 0, "quem guarda rancor fala do rancor: " + frase)
+	rl.rel = {}
+	var neutra := DialogueVoice.greeting(w, "garrick", visita)
+	check(neutra.find("Ainda não esqueci") < 0, "sem relação, não há a frase de rancor")

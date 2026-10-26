@@ -397,5 +397,12 @@
   "familia": "É da minha família. {nota}",
   "faccao": "Trabalhamos juntos. {nota}",
   "vila": "Conheço, claro. Todo mundo se conhece aqui. {nota}"
+ },
+ "reacao": {
+  "guarda_rancor": "Ainda não esqueci o que você fez.",
+  "teme": "Fique longe de mim, por favor.",
+  "respeita_mas_nao_confia": "Respeito o que você faz, mas não confio em você.",
+  "amigavel": "Sempre bom te ver por aqui.",
+  "confia": "Pode contar comigo para o que precisar."
  }
 }
