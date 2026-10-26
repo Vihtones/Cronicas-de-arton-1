@@ -5,6 +5,7 @@ extends WorldModule
 
 var regions: Dictionary = {}
 var treasury := 0  # ouro pago em refeições da vila (circulação monetária, ORIGINAL_DO_JOGO)
+var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regiões (Arton Viva, Fase 4)
 
 
 func module_id() -> String: return "economy"
@@ -15,6 +16,8 @@ func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTAN
 func _ensure() -> void:
 	if regions.is_empty():
 		regions = world.db.economy.get("regions", {}).duplicate(true)
+	if routes.is_empty():
+		routes = {"valkaria_vila": {"from": "valkaria", "to": "vila", "open": true}}
 
 
 func price(item_id: String, region: String = "vila", seller: String = "") -> int:
@@ -108,10 +111,17 @@ func on_event(e: GameEvent) -> Array:
 			if not eff.is_empty() and regions.has(eff.region):
 				var r: Dictionary = regions[eff.region]
 				r.stock[eff.good] = maxi(0, int(r.stock[eff.good]) + int(eff.delta))
+			# rota fechada ou reaberta (guerra, bloqueio, reabertura): reversível, sem perda de dados
+			var rt: Dictionary = e.payload.get("effect", {}).get("route", {})
+			if rt.has("id") and routes.has(rt.id):
+				routes[rt.id].open = bool(rt.get("open", true))
+				return [fact("ROUTE_CHANGED", {"route": rt.id, "open": routes[rt.id].open})]
 		"NPC_MOVED":
 			# Mensageiro chegando de Valkaria traz mercadoria que falta na vila.
 			for reg in world.db.distant.get("regions", []):
 				if e.payload.npc == reg.courier and e.payload.from == reg.id:
+					if not _route_open(reg.id):
+						return []  # rota fechada: o mensageiro chega sem carga
 					var moved := {}
 					for g in regions.vila.stock:
 						var deficit := int(regions.vila.target[g]) - int(regions.vila.stock[g])
@@ -126,14 +136,24 @@ func on_event(e: GameEvent) -> Array:
 	return []
 
 
+func _route_open(from_region: String) -> bool:
+	for id in routes:
+		if routes[id].from == from_region and routes[id].open:
+			return true
+	return false
+
+
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"regions": regions.duplicate(true), "treasury": treasury}
+	return {"regions": regions.duplicate(true), "treasury": treasury, "routes": routes.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
 	regions = d.get("regions", {}).duplicate(true)
 	treasury = int(d.get("treasury", 0))
+	routes = d.get("routes", {}).duplicate(true)
+	for id in routes:
+		routes[id].open = bool(routes[id].get("open", true))
 	for rid in regions:
 		for f in ["stock", "production", "consumption", "target"]:
 			for g in regions[rid][f]:

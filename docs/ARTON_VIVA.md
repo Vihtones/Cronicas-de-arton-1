@@ -43,7 +43,9 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 - **Fase 0 (auditoria):** feita — esta matriz. Riscos: o `NpcModule` concentra localização e agenda, e já recebe várias influências (eventos da vila, medo, necessidades, chuva). Novas camadas devem entrar por um ponto único de decisão (`desired_location`) e não por cópias.
 - **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro); refeição paga na taverna consome comida da vila e leva o ouro ao tesouro (`MEAL_SERVED`). Falta: o trabalho dos moradores ainda não produz mercadoria na economia da vila.
 - **Fase 2 (memória e sociedade):** relações multidimensionais feitas (`RelationsModule`, com traços: teimoso, memória longa, exige provas) e reações por rótulo (confia, amigável, indiferente, teme, guarda rancor). Diálogos ligados à reação na primeira conversa do dia (`reacao` em `voices.json`). Falta: família com objetivos próprios.
-- **Fases 3 a 9:** não iniciadas.
+- **Fase 3 (Prólogo Vivo):** parcial. Feito: perguntas A a F, gerador de começo (`Prologue`), destino por semente reproduzível, validação contra o mundo, comando `StartPrologue` (uma vez), ouro e vínculos iniciais. Falta: a tela do questionário, a posição inicial aplicada pela apresentação e a opção "Deixar o Destino Decidir" na criação.
+- **Fase 4 (economia regional):** parcial. Feito: rota comercial (`valkaria_vila`) que pode ser fechada e reaberta por DISTANT_EVENT, com fato `ROUTE_CHANGED`; com a rota fechada o mensageiro não entrega; reaberta, a entrega volta sem perda. Falta: crises de preço e recuperação explícitas, mais rotas e mercadorias de outras regiões.
+- **Fases 5 a 9:** não iniciadas.
 
 ## Regras de execução (da spec) aplicadas
 

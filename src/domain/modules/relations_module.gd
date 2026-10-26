@@ -17,7 +17,7 @@ var rel: Dictionary = {}  # quem -> {sobre_quem -> {dimensão: valor}}
 
 
 func module_id() -> String: return "relations"
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["MEMORY_FORMED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["MEMORY_FORMED", "PROLOGUE_STARTED"])
 
 
 ## Dimensões de um par (zeradas se nunca se viram). Puro para quem consulta.
@@ -39,6 +39,15 @@ func reaction(npc_id: String, about: String) -> String:
 
 
 func on_event(e: GameEvent) -> Array:
+	if e.event_type == "PROLOGUE_STARTED":
+		# vínculos do começo: família, mentor ou comunidade já se conhecem do jogador
+		var perda := str(e.payload.get("recent", "")) == "perda"
+		for c in e.payload.get("contacts", []):
+			var r := _pair(str(c), "player")
+			r.familiaridade = maxf(float(r.familiaridade), 12.0)
+			r.confianca = maxf(float(r.confianca), 10.0)
+			r.afeto = maxf(float(r.afeto), 20.0 if perda else 10.0)
+		return []
 	if e.event_type != "MEMORY_FORMED":
 		return []
 	var who: String = e.payload.npc
