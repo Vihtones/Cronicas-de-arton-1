@@ -41,7 +41,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 ## Andamento por fase
 
 - **Fase 0 (auditoria):** feita — esta matriz. Riscos: o `NpcModule` concentra localização e agenda, e já recebe várias influências (eventos da vila, medo, necessidades, chuva). Novas camadas devem entrar por um ponto único de decisão (`desired_location`) e não por cópias.
-- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro). Falta: consequências do trabalho na economia regional (o ouro do morador ainda não entra na economia da vila).
+- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro); refeição paga na taverna consome comida da vila e leva o ouro ao tesouro (`MEAL_SERVED`). Falta: o trabalho dos moradores ainda não produz mercadoria na economia da vila.
 - **Fase 2 (memória e sociedade):** parte já existe (memória, rumores, reputação). Falta: relações multidimensionais e reações por personalidade.
 - **Fases 3 a 9:** não iniciadas.
 

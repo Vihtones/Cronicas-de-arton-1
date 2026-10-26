@@ -87,11 +87,14 @@ func long_goal_for(id: String) -> String:
 
 func on_tick(tick: int) -> Array:
 	_ensure()
+	var out: Array = []
 	if tick % (60 / world.clock.tick_minutes) != 0:
-		return []
+		return out
 	var npcs = world.module("npcs")
 	var h := world.hour()
-	for id in state:
+	var ids := state.keys()
+	ids.sort()  # ordem estável: eventos saem sempre na mesma sequência, com ou sem salvamento
+	for id in ids:
 		var s: Dictionary = state[id]
 		var d := world.npc_def(id)
 		if npcs == null or not npcs.npc(id).get("alive", false) or npcs.npc(id).get("captive", false):
@@ -110,10 +113,10 @@ func on_tick(tick: int) -> Array:
 		s.long = long_goal_for(id)
 		if s.goal == "" and s.medium == "juntar_ouro" and loc == str(d.get("work", "")) and h >= WORK_START and h < WORK_END:
 			s.gold = int(s.gold) + WORK_INCOME
-		# ação: chegou à taverna querendo comer, come
-		if s.goal == "comer" and loc == "taverna":
-			eat(id)
-	return []
+		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
+		if s.goal == "comer" and loc == "taverna" and eat(id):
+			out.append(fact("MEAL_SERVED", {"npc": id, "cost": MEAL_COST}, [id]))
+	return out
 
 
 ## Lugar que o objetivo pede agora ("" se nenhum). Usado pela agenda do morador.
@@ -130,13 +133,14 @@ func location_override(id: String, d: Dictionary) -> String:
 
 
 ## Ação de comer: cobra na taverna e reduz a fome. Chamado quando o morador chega à taverna.
-func eat(id: String) -> void:
+## Devolve true só se a refeição foi paga.
+func eat(id: String) -> bool:
 	var s := _s(id)
-	if float(s.hunger) < 0.1:
-		return
-	if int(s.gold) >= MEAL_COST:
-		s.gold = int(s.gold) - MEAL_COST
-		s.hunger = maxf(0.0, float(s.hunger) - MEAL_RELIEF)
+	if float(s.hunger) < 0.1 or int(s.gold) < MEAL_COST:
+		return false
+	s.gold = int(s.gold) - MEAL_COST
+	s.hunger = maxf(0.0, float(s.hunger) - MEAL_RELIEF)
+	return true
 
 
 func to_dict() -> Dictionary:

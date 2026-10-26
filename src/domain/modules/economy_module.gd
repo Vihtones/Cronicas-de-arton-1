@@ -4,11 +4,12 @@ extends WorldModule
 ## Não simula cada moeda. O mensageiro leva mercadoria entre regiões. ORIGINAL_DO_JOGO.
 
 var regions: Dictionary = {}
+var treasury := 0  # ouro pago em refeições da vila (circulação monetária, ORIGINAL_DO_JOGO)
 
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "MEAL_SERVED"])
 
 
 func _ensure() -> void:
@@ -77,7 +78,7 @@ func on_tick(tick: int) -> Array:
 		var r: Dictionary = regions[rid]
 		for g in r.stock:
 			r.stock[g] = maxi(0, int(r.stock[g]) + int(r.production[g]) - int(r.consumption[g]))
-	return [fact("ECONOMY_DAY", {"vila": regions.vila.stock.duplicate()})]
+	return [fact("ECONOMY_DAY", {"vila": regions.vila.stock.duplicate(), "treasury": treasury})]
 
 
 func on_event(e: GameEvent) -> Array:
@@ -96,6 +97,10 @@ func on_event(e: GameEvent) -> Array:
 			for g in e.payload.get("goods", {}):
 				if regions.vila.stock.has(g):
 					regions.vila.stock[g] = int(regions.vila.stock[g]) + int(e.payload.goods[g])
+		"MEAL_SERVED":
+			# refeição paga na taverna: consome comida da vila e leva o ouro ao tesouro local
+			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 1)
+			treasury += int(e.payload.get("cost", 0))
 		"SHEEP_KILLED":
 			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 4 * int(e.payload.get("count", 1)))
 		"DISTANT_EVENT":
@@ -123,11 +128,12 @@ func on_event(e: GameEvent) -> Array:
 
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"regions": regions.duplicate(true)}
+	return {"regions": regions.duplicate(true), "treasury": treasury}
 
 
 func from_dict(d: Dictionary) -> void:
 	regions = d.get("regions", {}).duplicate(true)
+	treasury = int(d.get("treasury", 0))
 	for rid in regions:
 		for f in ["stock", "production", "consumption", "target"]:
 			for g in regions[rid][f]:
