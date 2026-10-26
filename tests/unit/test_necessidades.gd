@@ -143,3 +143,28 @@ func test_objetivo_de_medio_prazo_salva_e_carrega() -> void:
 	var w2 := WorldHelpers.world(1)
 	w2.from_snapshot(w.to_snapshot())
 	eq(w2.modules.npc_needs.medium_goal("garrick"), "juntar_ouro", "médio prazo salvo")
+
+
+func test_meta_de_medio_prazo_abre_objetivo_de_longo_prazo() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": NpcNeedsModule.MEDIUM_TARGET_GOLD, "goal": "", "medium": "", "long": ""}
+	nd.on_tick(12 * 6)
+	eq(nd.long_goal("garrick"), "abrir_negocio", "com a meta de médio prazo, o longo prazo se abre")
+
+
+func test_objetivo_de_longo_prazo_conclui_ao_bater_a_meta() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": NpcNeedsModule.LONG_TARGET_GOLD, "goal": "", "medium": "", "long": "abrir_negocio"}
+	nd.on_tick(12 * 6)
+	eq(nd.long_goal("garrick"), "concluido", "com a meta de longo prazo batida, o objetivo conclui")
+
+
+func test_longo_prazo_salva_e_carrega() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 20, "goal": "", "medium": "", "long": "abrir_negocio"}
+	var w2 := WorldHelpers.world(1)
+	w2.from_snapshot(w.to_snapshot())
+	eq(w2.modules.npc_needs.long_goal("garrick"), "abrir_negocio", "longo prazo salvo")

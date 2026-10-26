@@ -11,7 +11,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 | Agentes (WorldAgent, dados principais) | Parcial | Cada morador é um registro em `data/world/npcs.json` + estado em `NpcModule`. Não há um modelo comum `WorldAgent` |
 | Personalidade | Parcial | `traits` (10 traços, ex.: teimoso, curioso, mentiroso). Sem as 10 dimensões numéricas da spec |
 | Necessidades (fome, cansaço, dinheiro) | **Validado (Fase 1)** | `NpcNeedsModule`: fome, cansaço e ouro; comer na taverna e descansar em casa mudam o caminho |
-| Objetivos curto/médio/longo prazo | Parcial | Curto prazo ("comer", "descansar") e médio prazo ("juntar_ouro", meta de 15 de ouro, trabalho rende ouro). Sem longo prazo |
+| Objetivos curto/médio/longo prazo | Parcial | Curto prazo ("comer", "descansar"), médio prazo ("juntar_ouro", meta de 15 de ouro, trabalho rende ouro) e longo prazo ("abrir_negocio", meta de 40 de ouro). Sem agir sobre a economia |
 | Decisão autônoma (utilidade) | Parcial | Decisão por utilidade entre necessidades acima do limite (a de maior valor vence). Sem utilidade para ações da agenda |
 | Atividades e humor | **Validado (0.7.1)** | `NpcLifeModule`: medo, alegria e atividade no rótulo |
 | Memória social | **Validado** | `MemoryModule`: testemunhas, rumores no mesmo local, reputação, esquecimento |
@@ -41,7 +41,7 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 ## Andamento por fase
 
 - **Fase 0 (auditoria):** feita — esta matriz. Riscos: o `NpcModule` concentra localização e agenda, e já recebe várias influências (eventos da vila, medo, necessidades, chuva). Novas camadas devem entrar por um ponto único de decisão (`desired_location`) e não por cópias.
-- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Falta: objetivos de longo prazo e consequências do trabalho na economia regional.
+- **Fase 1 (agentes e objetivos):** em andamento. Feito: necessidades (fome, cansaço, ouro), objetivo urgente por utilidade, objetivo de médio prazo (juntar ouro), trabalho que rende ouro, ação de comer e descansar, persistência. Feito também: objetivo de longo prazo (abrir negócio, meta de 40 de ouro). Falta: consequências do trabalho na economia regional (o ouro do morador ainda não entra na economia da vila).
 - **Fase 2 (memória e sociedade):** parte já existe (memória, rumores, reputação). Falta: relações multidimensionais e reações por personalidade.
 - **Fases 3 a 9:** não iniciadas.
 

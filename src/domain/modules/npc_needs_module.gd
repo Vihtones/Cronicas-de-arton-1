@@ -21,8 +21,9 @@ const MEDIUM_TARGET_GOLD := 15  # médio prazo: juntar ouro até esta meta
 const WORK_INCOME := 1          # ouro por hora de trabalho enquanto junta
 const WORK_START := 8
 const WORK_END := 18
+const LONG_TARGET_GOLD := 40    # longo prazo: depois de juntar, abrir o próprio negócio
 
-var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium}
+var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium, long}
 
 
 func module_id() -> String: return "npc_needs"
@@ -37,7 +38,7 @@ func _ensure() -> void:
 
 
 func _fresh(gold: int) -> Dictionary:
-	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": ""}
+	return {"hunger": 0.2, "tired": 0.1, "gold": gold, "goal": "", "medium": "", "long": ""}
 
 
 func _s(id: String) -> Dictionary:
@@ -52,6 +53,7 @@ func tired(id: String) -> float: return float(_s(id).tired)
 func gold(id: String) -> int: return int(_s(id).gold)
 func goal(id: String) -> String: return str(_s(id).goal)
 func medium_goal(id: String) -> String: return str(_s(id).medium)
+func long_goal(id: String) -> String: return str(_s(id).long)
 
 
 ## Objetivo de curto prazo por utilidade (puro para quem consulta): "comer", "descansar" ou "".
@@ -70,6 +72,17 @@ func urgent_goal(id: String) -> String:
 ## Objetivo de médio prazo: juntar ouro enquanto o morador tiver menos que a meta.
 func medium_goal_for(id: String) -> String:
 	return "juntar_ouro" if gold(id) < MEDIUM_TARGET_GOLD else ""
+
+
+## Objetivo de longo prazo: abrir negócio, a partir de a meta de médio prazo ser batida.
+## Fica ativo até o ouro bater a meta de longo prazo; depois, o morador segue a vida normal.
+func long_goal_for(id: String) -> String:
+	var current := str(_s(id).get("long", ""))
+	if current == "abrir_negocio" and gold(id) >= LONG_TARGET_GOLD:
+		return "concluido"
+	if current == "abrir_negocio" or current == "concluido":
+		return current
+	return "abrir_negocio" if gold(id) >= MEDIUM_TARGET_GOLD else ""
 
 
 func on_tick(tick: int) -> Array:
@@ -94,6 +107,7 @@ func on_tick(tick: int) -> Array:
 		s.goal = urgent_goal(id)
 		# médio prazo: sem urgência, junta ouro; o trabalho rende ouro no horário
 		s.medium = medium_goal_for(id)
+		s.long = long_goal_for(id)
 		if s.goal == "" and s.medium == "juntar_ouro" and loc == str(d.get("work", "")) and h >= WORK_START and h < WORK_END:
 			s.gold = int(s.gold) + WORK_INCOME
 		# ação: chegou à taverna querendo comer, come
@@ -138,3 +152,4 @@ func from_dict(d: Dictionary) -> void:
 		state[id].gold = int(state[id].gold)
 		state[id].goal = str(state[id].goal)
 		state[id].medium = str(state[id].get("medium", ""))
+		state[id].long = str(state[id].get("long", ""))
