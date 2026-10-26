@@ -1,6 +1,6 @@
 # Arton Viva — auditoria (Fase 0) e andamento
 
-Documento-base: `CDA-WORLD-001` v1.0 (25/10/2026). Este arquivo registra o que o repositório realmente tem, o que falta e o andamento de cada fase. Estado verificado em 26/10/2026: 273 testes, 0 violações de arquitetura, 0 apontamentos de estilo.
+Documento-base: `CDA-WORLD-001` v2.0 (26/10/2026, em `docs/especificacao/CDA_WORLD_001_v2.0.md`; a v1.0 segue em `docs/especificacao/CDA_WORLD_001.md` para histórico). O CDA-GAME-002 citado pela v2.0 não foi recebido. Este arquivo registra o que o repositório realmente tem, o que falta e o andamento de cada fase. Estado verificado em 26/10/2026: 273 testes, 0 violações de arquitetura, 0 apontamentos de estilo.
 
 ## Matriz de requisitos
 
