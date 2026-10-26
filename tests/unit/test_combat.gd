@@ -100,6 +100,15 @@ func test_nadar_atravessa_rio_so_quem_nada() -> void:
 	check(sim.passable(agua, "player"), "com natação, atravessa o rio (Heróis: natação = base)")
 
 
+func test_barranco_so_quem_voa_atravessa_e_ponte_passa_a_pe() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	check(not sim.passable(Vector2i(60, 5), "player"), "barranco bloqueia a pé")
+	check(sim.passable(Vector2i(60, 9), "player"), "ponte é passagem a pé")
+	sim.c("player").sheet.fly_m = 9.0
+	check(sim.passable(Vector2i(60, 5), "player"), "voo atravessa o barranco (Heróis, Voo)")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:

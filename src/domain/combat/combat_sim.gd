@@ -100,7 +100,7 @@ func step_cost(from: Vector2i, to: Vector2i) -> int:
 
 
 func passable(t: Vector2i, mover: String) -> bool:
-	if not walk_fn.call(t) and not _swims_into(t, mover):
+	if not walk_fn.call(t) and not _swims_into(t, mover) and not _flies_over(t, mover):
 		return false
 	var occ := occupant(t, mover)
 	if occ == "":
@@ -112,6 +112,11 @@ func passable(t: Vector2i, mover: String) -> bool:
 ## Nadar (Heróis: deslocamento de natação igual ao base): quem nada atravessa a água sem custo extra.
 func _swims_into(t: Vector2i, mover: String) -> bool:
 	return db.is_water(t) and c(mover).sheet.can_swim()
+
+
+## Voo sobre desnível (barranco): quem voa atravessa sem custo extra (Heróis, Voo).
+func _flies_over(t: Vector2i, mover: String) -> bool:
+	return db.is_chasm(t) and c(mover).sheet.can_fly()
 
 
 func path_cost(mover: String, path: Array) -> Dictionary:

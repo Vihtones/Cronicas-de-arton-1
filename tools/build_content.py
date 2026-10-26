@@ -352,12 +352,19 @@ distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "even
    {"id": "patrulha", "chance": 0.1, "effect": {}, "news": "Patrulhas da capital foram vistas nas estradas do sul."}],
   "courier": "saria", "courier_cycle_days": 5, "courier_present_days": 2, "status": "ORIGINAL_DO_JOGO"}]}
 
+# Barranco na floresta (desnível): só quem voa atravessa; a ponte é a passagem a pé.
+for y in range(4, 16):
+    for x in (60, 61):
+        g[y][x] = "B"
+for x in (60, 61):
+    g[9][x] = "p"
 grid = ["".join(r) for r in g]
 legend = {".": {"name": "grama", "walk": True}, "=": {"name": "estrada", "walk": True}, ":": {"name": "trilha", "walk": True},
           ",": {"name": "chão de floresta", "walk": True}, "c": {"name": "plantação", "walk": True, "difficult": True},
           "T": {"name": "árvore", "walk": False, "cover": True}, "~": {"name": "rio", "walk": False, "water": True}, "#": {"name": "parede", "walk": False},
           "_": {"name": "piso", "walk": True}, "%": {"name": "entulho", "walk": True, "difficult": True}, "D": {"name": "porta", "walk": True, "object": True},
-          "S": {"name": "escada", "walk": True}, "U": {"name": "escada", "walk": True}, "o": {"name": "poço", "walk": False}, "X": {"name": "vazio", "walk": False}}
+          "S": {"name": "escada", "walk": True}, "U": {"name": "escada", "walk": True}, "o": {"name": "poço", "walk": False}, "X": {"name": "vazio", "walk": False},
+          "B": {"name": "barranco", "walk": False, "chasm": True}, "p": {"name": "ponte", "walk": True}}
 zones = [{"id": "vila", "rect": [2, 6, 44, 42]}, {"id": "estrada", "rect": [44, 22, 52, 6]}, {"id": "floresta", "rect": [48, 0, 48, 50]},
          {"id": "ruina", "rect": [80, 4, 13, 11]}, {"id": "cripta", "rect": [3, 50, 42, 13]}]
 world = {"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "tile_px": 32, "size": [W, H], "grid": grid, "legend": legend, "zones": zones,

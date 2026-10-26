@@ -93,6 +93,11 @@ func is_water(t: Vector2i) -> bool:
 	return bool(tile_info(t).get("water", false))
 
 
+## Desnível (barranco): intransponível a pé; só quem voa atravessa.
+func is_chasm(t: Vector2i) -> bool:
+	return bool(tile_info(t).get("chasm", false))
+
+
 func world_to_tile(p: Vector2) -> Vector2i:
 	return Vector2i(floori(p.x / tile_px), floori(p.y / tile_px))
 

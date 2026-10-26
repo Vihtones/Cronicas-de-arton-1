@@ -15,6 +15,7 @@ var pm: int = 0
 var defense_base: int = 10        # 10 + armadura/escudo (sem Des) ou valor fixo de criatura
 var defense_fixed: int = -1       # se >= 0, Defesa total do bloco (criaturas)
 var speed_m: float = 9.0
+var fly_m: float = 0.0             # deslocamento de voo (0 = não voa; atravessa desníveis)
 var swim_m: float = 0.0           # deslocamento de natação (0 = não nada; Heróis: natação = base)
 var attacks: Array[Dictionary] = []
 var conditions: PackedStringArray = PackedStringArray()
@@ -86,6 +87,10 @@ func has_power(p: String) -> bool:
 
 func can_swim() -> bool:
 	return swim_m > 0.0
+
+
+func can_fly() -> bool:
+	return fly_m > 0.0
 
 
 func can_use_skill(skill: String, rules: RuleRegistry) -> bool:
