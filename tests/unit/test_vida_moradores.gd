@@ -75,3 +75,12 @@ func test_persistencia_do_humor() -> void:
 	var w3 := WorldHelpers.world(1)
 	w3.from_snapshot(old)
 	check(w3.modules.npc_life.mood.is_empty(), "save antigo sem humor carrega vazio")
+
+
+func test_atividade_aparece_para_o_rotulo_e_medo_muda_a_fala() -> void:
+	var w := WorldHelpers.world(3)
+	var life: NpcLifeModule = w.modules.npc_life
+	w.clock.tick = 6 * 12
+	check(life.activity("garrick") != "", "ferreiro tem atividade para o rótulo")
+	life.mood["davi"] = {"fear": 0.9, "joy": 0.0}
+	eq(life.activity("davi"), "assustado, em casa", "aprendiz assustado: atividade explica o recolhimento")

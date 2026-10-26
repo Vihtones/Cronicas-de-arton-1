@@ -1,13 +1,13 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `5ab4cce`. **Não edite à mão**: rode os dois scripts.
-Grafo: 611 nós, 1708 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `6043205`. **Não edite à mão**: rode os dois scripts.
+Grafo: 612 nós, 1712 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
 | Documento | Assunto | Seções | Cita código/regras |
 |---|---|---|---|
-| `CHANGELOG.md` | Changelog | 10 | 24 |
+| `CHANGELOG.md` | Changelog | 10 | 25 |
 | `README.md` | Crônicas de Arton | 6 | 7 |
 | `docs/ART_BIBLE.md` | Art Bible (provisória) | 1 | 1 |
 | `docs/GOVERNADOR_DE_ARTE.md` | Governador de Direção de Arte | 7 | 3 |
@@ -18,7 +18,7 @@ Grafo: 611 nós, 1708 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 | `docs/PROTOTIPOS.md` | Protótipos por mecânica (v0.3.0) | 0 | 6 |
 | `docs/REFERENCIAS_VISUAIS.md` | Referências visuais e de sensação de jogo (pesquisa de 24/10/2026) | 3 | 0 |
 | `docs/REGRAS.md` | Regras usadas pelo jogo e sua proveniência | 1 | 91 |
-| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 5 | 11 |
+| `docs/ROADMAP.md` | Roadmap: próximos passos, correções e revisões | 5 | 12 |
 | `docs/XP_DINAMICA.md` | XP dinâmica (ORIGINAL_DO_JOGO) | 5 | 1 |
 | `docs/adr/ADR-0001-fundacao.md` | ADR-0001 — Decisões de fundação | 0 | 0 |
 | `docs/adr/ADR-0002-modulos-eventos.md` | ADR-0002: Módulos do mundo, comandos e eventos | 2 | 4 |
@@ -72,8 +72,8 @@ Grafo: 611 nós, 1708 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **ItemsModule** (`src/domain/modules/items_module.gd`, 21 ligações) — Equipamento e consumíveis (protótipo).
 - **LineageModule** (`src/domain/modules/lineage_module.gd`, 22 ligações) — Gerações (§8, §20.8): longevidade 70+2d20 rolada uma vez (LB p.108), morte por velhice, herança para o parente mais velho, nascimentos em casais e sucessão do h
 - **MemoryModule** (`src/domain/modules/memory_module.gd`, 35 ligações) — Memória estruturada, rumores e reputação (§8, §11).
-- **NpcLifeModule** (`src/domain/modules/npc_life_module.gd`, 14 ligações) — Vida dos moradores: o que cada um ESTÁ FAZENDO agora e COMO se sente.
-- **NpcModule** (`src/domain/modules/npc_module.gd`, 42 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
+- **NpcLifeModule** (`src/domain/modules/npc_life_module.gd`, 17 ligações) — Vida dos moradores: o que cada um ESTÁ FAZENDO agora e COMO se sente.
+- **NpcModule** (`src/domain/modules/npc_module.gd`, 43 ligações) — NPCs com agenda (LOD L1): local muda por hora segundo rotina, clima e estado.
 - **ObjectsModule** (`src/domain/modules/objects_module.gd`, 28 ligações) — Portas, baús, escadas e barracas.
 - **PacingModule** (`src/domain/modules/pacing_module.gd`, 9 ligações) — WorldPacingDirector (§7): decide QUANDO apresentar conteúdo opcional que JÁ é verdadeiro no estado (vinhetas).
 - **ProgressionModule** (`src/domain/modules/progression_module.gd`, 31 ligações) — Progressão.
@@ -107,7 +107,7 @@ Grafo: 611 nós, 1708 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **CombatView** (`src/presentation/combat_view.gd`, 34 ligações) — Combate na tela: grade, planejamento com projeção fantasma, confirmação e reprodução cinematográfica dos eventos.
 - **GhostActor** (`src/presentation/ghost_actor.gd`, 2 ligações) — Fantasma do jogador no combate: um sprite translúcido que ENSAIA o plano em laço — anda o caminho, investe contra o alvo, dispara ou conjura — para o jogador ve
 - **Narrator** (`src/presentation/narrator.gd`, 78 ligações) — Converte eventos em texto para o registro.
-- **NpcLayer** (`src/presentation/npc_layer.gd`, 17 ligações) — Materializa (L0) NPCs e criaturas da zona do jogador a partir do estado L1.
+- **NpcLayer** (`src/presentation/npc_layer.gd`, 18 ligações) — Materializa (L0) NPCs e criaturas da zona do jogador a partir do estado L1.
 - **PlayerView** (`src/presentation/player.gd`, 6 ligações) — Jogador: input -> movimento físico -> comando MovePlayer quando muda de tile.
 - **SpeechBubble** (`src/presentation/speech_bubble.gd`, 3 ligações) — Balão de fala sobre um ator (apresentação).
 - **WorldView** (`src/presentation/world_view.gd`, 5 ligações) — Desenha o mapa a partir do catálogo (TileMapLayer) com colisão para tiles bloqueados e portas fechadas.
@@ -168,6 +168,7 @@ Grafo: 611 nós, 1708 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 ### `tools`
 
 - **art_test_runner** (`tools/art_test_runner.gd`, 2 ligações) — Teste visual do acervo Tormenta20 (NÃO aprovado) dentro do cenário real do jogo.
+- **atividade_check** (`tools/atividade_check.gd`, 1 ligações) — Captura: rótulo de um morador perto do jogador mostra a atividade.
 - **benchmark** (`tools/benchmark.gd`, 4 ligações) — Benchmark da cena típica (§15): anda pela vila em cada perfil gráfico e mede p50/p95 de frame, tempo de comando, save e load.
 - **combat_fx_check** (`tools/combat_fx_check.gd`, 3 ligações) — Verificação ponta a ponta da encenação de combate: um golpe que derruba o alvo (momento "ABATIDO!") pelo caminho real (ExecutePlan → eventos → reprodução).
 - **falas_check** (`tools/falas_check.gd`, 2 ligações) — Capturas do mundo vivo: casas com telhado, caminhos, figurantes, feira, festa, chuva chegando, telhado abrindo ao entrar, HUD e árvore de poderes.

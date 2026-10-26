@@ -168,6 +168,9 @@ func _process(_d: float) -> void:
 			bd = d; best = id
 	for id in npc_views:
 		(npc_views[id] as ActorView).show_name(id == best)
+	if best != "":
+		var act := _activity_line(best)
+		(npc_views[best] as ActorView).label.text = "%s · %s" % [str(Game.world.npc_def(best).get("name", best)), act] if act != "" else str(Game.world.npc_def(best).get("name", best))
 	if best != "" and bd < 56.0 and Game.mode == Game.Mode.EXPLORE:
 		_bark(best)
 
@@ -184,5 +187,13 @@ func _bark(id: String) -> void:
 		return
 	v.set_meta("bark_day", today)
 	var seed_value := ("%s|%d" % [id, today]).hash()
-	var txt := AmbientTalk.latido(Game.db.ambient, DialogueVoice.register(Game.world, id), DialogueVoice.tier(Game.world, id), seed_value)
+	var life = Game.world.module("npc_life")
+	var fearful: bool = life != null and life.fear(id) >= 0.5
+	var txt := "" if fearful and randf() < 0.5 else AmbientTalk.latido(Game.db.ambient, DialogueVoice.register(Game.world, id), DialogueVoice.tier(Game.world, id), seed_value)
 	SpeechBubble.show(self, v, txt)
+
+
+## Atividade do morador para o rótulo (ex.: "forjando"). Vazio quando não há nada a mostrar.
+func _activity_line(id: String) -> String:
+	var life = Game.world.module("npc_life")
+	return life.activity(id) if life != null else ""
