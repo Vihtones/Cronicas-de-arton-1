@@ -70,6 +70,15 @@ func by_category(cat: String) -> Array:
 	return entries.filter(func(x): return x.category == cat)
 
 
+## Canal pelo qual a notícia chega ao jogador (§19.4). Só o canal; a verdade continua no diário.
+const CHANNEL_BY_CATEGORY := {"economia": "mercador", "tormenta": "mensageiro", "guildas": "taverneiro",
+	"politica": "taverneiro", "vida": "taverneiro"}
+
+
+func news_via(channel: String) -> Array:
+	return entries.filter(func(x): return CHANNEL_BY_CATEGORY.get(x.category, "taverneiro") == channel)
+
+
 func to_dict() -> Dictionary: return {"entries": entries.duplicate(true), "seq": _seq}
 
 

@@ -58,6 +58,30 @@ func supply_index() -> float:
 	return soma / float(maxi(1, n))
 
 
+## Indicadores urbanos da vila (0 a 1), derivados do estado do mundo. Não são guardados: são leitura.
+func indicators() -> Dictionary:
+	var eco = world.module("economy")
+	var npcs = world.module("npcs")
+	var saude := 1.0
+	var prosperidade := 0.0
+	if eco != null:
+		var r: Dictionary = eco.regions.vila
+		var meta := float(r.target.get("remedio", 1))
+		saude = minf(1.0, float(r.stock.get("remedio", 0)) / maxf(1.0, meta))
+	var n := 0
+	var ouro := 0.0
+	var needs = world.module("npc_needs")
+	if needs != null and npcs != null:
+		for id in needs.state:
+			if npcs.npc(id).get("alive", false):
+				ouro += float(needs.gold(id))
+				n += 1
+	if n > 0:
+		prosperidade = minf(1.0, ouro / float(n) / 30.0)
+	return {"abastecimento": snappedf(supply_index(), 0.01), "saude": snappedf(saude, 0.01),
+		"prosperidade": snappedf(prosperidade, 0.01), "estabilidade": 0.0 if city_status == "em_decadencia" else 1.0}
+
+
 func on_event(e: GameEvent) -> Array:
 	_ensure()
 	if e.event_type == "NPC_DIED":

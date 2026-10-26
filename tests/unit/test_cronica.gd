@@ -34,3 +34,12 @@ func test_fatos_antes_sem_consumidor_viram_registro() -> void:
 	c.on_event(GameEvent.create("o2c", "STOLEN_GOODS_RECOVERED", 3, {}))
 	eq(c.entries.size(), 3, "os três fatos que ninguém escutava agora ficam no diário")
 	eq(c.by_category("politica").size(), 2, "pista perdida e alerta entram na política")
+
+
+func test_noticia_chega_pelo_canal_da_categoria() -> void:
+	var w := _world()
+	var c: ChronicleModule = w.modules.chronicle
+	c.on_event(GameEvent.create("n1", "TORMENTA_STAGE_CHANGED", 1, {"stage": 1, "corruption": 2.0}))
+	c.on_event(GameEvent.create("n2", "ROUTE_CHANGED", 2, {"route": "valkaria_vila", "open": false}))
+	eq(c.news_via("mensageiro").size(), 1, "notícia da Tormenta vem pelo mensageiro")
+	eq(c.news_via("mercador").size(), 1, "notícia de rota vem pelo mercador")

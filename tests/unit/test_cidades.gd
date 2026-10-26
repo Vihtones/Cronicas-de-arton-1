@@ -49,3 +49,14 @@ func test_abastecimento_baixo_por_dias_leva_a_decadencia_e_a_recuperacao() -> vo
 	for i in 4:
 		_dia(w, 1.0)
 	eq(ci.city_status, "estavel", "com abastecimento bom, a cidade se recupera sem o jogador")
+
+
+func test_indicadores_urbanos_refletem_o_mundo() -> void:
+	var w := _world()
+	var ci: CitiesModule = w.modules.cities
+	var eco: EconomyModule = w.modules.economy
+	var ind := ci.indicators()
+	for k in ["abastecimento", "saude", "prosperidade", "estabilidade"]:
+		check(ind[k] >= 0.0 and ind[k] <= 1.0, "%s fica entre 0 e 1" % k)
+	eco.regions.vila.stock.remedio = 0
+	eq(ci.indicators().saude, 0.0, "sem remédio, a saúde da vila cai a zero")
