@@ -210,3 +210,12 @@ func test_c24_kael_tem_poderes_e_pm() -> void:
 	var s := CharacterSheet.from_dict(w.modules.combat.creature_state.kael.sheet)
 	check(s.has_power("ataque_reflexo") and s.has_power("impeto"), "Kael usa poderes de classe (LB p.322)")
 	eq(s.pm, 3)
+
+
+func test_sereia_nada_e_humano_nao() -> void:
+	var r := RuleRegistry.load_default()
+	var sereia := CharacterBuilder.build(r, "sereia", "guerreiro", CharacterBuilder.presets("guerreiro")[0], ["for", "con", "des"])
+	eq(sereia.swim_m, 12.0, "sereia: natação 12m (LB p.30)")
+	check(sereia.can_swim(), "sereia nada")
+	var humano := CharacterBuilder.build(r, "humano", "guerreiro", CharacterBuilder.presets("guerreiro")[0], ["for", "con", "des"])
+	check(not humano.can_swim(), "humano não nada por padrão")
