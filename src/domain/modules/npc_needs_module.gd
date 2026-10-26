@@ -23,6 +23,7 @@ const WORK_INCOME := 1          # ouro por hora de trabalho enquanto junta
 const WORK_START := 8
 const WORK_END := 18
 const LONG_TARGET_GOLD := 40    # longo prazo: depois de juntar, abrir o próprio negócio
+const VISIT_MIN_AFFECTION := 30.0  # afeto acima disso (de 100) vence o lazer da agenda e leva à visita
 const SHIFT_MIN_HOURS := 6      # horas no posto para cumprir o turno e produzir o bem da profissão
 
 var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium, long, shift}
@@ -138,11 +139,43 @@ func agenda_override(id: String, d: Dictionary, planned: String, h: int) -> Stri
 	if not enabled or STAY_PUT.has(str(d.get("schedule", ""))):
 		return planned
 	var work := str(d.get("work", ""))
-	if planned == work or planned == str(d.get("home", "")):
+	var home := str(d.get("home", ""))
+	if planned == work or planned == home or goal(id) != "":
 		return planned
-	if h < WORK_START or h >= WORK_END or goal(id) != "" or medium_goal_for(id) != "juntar_ouro":
-		return planned
-	return work
+	if h >= WORK_START and h < WORK_END and medium_goal_for(id) == "juntar_ouro":
+		return work
+	# tempo livre: visita quem gosta do morador e está em casa (Fase 1, utilidade da agenda)
+	var visit := visit_target(id, d)
+	if visit != "":
+		return str(world.npc_def(visit).get("home", planned))
+	return planned
+
+
+## Morador de outra casa que o morador visitaria agora: o de maior afeto acima do limite, e que está em casa.
+## "" se ninguém. Puro para quem consulta.
+func visit_target(id: String, d: Dictionary) -> String:
+	var rel = world.module("relations")
+	var npcs = world.module("npcs")
+	if rel == null or npcs == null:
+		return ""
+	var best := ""
+	var best_affection := VISIT_MIN_AFFECTION
+	for other in world.all_npc_ids():
+		if other == id:
+			continue
+		var od := world.npc_def(other)
+		if str(od.get("home", "")) == str(d.get("home", "")):
+			continue  # mesma casa: não é visita
+		var st: Dictionary = npcs.state.get(other, {})
+		if not st.get("alive", true) or st.get("captive", false):
+			continue
+		if str(npcs.npc(other).location) != str(od.get("home", "")):
+			continue  # só visita quem está em casa
+		var afeto: float = rel.dims(id, other).afeto
+		if afeto > best_affection:
+			best_affection = afeto
+			best = other
+	return best
 
 
 ## Bem que a profissão do morador produz num turno completo ("" se não produz nada). Vem de economy.json.
