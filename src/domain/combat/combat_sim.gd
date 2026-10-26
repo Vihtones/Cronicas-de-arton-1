@@ -306,6 +306,9 @@ func apply_damage(target: String, amount: int) -> Array:
 
 
 func next_turn() -> void:
+	# Atordoado (Olhar Atordoante) perde a própria rodada: a condição acaba ao fim do turno dela
+	if combatants.has(current_id()):
+		combatants[current_id()].sheet.remove_condition("atordoado")
 	turn_idx += 1
 	turn_counter += 1
 	if turn_idx >= order.size():

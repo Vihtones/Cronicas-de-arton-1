@@ -144,6 +144,25 @@ func test_armadura_de_allihanna_custa_pm_da_defesa_e_nao_ativa_duas_vezes() -> v
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "allihanna"}).ok, "não ativa duas vezes na cena")
 
 
+func test_olhar_atordoante_e_uma_vez_por_cena_e_so_medusa() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var P := sim.c("player")
+	var B := sim.c("bandido_1")
+	B.tile = Vector2i(P.tile.x + 2, P.tile.y)
+	P.sheet.race_id = "medusa"
+	P.sheet.pm = 3
+	var a := {"type": "olhar_atordoante", "target": "bandido_1"}
+	check(GhostPlanner.validate_action(sim, "player", a).ok, "medusa usa o olhar em alvo no alcance curto")
+	w.modules.combat._execute_action("player", a, {"ok": true, "kind": "movimento", "cost": 1})
+	eq(P.sheet.pm, 2, "custa 1 PM")
+	check(P.sheet.olhar_usado, "marca uso da cena")
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "não usa duas vezes na cena")
+	P.sheet.race_id = "humano"
+	P.sheet.olhar_usado = false
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "só medusa")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:

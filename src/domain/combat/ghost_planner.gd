@@ -111,6 +111,13 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
 			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}
 			return {"ok": true, "kind": "padrao"}
+		"olhar_atordoante":
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
+			if not A.sheet.can_olhar_atordoante(): return {"ok": false, "reason": "só medusa, com PM, uma vez por cena"}
+			var T := sim.c(a.get("target", ""))
+			if T.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
+			if CombatSim.cheb(A.tile, T.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
+			return {"ok": true, "kind": "movimento", "cost": 1}
 		"allihanna":
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
 			if A.sheet.race_id != "dahllan": return {"ok": false, "reason": "só dahllan tem Armadura de Allihanna"}

@@ -507,6 +507,18 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_coup(id, a.target))
 		"cast":
 			out.append_array(_cast(id, a, v))
+		"olhar_atordoante":
+			var sh_o: CharacterSheet = sim.c(id).sheet
+			sh_o.pm -= 1
+			sh_o.olhar_usado = true
+			# Bestiário (medusa): Fort CD 19 evita; falhou, fica atordoada por 1 rodada (sem ações)
+			var alvo: CharacterSheet = sim.c(a.target).sheet
+			var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
+			if res.get("success", false):
+				out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": a.target, "tags": ["racial"]}, [id]))
+			else:
+				alvo.add_condition("atordoado")
+				out.append(fact("CONDITION_APPLIED", {"actor": id, "target": a.target, "condition": "atordoado", "tags": ["racial"]}, [id]))
 		"allihanna":
 			var sh_a: CharacterSheet = sim.c(id).sheet
 			sh_a.pm -= 1
@@ -968,6 +980,7 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet.remove_condition("surpreendido")
 	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
 	world.player_sheet.allihanna_ativa = false
+	world.player_sheet.olhar_usado = false
 	world.player.position = world.db.tile_to_world(P.tile)
 	for id in sim.combatants:
 		if id == "player":
