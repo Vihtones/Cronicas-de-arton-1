@@ -15,6 +15,7 @@
 - Prólogo (Fase 3): ao criar o personagem, abre-se o questionário do passado (seis perguntas); "Deixar o Destino Decidir" sorteia a semente. O começo move o jogador para o lugar do passado. Verificado por `tools/playtest_prologo.gd`.
 - Fase 4 (economia): crise de escassez explícita por bem da vila, com histerese (`SHORTAGE_STARTED`, `SHORTAGE_ENDED`), recuperação pela produção e registro no diário. O diário (J) ganha a seção "Crônica da vila", que antes não aparecia na interface.
 - Fase 4: na falta de comida, a refeição na taverna custa o dobro. Quem não pode pagar o novo preço continua com fome.
+- Playtest `tools/playtest_refeicao.gd`: força a falta de comida pelo menu de debug e confere, na tela e no mundo, a refeição a 4 de ouro, o morador sem ouro com fome e o morador com ouro pagando o dobro na taverna. O menu de debug (F2) mostra o preço da refeição e a falta de comida.
 - Menu de debug (F2): teleporte para qualquer local ou morador, e ajuste de hora, ouro, tesouro, estoque da vila, clima e de ouro, fome e cansaço de cada morador. Tudo passa por comandos validados (`DebugModule`). `DebugMenu.ENABLED` esconde o menu em builds de jogador.
 - Carroças de entrega: `CartsModule` (domínio). Nascem de dia, levam a mercadoria que falta na vila, descarregam no mercado (estoque sobe) e voltam. A apresentação só desenha a posição. Salvam e carregam.
 

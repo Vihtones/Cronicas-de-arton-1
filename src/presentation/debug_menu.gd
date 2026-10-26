@@ -84,8 +84,10 @@ func _estado() -> String:
 	var w: WorldState = Game.world
 	var dia := int(w.clock.tick / (24 * 60 / w.clock.tick_minutes)) + 1
 	var eco = w.modules.economy
-	return "dia %d, %02dh · ouro %d · tesouro %d · comida %d · clima %s" % [dia, w.hour(), w.player.gold,
-		eco.treasury, int(eco.regions.vila.stock.comida), str(w.modules.weather.region.condition)]
+	var falta := " (falta de comida)" if bool(eco.shortage.get("comida", false)) else ""
+	return "dia %d, %02dh · ouro %d · tesouro %d · comida %d · clima %s · refeição %d ouro%s" % [dia, w.hour(),
+		w.player.gold, eco.treasury, int(eco.regions.vila.stock.comida), str(w.modules.weather.region.condition),
+		w.modules.npc_needs.meal_cost(), falta]
 
 
 func _locations() -> Dictionary:
