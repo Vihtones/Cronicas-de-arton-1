@@ -219,3 +219,16 @@ func test_sereia_nada_e_humano_nao() -> void:
 	check(sereia.can_swim(), "sereia nada")
 	var humano := CharacterBuilder.build(r, "humano", "guerreiro", CharacterBuilder.presets("guerreiro")[0], ["for", "con", "des"])
 	check(not humano.can_swim(), "humano não nada por padrão")
+
+
+func test_armadura_de_allihanna_soma_patamar_com_arsenal() -> void:
+	var s := CharacterSheet.new()
+	s.race_id = "dahllan"
+	s.level = 5
+	eq(s.patamar(), 2, "nível 5 é patamar veterano")
+	eq(s.allihanna_defense(false), 0, "sem ativar, não dá Defesa")
+	eq(s.allihanna_defense(true), 2, "ativa: +2 (base)")
+	s.powers["arsenal_de_lisandra"] = true
+	eq(s.allihanna_defense(true), 4, "com Arsenal: +2 base +1 por patamar (veterano)")
+	s.race_id = "humano"
+	eq(s.allihanna_defense(true), 0, "só dahllan")

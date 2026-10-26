@@ -93,6 +93,21 @@ func can_fly() -> bool:
 	return fly_m > 0.0
 
 
+## Patamar (Heróis, Arsenal de Lisandra): iniciante 1-4, veterano 5-10, experiente 11-16, campeão 17-20.
+func patamar() -> int:
+	if level <= 4: return 1
+	if level <= 10: return 2
+	if level <= 16: return 3
+	return 4
+
+
+## Defesa da Armadura de Allihanna (dahllan, LB): +2 ao ativar. Com Arsenal de Lisandra soma +1 por patamar (Heróis).
+func allihanna_defense(ativa: bool) -> int:
+	if not ativa or race_id != "dahllan":
+		return 0
+	return 2 + (patamar() if has_power("arsenal_de_lisandra") else 0)
+
+
 func can_use_skill(skill: String, rules: RuleRegistry) -> bool:
 	if flat_skills.has(skill):
 		return true
