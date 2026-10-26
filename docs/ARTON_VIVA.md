@@ -46,7 +46,8 @@ Legenda: **Validado** (implementado e testado), **Parcial**, **Existe sem integr
 - **Fase 3 (Prólogo Vivo):** parcial. Feito: perguntas A a F, gerador de começo (`Prologue`), destino por semente reproduzível, validação contra o mundo, comando `StartPrologue` (uma vez), ouro e vínculos iniciais. Falta: a tela do questionário, a posição inicial aplicada pela apresentação e a opção "Deixar o Destino Decidir" na criação.
 - **Fase 4 (economia regional):** parcial. Feito: rota comercial (`valkaria_vila`) que pode ser fechada e reaberta por DISTANT_EVENT, com fato `ROUTE_CHANGED`; com a rota fechada o mensageiro não entrega; reaberta, a entrega volta sem perda. Falta: crises de preço e recuperação explícitas, mais rotas e mercadorias de outras regiões.
 - **Fase 5 (cidades e organizações):** parcial. Feito: abastecimento da vila (média de estoque sobre meta); decadência após dias seguidos de escassez e recuperação sem o jogador (`CITY_STATUS_CHANGED`); sucessão de líder por morte, com o membro vivo mais velho, ou organização fragmentada (`LEADERSHIP_CHANGED`). Falta: indicadores urbanos completos (segurança, saúde, moradia), desenvolvimento por construção e influência política.
-- **Fases 6 a 9:** não iniciadas.
+- **Fase 6 (party e guildas):** parcial. Feito: recrutamento com consentimento (confiança e familiaridade, ou pagamento que cubra o risco; reputação sozinha não recruta), ordens guardadas, lealdade diária, perda por morte (`PARTY_LOST`) e guilda (dois membros e 50 de ouro, criada uma vez). Falta: ordens no combate, contratos da guilda e administração.
+- **Fases 7 a 9:** não iniciadas.
 
 ## Regras de execução (da spec) aplicadas
 
