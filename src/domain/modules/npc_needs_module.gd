@@ -15,6 +15,7 @@ const TIRED_PER_HOUR := 0.02
 const HUNGRY_AT := 0.7          # a partir daqui o morador quer comer
 const TIRED_AT := 0.8           # a partir daqui o morador quer descansar
 const MEAL_COST := 2            # ouro de uma refeição na taverna
+const SHORTAGE_MEAL_MULT := 2   # na falta de comida, a refeição na taverna custa o dobro (Fase 4)
 const MEAL_RELIEF := 0.6
 const REST_RELIEF_PER_HOUR := 0.15
 const STAY_PUT := ["guarda_dia", "guarda_noite"]
@@ -58,6 +59,13 @@ func _history_tools(d: Dictionary) -> bool:
 
 func _tool_rule() -> Dictionary:
 	return world.db.economy.get("ferramenta_de_oficio", {})
+
+
+## Preço da refeição: dobra enquanto a vila está em falta de comida (crise de escassez, Fase 4).
+func meal_cost() -> int:
+	var eco = world.module("economy")
+	var em_falta: bool = eco != null and bool(eco.shortage.get("comida", false))
+	return MEAL_COST * SHORTAGE_MEAL_MULT if em_falta else MEAL_COST
 
 
 func owns_tools(id: String) -> bool:
@@ -155,13 +163,13 @@ func on_tick(tick: int) -> Array:
 					out.append(fact("WORK_DONE", {"npc": id, "good": good, "amount": 1}, [id]))
 			s.shift = 0
 		# família: criança com fome e sem ouro recebe a refeição de um adulto da família que possa pagar
-		if s.goal == "comer" and float(s.hunger) >= HUNGRY_AT and int(s.gold) < MEAL_COST:
+		if s.goal == "comer" and float(s.hunger) >= HUNGRY_AT and int(s.gold) < meal_cost():
 			var payer := family_payer(id)
 			if payer != "":
 				var ps := _s(payer)
-				ps.gold = int(ps.gold) - MEAL_COST
-				s.gold = int(s.gold) + MEAL_COST
-				out.append(fact("FAMILY_SUPPORT", {"from": payer, "to": id, "amount": MEAL_COST}, [payer, id]))
+				ps.gold = int(ps.gold) - meal_cost()
+				s.gold = int(s.gold) + meal_cost()
+				out.append(fact("FAMILY_SUPPORT", {"from": payer, "to": id, "amount": meal_cost()}, [payer, id]))
 		# ferramenta de ofício: quem não tem (pela história) compra no mercado, no tempo livre, com ouro
 		if not at_work and not bool(s.get("tools", true)) and loc == tool_shop_location() and int(s.gold) >= tool_price():
 			s.gold = int(s.gold) - tool_price()
@@ -169,7 +177,7 @@ func on_tick(tick: int) -> Array:
 			out.append(fact("TOOL_BOUGHT", {"npc": id, "price": tool_price()}, [id]))
 		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
 		if s.goal == "comer" and loc == "taverna" and eat(id):
-			out.append(fact("MEAL_SERVED", {"npc": id, "cost": MEAL_COST}, [id]))
+			out.append(fact("MEAL_SERVED", {"npc": id, "cost": meal_cost()}, [id]))
 	return out
 
 
@@ -233,7 +241,7 @@ func family_payer(id: String) -> String:
 		return ""
 	var npcs = world.module("npcs")
 	var best := ""
-	var best_gold := MEAL_COST * 2
+	var best_gold := meal_cost() * 2
 	for other in world.all_npc_ids():
 		if other == id:
 			continue
@@ -262,7 +270,7 @@ func location_override(id: String, d: Dictionary) -> String:
 	var g := goal(id)
 	if g == "comer":
 		# só come fora se tiver ouro; sem ouro, segue a vida normal (fome vai subindo)
-		return "taverna" if gold(id) >= MEAL_COST else ""
+		return "taverna" if gold(id) >= meal_cost() else ""
 	if g == "descansar":
 		return str(d.get("home", ""))
 	return ""
@@ -272,9 +280,9 @@ func location_override(id: String, d: Dictionary) -> String:
 ## Devolve true só se a refeição foi paga.
 func eat(id: String) -> bool:
 	var s := _s(id)
-	if float(s.hunger) < 0.1 or int(s.gold) < MEAL_COST:
+	if float(s.hunger) < 0.1 or int(s.gold) < meal_cost():
 		return false
-	s.gold = int(s.gold) - MEAL_COST
+	s.gold = int(s.gold) - meal_cost()
 	s.hunger = maxf(0.0, float(s.hunger) - MEAL_RELIEF)
 	return true
 

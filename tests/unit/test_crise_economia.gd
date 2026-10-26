@@ -71,3 +71,26 @@ func test_diario_registra_a_falta() -> void:
 		if str(e.text).contains("Está faltando comida"):
 			achou = true
 	check(achou, "o diário conta que está faltando comida na vila")
+
+
+func test_refeicao_custa_o_dobro_na_falta_de_comida() -> void:
+	var w := _world()
+	var eco: EconomyModule = w.modules.economy
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	eq(nd.meal_cost(), NpcNeedsModule.MEAL_COST, "sem falta, a refeição custa o preço normal")
+	eco.shortage.comida = true
+	eq(nd.meal_cost(), NpcNeedsModule.MEAL_COST * NpcNeedsModule.SHORTAGE_MEAL_MULT, "na falta, a refeição custa o dobro")
+
+
+func test_morador_sem_ouro_para_a_refeicao_na_falta_fica_sem_comer() -> void:
+	var w := _world()
+	var eco: EconomyModule = w.modules.economy
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var ouro := NpcNeedsModule.MEAL_COST + 1  # dá para pagar o preço normal, não o da falta
+	nd.state.garrick = {"hunger": 0.9, "tired": 0.1, "gold": ouro, "goal": "comer", "medium": "", "long": "", "shift": 0}
+	eq(nd.location_override("garrick", w.npc_def("garrick")), "taverna", "sem falta, vai comer na taverna")
+	eco.shortage.comida = true
+	eq(nd.location_override("garrick", w.npc_def("garrick")), "", "na falta, sem o preço dobrado, não vai comer")
+	var antes := nd.hunger("garrick")
+	nd.on_tick(w.clock.tick)
+	check(nd.hunger("garrick") > antes, "a fome continua subindo sem dinheiro para a refeição")
