@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1 (em andamento)
+- Fuga e captura não rendem mais XP; evasão furtiva rende uma vez por criatura (fecha o exploit de entrar/sair da visão).
+- Combate: fantasma do jogador (`GhostActor`) ensaia o plano em laço — anda o caminho, recua e investe, dispara ou conjura — antes de confirmar. Verificação: `tools/ghost_check.gd`.
+
 ## [0.7.0] — 2026-10-24 — Mundo vivo, árvore de poderes, HUD Stoneshard e Godot 4.7.2
 ### Mudou
 - **Motor: Godot 4.7.2** (a versão que o usuário enviou; conferida contra o SHA-512 oficial). Na 4.3, a tela

@@ -26,10 +26,62 @@ var _skip := false
 var _font: Font
 
 
+var ghost: GhostActor
+
+
 func _ready() -> void:
 	z_index = 5
 	_font = ThemeDB.fallback_font
 	Game.event_published.connect(_on_event)
+	ghost = GhostActor.new()
+	ghost.name = "Fantasma"
+	add_child(ghost)
+
+
+## Roteiro do fantasma a partir do preview do plano (só os passos válidos, até o primeiro inválido).
+func _ghost_script() -> Array:
+	var segs: Array = []
+	if preview.is_empty():
+		return segs
+	var s := sim()
+	var pos := Game.db.tile_to_world(s.c("player").tile)
+	for st in preview.get("steps", []):
+		if not st.ok:
+			break
+		var a: Dictionary = st.action
+		match str(a.type):
+			"move", "charge":
+				var pts: Array = []
+				for p in a.get("path", []):
+					pts.append(Game.db.tile_to_world(Vector2i(int(p[0]), int(p[1]))))
+				if not pts.is_empty():
+					segs.append({"k": "walk", "pts": pts})
+					pos = pts[-1]
+			"cast":
+				var tg: Array = a.get("targets", [])
+				var to := pos
+				if not tg.is_empty() and tg[0] != "player" and s.combatants.has(tg[0]):
+					to = Game.db.tile_to_world(s.c(tg[0]).tile)
+				segs.append({"k": "cast", "at": pos, "to": to})
+		if str(a.type) in ["attack", "charge", "ataque_extra", "coup"] and s.combatants.has(str(a.get("target", ""))):
+			var tp := Game.db.tile_to_world(s.c(a.target).tile)
+			var close: bool = pos.distance_to(tp) <= 48.0 or str(a.type) in ["charge", "coup"]
+			segs.append({"k": "hit" if close else "shoot", "from": pos, "to": tp})
+	return segs
+
+
+func _refresh_ghost() -> void:
+	if ghost == null:
+		return
+	if not active() or not my_turn() or playing or player_view == null or preview.is_empty():
+		ghost.clear()
+		return
+	var segs := _ghost_script()
+	if segs.is_empty():
+		ghost.clear()
+		return
+	var v := player_view.view
+	ghost.set_script_data(Game.db.tile_to_world(sim().c("player").tile), segs, v.sprite.texture, v.sprite.self_modulate, v.base_scale)
 
 
 func active() -> bool:
@@ -384,6 +436,7 @@ func _draw() -> void:
 
 
 func _process(_d: float) -> void:
+	_refresh_ghost()
 	if active():
 		queue_redraw()
 

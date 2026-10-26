@@ -124,7 +124,7 @@ Atualizado em 24/10/2026 para a versão 0.7.0 (Godot 4.7.2). Estado: 165 testes 
 Fato (relato do usuário) e proposta separados. Nada abaixo foi iniciado, exceto o item 0.
 
 0. **FEITO:** exploit de XP por fuga (entrar/sair da visão). Fuga e captura = 0 XP; evasão furtiva rende uma vez por criatura. Testes novos.
-1. **Combate dinâmico:** pré-visualização "fantasma" do sprite do jogador andando até o alvo e executando a ação (atacar) antes de confirmar.
+1. **FEITO (0.7.1):** **Combate dinâmico:** pré-visualização "fantasma" do sprite do jogador andando até o alvo e executando a ação (atacar) antes de confirmar.
 2. **Diálogos:** hoje muito básicos; reescrever o sistema (nós, condições, memória do NPC, tons).
 3. **Falas em balão:** genéricas e falhas; ligar ao papel, humor, hora e evento do NPC.
 4. **Comportamento dos NPCs:** simplório; rotinas com objetivos, necessidades e reações.

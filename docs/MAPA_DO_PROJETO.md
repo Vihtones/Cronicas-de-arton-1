@@ -1,13 +1,13 @@
 # Mapa do projeto (gerado pelo Graphify)
 
-Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `deeb808`. **Não edite à mão**: rode os dois scripts.
-Grafo: 598 nós, 1643 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
+Gerado por `tools/graphify_build.py` + `tools/graphify_mapa.py` a partir do commit `bd9c92b`. **Não edite à mão**: rode os dois scripts.
+Grafo: 601 nós, 1649 arestas. Abra `graphify-out/graph.html` para navegar. Achados com decisão humana ficam em `docs/ORGANIZACAO.md`.
 
 ## Documentos
 
 | Documento | Assunto | Seções | Cita código/regras |
 |---|---|---|---|
-| `CHANGELOG.md` | Changelog | 9 | 19 |
+| `CHANGELOG.md` | Changelog | 10 | 21 |
 | `README.md` | Crônicas de Arton | 6 | 7 |
 | `docs/ART_BIBLE.md` | Art Bible (provisória) | 1 | 1 |
 | `docs/GOVERNADOR_DE_ARTE.md` | Governador de Direção de Arte | 7 | 3 |
@@ -53,13 +53,13 @@ Grafo: 598 nós, 1643 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 
 ### `src/domain/combat`
 
-- **CombatSim** (`src/domain/combat/combat_sim.gd`, 28 ligações) — Estado e regras de combate puros (LB cap.
+- **CombatSim** (`src/domain/combat/combat_sim.gd`, 29 ligações) — Estado e regras de combate puros (LB cap.
 - **GhostPlanner** (`src/domain/combat/ghost_planner.gd`, 23 ligações) — Projeção fantasma (§9): recebe o estado (somente leitura), clona e simula o plano sem dados.
 
 ### `src/domain/modules`
 
 - **AdventurersModule** (`src/domain/modules/adventurers_module.gd`, 8 ligações) — Aventureiros NPC em LOD L3 (§8): progridem por atividades plausíveis, usando a MESMA regra de XP do jogador (ND × 1000 / grupo, LB p.326).
-- **CombatModule** (`src/domain/modules/combat_module.gd`, 102 ligações) — Combate tático híbrido (§9).
+- **CombatModule** (`src/domain/modules/combat_module.gd`, 103 ligações) — Combate tático híbrido (§9).
 - **CrimeModule** (`src/domain/modules/crime_module.gd`, 23 ligações) — Crime (§11): ato real, evidência, testemunhas, conhecimento das autoridades, lei local, mandado, multa e resolução.
 - **DialogueModule** (`src/domain/modules/dialogue_module.gd`, 33 ligações) — Diálogo estruturado (§6, §8).
 - **DomainModule** (`src/domain/modules/domain_module.gd`, 18 ligações) — Administração de domínio (§11): decisões de alto nível, conselheiros e delegação.
@@ -101,7 +101,8 @@ Grafo: 598 nós, 1643 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **ActorView** (`src/presentation/actor_view.gd`, 7 ligações) — Figura animada (spritesheet 3x4: parado/passo1/passo2 x baixo/esq/dir/cima).
 - **AmbientLife** (`src/presentation/ambient_life.gd`, 8 ligações) — Figurantes da vila (L0, só apresentação): gente andando, correndo da chuva, trabalhando, conversando, vendendo, crianças brincando de pega-pega, carroças na est
 - **CameraDirector** (`src/presentation/camera_director.gd`, 3 ligações) — Câmera cinematográfica (§9): responde a tags de eventos (ataque, impacto, crítico, queda, morte...).
-- **CombatView** (`src/presentation/combat_view.gd`, 33 ligações) — Combate na tela: grade, planejamento com projeção fantasma, confirmação e reprodução cinematográfica dos eventos.
+- **CombatView** (`src/presentation/combat_view.gd`, 34 ligações) — Combate na tela: grade, planejamento com projeção fantasma, confirmação e reprodução cinematográfica dos eventos.
+- **GhostActor** (`src/presentation/ghost_actor.gd`, 2 ligações) — Fantasma do jogador no combate: um sprite translúcido que ENSAIA o plano em laço — anda o caminho, investe contra o alvo, dispara ou conjura — para o jogador ve
 - **Narrator** (`src/presentation/narrator.gd`, 78 ligações) — Converte eventos em texto para o registro.
 - **NpcLayer** (`src/presentation/npc_layer.gd`, 14 ligações) — Materializa (L0) NPCs e criaturas da zona do jogador a partir do estado L1.
 - **PlayerView** (`src/presentation/player.gd`, 6 ligações) — Jogador: input -> movimento físico -> comando MovePlayer quando muda de tile.
@@ -163,6 +164,7 @@ Grafo: 598 nós, 1643 arestas. Abra `graphify-out/graph.html` para navegar. Acha
 - **benchmark** (`tools/benchmark.gd`, 4 ligações) — Benchmark da cena típica (§15): anda pela vila em cada perfil gráfico e mede p50/p95 de frame, tempo de comando, save e load.
 - **combat_fx_check** (`tools/combat_fx_check.gd`, 3 ligações) — Verificação ponta a ponta da encenação de combate: um golpe que derruba o alvo (momento "ABATIDO!") pelo caminho real (ExecutePlan → eventos → reprodução).
 - **fx_runner** (`tools/fx_runner.gd`, 6 ligações) — Capturas dos sistemas visuais (luz, sombras, desfoque, cinematográfico, retratos, rastros e impacto).
+- **ghost_check** (`tools/ghost_check.gd`, 3 ligações) — Verificação ponta a ponta da encenação de combate: um golpe que derruba o alvo (momento "ABATIDO!") pelo caminho real (ExecutePlan → eventos → reprodução).
 - **lab_runner** (`tools/lab_runner.gd`, 4 ligações) — Capturas dos protótipos do laboratório.
 - **life_runner** (`tools/life_runner.gd`, 1 ligações) — Capturas do mundo vivo: casas com telhado, caminhos, figurantes, feira, festa, chuva chegando, telhado abrindo ao entrar, HUD e árvore de poderes.
 - **screenshot_runner** (`tools/screenshot_runner.gd`, 9 ligações) — Roteiro automático de capturas (verificação visual).
