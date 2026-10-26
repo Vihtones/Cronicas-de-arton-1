@@ -355,7 +355,7 @@ distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "even
 grid = ["".join(r) for r in g]
 legend = {".": {"name": "grama", "walk": True}, "=": {"name": "estrada", "walk": True}, ":": {"name": "trilha", "walk": True},
           ",": {"name": "chão de floresta", "walk": True}, "c": {"name": "plantação", "walk": True, "difficult": True},
-          "T": {"name": "árvore", "walk": False, "cover": True}, "~": {"name": "rio", "walk": False}, "#": {"name": "parede", "walk": False},
+          "T": {"name": "árvore", "walk": False, "cover": True}, "~": {"name": "rio", "walk": False, "water": True}, "#": {"name": "parede", "walk": False},
           "_": {"name": "piso", "walk": True}, "%": {"name": "entulho", "walk": True, "difficult": True}, "D": {"name": "porta", "walk": True, "object": True},
           "S": {"name": "escada", "walk": True}, "U": {"name": "escada", "walk": True}, "o": {"name": "poço", "walk": False}, "X": {"name": "vazio", "walk": False}}
 zones = [{"id": "vila", "rect": [2, 6, 44, 42]}, {"id": "estrada", "rect": [44, 22, 52, 6]}, {"id": "floresta", "rect": [48, 0, 48, 50]},

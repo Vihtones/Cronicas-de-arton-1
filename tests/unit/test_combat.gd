@@ -90,6 +90,24 @@ func test_diagonal_custa_dobro_e_terreno_dificil() -> void:
 	eq(sim.speed_squares("player"), 6, "9m = 6 quadrados")
 
 
+func test_nadar_atravessa_rio_so_quem_nada() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var agua := _primeira_agua(sim.db)
+	check(agua != Vector2i(-1, -1), "mapa tem rio")
+	check(not sim.passable(agua, "player"), "sem natação, o rio bloqueia (LB p.238)")
+	sim.c("player").sheet.swim_m = 9.0
+	check(sim.passable(agua, "player"), "com natação, atravessa o rio (Heróis: natação = base)")
+
+
+func _primeira_agua(db) -> Vector2i:
+	for y in db.size.y:
+		for x in db.size.x:
+			if db.is_water(Vector2i(x, y)):
+				return Vector2i(x, y)
+	return Vector2i(-1, -1)
+
+
 func test_investida_exige_linha_reta() -> void:
 	var w := _crypt_fight()
 	var c: CombatModule = w.modules.combat

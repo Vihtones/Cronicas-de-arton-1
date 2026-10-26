@@ -101,7 +101,8 @@
   },
   "~": {
    "name": "rio",
-   "walk": false
+   "walk": false,
+   "water": true
   },
   "#": {
    "name": "parede",

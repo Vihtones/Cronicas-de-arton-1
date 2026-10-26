@@ -88,6 +88,11 @@ func is_difficult(t: Vector2i) -> bool:
 	return bool(tile_info(t).get("difficult", false))
 
 
+## Água (rio): intransponível a pé; quem tem deslocamento de natação atravessa (Heróis, natação).
+func is_water(t: Vector2i) -> bool:
+	return bool(tile_info(t).get("water", false))
+
+
 func world_to_tile(p: Vector2) -> Vector2i:
 	return Vector2i(floori(p.x / tile_px), floori(p.y / tile_px))
 
