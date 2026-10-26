@@ -311,6 +311,8 @@ func next_turn() -> void:
 	if turn_idx >= order.size():
 		turn_idx = 0
 		round_no += 1
+		for id in combatants:
+			combatants[id].sheet.sorte_usada = false   # Sorte Salvadora volta a valer a cada rodada
 	budget = {"std": 1, "move": 1}
 
 

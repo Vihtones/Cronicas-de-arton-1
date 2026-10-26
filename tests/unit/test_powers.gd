@@ -232,3 +232,21 @@ func test_armadura_de_allihanna_soma_patamar_com_arsenal() -> void:
 	eq(s.allihanna_defense(true), 4, "com Arsenal: +2 base +1 por patamar (veterano)")
 	s.race_id = "humano"
 	eq(s.allihanna_defense(true), 0, "só dahllan")
+
+
+func test_sorte_salvadora_rola_de_novo_uma_vez_por_rodada() -> void:
+	var r := RuleRegistry.load_default()
+	var s := CharacterSheet.new()
+	s.race_id = "hynne"
+	s.pm = 3
+	var rng := RngStreams.new(7)
+	var primeira := Checks.skill(s, "fortitude", 99, r, rng, "combat")
+	check(primeira.sorte, "falha em teste de resistência aciona Sorte Salvadora")
+	eq(s.pm, 2, "custa 1 PM")
+	var segunda := Checks.skill(s, "fortitude", 99, r, rng, "combat")
+	check(not segunda.sorte, "não rola de novo na mesma rodada")
+	eq(s.pm, 2, "sem novo gasto na mesma rodada")
+	s.sorte_usada = false
+	s.race_id = "humano"
+	var humano := Checks.skill(s, "fortitude", 99, r, rng, "combat")
+	check(not humano.sorte, "só hynne tem Sorte Salvadora")
