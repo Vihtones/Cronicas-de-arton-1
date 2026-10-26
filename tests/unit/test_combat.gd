@@ -109,6 +109,27 @@ func test_barranco_so_quem_voa_atravessa_e_ponte_passa_a_pe() -> void:
 	check(sim.passable(Vector2i(60, 5), "player"), "voo atravessa o barranco (Heróis, Voo)")
 
 
+func test_superficie_inteira_alcancavel_a_pe() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var start := Vector2i(23, 27)
+	var seen := {start: true}
+	var fila: Array[Vector2i] = [start]
+	while not fila.is_empty():
+		var t: Vector2i = fila.pop_back()
+		for n in [t + Vector2i.RIGHT, t + Vector2i.LEFT, t + Vector2i.DOWN, t + Vector2i.UP]:
+			if not seen.has(n) and n.y < 49 and sim.db.static_walkable(n):
+				seen[n] = true
+				fila.append(n)
+	var falta := 0
+	for y in range(49):
+		for x in range(sim.db.size.x):
+			var t := Vector2i(x, y)
+			if sim.db.static_walkable(t) and not seen.has(t):
+				falta += 1
+	eq(falta, 0, "todo chão da superfície liga ao início (bolsões abertos em build_content)")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:

@@ -1,6 +1,7 @@
 """Gera o conteúdo estático do vertical slice (ORIGINAL_DO_JOGO) em data/world/.
 Determinístico: mesma execução => mesmos arquivos. Edite aqui, não os JSON gerados."""
-import json, random, pathlib
+import heapq, json, random, pathlib
+from collections import deque
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "world"
@@ -358,13 +359,69 @@ for y in range(4, 16):
         g[y][x] = "B"
 for x in (60, 61):
     g[9][x] = "p"
-grid = ["".join(r) for r in g]
 legend = {".": {"name": "grama", "walk": True}, "=": {"name": "estrada", "walk": True}, ":": {"name": "trilha", "walk": True},
           ",": {"name": "chão de floresta", "walk": True}, "c": {"name": "plantação", "walk": True, "difficult": True},
           "T": {"name": "árvore", "walk": False, "cover": True}, "~": {"name": "rio", "walk": False, "water": True}, "#": {"name": "parede", "walk": False},
           "_": {"name": "piso", "walk": True}, "%": {"name": "entulho", "walk": True, "difficult": True}, "D": {"name": "porta", "walk": True, "object": True},
           "S": {"name": "escada", "walk": True}, "U": {"name": "escada", "walk": True}, "o": {"name": "poço", "walk": False}, "X": {"name": "vazio", "walk": False},
           "B": {"name": "barranco", "walk": False, "chasm": True}, "p": {"name": "ponte", "walk": True}}
+## Bolsões de chão caminhável (superfície, y < 49) sem ligação com o início: abre caminho cortando árvores.
+## Ordem fixa e desempate fixo, para o mapa sair igual a cada geração. A cripta liga por escada, não entra aqui.
+def conectar_bolsoes(start: tuple, limite_y: int = 49) -> None:
+    def passavel(t: tuple) -> bool:
+        x, y = t
+        return 0 <= x < W and 0 <= y < limite_y and bool(legend.get(g[y][x], {}).get("walk", False))
+    def alcance(origem: tuple) -> set:
+        seen = {origem}
+        fila = deque([origem])
+        while fila:
+            x, y = fila.popleft()
+            for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if n not in seen and passavel(n):
+                    seen.add(n)
+                    fila.append(n)
+        return seen
+    while True:
+        seen = alcance(start)
+        sobras = [(x, y) for y in range(limite_y) for x in range(W) if passavel((x, y)) and (x, y) not in seen]
+        if not sobras:
+            return
+        alvo = sobras[0]
+        custo = {alvo: 0}
+        anterior = {}
+        fila = [(0, alvo)]
+        achado = None
+        while fila and achado is None:
+            c, t = heapq.heappop(fila)
+            if c > custo[t]:
+                continue
+            if t in seen:
+                achado = t
+                break
+            for n in ((t[0] + 1, t[1]), (t[0] - 1, t[1]), (t[0], t[1] + 1), (t[0], t[1] - 1)):
+                if not (0 <= n[0] < W and 0 <= n[1] < limite_y):
+                    continue
+                if g[n[1]][n[0]] == "T":
+                    w = 1
+                elif passavel(n):
+                    w = 0
+                else:
+                    continue
+                if c + w < custo.get(n, 10 ** 9):
+                    custo[n] = c + w
+                    anterior[n] = t
+                    heapq.heappush(fila, (c + w, n))
+        if achado is None:
+            raise RuntimeError("bolsão sem caminho até o início: %s" % (alvo,))
+        t = achado
+        while t != alvo:
+            if g[t[1]][t[0]] == "T":
+                g[t[1]][t[0]] = ","
+            t = anterior[t]
+
+
+conectar_bolsoes((23, 27))
+grid = ["".join(r) for r in g]
 zones = [{"id": "vila", "rect": [2, 6, 44, 42]}, {"id": "estrada", "rect": [44, 22, 52, 6]}, {"id": "floresta", "rect": [48, 0, 48, 50]},
          {"id": "ruina", "rect": [80, 4, 13, 11]}, {"id": "cripta", "rect": [3, 50, 42, 13]}]
 world = {"schema_version": 1, "status": "ORIGINAL_DO_JOGO", "tile_px": 32, "size": [W, H], "grid": grid, "legend": legend, "zones": zones,
