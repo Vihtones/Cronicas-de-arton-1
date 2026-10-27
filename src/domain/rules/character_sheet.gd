@@ -55,7 +55,6 @@ var egide_ativa: bool = false         # Égide Sagrada (paladino, poder do 5º n
 var pv_temp: int = 0                 # PV temporários (Heroísmo): absorvem dano antes dos PV; zeram ao fim do combate
 var manto_versao: String = "luz"       # Manto do Cruzado: versão escolhida ao aprender ("luz" | "trevas"); não muda depois
 var manto_cruzado: String = ""         # versão ativa do Manto do Cruzado na cena de combate ("" = inativo)
-var divindade: String = ""            # divindade da ficha (devoção: aliados devotos da mesma divindade recebem mais da Aura Divina)
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
 ## Efeitos temporários de magias e habilidades: {id, stat, bonus, fim, tipo}. stat: ataque | dano | defesa |
 ## resistencia | proxima_resistencia | rd (tipo de dano) | imune (condição). fim: rodada | turno | cena | proxima_resistencia.
@@ -410,7 +409,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "aura_sagrada_ativa": aura_sagrada_ativa, "egide_ativa": egide_ativa, "pv_temp": pv_temp, "manto_versao": manto_versao, "divindade": divindade, "manto_cruzado": manto_cruzado, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
+		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "aura_sagrada_ativa": aura_sagrada_ativa, "egide_ativa": egide_ativa, "pv_temp": pv_temp, "manto_versao": manto_versao, "manto_cruzado": manto_cruzado, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -440,7 +439,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.afinidade = (d.get("afinidade", {}) as Dictionary).duplicate()
 	s.aptidoes = (d.get("aptidoes", {}) as Dictionary).duplicate(true)
 	s.oficio = str(d.get("oficio", ""))
-	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.aura_sagrada_ativa = bool(d.get("aura_sagrada_ativa", false)); s.egide_ativa = bool(d.get("egide_ativa", false)); s.pv_temp = int(d.get("pv_temp", 0)); s.manto_versao = str(d.get("manto_versao", "luz")); s.divindade = str(d.get("divindade", "")); s.manto_cruzado = str(d.get("manto_cruzado", "")); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
+	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.aura_sagrada_ativa = bool(d.get("aura_sagrada_ativa", false)); s.egide_ativa = bool(d.get("egide_ativa", false)); s.pv_temp = int(d.get("pv_temp", 0)); s.manto_versao = str(d.get("manto_versao", "luz")); s.manto_cruzado = str(d.get("manto_cruzado", "")); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()
 	s.race_defense = int(d.get("race_defense", 0)); s.extra_armor_penalty = int(d.get("extra_armor_penalty", 0))

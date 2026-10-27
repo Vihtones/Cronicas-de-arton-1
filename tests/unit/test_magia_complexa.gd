@@ -779,13 +779,13 @@ func test_aura_divina_aliado_devoto_ganha_10_e_nao_devoto_ganha_5() -> void:
 	var m := _cena_grupo(17)
 	var sim: CombatSim = m[2]
 	var c: CombatModule = m[1]
-	sim.c("player").sheet.divindade = "Khalmyr"
+	sim.c("player").sheet.devotion = "Khalmyr"
 	sim.c("bandido_1").side = "player"   # aliado dentro da esfera (27,57)
-	sim.c("bandido_1").sheet.divindade = "Khalmyr"
+	sim.c("bandido_1").sheet.devotion = "Khalmyr"
 	_conjurar_aura(m)
 	c._refresh_bencaos()
 	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 10, "aliado devoto da mesma divindade ganha +10")
-	sim.c("bandido_1").sheet.divindade = "Lena"
+	sim.c("bandido_1").sheet.devotion = "Lena"
 	c._refresh_bencaos()
 	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 5, "aliado de outra divindade ganha +5")
 	eq(sim.c("bandido_1").sheet.efeito_bonus("imune", "fascinado"), 0, "não devoto não ganha imunidade")
@@ -837,9 +837,9 @@ func test_aura_divina_acaba_quando_o_conjurador_cai() -> void:
 	var m := _cena_grupo(17)
 	var sim: CombatSim = m[2]
 	var c: CombatModule = m[1]
-	sim.c("player").sheet.divindade = "Khalmyr"
+	sim.c("player").sheet.devotion = "Khalmyr"
 	sim.c("bandido_1").side = "player"
-	sim.c("bandido_1").sheet.divindade = "Khalmyr"
+	sim.c("bandido_1").sheet.devotion = "Khalmyr"
 	_conjurar_aura(m)
 	c._refresh_bencaos()
 	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 10, "com o conjurador de pé, o aliado recebe o bônus")

@@ -502,7 +502,7 @@ func _refresh_aura_divina() -> void:
 				continue
 			if CombatSim.cheb(hx.tile, ax.tile) > RAIO_AURA_DIVINA_QUADRADOS:
 				continue
-			var devoto: bool = a == h or (hs.divindade != "" and ax.sheet.divindade == hs.divindade)
+			var devoto: bool = a == h or (hs.devotion != "" and ax.sheet.devotion == hs.devotion)
 			if devoto:
 				ax.sheet.add_efeito("aura_divina", "defesa", 10 + apr, "cena")
 				ax.sheet.add_efeito("aura_divina", "resistencia", 10 + apr, "cena")
