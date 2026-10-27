@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -750,3 +750,99 @@ func test_ligacao_sombria_repassa_condicoes_quando_o_alvo_falha() -> void:
 	sim.c("player").sheet.add_condition("cego", m[3])
 	c._propagar_ligacoes()
 	check(sim.c("bandido_1").sheet.conditions.has("cego"), "o alvo recebe a condição do conjurador quando falha")
+
+
+# --- Aura Divina (5º círculo) ----------------------------------------------------------------
+func _conjurar_aura(m: Array, cond: String = "debilitado") -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "aura_divina", "target": "player", "targets": ["player"], "condicao": cond}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+
+
+func test_aura_divina_exige_circulo_5() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(16)[2], "player", {"type": "cast", "spell": "aura_divina", "target": "player", "targets": ["player"]}).ok, "nível 16 não lança magia de 5º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(17)[2], "player", {"type": "cast", "spell": "aura_divina", "target": "player", "targets": ["player"]}).ok, "nível 17 lança a Aura Divina")
+
+
+func test_aura_divina_da_ao_conjurador_bonus_de_10_e_imunidade_a_encantamento() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	_conjurar_aura(m)
+	var sh: CharacterSheet = sim.c("player").sheet
+	eq(sh.efeito_bonus("defesa"), 10, "o conjurador ganha +10 na Defesa")
+	eq(sh.efeito_bonus("resistencia"), 10, "o conjurador ganha +10 em resistências")
+	eq(sh.efeito_bonus("imune", "fascinado"), 1, "o conjurador é imune a fascinado")
+
+
+func test_aura_divina_aliado_devoto_ganha_10_e_nao_devoto_ganha_5() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	sim.c("player").sheet.divindade = "Khalmyr"
+	sim.c("bandido_1").side = "player"   # aliado dentro da esfera (27,57)
+	sim.c("bandido_1").sheet.divindade = "Khalmyr"
+	_conjurar_aura(m)
+	c._refresh_bencaos()
+	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 10, "aliado devoto da mesma divindade ganha +10")
+	sim.c("bandido_1").sheet.divindade = "Lena"
+	c._refresh_bencaos()
+	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 5, "aliado de outra divindade ganha +5")
+	eq(sim.c("bandido_1").sheet.efeito_bonus("imune", "fascinado"), 0, "não devoto não ganha imunidade")
+
+
+func test_aura_divina_com_aprimoramento_soma_1_nos_bonus() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	var a := {"type": "cast", "spell": "aura_divina", "target": "player", "targets": ["player"], "condicao": "lento", "aprimoramentos": [0]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	eq(sim.c("player").sheet.efeito_bonus("defesa"), 11, "com o aprimoramento, o bônus de Defesa é +11")
+
+
+func test_aura_divina_inimigo_que_entra_e_falha_recebe_a_condicao() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	_conjurar_aura(m, "debilitado")
+	sim.c("bandido_1").tile = Vector2i(34, 57)   # fora da esfera (distância 8)
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	c._aura_divina_entrada("bandido_1", Vector2i(34, 57), [Vector2i(33, 57), Vector2i(32, 57)])
+	check(sim.c("bandido_1").sheet.conditions.has("debilitado"), "quem entra e falha na Vontade fica debilitado")
+
+
+func test_aura_divina_inimigo_que_entra_e_passa_nao_recebe_nada() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	_conjurar_aura(m, "debilitado")
+	sim.c("bandido_1").tile = Vector2i(34, 57)
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	c._aura_divina_entrada("bandido_1", Vector2i(34, 57), [Vector2i(33, 57), Vector2i(32, 57)])
+	check(not sim.c("bandido_1").sheet.conditions.has("debilitado"), "quem passa na Vontade não recebe a condição")
+
+
+func test_aura_divina_nao_dispara_para_quem_ja_comeca_dentro() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	_conjurar_aura(m, "debilitado")
+	sim.c("bandido_2").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	var out: Array = c._aura_divina_entrada("bandido_2", Vector2i(32, 57), [Vector2i(31, 57)])
+	eq(out.size(), 0, "quem já está dentro da esfera não faz o teste ao se mover lá dentro")
+	check(not sim.c("bandido_2").sheet.conditions.has("debilitado"), "sem entrada, sem condição")
+
+
+func test_aura_divina_acaba_quando_o_conjurador_cai() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	sim.c("player").sheet.divindade = "Khalmyr"
+	sim.c("bandido_1").side = "player"
+	sim.c("bandido_1").sheet.divindade = "Khalmyr"
+	_conjurar_aura(m)
+	c._refresh_bencaos()
+	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 10, "com o conjurador de pé, o aliado recebe o bônus")
+	sim.c("player").sheet.pv = 0
+	c._refresh_bencaos()
+	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 0, "com o conjurador caído, o bônus some")

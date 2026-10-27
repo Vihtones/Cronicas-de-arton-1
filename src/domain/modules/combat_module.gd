@@ -451,9 +451,15 @@ func _run_until_player() -> Array:
 const RAIO_AURA_QUADRADOS := 6
 
 
+## Raio da Aura Divina: 9m (LB p.182), com 1 quadrado = 1,5m. Condições que a aura pode impor (a escolha do conjurador).
+const RAIO_AURA_DIVINA_QUADRADOS := 6
+const CONDICOES_AURA_DIVINA := ["esmorecido", "debilitado", "lento"]
+
+
 ## Recalcula os efeitos de Aura Sagrada (resistência) e Égide Sagrada (Defesa) conforme as posições atuais:
 ## cada paladino ativo dá o próprio Carisma aos aliados do mesmo lado que estão no alcance e consciências.
 func _refresh_bencaos() -> void:
+	_refresh_aura_divina()
 	for id in sim.combatants:
 		var sh: CharacterSheet = sim.c(id).sheet
 		sh.remove_efeito("aura_sagrada")
@@ -476,6 +482,76 @@ func _refresh_bencaos() -> void:
 				ax.sheet.add_efeito("aura_sagrada", "resistencia", car, "cena")
 			if hs.egide_ativa and d <= 1:
 				ax.sheet.add_efeito("egide_sagrada", "defesa", car, "cena")
+
+
+## Aura Divina (5º círculo): sustentada pelo conjurador e segue a posição dele. Você e os aliados devotos da mesma
+## divindade (e você, sempre) ganham +10 na Defesa e em resistências e são imunes a fascinado e enfeitiçado; os outros
+## aliados ganham +5. Aprimoramento: +1 em todos esses bônus.
+func _refresh_aura_divina() -> void:
+	for id in sim.combatants:
+		sim.c(id).sheet.remove_efeito("aura_divina")
+	for h in sim.combatants:
+		var hx: Dictionary = sim.c(h)
+		var hs: CharacterSheet = hx.sheet
+		if not hs.has_efeito("magia.aura_divina") or not sim.conscious(h):
+			continue
+		var apr := hs.efeito_bonus("aprimoramento")
+		for a in sim.combatants:
+			var ax: Dictionary = sim.c(a)
+			if ax.side != hx.side or not sim.conscious(a):
+				continue
+			if CombatSim.cheb(hx.tile, ax.tile) > RAIO_AURA_DIVINA_QUADRADOS:
+				continue
+			var devoto: bool = a == h or (hs.divindade != "" and ax.sheet.divindade == hs.divindade)
+			if devoto:
+				ax.sheet.add_efeito("aura_divina", "defesa", 10 + apr, "cena")
+				ax.sheet.add_efeito("aura_divina", "resistencia", 10 + apr, "cena")
+				ax.sheet.add_efeito("aura_divina", "imune", 1, "cena", "fascinado")
+				ax.sheet.add_efeito("aura_divina", "imune", 1, "cena", "enfeiticado")
+			else:
+				ax.sheet.add_efeito("aura_divina", "defesa", 5 + apr, "cena")
+				ax.sheet.add_efeito("aura_divina", "resistencia", 5 + apr, "cena")
+
+
+## Entrada na Aura Divina: quando uma criatura do outro lado passa de fora para dentro da área durante o movimento,
+## faz Vontade (CD da aura); se falhar, recebe a condição escolhida pelo conjurador até o fim da cena.
+## Quem já começa dentro da área não dispara o teste.
+func _aura_divina_entrada(mover: String, from: Vector2i, path: Array) -> Array:
+	var out: Array = []
+	var mx: Dictionary = sim.c(mover)
+	for h in sim.combatants:
+		var hx: Dictionary = sim.c(h)
+		var hs: CharacterSheet = hx.sheet
+		if hx.side == mx.side or not hs.has_efeito("magia.aura_divina") or not sim.conscious(h) or not sim.conscious(mover):
+			continue
+		var centro: Vector2i = hx.tile
+		var entrou := false
+		var prev := from
+		for t in path:
+			var t_v: Vector2i = t
+			if CombatSim.cheb(centro, t_v) <= RAIO_AURA_DIVINA_QUADRADOS and CombatSim.cheb(centro, prev) > RAIO_AURA_DIVINA_QUADRADOS:
+				entrou = true
+				break
+			prev = t_v
+		if not entrou:
+			continue
+		var cd := hs.efeito_bonus("cd")
+		var cond := _condicao_aura(hs)
+		var sv := Checks.skill(mx.sheet, "vontade", cd, world.rules, world.rng, "combat")
+		sv = _pos_teste(mover, sv, cd, out)
+		if sv.get("success", false):
+			out.append(fact("SPELL_MISSED", {"caster": h, "target": mover, "spell": "aura_divina"}, [h, mover]))
+		else:
+			sim.add_condicao(mover, cond, 999, "aura_divina")   # 999 rodadas: a condição dura até o fim da cena
+			out.append(fact("BUFF_APPLIED", {"actor": h, "target": mover, "buff": "aura_divina", "condicao": cond, "tags": ["magia"]}, [h, mover]))
+	return out
+
+
+func _condicao_aura(hs: CharacterSheet) -> String:
+	for e in hs.efeitos:
+		if e.id == "magia.aura_divina" and e.stat == "condicao":
+			return str(e.tipo)
+	return "esmorecido"
 
 
 ## Quadrado livre e transitável mais perto de `centro`, pela própria simulação (vale no planejamento também).
@@ -841,6 +917,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var reactors := _reflex_watchers(id, from)
 			sim.c(id).tile = v.end
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y])}, [id]))
+			out.append_array(_aura_divina_entrada(id, from, path))
 			for r_id in reactors:
 				if CombatSim.cheb(sim.c(r_id).tile, v.end) > 1:
 					out.append_array(_reflex_attack(r_id, id, from))
@@ -850,6 +927,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.c(id).tile = v.end
 			sim.c(id).charge_turn = sim.turn_counter
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y]), "charge": true}, [id]))
+			out.append_array(_aura_divina_entrada(id, from, path))
 			_cur_action = a
 			out.append_array(_resolve_attack(id, a.target, v, false))
 			_cur_action = {}
@@ -1215,6 +1293,17 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					"pv_after": ts_cz.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": passou_cz, "tags": tags_cz}, [id, tg_cz]))
 			if apr_cz.has(2):
 				_dissipar_na_area(tiles_cz, "Necromancia", out)
+		"aura_divina":
+			# Aura Divina (5º círculo): esfera de 9m que segue você pela cena (ver `_refresh_aura_divina`). A CD guarda
+			# a da magia; a condição (esmorecido, debilitado ou lento) é a escolha do conjurador, aplicada a quem entra.
+			var cond_ad := str(a.get("condicao", "esmorecido"))
+			if not CONDICOES_AURA_DIVINA.has(cond_ad):
+				cond_ad = "esmorecido"
+			sh.add_efeito("magia.aura_divina", "cd", spell_dc(sh, a), "cena")
+			sh.add_efeito("magia.aura_divina", "aprimoramento", 1 if a.get("aprimoramentos", []).has(0) else 0, "cena")
+			sh.add_efeito("magia.aura_divina", "condicao", 0, "cena", cond_ad)
+			_refresh_bencaos()
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "aura_divina", "tags": ["magia"]}, [id]))
 		"ligacao_sombria":
 			# Ligação Sombria (4º círculo): o alvo faz Fortitude; se falhar, fica ligado a você por um dia. Enquanto a ligação
 			# durar, o dano e as condições que você sofrer também atingem o alvo (ele faz Fortitude; falha, sofre igual).
@@ -1880,8 +1969,14 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet.limpar_efeitos("rodada")
 	world.player_sheet.limpar_efeitos("turno")
 	world.player_sheet.allihanna_ativa = false
+	for m in sim.marcas:   # condições impostas pela Aura Divina duram só a cena
+		var cond_m := str(m.dados.get("condicao", ""))
+		if str(m.fonte) == "aura_divina" and cond_m != "" and sim.combatants.has(m.alvo):
+			sim.c(m.alvo).sheet.remove_condition(cond_m)
 	for id in sim.combatants:   # Aura Sagrada é sustentada até o fim do combate; Égide, até o fim da cena
 		var sh_f: CharacterSheet = sim.c(id).sheet
+		sh_f.remove_efeito("magia.aura_divina")
+		sh_f.remove_efeito("aura_divina")
 		sh_f.aura_sagrada_ativa = false
 		sh_f.egide_ativa = false
 		sh_f.manto_cruzado = ""
