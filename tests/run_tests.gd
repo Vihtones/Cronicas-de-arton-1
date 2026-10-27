@@ -23,6 +23,7 @@ const SUITES := [
 	"res://tests/unit/test_classes.gd",
 	"res://tests/unit/test_aptitudes.gd",
 	"res://tests/unit/test_magia_complexa.gd",
+	"res://tests/unit/test_condicoes_combate.gd",
 	"res://tests/unit/test_powers.gd",
 	"res://tests/unit/test_racas.gd",
 	"res://tests/unit/test_mundo_vivo.gd",

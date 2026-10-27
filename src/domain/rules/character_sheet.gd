@@ -207,6 +207,13 @@ func curar(n: int) -> int:
 	return pv - antes
 
 
+## Dano de um tipo depois de imunidade (zera) e de redução por tipo (magia e raça).
+func dano_por_tipo(tipo: String, dano: int) -> int:
+	if efeito_bonus("imune", tipo) > 0:
+		return 0
+	return maxi(0, dano - efeito_rd(tipo) - int(dr.get(tipo, 0)))
+
+
 ## Remove os efeitos de um tipo de bônus (ex.: uso de Premonição gasto).
 func remove_efeito_stat(stat: String) -> void:
 	efeitos = efeitos.filter(func(e): return e.stat != stat)

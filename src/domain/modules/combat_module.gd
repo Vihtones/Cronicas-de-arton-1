@@ -3,6 +3,7 @@ extends WorldModule
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const Area := preload("res://src/domain/combat/area.gd")
+const CondicoesCombate := preload("res://src/domain/combat/condicoes_combate.gd")
 ## Combate tático híbrido (§9). Planejamento congelado no turno, fantasma sem
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
@@ -553,6 +554,8 @@ func _nuvens_do_conjurador(id: String, facts: Array) -> void:
 ## Reação Premonição (3 PM, aprimoramento de reação): logo após um teste de resistência, o conjurador força nova rolagem.
 ## Aliados: só quando falharam. Inimigos (involuntários) têm Vontade para negar; sem negar, se tiverem passado, a nova rolagem vale.
 func _pos_teste(alvo: String, sv: Dictionary, cd: int, out: Array) -> Dictionary:
+	if sim.c("player").has("sheet") and not CondicoesCombate.pode_reagir(sim.c("player").sheet, world.rules):
+		return sv
 	if str(power_policy.get("premonicao_reacao", "auto")) == "nunca":
 		return sv
 	var P := sim.c("player")
@@ -688,9 +691,7 @@ func _condicao_do_sopro(ts: CharacterSheet, pedida: String) -> String:
 
 ## Dano por tipo: imunidade zera; redução de dano por tipo (magia e raça) é descontada.
 func _dano_por_tipo(ts: CharacterSheet, tipo: String, dano: int) -> int:
-	if ts.efeito_bonus("imune", tipo) > 0:
-		return 0
-	return maxi(0, dano - ts.efeito_rd(tipo) - int(ts.dr.get(tipo, 0)))
+	return ts.dano_por_tipo(tipo, dano)
 
 
 ## Manto do Cruzado no início de cada turno do conjurador (LB p.84 do 4º círculo, ver catálogo).
@@ -742,6 +743,9 @@ func _begin_turn(id: String) -> Dictionary:
 	_zonas_e_marcas_inicio_de_turno(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
+	CondicoesCombate.inicio_de_turno(sim, id, world.rng, facts)   # em chamas e sangramento
+	if s.is_dead():
+		return {"skip": true, "facts": facts}
 	if x.surprised:
 		x.surprised = false
 		s.remove_condition("surpreendido")
@@ -760,6 +764,23 @@ func _begin_turn(id: String) -> Dictionary:
 			facts.append(fact("BLEED_CHECK", {"actor": id, "check": r, "lost": lost, "pv": s.pv, "dead": s.is_dead(),
 				"tags": ["morte"] if s.is_dead() else []}))
 		return {"skip": true, "facts": facts}
+	# Ações bloqueadas (atordoado, fascinado, pasmo, paralisado): o turno passa sem ação.
+	var bloqueio := CondicoesCombate.bloqueio_de_acoes(s, world.rules)
+	if bloqueio != "":
+		facts.append(fact("TURN_SKIPPED", {"actor": id, "reason": bloqueio}))
+		return {"skip": true, "facts": facts}
+	# Confuso (1d6): pode perder o turno, andar ao acaso ou atacar a criatura adjacente.
+	var conf := CondicoesCombate.confuso(sim, id, world.rng, facts)
+	if conf.acao == "atacar":
+		var v_c := GhostPlanner.validate_action(sim, id, {"type": "attack", "target": conf.alvo, "attack": 0})
+		if v_c.ok:
+			facts.append_array(_resolve_attack(id, conf.alvo, v_c, false))
+		return {"skip": true, "facts": facts}
+	if conf.acao == "perder":
+		return {"skip": true, "facts": facts}
+	# Enjoado: uma única ação, padrão ou de movimento, por turno (ver CombatSim.spend).
+	if s.has_effective_condition(world.rules, "enjoado"):
+		sim.budget["enjoado"] = true
 	x.flags.erase("defensivo")   # Combate Defensivo vale "até seu próximo turno" (LB p.125)
 	var extra_move := false
 	if not x.flags.has("agiu"):
@@ -922,6 +943,9 @@ func casting_cd(sh: CharacterSheet, sp: Dictionary, cost: int) -> Dictionary:
 
 
 func _casting_check(id: String, sh: CharacterSheet, sp: Dictionary, cost: int) -> Dictionary:
+	# Surdo (LB p.394): 20% de falha ao lançar magia.
+	if sh.has_effective_condition(world.rules, "surdo") and CondicoesCombate.surdo_falha(int(world.rng.roll("combat", 1, 100)[0])):
+		return {"caster": id, "check": "surdez", "cd": 0, "reason": "surdo", "d20": 0, "total": 0}
 	var c := casting_cd(sh, sp, cost)
 	if int(c.concentration_cd) > 0:
 		var r := Checks.skill(sh, "vontade", int(c.concentration_cd), world.rules, world.rng, "combat")
@@ -1267,6 +1291,8 @@ func _reflex_watchers(mover: String, from: Vector2i) -> Array:
 	var out: Array = []
 	for r_id in sim.combatants:
 		var R := sim.c(r_id)
+		if not CondicoesCombate.pode_reagir(R.sheet, world.rules):
+			continue
 		if R.side == sim.c(mover).side or not sim.conscious(r_id) or not R.sheet.has_power("ataque_reflexo"):
 			continue
 		if R.sheet.pm < int(world.rules.value("poder.ataque_reflexo").custo_pm) or CombatSim.cheb(R.tile, from) != 1:
@@ -1351,6 +1377,8 @@ func _aplicar_escudo(caster: String, tg: String, apr: Array, reacao: bool, out: 
 ## Reação do Escudo da Fé: quando um aliado é atacado, o jogador pode lançá-lo (1 PM, uma vez por rodada),
 ## por padrão automaticamente (política "escudo_da_fe"). Retorna a Defesa extra para esse ataque.
 func _reacao_escudo(attacker: String, target: String, out: Array) -> int:
+	if sim.c("player").has("sheet") and not CondicoesCombate.pode_reagir(sim.c("player").sheet, world.rules):
+		return 0
 	if attacker == "player" or sim.is_enemy("player", target) or target == "player":
 		return 0
 	if str(power_policy.get("escudo_da_fe", "auto")) == "nunca":
@@ -1373,6 +1401,8 @@ func _reacao_escudo(attacker: String, target: String, out: Array) -> int:
 ## resistência, o jogador reage e o aliado recebe +5 nesse teste (em vez do bônus normal). Automática pela
 ## política "protecao_divina"; uma vez por alvo por rodada.
 func _reacao_protecao(atacante: String, alvo: String, out: Array) -> void:
+	if sim.c("player").has("sheet") and not CondicoesCombate.pode_reagir(sim.c("player").sheet, world.rules):
+		return
 	if alvo == "player" or not sim.is_enemy(atacante, alvo) or sim.is_enemy("player", alvo):
 		return
 	if str(power_policy.get("protecao_divina", "auto")) == "nunca":

@@ -71,11 +71,15 @@ static func cheb(a: Vector2i, b: Vector2i) -> int:
 
 func speed_squares(id: String) -> int:
 	var s: CharacterSheet = c(id).sheet
-	var q := int(s.speed_m / float(rules.value("mapa.quadrado_m", 1.5)))
+	var quadrado := float(rules.value("mapa.quadrado_m", 1.5))
+	var q := int(s.speed_m / quadrado)
 	var eff := s.effective_conditions(rules)
 	if eff.has("imovel"): return 0
 	if eff.has("caido"): return 1
 	if eff.has("lento"): q = maxi(1, q / 2)
+	var recuo_m := s.condition_mod(rules, "deslocamento_m")   # sobrecarregado: -3m
+	if recuo_m < 0:
+		q = maxi(0, q + int(float(recuo_m) / quadrado))
 	if (c(id).flags as Array).has("impeto_%d" % round_no):
 		q += int(float(rules.value("poder.impeto").deslocamento_m) / float(rules.value("mapa.quadrado_m", 1.5)))   # Ímpeto (LB p.66)
 	return q
@@ -108,6 +112,9 @@ func spend(kind: String) -> void:
 			else: budget.std -= 1
 		"completa":
 			budget.std = 0; budget.move = 0
+	# Enjoado (LB p.394): uma única ação, padrão ou de movimento, por turno.
+	if kind != "completa" and budget.get("enjoado", false):
+		budget.std = 0; budget.move = 0
 
 
 ## --- Movimento (LB p.238) ----------------------------------------------------
@@ -327,6 +334,8 @@ static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
 func apply_damage(target: String, amount: int) -> Array:
 	var T := c(target)
 	var s: CharacterSheet = T.sheet
+	if s.has_effective_condition(rules, "petrificado"):
+		amount = maxi(0, amount - 8)   # petrificado: redução de dano 8 (LB p.394)
 	var link := _link_de(target)
 	if link != "" and c(link).has("sheet") and not c(link).sheet.is_dead():
 		# Escudo da Fé (4º aprimoramento): metade do dano vai para o conjurador, se ele estiver a até alcance curto
@@ -399,6 +408,17 @@ func add_marca(id: String, alvo: String, fonte: String, tipo: String, rodadas: i
 	marcas.append({"id": id, "alvo": alvo, "fonte": fonte, "tipo": tipo, "rodadas": rodadas, "dados": dados.duplicate(true)})
 
 
+## Condição com duração em rodadas: vira uma marca do tipo "condicao", que a tira quando zera. Imune não recebe.
+func add_condicao(alvo: String, condicao: String, rodadas: int, fonte: String) -> bool:
+	var s: CharacterSheet = c(alvo).sheet
+	if s.efeito_bonus("imune", condicao) > 0:
+		return false
+	s.add_condition(condicao, rules)
+	if rodadas > 0:
+		add_marca("cond_" + condicao, alvo, fonte, "condicao", rodadas, {"condicao": condicao})
+	return true
+
+
 func remove_marca(id: String, alvo: String) -> void:
 	marcas = marcas.filter(func(m): return not (m.id == id and m.alvo == alvo))
 
@@ -442,6 +462,8 @@ func _passar_rodada() -> void:
 			m.rodadas -= 1
 		if m.rodadas == 0:
 			expiradas.append(m.id)
+			if m.tipo == "condicao" and combatants.has(m.alvo):
+				c(m.alvo).sheet.remove_condition(str(m.dados.condicao))   # condição de rodadas (ex.: cego da Cólera de Azgher)
 			if m.tipo == "invocacao" and combatants.has(m.alvo):
 				remove_combatant(m.alvo)
 		else:
