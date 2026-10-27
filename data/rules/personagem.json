@@ -14461,6 +14461,1448 @@
    "pagina": 211,
    "pdf_page": 217,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.anular_a_luz",
+   "valor": {
+    "nome": "Anular a Luz",
+    "tipo": "divina",
+    "escola": "Necromancia",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 6m de raio",
+    "duracao": "ver texto",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia cria uma onda de escuridão que causa diversos efeitos. Magias de até 3º círculo na área são dissipadas se você passar num teste de Religião contra a CD de cada uma. Seus aliados na área são protegidos por uma aura sombria e recebem +4 na Defesa até o fim da cena. Inimigos na área ficam enjoados por 1d4 rodadas (apenas uma vez por cena). Anular a Luz anula Dispersar as Trevas (este efeito tem duração instantânea).",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o bônus na Defesa em +1."
+     },
+     {
+      "pm": 4,
+      "texto": "muda as magias dissipadas para até 4º círculo. Requer 4º círculo."
+     },
+     {
+      "pm": 9,
+      "texto": "muda as magias dissipadas para até 5º círculo. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 180,
+   "pdf_page": 186,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.banimento",
+   "valor": {
+    "nome": "Banimento",
+    "tipo": "divina",
+    "escola": "Abjuração",
+    "circulo": 3,
+    "execucao": "1d3+1 rodadas",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "Vontade parcial",
+    "texto": "Você expulsa uma criatura não nativa de Arton. Um alvo nativo de outro mundo (como muitos espíritos), é teletransportado de volta para um lugar aleatório de seu mundo de origem. Já um alvo morto-vivo tem sua conexão com as energias negativas rompidas, sendo reduzido a 0 PV. Se passar na resistência, em vez dos efeitos acima, o alvo fica enjoado por 1d4 rodadas. Se você tiver um ou mais itens que se oponham ao alvo de alguma maneira, a CD do teste de resistência aumenta em +2 por item. Por exemplo, se lançar a magia contra demônios do frio (vulneráveis a água benta e que odeiam luz e calor) enquanto segura um frasco de água benta e uma tocha acesa, a CD aumenta em +4. O mestre decide se determinado item é forte o bastante contra a criatura para isso.",
+    "aprimoramentos": [
+     {
+      "pm": 0,
+      "texto": "muda a resistência para nenhum. Em vez do normal, devolve automaticamente uma criatura conjurada (como por uma magia de convocação) para seu plano de origem."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 182,
+   "pdf_page": 188,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.coluna_de_chamas",
+   "valor": {
+    "nome": "Coluna de Chamas",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "longo",
+    "alvo_tipo": "Área",
+    "alvo": "cilindro com 3m de raio e 30m de altura",
+    "duracao": "instantânea",
+    "resistencia": "Reflexos reduz à metade",
+    "texto": "Um pilar de fogo sagrado desce dos céus, causando 6d6 pontos de dano de fogo mais 6d6 pontos de dano de luz nas criaturas e objetos livres na área.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta o dano de fogo em +1d6."
+     },
+     {
+      "pm": 1,
+      "texto": "aumenta o dano de luz em +1d6."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 184,
+   "pdf_page": 190,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.comunhao_com_a_natureza",
+   "valor": {
+    "nome": "Comunhão com a Natureza",
+    "tipo": "divina",
+    "escola": "Adivinhação",
+    "circulo": 3,
+    "execucao": "completa",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "1 dia",
+    "resistencia": "nenhuma",
+    "texto": "Após uma breve união com a natureza local, você obtém informações e intuições sobre a região em que está, numa distância equivalente a um dia de viagem. Você recebe 6d4 dados de auxílio. Enquanto a magia durar, sempre que for realizar um teste de perícia em áreas naturais, você pode gastar 2d4 (mais 2d4 para cada círculo de magias acima do 3º que puder lançar) e adicionar o resultado rolado como bônus no teste. A magia termina se você ficar sem dados.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda a execução para 1 minuto e a duração para instantânea. Em vez do normal, você descobre 1d4+1 informações sobre os seguintes temas: terreno, animais, vegetais, minerais, cursos d’água e presença de criaturas antinaturais numa região natural em que você esteja. Você pode, por exemplo, descobrir a quantidade de cavernas (terreno), se uma planta rara existe (vegetais) e se há mortos-vivos (criaturas antinaturais) na região."
+     },
+     {
+      "pm": 3,
+      "texto": "aumenta o número de dados de auxílio em +2."
+     },
+     {
+      "pm": 4,
+      "texto": "muda o tipo dos dados de auxílio para d6."
+     },
+     {
+      "pm": 8,
+      "texto": "muda o tipo dos dados de auxílio para d8."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 184,
+   "pdf_page": 190,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.controlar_agua",
+   "valor": {
+    "nome": "Controlar Água",
+    "tipo": "divina",
+    "escola": "Transmutação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "longo",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 30m de raio",
+    "duracao": "cena",
+    "resistencia": "veja texto",
+    "texto": "Você controla os movimentos e comportamentos da água. Ao lançar a magia, escolha um dos efeitos abaixo. Congelar: toda a água mundana na área é congelada. Criaturas nadando na área ficam imóveis; escapar exige gastar uma ação padrão e passar num teste de Atletismo ou Acrobacia. Derreter: gelo mundano na área vira água e a magia termina. A critério do mestre, isso pode criar terreno difícil. Enchente: eleva o nível da água mundana na área em até 4,5m. A sua escolha, muda área para alvo: uma embarcação. O alvo recebe +3m em seu deslocamento pela duração do efeito. Evaporar: toda a água e gelo mundano na área evaporam instantaneamente e a magia termina. Elementais da água, plantas monstruosas e criaturas com imunidade a frio na área sofrem 10d8 pontos de dano de fogo; outras criaturas vivas recebem metade desse dano (Fortitude reduz à metade). Partir: diminui o nível de toda água mundana na área em até 4,5m. Em um corpo d’água raso, isso abre um caminho seco, que pode ser atravessado a pé. Em um corpo d’água profundo, cria um redemoinho que pode prender barcos (um teste de Pilotagem permite ao piloto livrar a embarcação). Elementais da água na área ficam lentos.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +2d8."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 186,
+   "pdf_page": 192,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.controlar_terra",
+   "valor": {
+    "nome": "Controlar Terra",
+    "tipo": "divina",
+    "escola": "Transmutação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "longo",
+    "alvo_tipo": "Área",
+    "alvo": "9 cubos com 1,5m de lado",
+    "duracao": "instantânea",
+    "resistencia": "veja texto",
+    "texto": "Você manipula a densidade e a forma de toda terra, pedra, lama, argila ou areia na área. Ao lançar a magia, escolha. Amolecer: se afetar o teto, uma coluna ou suporte, provoca um desabamento que causa 10d6 pontos de dano de impacto às criaturas na área (Reflexos reduz à metade). Se afetar um piso de terra ou pedra, cria terreno difícil de areia ou argila, respectivamente. Modelar: pode usar pedra ou argila para criar um ou mais objetos simples de tamanho Enorme ou menor (sem mecanismos ou partes móveis). Por exemplo, pode transformar um tijolo em uma maça, criar uma passagem onde antes havia apenas uma parede ou levantar uma ou mais paredes que oferecem cobertura total (RD 8 e 50 PV para cada 3m). Solidificar: transforma lama ou areia em terra ou pedra. Criaturas com os pés na superfície ficam agarradas. Elas podem se soltar com uma ação padrão e um teste de Acrobacia ou Atletismo.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta o número de cubos de 1,5m em +2."
+     },
+     {
+      "pm": 1,
+      "texto": "muda o alcance para pessoal, o alvo para você e a duração para um dia. Você e seu equipamento fundem-se a uma superfície ou objeto adjacente feito de pedra, terra, argila ou areia que possa acomodá-lo. Você pode voltar ao espaço adjacente como uma ação livre, dissipando a magia. Enquanto mesclado, você não pode falar ou fazer ações físicas, mas consegue perceber seus arredores normalmente. Pequenos danos não o afetam, mas se o objeto (ou o trecho onde você está imerso) for destruído, a magia é dissipada, você volta a um espaço livre adjacente e sofre 10d6 pontos de dano de impacto."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 188,
+   "pdf_page": 194,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.despertar_consciencia",
+   "valor": {
+    "nome": "Despertar Consciência",
+    "tipo": "divina",
+    "escola": "Encantamento",
+    "circulo": 3,
+    "execucao": "completa",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 animal ou planta",
+    "duracao": "1 dia",
+    "resistencia": "nenhuma",
+    "texto": "Você desperta a consciência de um animal ou planta. O alvo se torna um parceiro veterano de um tipo a sua escolha entre ajudante, combatente, fortão, guardião, médico, perseguidor ou vigilante. Se usar esta magia em outro parceiro que já possua, o nível de poder de um de seus tipos aumenta em um passo (apenas uma vez por parceiro). Se já for um parceiro mestre, recebe o bônus de outro tipo de parceiro iniciante (entre as escolhas acima). O alvo se torna uma criatura racional, com Inteligência –1, e pode falar.",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda o alvo para 1 escultura mundana inanimada. Além do normal, o alvo tem as mesmas características de um construto."
+     },
+     {
+      "pm": 4,
+      "texto": "muda a duração para permanente e adiciona penalidade de –3 PM."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 190,
+   "pdf_page": 196,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.dispersar_as_trevas",
+   "valor": {
+    "nome": "Dispersar as Trevas",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 6m de raio",
+    "duracao": "veja texto",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia cria um forte brilho (multicolorido ou de uma cor que remeta a sua divindade) que causa diversos efeitos. Todas as magias de 3º círculo ou menor ativas na área são dissipadas se você passar num teste de Religião contra a CD de cada magia. Seus aliados na área recebem +4 em testes de resistência e redução de trevas 10 até o fim da cena, protegidos por uma aura sutil da mesma cor. Inimigos na área ficam cegos por 1d4 rodadas (apenas uma vez por cena). Dispersar as Trevas anula Anular a Luz (este efeito tem duração instantânea).",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o bônus nas resistências em +1."
+     },
+     {
+      "pm": 4,
+      "texto": "muda o alcance para curto, a área para alvo 1 criatura e a duração para cena. O alvo fica imune a efeitos de trevas."
+     },
+     {
+      "pm": 4,
+      "texto": "muda o círculo máximo de magias dissipadas para 4º. Requer 4º círculo."
+     },
+     {
+      "pm": 9,
+      "texto": "muda o círculo máximo de magias dissipadas para 5º. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 191,
+   "pdf_page": 197,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.heroismo",
+   "valor": {
+    "nome": "Heroísmo",
+    "tipo": "divina",
+    "escola": "Encantamento",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia imbui uma criatura com coragem e valentia. O alvo fica imune a medo e recebe 40 PV temporários e +4 em testes de ataque e rolagens de dano contra o inimigo de maior ND na cena.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda o bônus para +6. Hipnotismo arcana 1 (Encantamento) Execução: padrão; Alcance: curto; Alvos: 1 animal ou humanoide; Duração: 1d4 rodadas; Resistência: Vontade anula. Suas palavras e movimentos ritmados deixam o alvo fascinado. Esta magia só afeta criaturas que possam perceber você. Se usar esta magia em combate, o alvo recebe +5 em seu teste de resistência. Se a criatura passar, fica imune a este efeito por um dia. Truque: muda a duração para 1 rodada. Em vez de fascinado, o alvo fica pasmo (apenas uma vez por cena)."
+     },
+     {
+      "pm": 1,
+      "texto": "como o normal, mas alvos que passem na resistência não sabem que foram vítimas de uma magia."
+     },
+     {
+      "pm": 2,
+      "texto": "muda o alvo para animais ou humanoides escolhidos."
+     },
+     {
+      "pm": 2,
+      "texto": "muda a duração para sustentada."
+     },
+     {
+      "pm": 2,
+      "texto": "também afeta espíritos e monstros na área. Requer 2º círculo."
+     },
+     {
+      "pm": 5,
+      "texto": "também afeta construtos, espíritos, monstros e mortos-vivos na área. Requer 3º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 194,
+   "pdf_page": 200,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.imobilizar",
+   "valor": {
+    "nome": "Imobilizar",
+    "tipo": "universal",
+    "escola": "Encantamento",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 humanoide ou animal",
+    "duracao": "cena",
+    "resistencia": "Vontade parcial",
+    "texto": "O alvo fica paralisado; se passar na resistência, em vez disso fica lento. A cada rodada, pode gastar uma ação completa para fazer um novo teste de Vontade. Se passar, se liberta do efeito.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda o alvo para 1 espírito."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta o número de alvos em +1."
+     },
+     {
+      "pm": 3,
+      "texto": "muda o alvo para 1 criatura. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 195,
+   "pdf_page": 201,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.lendas_e_historias",
+   "valor": {
+    "nome": "Lendas e Histórias",
+    "tipo": "universal",
+    "escola": "Adivinhação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura, objeto ou local",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Você descobre informações sobre uma criatura, objeto ou local que esteja tocando. O que exatamente você descobre depende do mestre: talvez você não descubra tudo que há para saber, mas ganhe pistas para continuar a investigação. A cada rodada que mantiver a magia, você descobre: • Todas as informações sobre o alvo, como se tivesse passado em todos os testes de Conhecimento para tal. • Todas as habilidades do alvo. Se for uma criatura, você sabe suas estatísticas de jogo como raça, classe, nível, atributos, magias, resistências e fraquezas. Se for um item mágico, aprende seu efeito e funcionamento. • Se o alvo está sob influência de alguma magia e todas as informações sobre as magias ativas, se houver alguma.",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda a execução para um dia, o alcance para ilimitado e adiciona componente material (cuba de ouro cheia d’água e ingredientes mágicos, no valor de T$ 1.000). Você ainda precisa ter alguma informação sobre o alvo, como um nome, descrição ou localização."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 196,
+   "pdf_page": 202,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.manto_de_sombras",
+   "valor": {
+    "nome": "Manto de Sombras",
+    "tipo": "universal",
+    "escola": "Ilusão",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Você fica coberto por um manto de energia sombria. Nesta forma, torna-se incorpóreo (inclui seu equipamento): só pode ser afetado por armas e habilidades mágicas, ou por outras criaturas incorpóreas, e pode atravessar objetos sólidos, mas não manipulá-los. Também não pode atacar criaturas normais (mas ainda pode lançar magias nelas). Além disso, se torna vulnerável à luz direta: se exposto a uma fonte de luz, sofre 1 ponto de dano por rodada. Você pode gastar uma ação de movimento e 1 PM para “entrar” em uma sombra do seu tamanho ou maior e se teletransportar para outra sombra, também do seu tamanho ou maior, em alcance médio.",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda o alcance para toque e o alvo para 1 criatura voluntária. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 197,
+   "pdf_page": 203,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.missao_divina",
+   "valor": {
+    "nome": "Missão Divina",
+    "tipo": "divina",
+    "escola": "Encantamento",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "1 semana ou até ser descarregada",
+    "resistencia": "Vontade anula (veja texto) Esta magia obriga o alvo a cumprir uma tarefa a sua escolha",
+    "texto": "Ela dura uma semana ou até o alvo cumprir a tarefa, o que vier primeiro. O alvo pode recusar a missão — mas, no fim de cada dia em que não se esforçar para cumprir a tarefa, deve fazer um teste de Vontade; se falhar, sofre uma penalidade cumulativa de –2 em todos os testes e rolagens. A Missão Divina não pode forçar um ato suicida, nem uma missão impossível (como matar um ser que não existe).",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda o alcance para toque, a duração para permanente e adiciona penalidade de –1 PM. Em vez do normal, você inscreve uma marca (como uma tatuagem) na pele do alvo e escolhe um tipo de ação que ativará a marca. Normalmente, será cometer um crime (roubar, matar...) ou outra coisa contrária às Obrigações & Restrições de sua divindade. Sempre que a marca é ativada, o alvo recebe uma penalidade cumulativa de –2 em todos os testes. Muitas vezes, portar essa marca é um estigma por si só, já que esta magia normalmente é lançada em criminosos ou traidores. Uma magia que dissipe outras suprime a marca e suas penalidades por um dia; elas só podem ser totalmente removidas pelo conjurador original ou pela magia Purificação."
+     },
+     {
+      "pm": 4,
+      "texto": "muda a duração para 1 ano ou até ser descarregada."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 199,
+   "pdf_page": 205,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.pele_de_pedra",
+   "valor": {
+    "nome": "Pele de Pedra",
+    "tipo": "universal",
+    "escola": "Transmutação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Sua pele ganha aspecto e dureza de rocha. Você recebe redução de dano 5.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda o alcance para toque e o alvo para 1 criatura."
+     },
+     {
+      "pm": 4,
+      "texto": "muda a duração para um dia."
+     },
+     {
+      "pm": 4,
+      "texto": "sua pele ganha aspecto e dureza de aço. Você recebe redução de dano 10. Requer 4º círculo."
+     },
+     {
+      "pm": 4,
+      "texto": "muda o alcance para toque, o alvo para 1 criatura, a duração para 1d4 rodadas e adiciona Resistência: Fortitude anula. Em vez do efeito normal, a magia transforma o alvo e seu equipamento em uma estátua inerte e sem consciência. A estátua possui os mesmos PV da criatura e redução de dano 8; se for quebrada, a criatura morrerá. Requer 4º círculo."
+     },
+     {
+      "pm": 9,
+      "texto": "como acima, mas com duração permanente. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 201,
+   "pdf_page": 207,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.poeira_da_podridao",
+   "valor": {
+    "nome": "Poeira da Podridão",
+    "tipo": "divina",
+    "escola": "Necromancia",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Área",
+    "alvo": "nuvem com 6m de raio",
+    "duracao": "cena",
+    "resistencia": "Fortitude (veja texto)",
+    "texto": "Você manifesta uma nuvem de poeira carregada de energia negativa, que apodrece lentamente as criaturas na área. Ao lançar a magia, e no início de seus turnos, criaturas na área sofrem 2d8+8 pontos de dano de trevas (Fortitude reduz à metade). Alvos que falharem no teste não podem recuperar PV por uma rodada.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +1d8+4."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 201,
+   "pdf_page": 207,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.potencia_divina",
+   "valor": {
+    "nome": "Potência Divina",
+    "tipo": "divina",
+    "escola": "Transmutação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Você canaliza o poder de sua divindade. Você aumenta uma categoria de tamanho (seu equipamento muda de acordo) e recebe Força +4 e RD 10. Você não pode lançar magias enquanto estiver sob efeito de Potência Divina.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o bônus de Força em +1."
+     },
+     {
+      "pm": 5,
+      "texto": "aumenta a RD em +5."
+     },
+     {
+      "pm": 2,
+      "texto": "muda o alcance para toque e o alvo para 1 criatura. A magia falha se você e o alvo não forem devotos da mesma divindade."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 201,
+   "pdf_page": 207,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.protecao_contra_magia",
+   "valor": {
+    "nome": "Proteção contra Magia",
+    "tipo": "divina",
+    "escola": "Abjuração",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você protege o alvo contra efeitos mágicos nocivos. O alvo recebe +5 em testes de resistência contra magias.",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda o bônus para +10. Requer 4º círculo."
+     },
+     {
+      "pm": 4,
+      "texto": "em vez do normal, o alvo fica imune a uma escola de magia a sua escolha. Requer 4º Círculo."
+     },
+     {
+      "pm": 9,
+      "texto": "em vez do normal, o alvo fica imune a duas escolas de magia a sua escolha. Requer 5º Círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 202,
+   "pdf_page": 208,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.selo_de_mana",
+   "valor": {
+    "nome": "Selo de Mana",
+    "tipo": "universal",
+    "escola": "Encantamento",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "Vontade parcial",
+    "texto": "Seu toque manifesta um selo mágico na pele do alvo, que atrapalha o fluxo de mana. Pela duração da magia, sempre que o alvo realizar qualquer ação que gaste PM, deve fazer um teste de Vontade; se passar, faz a ação normalmente. Se falhar, a ação não tem efeito (mas os PM são gastos mesmo assim).",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda o alcance para curto e o alvo para criaturas escolhidas dentro do alcance. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 205,
+   "pdf_page": 211,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.servo_divino",
+   "valor": {
+    "nome": "Servo Divino",
+    "tipo": "divina",
+    "escola": "Convocação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Efeito",
+    "alvo": "criatura conjurada",
+    "duracao": "cena ou até ser descarregada",
+    "resistencia": "nenhuma",
+    "texto": "Magia 205 Você pede a sua divindade que envie um espírito para ajudá-lo. Esse espírito realiza uma tarefa a sua escolha que possa ser cumprida em até uma hora — desde algo simples como “use suas asas para nos levar até o topo da montanha” até algo complexo como “escolte esses camponeses até o castelo”. A magia é descarregada quando a criatura cumpre a tarefa, retornando a seu plano natal. O tipo de criatura é escolhido pelo mestre, de acordo com as necessidades da tarefa. Componente material: um pagamento de T$ 100 ao espírito. A forma de pagamento varia — doações a um templo, um item mágico ou mesmo dinheiro.",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda a duração para um dia ou até ser descarregada. O espírito realiza uma tarefa a sua escolha que exija até um dia. O custo do pagamento aumenta para T$ 500. O resto segue normal."
+     },
+     {
+      "pm": 9,
+      "texto": "muda a duração para 1 semana ou até ser descarregada. O espírito realiza uma tarefa que exija até uma semana. O custo do pagamento aumenta para T$ 1.000. O resto segue normal."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 205,
+   "pdf_page": 211,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.servo_morto_vivo",
+   "valor": {
+    "nome": "Servo Morto-Vivo",
+    "tipo": "universal",
+    "escola": "Necromancia",
+    "circulo": 3,
+    "execucao": "completa",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 cadáver",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia transforma o cadáver de um humanoide, animal ou monstro em um esqueleto ou zumbi (conforme o estado de conservação do corpo). O morto-vivo então obedece a todos os seus comandos, mesmo suicidas. Se quiser que o morto-vivo o acompanhe, ele funciona como um parceiro iniciante, de um tipo a sua escolha entre ajudante, atirador, combatente, fortão, guardião ou montaria. Uma vez por rodada, quando sofre dano, você pode sacrificar um servo morto-vivo e evitar esse dano. O servo é destruído no processo e não pode ser reanimado Componente material: um ônix negro (T$ 100), inserido na boca ou olho do cadáver.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "muda o componente material para pó de ônix negro (T$ 500). Em vez de um zumbi ou esqueleto, cria um carniçal. Ele pode funcionar como um parceiro veterano, escolhido entre ajudante, atirador, combatente, fortão ou guardião. O resto segue normal."
+     },
+     {
+      "pm": 3,
+      "texto": "muda o componente material para pó de ônix negro (T$ 500). Em vez de um zumbi ou esqueleto, cria uma sombra. Ela pode funcionar como um parceiro veterano, escolhido entre assassino, combatente ou perseguidor. O restante da magia segue normal."
+     },
+     {
+      "pm": 7,
+      "texto": "muda o componente material para ferramentas de embalsamar (T$ 1.000). Em vez de um zumbi ou esqueleto, cria uma múmia. Ela pode funcionar como um parceiro mestre, escolhido entre ajudante, destruidor, guardião ou médico. O restante da magia segue normal. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 206,
+   "pdf_page": 212,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.sopro_da_salvacao",
+   "valor": {
+    "nome": "Sopro da Salvação",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 3,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Área",
+    "alvo": "cone de 9m",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Você enche seus pulmões de luz e energia positiva e sopra um cone de poeira reluzente. O sopro afeta apenas seus aliados na área, curando 2d8+4 pontos de vida e removendo uma das seguintes condições de todos os alvos: abalado, atordoado, apavorado, alquebrado, cego, confuso, debilitado, enfeitiçado, enjoado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, paralisado, pasmo e surdo.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta a cura em +1d8+2."
+     },
+     {
+      "pm": 4,
+      "texto": "além do normal, se um aliado estiver com PV negativos, seus PV são levados a 0 e então a cura é aplicada."
+     },
+     {
+      "pm": 4,
+      "texto": "remove todas as condições listadas, em vez de apenas uma."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 207,
+   "pdf_page": 213,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.viagem_arborea",
+   "valor": {
+    "nome": "Viagem Arbórea",
+    "tipo": "divina",
+    "escola": "Convocação",
+    "circulo": 3,
+    "execucao": "completa",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Como parte da execução, você entra em uma árvore adjacente que seja maior do que você. Você pode permanecer dentro da árvore, percebendo os arredores de forma normal (mas sem poder fazer ações). Você pode gastar uma ação de movimento para sair dessa árvore, ou de qualquer outra dentro de 1km. Se estiver dentro de uma árvore que seja destruída, a magia termina e você sofre 10d6 pontos de dano de impacto. Enquanto a magia durar você pode gastar uma ação de movimento e 1 PM para entrar em outras árvores.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda o alcance para toque, o alvo para até cinco criaturas e a duração para instantânea. Os alvos entram em uma planta (de tamanho Médio ou maior) e saem em outra planta do mesmo tamanho a até 100km de distância, especificada em direção e distância aproximadas (como “50km ao norte”)."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 210,
+   "pdf_page": 216,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.videncia",
+   "valor": {
+    "nome": "Vidência",
+    "tipo": "universal",
+    "escola": "Adivinhação",
+    "circulo": 3,
+    "execucao": "completa",
+    "alcance": "ilimitado",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "sustentada",
+    "resistencia": "Vontade anula",
+    "texto": "Através de uma superfície reflexiva (bacia de água benta para clérigos, lago para druidas, bola de cristal para magos, espelho para feiticeiros etc.) você pode ver e ouvir uma criatura escolhida e seus arredores (cerca de 6m em qualquer direção), mesmo que ela se mova. O alvo pode estar a qualquer distância, mas se passar em um teste de Vontade, a magia falha. A vítima recebe bônus ou penalidades em seu teste de resistência, dependendo do conhecimento que você tiver dela. • Não conhece o alvo: +10. • Ouviu falar do alvo: +5. • O alvo está em outro plano ou mundo: +5. • Já encontrou o alvo pessoalmente: +0. • Tem uma pintura, escultura ou outra representação do alvo: –2. • Conhece bem o alvo: –5. • Tem um pertence pessoal ou peça de roupa do alvo: –5. • Tem uma parte do corpo do alvo (unhas, cabelos...): –10.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 211,
+   "pdf_page": 217,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.circulo_da_restauracao",
+   "valor": {
+    "nome": "Círculo da Restauração",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 3m de raio",
+    "duracao": "5 rodadas",
+    "resistencia": "nenhuma",
+    "texto": "Você evoca um círculo de luz que emana uma energia poderosa. Qualquer criatura viva que termine o turno dentro do círculo recupera 3d8+3 PV e 1 PM. Mortos-vivos e criaturas que sofrem dano por luz perdem PV e PM na mesma quantidade. Uma criatura pode recuperar no máximo 5 PM por dia com esta magia.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta a regeneração de PV em 1d8+1."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 184,
+   "pdf_page": 190,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.colera_de_azgher",
+   "valor": {
+    "nome": "Cólera de Azgher",
+    "tipo": "divina",
+    "escola": "evocação",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 6m de raio",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Resistência: Reflexos parcial. Você cria um fulgor dourado e intenso. Criaturas na área ficam cegas por 1d4 rodadas e em chamas, e sofrem 10d6 pontos de dano de fogo (mortos-vivos sofrem 10d8 pontos de dano). Uma criatura que passe no teste de resistência não fica cega nem em chamas e sofre metade do dano.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +2d6 (+2d8 contra mortos-vivos)."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta a área em +6m de raio."
+     },
+     {
+      "pm": 5,
+      "texto": "a luz purificadora do Deus-Sol dissipa todas as magias de necromancia ativas na área. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 184,
+   "pdf_page": 190,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.conceder_milagre",
+   "valor": {
+    "nome": "Conceder Milagre",
+    "tipo": "divina",
+    "escola": "Encantamento",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "permanente até ser descarregada",
+    "resistencia": "nenhuma",
+    "texto": "Você transfere um pouco de seu poder divino a outra criatura. Escolha uma magia de até 2º círculo que você conheça; o alvo pode lançar essa magia uma vez, sem pagar o custo dela em PM (aprimoramentos podem ser usados, mas o alvo deve gastar seus próprios PM). Você sofre uma penalidade de –3 PM até que o alvo lance a magia.",
+    "aprimoramentos": [
+     {
+      "pm": 4,
+      "texto": "muda o círculo da magia concedida para 3º e a penalidade de PM para –6."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 184,
+   "pdf_page": 190,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.controlar_o_clima",
+   "valor": {
+    "nome": "Controlar o Clima",
+    "tipo": "divina",
+    "escola": "Transmutação",
+    "circulo": 4,
+    "execucao": "completa",
+    "alcance": "2km",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 2km de raio",
+    "duracao": "4d12 horas",
+    "resistencia": "nenhuma",
+    "texto": "Você muda o clima da área onde se encontra, podendo criar qualquer condição climática: chuva, neve, ventos, névoas... Veja o Capítulo 6: O Mestre para os efeitos do clima. +1 PM (Apenas Druidas): muda o raio da área para 3km e duração para 1d4 dias.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 187,
+   "pdf_page": 193,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.cupula_de_repulsao",
+   "valor": {
+    "nome": "Cúpula de Repulsão",
+    "tipo": "divina",
+    "escola": "Abjuração",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "sustentada",
+    "resistencia": "Vontade anula",
+    "texto": "Uma cúpula de energia invisível o cerca, impedindo a aproximação de certas criaturas. Escolha um tipo de criatura (animais, espíritos, monstros...) ou uma raça de humanoides (elfos, goblins, minotauros..). Criaturas do grupo escolhido que tentem se aproximar a menos de 3m de você (ou seja, que tentem ficar adjacentes a você) devem fazer um teste de Vontade. Se falharem, não conseguem, gastam a ação e só podem tentar novamente na rodada seguinte. Isso impede ataques corpo a corpo, mas não ataques ou outros efeitos à distância. Se você tentar se aproximar além do limite de 3m, rompe a cúpula e a magia é dissipada.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "a cúpula impede criaturas de se aproximarem a menos de 4,5m de você (ou seja, deve haver dois quadrados entre você e as criaturas)."
+     },
+     {
+      "pm": 5,
+      "texto": "além do normal, criaturas afetadas também precisam fazer o teste de resistência se fizerem um ataque ou efeito à distância você. Se falharem, o efeito é desviado pela cúpula. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 189,
+   "pdf_page": 195,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.guardiao_divino",
+   "valor": {
+    "nome": "Guardião Divino",
+    "tipo": "divina",
+    "escola": "Convocação",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Efeito",
+    "alvo": "elemental de luz invocado",
+    "duracao": "cena ou até ser descarregado",
+    "resistencia": "nenhuma",
+    "texto": "A magia invoca um elemental Pequeno, com a forma de um orbe feito de luz divina. A criatura é incorpórea, imune a dano e ilumina como uma tocha. O elemental tem 100 pontos de luz. Uma vez por rodada, durante o seu turno, o elemental pode se movimentar (deslocamento de voo 18m) e gastar quantos pontos de luz quiser para curar dano ou condições de criaturas em alcance curto, à taxa de 1 PV por 1 ponto de luz ou uma condição por 3 pontos de luz (entre abalado, apavorado, alquebrado, atordoado, cego, confuso, debilitado, enjoado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, ofuscado, pasmo, sangrando, surdo ou vulnerável). A magia é encerrada quando o elemental fica sem pontos de luz.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 194,
+   "pdf_page": 200,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.libertacao",
+   "valor": {
+    "nome": "Libertação",
+    "tipo": "universal",
+    "escola": "abjuração",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "O alvo fica imune a efeitos de movimento e ignora qualquer efeito que impeça ou restrinja seu deslocamento. Por fim, pode usar habilidades que exigem liberdade de movimentos mesmo se estiver usando armadura ou escudo.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "além do normal, o alvo pode caminhar sobre a água ou outros líquidos com seu deslocamento normal. Entretanto, isso não protege contra qualquer efeito que o líquido possa causar (o alvo pode andar sobre lava, mas ainda vai sofrer dano)."
+     },
+     {
+      "pm": 2,
+      "texto": "além do normal, o alvo pode escolher 20 em todos os testes de Atletismo."
+     },
+     {
+      "pm": 2,
+      "texto": "além do normal, o alvo pode escolher 20 em todos os testes de Acrobacia e pode fazer todas as manobras desta perícia mesmo sem treinamento."
+     },
+     {
+      "pm": 5,
+      "texto": "muda o alvo para até 5 criaturas."
+     },
+     {
+      "pm": 5,
+      "texto": "pode dissipar Aprisionamento."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 196,
+   "pdf_page": 202,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.ligacao_sombria",
+   "valor": {
+    "nome": "Ligação Sombria",
+    "tipo": "divina",
+    "escola": "Necromancia",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "longo",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "1 dia",
+    "resistencia": "Fortitude anula",
+    "texto": "Cria uma conexão entre seu corpo e o da criatura alvo, deixando uma marca idêntica na pele de ambos. Enquanto a magia durar, sempre que você sofrer qualquer dano ou condição, o alvo desta magia deve fazer um teste de Fortitude; se falhar, sofre o mesmo dano que você ou adquire a mesma condição. A magia termina se o alvo chegar a 0 pontos de vida.",
+    "aprimoramentos": [
+     {
+      "pm": 5,
+      "texto": "a magia não termina se o alvo chegar a 0 PV (o que significa que dano causado por essa magia pode matá-lo)."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 196,
+   "pdf_page": 202,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.manto_do_cruzado",
+   "valor": {
+    "nome": "Manto do Cruzado",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Você invoca o poder de sua divindade na forma de um manto de energia que reveste seu corpo. Esta magia tem duas versões. Você escolhe qual versão pode lançar quando aprende esta magia. Ela não pode ser mudada. Manto de Luz: um manto dourado e luminoso. No início de cada um de seus turnos, você e todos os seus aliados em alcance curto recuperam 2d8 PV. Você recebe imunidade a dano de trevas e seus ataques corpo a corpo causam +2d8 pontos de dano de luz. Manto de Trevas: um manto negro como a noite. No início de cada um de seus turnos, todos os inimigos em alcance curto sofrem 4d8 pontos de dano de trevas. Você cura metade de todo o dano causado pela magia.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 197,
+   "pdf_page": 203,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.muralha_de_ossos",
+   "valor": {
+    "nome": "Muralha de Ossos",
+    "tipo": "universal",
+    "escola": "Necromancia",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Efeito",
+    "alvo": "muro de ossos",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Uma parede de ossos se eleva da terra. A parede tem 15m de comprimento, 9m de altura e 1,5m de espessura. Ela pode ter qualquer forma — não precisa ser uma linha reta —, mas sua base precisa estar sempre tocando o solo. Quando a parede surge, criaturas na área ocupada ou adjacentes sofrem 4d8 pontos de dano de corte e precisam fazer um teste de Reflexos para não ficarem presas no emaranhado de ossos. Uma criatura presa dessa maneira fica agarrada, e pode gastar uma ação padrão para fazer um teste de Atletismo para se soltar. Se passar no teste, sai da muralha para um dos lados adjacentes. Se falhar, sofre 4d8 pontos de dano de corte. Magia 199 É possível destruir o muro para atravessá-lo ou libertar uma criatura agarrada. Cada trecho de 3m do muro tem Defesa 8, 40 PV e redução de corte, frio e perfuração 10. Também é possível escalar a parede. Isso exige um teste de Atletismo e causa 4d8 pontos de dano de corte para cada 3m escalados.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "aumenta o comprimento em +15m e a altura em +3m."
+     },
+     {
+      "pm": 5,
+      "texto": "o muro é feito de uma massa de esqueletos animados. Sempre que uma criatura iniciar seu turno adjacente ou escalando a muralha, deve fazer um teste de Reflexos. Se falhar fica agarrada, sofrendo os efeitos normais de estar agarrada pela magia."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 199,
+   "pdf_page": 205,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.premonicao",
+   "valor": {
+    "nome": "Premonição",
+    "tipo": "divina",
+    "escola": "Adivinhação",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Vislumbres do futuro permitem que você reavalie suas ações. Uma vez por rodada, você pode rolar novamente um teste recém realizado, mas deve aceitar o resultado da nova rolagem.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "muda a execução para reação, o alcance para curto, o alvo para 1 criatura e a duração para instantânea. Esta magia só pode ser usada em uma criatura que tenha acabado de fazer um teste. Obriga a criatura a fazer uma nova rolagem de dados e aceitar o novo resultado, seja ele um sucesso ou falha. Criaturas involuntárias têm direito a um teste de Vontade para negar o efeito."
+     },
+     {
+      "pm": 10,
+      "texto": "muda a duração para um dia."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 201,
+   "pdf_page": 207,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.terremoto",
+   "valor": {
+    "nome": "Terremoto",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 4,
+    "execucao": "padrão",
+    "alcance": "longo",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 30m de raio",
+    "duracao": "1 rodada",
+    "resistencia": "veja texto",
+    "texto": "Esta magia cria um tremor de terra que rasga o solo. O terremoto dura uma rodada, durante a qual criaturas sobre o solo ficam atordoadas (apenas uma vez por cena). Barreiras físicas não interrompem a área de Terremoto. O efeito exato depende do terreno. Caverna ou subterrâneo: a magia derruba o teto, causando 12d6 pontos de dano de impacto e agarrando todas as criaturas na área. Um teste de Reflexos reduz o dano à metade e evita a condição. Construção: todas as estruturas na área sofrem 200 pontos de dano de impacto, o suficiente para derrubar construções de madeira ou alvenaria simples, mas não de alvenaria reforçada. Criaturas em uma construção que desmorone sofrem o mesmo efeito de criaturas em uma caverna (veja acima). Espaço aberto: fendas se abrem no chão. Cada criatura na área precisa rolar um dado; em um resultado ímpar, uma fenda se abre sob ela e ela precisa fazer um teste de Reflexos; se falhar, cai na fenda. A criatura pode escapar gastando uma ação completa e passando em um teste de Atletismo. No início do seu próximo turno as fendas se fecham, matando todos que estejam dentro delas. Penhasco: o penhasco racha, criando um desmoronamento que percorre uma distância horizontal igual à distância da queda. Por exemplo, um penhasco com 30m de altura desmorona em uma área de 30m de comprimento além da base. Qualquer criatura no caminho sofre 12d6 pontos de dano de impacto e fica agarrada. Um teste de Reflexos reduz o dano à metade e evita ficar agarrado. Rio, lago ou pântano: fissuras se abrem sob a água, drenando-a e formando um lamaçal. Criaturas na área precisam fazer um teste de Reflexos para não afundarem na lama e ficarem agarradas. No início do seu próximo turno as fissuras se fecham, possivelmente afogando as criaturas que ficaram agarradas. Criaturas agarradas (efeito possível de caverna, construção, penhasco e rio, lago ou pântano) sofrem 1d6 pontos de dano por rodada até serem libertadas, o que exige uma ação completa e um teste de Atletismo (por parte da própria criatura ou de um aliado adjacente).",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 209,
+   "pdf_page": 215,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.viagem_planar",
+   "valor": {
+    "nome": "Viagem Planar",
+    "tipo": "universal",
+    "escola": "Convocação",
+    "circulo": 4,
+    "execucao": "completa",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "pessoal",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Você viaja instantaneamente para outro plano da Criação. Lá, você chega de 10 a 1.000km do destino pretendido (role 1d100 e multiplique por 10km). Componente material: um bastão de metal precioso em forma de forquilha (no valor de T$ 1.000). O tipo de metal determina para qual plano de existência você será enviado. Os metais que levam a dimensões específicas podem ser difíceis de encontrar, de acordo com o mestre.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda o alvo para até cinco criaturas voluntárias que você esteja tocando."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 211,
+   "pdf_page": 217,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.visao_da_verdade",
+   "valor": {
+    "nome": "Visão da Verdade",
+    "tipo": "universal",
+    "escola": "Adivinhação",
+    "circulo": 4,
+    "execucao": "movimento",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você enxerga a forma real das coisas. Você pode ver através de camuflagem e escuridão (normais e mágicas), assim como efeitos de ilusão e transmutação (enxergando a verdade como formas translúcidas ou sobrepostas).",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda o alcance para toque e o alvo para 1 criatura."
+     },
+     {
+      "pm": 1,
+      "texto": "além do normal, o alvo fica com sentidos apurados; ele recebe +10 em todos os testes de Percepção."
+     },
+     {
+      "pm": 2,
+      "texto": "além do normal, o alvo escuta falsidades; ele recebe +10 em todos os testes de Intuição."
+     },
+     {
+      "pm": 4,
+      "texto": "além do normal, o alvo enxerga através de paredes e barreiras com 30cm de espessura ou menos (as paredes e barreiras parecem translúcidas)."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 211,
+   "pdf_page": 217,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.aura_divina",
+   "valor": {
+    "nome": "Aura Divina",
+    "tipo": "divina",
+    "escola": "Abjuração",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 9m de raio",
+    "duracao": "cena",
+    "resistencia": "Vontade parcial",
+    "texto": "Você se torna um conduíte da energia de sua divindade, emanando uma aura brilhante. Você e aliados devotos da mesma divindade ficam imunes a encantamento e recebem +10 na Defesa e em testes de resistência. Aliados não devotos da mesma divindade recebem +5 na Defesa e em testes de resistência. Além disso, inimigos que entrem na área devem fazer um teste de Vontade; em caso de falha, recebem uma condição a sua escolha entre esmorecido, debilitado ou lento até o fim da cena. O teste deve ser refeito cada vez que a criatura entrar novamente na área.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta os bônus na Defesa e em testes de resistência em +1."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 182,
+   "pdf_page": 188,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.buraco_negro",
+   "valor": {
+    "nome": "Buraco Negro",
+    "tipo": "universal",
+    "escola": "Convocação",
+    "circulo": 5,
+    "execucao": "completa",
+    "alcance": "longo",
+    "alvo_tipo": "Efeito",
+    "alvo": "buraco negro",
+    "duracao": "3 rodadas",
+    "resistencia": "Fortitude parcial",
+    "texto": "Esta magia cria um vácuo capaz de sugar tudo nas proximidades. Escolha um espaço desocupado para o buraco negro. No início de cada um de seus três turnos seguintes, todas as criaturas a até alcance longo do buraco negro, incluindo você, devem fazer um teste de Fortitude. Em caso de falha, ficam caídas e são puxadas 30m na direção do buraco. Objetos soltos também são puxados. Criaturas podem gastar uma ação de movimento para se segurar em algum objeto fixo, recebendo +2 em seus testes de resistência. Criaturas e objetos que iniciem seu turno no espaço do buraco negro devem gastar uma ação de movimento e fazer um teste de Fortitude. Se passarem, podem escapar se arrastando (deslocamento de 1,5m) para longe dele. Se falharem, perdem a ação (mas podem gastar outra para tentar novamente). Se terminarem seu turno no espaço do buraco negro, são sugadas, desaparecendo para sempre. Não se conhece o destino das coisas sugadas pelo buraco negro. Alguns estudiosos sugerem que são enviadas para outros mundos — provavelmente Sombria, reino da deusa Tenebra.",
+    "aprimoramentos": [
+     {
+      "pm": 5,
+      "texto": "muda o efeito para que você não seja afetado."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 182,
+   "pdf_page": 188,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.furia_do_panteao",
+   "valor": {
+    "nome": "Fúria do Panteão",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 5,
+    "execucao": "completa",
+    "alcance": "longo",
+    "alvo_tipo": "Área",
+    "alvo": "cubo de 90m",
+    "duracao": "sustentada",
+    "resistencia": "veja texto",
+    "texto": "Você cria uma nuvem de tempestade violenta. Os ventos tornam ataques à distância impossíveis e fazem a área contar como condição terrível para lançar magia. Além disso, inimigos na área têm a visibilidade reduzida (como a magia Névoa). Uma vez por turno, você pode gastar uma ação de movimento para gerar um dos efeitos a seguir. Nevasca. Inimigos na área sofrem 10d6 pontos de dano de frio (Fortitude reduz à metade). A área fica coberta de neve, virando terreno difícil até o fim da cena ou até você usar siroco. Raios. Até 6 inimigos a sua escolha na área sofrem 10d8 pontos de dano de eletricidade (Reflexos reduz à metade). Siroco. Transforma a chuva em uma tempestade de areia escaldante. Inimigos na área sofrem 10d6 pontos de dano (metade corte, metade fogo) e ficam sangrando (Fortitude reduz o dano à metade e evita a condição). Trovões. Inimigos sofrem 10d6 pontos de dano de impacto e ficam desprevenidos por uma rodada (Fortitude reduz o dano à metade e evita a condição). Globo da verdade de gwen divina 2 (adivinhação) Execução: padrão; Alcance: curto; Efeito: 1 globo; Duração: cena. Cria um globo flutuante e intangível, com 50cm de diâmetro. O globo mostra uma cena vista até uma semana atrás por você ou por uma criatura que você toque ao lançar a magia (mediante uma pergunta; a criatura pode fazer um teste de Vontade para anular o efeito), permitindo que outras pessoas a vejam.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "o globo mostra uma cena vista até um mês atrás."
+     },
+     {
+      "pm": 2,
+      "texto": "como acima, até um ano atrás."
+     },
+     {
+      "pm": 2,
+      "texto": "ao lançar a magia, você pode tocar um cadáver. O globo mostra a última cena vista por essa criatura."
+     },
+     {
+      "pm": 4,
+      "texto": "muda o alcance para longo e o efeito para 10 globos. Todos mostram a mesma cena."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 194,
+   "pdf_page": 200,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.intervencao_divina",
+   "valor": {
+    "nome": "Intervenção Divina",
+    "tipo": "divina",
+    "escola": "Convocação",
+    "circulo": 5,
+    "execucao": "completa",
+    "alcance": "veja texto",
+    "alvo_tipo": "Alvo",
+    "alvo": "veja texto",
+    "duracao": "veja texto",
+    "resistencia": "veja texto",
+    "texto": "Você pede a sua divindade para interceder diretamente. Você pode: • Curar todos os PV e condições de até 10 criaturas em alcance longo (este efeito cura mortos-vivos, em vez de causar dano). • Dissipar os efeitos de qualquer magia de 4º círculo ou menor. Você pode implorar por algo ainda mais poderoso. Nesse caso, a magia requer o sacrifício de 2 PM e pode fazer coisas como: • Criar um item mundano de até T$ 30.000. • Duplicar os efeitos de qualquer magia de até 4º círculo. Caso a magia precise de um componente material para ser lançada, ainda é necessário providenciar o componente. • Proteger uma cidade de um desastre, como uma erupção vulcânica, enchente ou terremoto. • Ressuscitar uma criatura em alcance longo que tenha morrido há até uma rodada. A criatura acorda com 1 PV. • Qualquer outra coisa que o mestre autorize, conforme os desejos e objetivos da divindade do conjurador.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 195,
+   "pdf_page": 201,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.invulnerabilidade",
+   "valor": {
+    "nome": "Invulnerabilidade",
+    "tipo": "universal",
+    "escola": "Abjuração",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia cria uma barreira mágica impenetrável que protege você contra efeitos nocivos mentais ou físicos, a sua escolha. Proteção mental: você fica imune às condições abalado, alquebrado, apavorado, atordoado, confuso, esmorecido, Magia 195 fascinado, frustrado e pasmo, além de efeitos de encantamento e ilusão. Proteção física: você fica imune às condições atordoado, cego, debilitado, enjoado, envenenado, exausto, fatigado, fraco, lento, ofuscado e paralisado, além de acertos críticos, ataques furtivos e doenças.",
+    "aprimoramentos": [
+     {
+      "pm": 5,
+      "texto": "muda o alcance para curto e o alvo para 1 criatura."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 195,
+   "pdf_page": 201,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.lagrimas_de_wynna",
+   "valor": {
+    "nome": "Lágrimas de Wynna",
+    "tipo": "divina",
+    "escola": "abjuração",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "Vontade parcial",
+    "texto": "Se falhar no teste de resistência, o alvo perde a habilidade de lançar magias arcanas até o fim da cena. Se passar, perde a habilidade por uma rodada.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda a área para esfera com 6m de raio e o alvo para criaturas escolhidas."
+     },
+     {
+      "pm": 5,
+      "texto": "muda a execução para um dia e adiciona custo adicional (sacrifício de 1 PM). O alvo da magia precisa ser mantido em alcance curto do conjurador durante toda a execução. Ao término, faz um teste de Vontade. Se falhar, perde a habilidade de lançar magias arcanas permanentemente. Se passar, resiste, mas ainda pode ser alvo da magia no dia seguinte. Nenhum poder mortal é capaz de reverter essa perda. Os clérigos de Wynna dizem que a deusa chora cada vez que este ritual é realizado."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 196,
+   "pdf_page": 202,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.palavra_primordial",
+   "valor": {
+    "nome": "Palavra Primordial",
+    "tipo": "universal",
+    "escola": "Encantamento",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura com menos níveis que você",
+    "duracao": "instantânea ou veja texto",
+    "resistencia": "Vontade parcial",
+    "texto": "Você pronuncia uma palavra do idioma primordial da Criação, que causa um dos efeitos abaixo, a sua escolha. Atordoar: a criatura fica atordoada por 1d4+1 rodadas (apenas uma vez por cena). Se passar no teste de resistência, ou se já foi atordoada por esta magia, fica desprevenida por 1d4 rodadas. Cegar: a criatura fica cega. Se passar no teste de resistência, fica ofuscada por 1d4 rodadas. Matar: a criatura morre. Além do teste de Vontade, a criatura tem direito a um teste de Fortitude se tiver mais da metade de seus PV. Se passar em qualquer um deles, em vez de morrer perde 10d8 pontos de vida e fica sangrando.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 200,
+   "pdf_page": 206,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.projetar_consciencia",
+   "valor": {
+    "nome": "Projetar Consciência",
+    "tipo": "universal",
+    "escola": "Adivinhação",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "ilimitado (veja texto)",
+    "alvo_tipo": "Alvo",
+    "alvo": "local ou criatura conhecidos",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia faz com que sua consciência deixe seu corpo e se transporte instantaneamente para um local ou para perto de uma criatura. Se escolher um local, ele precisa ser conhecido por você. Se escolher uma criatura, você transporta sua consciência até onde ela estiver, desde que esteja no mesmo plano. Você adquire uma forma fantasmagórica invisível, mas pode se mostrar usando uma ação de movimento. Pode se mover em qualquer direção com deslocamento de voo 18m e, por ser incorpóreo, é capaz de atravessar objetos sólidos, mas fica limitado a se mover dentro dos limites do local, ou dentro de alcance curto da criatura alvo. Você pode ver e ouvir como se estivesse presente no local e pode falar mentalmente com qualquer criatura que possa ver, contanto que tenham um idioma em comum.",
+    "aprimoramentos": [
+     {
+      "pm": 10,
+      "texto": "além do normal, sua projeção é capaz de lançar magias que não precisem de componentes materiais e tenham duração diferente de sustentada. Sua forma fantasmagórica funciona como na magia Forma Etérea, sendo afetada por magias de abjuração e essência, mas as magias que ela lança podem afetar criaturas corpóreas."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 202,
+   "pdf_page": 208,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.reanimacao_impura",
+   "valor": {
+    "nome": "Reanimação Impura",
+    "tipo": "divina",
+    "escola": "Necromancia",
+    "circulo": 5,
+    "execucao": "completa",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você reanima uma criatura morta recentemente (dentro da mesma cena), trazendo sua alma de volta ao corpo de forma forçada. O tipo da criatura muda para morto-vivo, mas ela retém suas memórias e habilidades de quando estava viva, podendo inclusive lançar magias. A criatura pode pensar e falar livremente, mas obedece cegamente a seus comandos. Quando a cena termina, a criatura volta a ficar morta, mas muitos clérigos malignos usam meios para guardar e preservar o corpo de criaturas poderosas para serem reanimadas dessa forma quando necessário. Se for destruída, a criatura não pode ser reanimada novamente com esta magia.",
+    "aprimoramentos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 203,
+   "pdf_page": 209,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.roubar_a_alma",
+   "valor": {
+    "nome": "Roubar a Alma",
+    "tipo": "universal",
+    "escola": "Necromancia",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "permanente",
+    "resistencia": "Vontade parcial",
+    "texto": "Você rouba a alma da vítima, armazenando-a em um objeto. Se o alvo passar no teste de resistência, sente o impacto de sua alma ser puxada para fora do corpo e fica abalado por 1 rodada. Se falhar, seu corpo fica caído, inconsciente e inerte, enquanto sua alma é transportada para dentro do objeto. O corpo não envelhece nem se decompõe, permanecendo em estase. Ele pode ser atacado e destruído normalmente. O objeto escolhido deve custar T$ 1.000 por nível ou ND da criatura e não possuir uma alma presa ou se quebrará quando a magia for lançada (embora personagens não conheçam o conceito de “nível” dentro do mundo de jogo, podem ter noção do poder geral de uma criatura, estimando assim o valor do objeto). Se o objeto for destruído, a magia se esvai. Se o corpo ainda estiver disponível, a alma retorna para ele. Caso contrário, escapa para os Mundos dos Deuses. Custo adicional: sacrifício de 1 PM.",
+    "aprimoramentos": [
+     {
+      "pm": 5,
+      "texto": "o objeto que abriga a alma detém os mesmos PM totais que o alvo. Se estiver empunhando o objeto, você pode usar esses PM para pagar o custo de PM para lançar magias. O objeto recupera PM por dia como se o personagem estivesse em descanso normal."
+     },
+     {
+      "pm": 10,
+      "texto": "como uma reação ao lançar esta magia, você possui o corpo sem alma do alvo, como na magia Possessão (mesmo que não conheça a magia)."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 204,
+   "pdf_page": 210,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.segunda_chance",
+   "valor": {
+    "nome": "Segunda Chance",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Um brilho de luz, na forma de asas de fênix, emana do alvo. Ele recupera 200 pontos de vida e se cura de qualquer das seguintes condições: abalado, apavorado, alquebrado, atordoado, cego, confuso, debilitado, enjoado, envenenado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, ofuscado, paralisado, pasmo ou surdo.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta a cura em +20 PV."
+     },
+     {
+      "pm": 2,
+      "texto": "muda o alcance para curto e o alvo para até 5 criaturas."
+     },
+     {
+      "pm": 5,
+      "texto": "muda o alvo para uma criatura que tenha morrido há até uma rodada. Esta magia pode curá-la."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 205,
+   "pdf_page": 211,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.toque_da_morte",
+   "valor": {
+    "nome": "Toque da Morte",
+    "tipo": "universal",
+    "escola": "Necromancia",
+    "circulo": 5,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "veja texto",
+    "texto": "Sua mão exala energias letais. A criatura sofre 10d8+10 pontos de dano de trevas. Se estiver com menos da metade de seus PV, em vez disso deve fazer um teste de Fortitude. Se passar, sofre o dano normal. Se falhar, seus PV são reduzidos a –10.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda o alcance para curto. Em vez de tocar no alvo, você dispara um raio púrpura da ponta de seu dedo indicador."
+     },
+     {
+      "pm": 10,
+      "texto": "muda o alcance para curto e o alvo para inimigos no alcance. Em vez de tocar no alvo, você dispara raios púrpuras da ponta de seus dedos."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 209,
+   "pdf_page": 215,
+   "status": "VERIFICADA"
   }
  ]
 }
