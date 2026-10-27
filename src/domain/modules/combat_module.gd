@@ -233,6 +233,7 @@ func execute(cmd: GameCommand) -> Array:
 		"EndTurn":
 			var out: Array = []
 			_zonas_fim_de_turno("player", out)
+			_enxames_fim_de_turno("player", out)
 			out.append(fact("TURN_ENDED", {"actor": "player"}, ["player"]))
 			sim.next_turn()
 			out.append_array(_run_until_player())
@@ -525,6 +526,7 @@ func _run_until_player() -> Array:
 				out.append_array(end)
 				return out
 		_zonas_fim_de_turno(id, out)
+		_enxames_fim_de_turno(id, out)
 		out.append(fact("TURN_ENDED", {"actor": id}))
 		sim.next_turn()
 	push_warning("Combate: limite de iterações atingido")
@@ -1707,6 +1709,61 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Enxame de Pestes (divina 2): enxame Médio num quadrado em alcance médio, sustentado; não ocupa espaço. No fim dos
+## turnos do conjurador, 2d12 de corte em quem está no quadrado (Fortitude reduz à metade). Ação de movimento
+## ("mover_enxame") leva o enxame 12m. Aprimoramentos: +1d12 (repetível); criaturas maiores (Reflexos, 3d12 de corte,
+## impacto ou perfuração); +1 enxame (3º, repetível, em quadrados diferentes); criaturas elementais (Reflexos, 5d12 de
+## ácido, eletricidade, fogo ou frio, 4º).
+const DANO_ENXAME_MAIOR := ["corte", "impacto", "perfuracao"]
+const DANO_ENXAME_ELEMENTAL := ["acido", "eletricidade", "fogo", "frio"]
+
+
+func _enxame(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var base := 5 if apr.has(3) else (3 if apr.has(1) else 2)
+	var tipo := "corte"
+	if apr.has(3):
+		tipo = str(a.get("tipo_dano", "fogo"))
+	elif apr.has(1):
+		tipo = str(a.get("tipo_dano", "corte"))
+	var res := "reflexos" if apr.has(1) or apr.has(3) else "fortitude"
+	var quadrados: Array = a.get("tiles", [a.get("tile", sim.c(id).tile)])
+	for z in sim.zonas.duplicate(true):
+		if str(z.fonte) == "enxame_de_pestes" and str(z.dados.conjurador) == id:
+			sim.remove_zona(str(z.id))
+	for i in quadrados.size():
+		var q = quadrados[i]
+		var t: Vector2i = q if q is Vector2i else Vector2i(int(q[0]), int(q[1]))
+		sim.add_zona("enxame_%s_%d" % [id, i], [t], "enxame", -1, "enxame_de_pestes",
+			{"conjurador": id, "dados": "%dd12" % (base + apr.count(0)), "tipo_dano": tipo, "resistencia": res, "cd": spell_dc(sh, a)})
+	_iniciar_sustentada(id, "enxame_de_pestes", out)
+	out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "conjurar", "enxames": quadrados.size()}, [id]))
+	return out
+
+
+## Fim do turno do conjurador: cada enxame dele fere quem está no seu quadrado.
+func _enxames_fim_de_turno(id: String, facts: Array) -> void:
+	for z in sim.zonas.duplicate(true):
+		if str(z.fonte) != "enxame_de_pestes" or str(z.dados.conjurador) != id:
+			continue
+		for tg in _criaturas_vivas_em(z.tiles):
+			var T: CharacterSheet = sim.c(tg).sheet
+			var dano := _dados_energia(str(z.dados.dados), str(z.dados.tipo_dano), sim.c(tg).tile)
+			var passou := _resiste(tg, str(z.dados.resistencia), int(z.dados.cd), facts)
+			if passou:
+				dano = dano / 2
+			dano = _dano_por_tipo(T, str(z.dados.tipo_dano), dano)
+			var tags: Array = ["magia", str(z.dados.tipo_dano)]
+			if passou:
+				tags.append("resistiu")
+			tags.append_array(sim.apply_damage(tg, dano))
+			facts.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Enxame de Pestes", "d20": 0, "mod": 0, "mods": [], "total": 0,
+				"defense": int(z.dados.cd), "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [], "pv_after": T.pv, "special": false,
+				"ranged": true, "spell": true, "save": str(z.dados.resistencia), "saved": passou, "tags": tags}, [id, tg]))
+
+
 ## Miasma Mefítico (divina 2): nuvem de 6m de raio em alcance médio; 5d6 de ácido e enjoado por 1 rodada, Fortitude
 ## reduz à metade e evita o enjoo. Aprimoramentos: +1d6 (repetível); dano de trevas. Truque (pó de ônix, T$ 10): toque
 ## numa criatura com 0 PV ou menos; Fortitude anula — falhou, morre e o conjurador tem +2 na CD das magias por um dia;
@@ -2273,6 +2330,10 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			s.remove_efeito("magia.arma_espiritual")
 		"oracao":
 			sim.c(id).erase("oracao")
+		"enxame_de_pestes":
+			for z in sim.zonas.duplicate(true):
+				if str(z.fonte) == "enxame_de_pestes" and str(z.dados.conjurador) == id:
+					sim.remove_zona(str(z.id))
 		"controlar_fogo":
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
@@ -2596,6 +2657,13 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var r_dm := Checks.skill(sim.c(id).sheet, "misticismo", 15, world.rules, world.rng, "combat")
 			var auras_dm: Array = auras_na_cena(sim.c(id).tile, ALCANCE_CURTO_QUADRADOS, false) if r_dm.get("success", false) else []
 			out.append(fact("MAGIC_DETECTED", {"actor": id, "check": r_dm, "auras": auras_dm}, [id]))
+		"mover_enxame":
+			var para_e: Vector2i = a.tile
+			var zid_e := "enxame_%s_%d" % [id, int(a.get("enxame", 0))]
+			for z in sim.zonas:
+				if str(z.id) == zid_e:
+					z.tiles = [para_e]
+			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "mover", "tile": [para_e.x, para_e.y]}, [id]))
 		"resfriar":
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "esquentar":
@@ -2860,6 +2928,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_controlar_fogo(id, a))
 		"miasma_mefitico":
 			out.append_array(_miasma(id, a))
+		"enxame_de_pestes":
+			out.append_array(_enxame(id, a))
 		"augurio":
 			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
 			var magia_au = world.module("magia")

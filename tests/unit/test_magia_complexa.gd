@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3128,3 +3128,30 @@ func test_miasma_mefitico_nuvem_e_truque() -> void:
 	check(not v3.is_dead(), "passou: sobrevive")
 	m3[2].budget.std = 1
 	check(not GhostPlanner.validate_action(m3[2], "player", {"type": "cast", "spell": "miasma_mefitico", "target": "bandido_1", "truque": true}).ok, "imune ao truque por um dia")
+
+
+func test_enxame_de_pestes_fere_no_fim_do_turno_e_se_move() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b2 := _bandido(m, "bandido_2", -50)
+	check(_lanca(m, {"type": "cast", "spell": "enxame_de_pestes", "tile": Vector2i(32, 57)}).ok, "Enxame")
+	eq(str(sim.sustentadas.get("player", "")), "enxame_de_pestes", "sustentado")
+	m[1]._enxames_fim_de_turno("player", [])
+	var d := 999 - b2.pv
+	check(d >= 2 and d <= 24, "2d12 de corte (%d)" % d)
+	sim.budget.move = 1
+	var mv := {"type": "mover_enxame", "tile": Vector2i(27, 57)}
+	var v := GhostPlanner.validate_action(sim, "player", mv)
+	check(v.ok and v.kind == "movimento", "mover o enxame: ação de movimento")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "mover_enxame", "tile": Vector2i(10, 57)}).ok, "até 12m")
+	m[1]._execute_action("player", mv, v)
+	var b1 := _bandido(m, "bandido_1", -50)
+	m[1]._enxames_fim_de_turno("player", [])
+	check(b1.pv < 999, "agora fere quem está no novo quadrado")
+	m[1]._encerrar_sustentada("player", [])
+	check(not sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes"), "fim da sustentação: some")
+	var m2 := _cena_grupo(9)
+	check(not _lanca(m2, {"type": "cast", "spell": "enxame_de_pestes", "tiles": [Vector2i(32, 57), Vector2i(32, 57)], "aprimoramentos": [2]}).ok, "dois enxames não ocupam o mesmo espaço")
+	check(_lanca(m2, {"type": "cast", "spell": "enxame_de_pestes", "tiles": [Vector2i(32, 57), Vector2i(27, 57)], "aprimoramentos": [1, 2], "tipo_dano": "impacto"}).ok, "dois enxames maiores")
+	eq(m2[2].zonas.filter(func(z): return str(z.fonte) == "enxame_de_pestes").size(), 2, "dois enxames")
+	eq(str(m2[2].zonas.filter(func(z): return str(z.fonte) == "enxame_de_pestes")[0].dados.resistencia), "reflexos", "maiores: Reflexos")

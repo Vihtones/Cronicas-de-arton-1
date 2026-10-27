@@ -164,6 +164,19 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]
+			if sp_id == "enxame_de_pestes":
+				if apr.has(1) and apr.has(3): return {"ok": false, "reason": "escolha um tipo de enxame"}
+				if apr.has(1) and not ["corte", "impacto", "perfuracao"].has(str(a.get("tipo_dano", "corte"))): return {"ok": false, "reason": "dano de corte, impacto ou perfuração"}
+				if apr.has(3) and not ["acido", "eletricidade", "fogo", "frio"].has(str(a.get("tipo_dano", "fogo"))): return {"ok": false, "reason": "dano de ácido, eletricidade, fogo ou frio"}
+				var qs: Array = a.get("tiles", [a.get("tile", A.tile)])
+				if qs.size() != 1 + apr.count(2): return {"ok": false, "reason": "escolha %d quadrado(s)" % (1 + apr.count(2))}
+				var vistos: Array = []
+				for q in qs:
+					var tq2: Vector2i = q if q is Vector2i else Vector2i(int(q[0]), int(q[1]))
+					if vistos.has(tq2): return {"ok": false, "reason": "os enxames não ocupam o mesmo espaço"}
+					vistos.append(tq2)
+					if CombatSim.cheb(A.tile, tq2) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 20)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "miasma_mefitico":
 				if a.get("truque", false):
 					var TM2 := sim.c(a.get("target", ""))
@@ -434,6 +447,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "detectar magia exige ação completa"}
 			if not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Misticismo é somente treinada"}
 			return {"ok": true, "kind": "completa"}
+		"mover_enxame":
+			# Enxame de Pestes: ação de movimento, o enxame vai até 12m; não pode ocupar o quadrado de outro enxame seu.
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			var ze: Array = sim.zonas.filter(func(z): return str(z.id) == "enxame_%s_%d" % [actor, int(a.get("enxame", 0))])
+			if ze.is_empty(): return {"ok": false, "reason": "sem enxame"}
+			var para_e: Vector2i = a.get("tile", Vector2i(-1, -1))
+			if CombatSim.cheb(ze[0].tiles[0], para_e) > Area.quadrados(12.0): return {"ok": false, "reason": "o enxame anda até 12m"}
+			if sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes" and z != ze[0] and (z.tiles as Array).has(para_e)): return {"ok": false, "reason": "já há um enxame lá"}
+			return {"ok": true, "kind": "movimento"}
 		"resfriar":
 			# Controlar Fogo (Esquentar): ação completa para resfriar o objeto e cancelar o efeito.
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "resfriar exige ação completa"}
