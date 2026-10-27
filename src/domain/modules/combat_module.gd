@@ -1,5 +1,6 @@
 class_name CombatModule
 extends WorldModule
+const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 ## Combate tático híbrido (§9). Planejamento congelado no turno, fantasma sem
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
@@ -771,6 +772,8 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		if v.mods.any(func(m): return m[0] == "ataque poderoso"): extra += 5   # Ataque Poderoso (LB p.124)
 		extra += CombatSim.archer_bonus(A.sheet, bool(v.get("ranged", false)))   # Arqueiro (LB p.65)
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
+		if not bool(v.get("ranged", false)):
+			extra += ClassFeatures.furia_bonus(A.sheet)   # Fúria do bárbaro: +dano corpo a corpo
 		if T.damaged_round == sim.round_no and Array(A.sheet.habilidades).any(func(h): return str(h).begins_with("oportunista")):
 			extra += 2
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)

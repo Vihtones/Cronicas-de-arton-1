@@ -1148,7 +1148,7 @@ func _refresh_creation() -> void:
 	var cr := HBoxContainer.new()
 	cr.add_child(_row_label("Classe:"))
 	for c in CharacterBuilder.CLASSES:
-		cr.add_child(_button(("● " if _creation["class"] == c else "") + c.capitalize(), func(): _creation["class"] = c; _creation.preset = 0; _reset_picks(); _refresh_creation()))
+		cr.add_child(_button(("● " if _creation["class"] == c else "") + CharacterBuilder.CLASS_NAMES.get(c, c.capitalize()), func(): _creation["class"] = c; _creation.preset = 0; _reset_picks(); _refresh_creation()))
 	v.add_child(cr)
 	var pr := HBoxContainer.new()
 	pr.add_child(_row_label("Atributos:"))

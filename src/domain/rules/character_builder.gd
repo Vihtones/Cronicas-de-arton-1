@@ -14,9 +14,18 @@ const RACE_NAMES := {"humano": "Humano", "anao": "Anão", "dahllan": "Dahllan", 
 const FREE_ATTR_RACES := ["humano", "lefou", "osteon", "sereia"]
 ## Deformidade do lefou: +2 em duas perícias à escolha. Padrão provisório até haver tela de escolha.
 const LEFOU_DEFAULT := ["intimidacao", "sobrevivencia"]
-const CLASSES := ["guerreiro", "ladino", "arcanista"]
-const WEAPON_BY_CLASS := {"guerreiro": "espada_longa", "ladino": "espada_curta", "arcanista": "adaga"}
-const ARMOR_BY_CLASS := {"guerreiro": "couro_batido", "ladino": "couro_batido", "arcanista": ""}
+## Classes jogáveis na criação. Primeira leva: classes sem magia própria (bárbaro, paladino, nobre, bucaneiro,
+## cavaleiro, caçador, inventor) — o kit de equipamento é provisório, escolhido entre armas/armaduras já no catálogo.
+## Bardo, clérigo, druida e treinador ficam para a leva seguinte (exigem sistema de magia divina/bardo e mascotes).
+const CLASSES := ["guerreiro", "ladino", "arcanista", "barbaro", "paladino", "nobre", "bucaneiro", "cavaleiro", "cacador", "inventor"]
+const CLASS_NAMES := {"guerreiro": "Guerreiro", "ladino": "Ladino", "arcanista": "Arcanista", "barbaro": "Bárbaro",
+	"paladino": "Paladino", "nobre": "Nobre", "bucaneiro": "Bucaneiro", "cavaleiro": "Cavaleiro", "cacador": "Caçador", "inventor": "Inventor"}
+const WEAPON_BY_CLASS := {"guerreiro": "espada_longa", "ladino": "espada_curta", "arcanista": "adaga",
+	"barbaro": "machado_batalha", "paladino": "espada_longa", "nobre": "espada_curta", "bucaneiro": "espada_curta",
+	"cavaleiro": "espada_longa", "cacador": "arco_curto", "inventor": "funda"}
+const ARMOR_BY_CLASS := {"guerreiro": "couro_batido", "ladino": "couro_batido", "arcanista": "",
+	"barbaro": "gibao_peles", "paladino": "cota_malha", "nobre": "couro_batido", "bucaneiro": "couro_batido",
+	"cavaleiro": "cota_malha", "cacador": "couro_batido", "inventor": "couro_batido"}
 ## Perícias escolhidas por padrão (protótipo: sem tela de escolha individual ainda)
 const DEFAULT_CHOICES := {
 	"guerreiro": ["atletismo", "percepcao"],
@@ -30,9 +39,33 @@ const ARCANE_PATHS := ["bruxo", "feiticeiro", "mago"]
 
 ## Lista de perícias da classe (LB p.37, 65, 73).
 static func class_list(rules: RuleRegistry, p_class: String) -> Array:
-	if p_class == "guerreiro":
-		return rules.value("classe.guerreiro").lista
-	return rules.value("classe.%s.lista" % p_class, [])
+	var sub: Array = rules.value("classe.%s.lista" % p_class, [])   # ladino/arcanista: lista em sub-entrada
+	if not sub.is_empty():
+		return sub
+	return rules.value("classe." + p_class, {}).get("lista", [])   # demais: lista dentro da própria classe
+
+
+## Perícia fixa com alternativa ("luta|pontaria"): usa a primeira opção.
+static func fixed_skills(rules: RuleRegistry, p_class: String) -> Array:
+	var out: Array = []
+	for f in rules.value("classe." + p_class).pericias_fixas:
+		out.append(str(f).get_slice("|", 0))
+	return out
+
+
+## Perícias escolhidas quando o jogador não escolhe: as primeiras da lista da classe, sem repetir as fixas.
+static func _default_choices(rules: RuleRegistry, p_class: String) -> Array:
+	if DEFAULT_CHOICES.has(p_class):
+		return DEFAULT_CHOICES[p_class]
+	var fixed := fixed_skills(rules, p_class)
+	var need := int(rules.value("classe." + p_class).pericias_escolha)
+	var out: Array = []
+	for k in class_list(rules, p_class):
+		if out.size() >= need:
+			break
+		if not fixed.has(k) and not out.has(k):
+			out.append(k)
+	return out
 
 
 ## Quantas perícias livres a criação pede (LB p.114): da classe + Int (qualquer) + Versátil (humano, qualquer).
@@ -60,9 +93,7 @@ static func validate_skills(rules: RuleRegistry, p_class: String, p_race: String
 	var errs := PackedStringArray()
 	var slots := skill_slots(rules, p_class, p_race, attrs_final)
 	var lst := class_list(rules, p_class)
-	var fixed: Array = []
-	for f in rules.value("classe." + p_class).pericias_fixas:
-		fixed.append(str(f).get_slice("|", 0))
+	var fixed := fixed_skills(rules, p_class)
 	if class_picks.size() != slots.classe:
 		errs.append("escolha %d perícias da classe (tem %d)" % [slots.classe, class_picks.size()])
 	if free_picks.size() > slots.livres:
@@ -134,7 +165,7 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	s.pm = s.pm_max
 	for f in c.pericias_fixas:
 		s.trained.append(str(f).get_slice("|", 0))
-	for k in (class_picks if not class_picks.is_empty() else DEFAULT_CHOICES[p_class]):
+	for k in (class_picks if not class_picks.is_empty() else _default_choices(rules, p_class)):
 		if not s.trained.has(k):
 			s.trained.append(k)
 	for k in extra_trained:  # Versátil (humano) / Inteligência
@@ -227,4 +258,11 @@ static func presets(p_class: String) -> Array:
 		"guerreiro": return [{"for": 3, "des": 2, "con": 2, "int": 1, "sab": 1, "car": 0}, {"for": 4, "des": 1, "con": 2, "int": 0, "sab": 0, "car": 0}]
 		"ladino": return [{"for": 0, "des": 4, "con": 1, "int": 1, "sab": 1, "car": 0}, {"for": 1, "des": 3, "con": 1, "int": 2, "sab": 0, "car": 1}]
 		"arcanista": return [{"for": -1, "des": 2, "con": 1, "int": 4, "sab": 1, "car": 0}, {"for": 0, "des": 1, "con": 2, "int": 3, "sab": 1, "car": 0}]
+		"barbaro": return [{"for": 3, "des": 1, "con": 3, "int": 0, "sab": 1, "car": 0}, {"for": 3, "des": 0, "con": 3, "int": 0, "sab": 1, "car": 1}]
+		"paladino": return [{"for": 2, "des": 0, "con": 2, "int": 1, "sab": 1, "car": 3}, {"for": 1, "des": 1, "con": 2, "int": 1, "sab": 1, "car": 3}]
+		"nobre": return [{"for": 0, "des": 1, "con": 0, "int": 1, "sab": 1, "car": 4}, {"for": 1, "des": 1, "con": 1, "int": 2, "sab": 1, "car": 3}]
+		"bucaneiro": return [{"for": 2, "des": 3, "con": 2, "int": 1, "sab": 1, "car": 0}, {"for": 2, "des": 3, "con": 1, "int": 1, "sab": 1, "car": 1}]
+		"cavaleiro": return [{"for": 3, "des": 1, "con": 2, "int": 1, "sab": 1, "car": 1}, {"for": 3, "des": 0, "con": 2, "int": 1, "sab": 1, "car": 1}]
+		"cacador": return [{"for": 1, "des": 3, "con": 2, "int": 0, "sab": 2, "car": 0}, {"for": 1, "des": 3, "con": 1, "int": 1, "sab": 2, "car": 0}]
+		"inventor": return [{"for": 1, "des": 1, "con": 2, "int": 3, "sab": 1, "car": 0}, {"for": 0, "des": 1, "con": 2, "int": 3, "sab": 1, "car": 1}]
 	return []

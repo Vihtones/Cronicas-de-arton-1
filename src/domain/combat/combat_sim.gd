@@ -1,5 +1,6 @@
 class_name CombatSim
 extends RefCounted
+const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 ## Estado e regras de combate puros (LB cap. 5, p.230-239). Usado tanto pela
 ## execução real (com dados) quanto pelo GhostPlanner (clone, sem dados).
 
@@ -241,6 +242,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	# Combate Defensivo (LB p.125): ao agredir, -2 nos ataques e +5 na Defesa até o próximo turno.
 	if sheet.has_power("combate_defensivo") and str(toggles.get("combate_defensivo", "nunca")) == "sempre" and attacker == "player":
 		mods.append(["combate defensivo", -2])
+	if not ranged and ClassFeatures.furia_bonus(sheet) > 0: mods.append(["fúria", ClassFeatures.furia_bonus(sheet)])   # Fúria do bárbaro
 	if ranged and dist > reach: mods.append(["dobro do alcance", -5])
 	if ranged and engaged_in_melee(target): mods.append(["alvo em corpo a corpo", -5])
 	var total_mod := 0
