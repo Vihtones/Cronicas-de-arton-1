@@ -10,7 +10,7 @@ OUT = pathlib.Path(__file__).resolve().parent.parent / "data" / "dialogue" / "vo
 registro = {
     "guarda": "seco", "guarda aposentado": "idoso", "capitã da guarda": "seco", "alcaide": "seco", "ferreiro": "seco", "caçador": "seco",
     "taverneira": "caloroso", "cozinheiro": "caloroso", "clériga de Lena": "sereno", "mercadora": "caloroso", "mercadora viajante": "caloroso", "mensageiro": "seco",
-    "fiandeira": "caloroso", "pastora": "simples", "lavrador": "simples", "lavradora": "simples", "moleiro": "simples", "ajudante de moleiro": "jovem",
+    "fiandeira": "caloroso", "estalajadeira": "caloroso", "barqueiro": "seco", "vigia": "seco", "pastora": "simples", "lavrador": "simples", "lavradora": "simples", "moleiro": "simples", "ajudante de moleiro": "jovem",
     "criança": "jovem", "aprendiz": "jovem", "acólito": "jovem", "bêbado": "bebado",
 }
 
@@ -130,6 +130,9 @@ trabalho = {   # como vai o trabalho, por profissão
     "fiandeira": "Fio a fio, o dia passa. Tecer acalma a cabeça, ainda que o coração não aquiete.",
     "pastora": "Cuido do rebanho. Ovelhas são mais sinceras que gente.",
     "lavrador": "Plantar é fé. A gente joga a semente e reza.",
+    "estalajadeira": "Quem passa por Pedra Branca dorme aqui. E quem dorme aqui conta o que viu na estrada.",
+    "barqueiro": "O lago não tem pressa, e eu aprendi com ele.",
+    "vigia": "Da torre se vê a estrada inteira. O que se faz com isso é outra conversa.",
     "lavradora": "A terra dá quando a gente respeita. E cobra quando a gente esquece.",
     "moleiro": "O moinho gira e a vila come. Não me peça mais do que isso.",
     "ajudante de moleiro": "Ajudo no moinho. Meu pai diz que um dia vai ser meu. Eu ainda não sei.",
@@ -143,7 +146,7 @@ nota_profissao = {   # como os outros veem alguém por profissão
     "guarda": "faz a ronda", "guarda aposentado": "já foi guarda", "capitã da guarda": "comanda a guarda", "alcaide": "cuida das leis",
     "ferreiro": "trabalha o ferro", "caçador": "vive na mata", "taverneira": "toca a taverna", "cozinheiro": "cuida da cozinha",
     "clériga de Lena": "cuida dos fiéis e dos doentes", "mercadora": "negocia na vila", "mercadora viajante": "traz notícias de longe", "mensageiro": "leva recados entre as cidades",
-    "fiandeira": "trabalha com fios e tecidos", "pastora": "cuida do rebanho", "lavrador": "trabalha a terra", "lavradora": "trabalha a terra",
+    "fiandeira": "trabalha com fios e tecidos", "estalajadeira": "hospeda quem vem da estrada", "barqueiro": "conhece o lago palmo a palmo", "vigia": "vigia a estrada do alto da torre", "pastora": "cuida do rebanho", "lavrador": "trabalha a terra", "lavradora": "trabalha a terra",
     "moleiro": "toca o moinho", "ajudante de moleiro": "ajuda no moinho", "criança": "ainda é criança", "aprendiz": "está aprendendo o ofício",
     "acólito": "serve no templo", "bêbado": "bebe mais do que deveria",
 }
@@ -151,7 +154,7 @@ nota_profissao = {   # como os outros veem alguém por profissão
 nota_traco = {
     "teimoso": "teimoso como mula", "aflita": "anda aflita nesses dias", "curioso": "curioso demais para o próprio bem",
     "desconfia_de_estrangeiros": "não gosta de forasteiros, mas é justo", "observadora": "vê mais do que diz", "exige_provas": "só acredita com provas",
-    "memoria_longa": "tem memória de elefante", "recluso": "gosta de ficar sozinho", "traz_noticias": "sempre sabe das novidades", "mentiroso": "cuidado: nem tudo o que diz é verdade",
+    "memoria_longa": "tem memória de elefante", "recluso": "gosta de ficar sozinho", "fofoqueira": "adora uma novidade, e a espalha", "calado": "fala pouco e escuta muito", "traz_noticias": "sempre sabe das novidades", "mentiroso": "cuidado: nem tudo o que diz é verdade",
 }
 
 relacao = {

@@ -565,6 +565,154 @@
     "classe": "guerreiro",
     "preset": 1
    }
+  },
+  {
+   "id": "berta",
+   "name": "Berta Pontes",
+   "age": 46,
+   "profession": "estalajadeira",
+   "schedule": "estalajadeiro",
+   "home": "estalagem",
+   "work": "estalagem",
+   "family": "pontes",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "fofoqueira"
+   ],
+   "beliefs": {},
+   "gold": 45,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "caio",
+   "name": "Caio Pontes",
+   "age": 49,
+   "profession": "cozinheiro",
+   "schedule": "estalajadeiro",
+   "home": "estalagem",
+   "work": "estalagem",
+   "family": "pontes",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 20,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "tuco",
+   "name": "Tuco Pontes",
+   "age": 34,
+   "profession": "barqueiro",
+   "schedule": "barqueiro",
+   "home": "casa_barqueiro",
+   "work": "cais",
+   "family": "pontes",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "calado"
+   ],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "gunther",
+   "name": "Gunther Pontes",
+   "age": 62,
+   "profession": "lavrador",
+   "schedule": "lavrador_pb",
+   "home": "casa_barqueiro",
+   "work": "campos_pedrabranca",
+   "family": "pontes",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "marta",
+   "name": "Marta Brisa",
+   "age": 41,
+   "profession": "mercadora",
+   "schedule": "comerciante_pb",
+   "home": "entreposto",
+   "work": "entreposto",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "traz_noticias"
+   ],
+   "beliefs": {},
+   "gold": 70,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "lia",
+   "name": "Lia Vento",
+   "age": 26,
+   "profession": "vigia",
+   "schedule": "vigia_noite",
+   "home": "torre_vigia",
+   "work": "torre_vigia",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "hesk",
+   "name": "Sargento Hesk",
+   "age": 50,
+   "profession": "vigia",
+   "schedule": "vigia_dia",
+   "home": "torre_vigia",
+   "work": "torre_vigia",
+   "family": null,
+   "faction": null,
+   "devotion": "Khalmyr",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   }
  ],
  "schedule_templates": {
@@ -933,6 +1081,138 @@
     24,
     "taverna"
    ]
+  ],
+  "estalajadeiro": [
+   [
+    0,
+    2,
+    "work"
+   ],
+   [
+    2,
+    8,
+    "home"
+   ],
+   [
+    8,
+    24,
+    "work"
+   ]
+  ],
+  "barqueiro": [
+   [
+    0,
+    6,
+    "home"
+   ],
+   [
+    6,
+    12,
+    "cais"
+   ],
+   [
+    12,
+    13,
+    "estalagem"
+   ],
+   [
+    13,
+    18,
+    "cais"
+   ],
+   [
+    18,
+    21,
+    "estalagem"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "comerciante_pb": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "estalagem"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "vigia_dia": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    19,
+    "work"
+   ],
+   [
+    19,
+    24,
+    "home"
+   ]
+  ],
+  "vigia_noite": [
+   [
+    0,
+    7,
+    "work"
+   ],
+   [
+    7,
+    19,
+    "home"
+   ],
+   [
+    19,
+    24,
+    "work"
+   ]
+  ],
+  "lavrador_pb": [
+   [
+    0,
+    5,
+    "home"
+   ],
+   [
+    5,
+    12,
+    "work"
+   ],
+   [
+    12,
+    13,
+    "home"
+   ],
+   [
+    13,
+    18,
+    "work"
+   ],
+   [
+    18,
+    24,
+    "home"
+   ]
   ]
  },
  "families": [
@@ -982,6 +1262,16 @@
     "elsa",
     "rurik",
     "teodoro"
+   ]
+  },
+  {
+   "id": "pontes",
+   "name": "Pontes",
+   "members": [
+    "berta",
+    "caio",
+    "tuco",
+    "gunther"
    ]
   }
  ],

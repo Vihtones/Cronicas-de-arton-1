@@ -1,6 +1,8 @@
 """Gera o conteúdo estático do vertical slice (ORIGINAL_DO_JOGO) em data/world/.
-Determinístico: mesma execução => mesmos arquivos. Edite aqui, não os JSON gerados."""
-import heapq, json, random, pathlib
+Determinístico: mesma execução => mesmos arquivos. Edite aqui, não os JSON gerados — EXCETO map.json e items.json, que hoje são
+mantidos à mão (armadilhas, objetos, madeira, ampliação a leste por tools/gen_mapa_leste.py, itens de magia): o gerador não os
+sobrescreve, a não ser com --forcar (o que perde essas edições)."""
+import heapq, json, random, pathlib, sys
 from collections import deque
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -243,6 +245,13 @@ SCHED = {
  "pastora":    [[0, 6, "home"], [6, 17, "estrada_leste"], [17, 24, "home"]],
  "bebado":     [[0, 10, "taverna"], [10, 23, "taverna"], [23, 24, "trilha_floresta", 3]],
  "viajante":   [[0, 8, "taverna"], [8, 18, "mercado"], [18, 24, "taverna"]],
+ # Pedra Branca (a leste, no fim da estrada)
+ "estalajadeiro": [[0, 2, "work"], [2, 8, "home"], [8, 24, "work"]],
+ "barqueiro":  [[0, 6, "home"], [6, 12, "cais"], [12, 13, "estalagem"], [13, 18, "cais"], [18, 21, "estalagem"], [21, 24, "home"]],
+ "comerciante_pb": [[0, 8, "home"], [8, 18, "work"], [18, 21, "estalagem"], [21, 24, "home"]],
+ "vigia_dia":  [[0, 7, "home"], [7, 19, "work"], [19, 24, "home"]],
+ "vigia_noite":[[0, 7, "work"], [7, 19, "home"], [19, 24, "work"]],
+ "lavrador_pb":[[0, 5, "home"], [5, 12, "work"], [12, 13, "home"], [13, 18, "work"], [18, 24, "home"]],
 }
 def npc(id, name, age, prof, sched, home, work=None, family=None, faction=None, devotion="", traits=None, beliefs=None, gold=5):
     return {"id": id, "name": name, "age": age, "profession": prof, "schedule": sched, "home": home, "work": work or home,
@@ -274,6 +283,14 @@ npcs = [
  npc("tobias", "Tobias", 28, "guarda", "guarda_dia", "quartel", "quartel", None, "guarda_vila"),
  npc("fenna", "Fenna", 24, "pastora", "pastora", "casa_aldren", "estrada_leste", "aldren"),
  npc("dorn", "Dorn", 47, "bêbado", "bebado", "taverna", "taverna", None, "garras_de_cinza", traits=["mentiroso"]),
+ # Pedra Branca
+ npc("berta", "Berta Pontes", 46, "estalajadeira", "estalajadeiro", "estalagem", "estalagem", "pontes", traits=["fofoqueira"], gold=45),
+ npc("caio", "Caio Pontes", 49, "cozinheiro", "estalajadeiro", "estalagem", "estalagem", "pontes", gold=20),
+ npc("tuco", "Tuco Pontes", 34, "barqueiro", "barqueiro", "casa_barqueiro", "cais", "pontes", traits=["calado"]),
+ npc("gunther", "Gunther Pontes", 62, "lavrador", "lavrador_pb", "casa_barqueiro", "campos_pedrabranca", "pontes"),
+ npc("marta", "Marta Brisa", 41, "mercadora", "comerciante_pb", "entreposto", "entreposto", None, traits=["traz_noticias"], gold=70),
+ npc("lia", "Lia Vento", 26, "vigia", "vigia_noite", "torre_vigia", "torre_vigia", None),
+ npc("hesk", "Sargento Hesk", 50, "vigia", "vigia_dia", "torre_vigia", "torre_vigia", None, devotion="Khalmyr", traits=["exige_provas"]),
 ]
 # Fichas de ameaça dos NPCs que agem com regras (LB Tabela 7-2). O ND e o foco são escolhas de design (ORIGINAL_DO_JOGO).
 NPC_FICHAS = {
@@ -290,6 +307,7 @@ families = [
  {"id": "vasquel", "name": "Vasquel", "members": ["rosana", "bento", "nina"]},
  {"id": "aldren", "name": "Aldren", "members": ["joran", "celia", "pell", "ivi", "fenna"]},
  {"id": "corvo", "name": "Corvo", "members": ["elsa", "rurik", "teodoro"]},
+ {"id": "pontes", "name": "Pontes", "members": ["berta", "caio", "tuco", "gunther"]},
 ]
 factions = [
  {"id": "guarda_vila", "name": "Guarda da Vila", "goals": ["manter_ordem", "proteger_estrada"], "resources": {"soldados": 3, "ouro": 80},
@@ -499,7 +517,10 @@ for _n in npcs:
     _n["combate"] = _f
 files = {"mysteries_extra": mysteries_extra, "map": world, "npcs": {"npcs": npcs, "schedule_templates": SCHED, "families": families, "factions": factions, "creatures": creatures},
          "mystery": mystery, "items": items, "economy": economy, "laws": laws, "distant": distant}
+MANTIDOS_A_MAO = {"map", "items"}
 for k, v in files.items():
+    if k in MANTIDOS_A_MAO and "--forcar" not in sys.argv:
+        continue
     (OUT / f"{k}.json").write_text(json.dumps(v, ensure_ascii=False, indent=1), encoding="utf-8")
 print("ok", len(npcs), "npcs", len(locations), "locais", len(objects), "objetos", len(targets), "alvos")
 print("\n".join(grid))
