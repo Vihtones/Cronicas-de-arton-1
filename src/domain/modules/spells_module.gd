@@ -2,18 +2,26 @@ extends WorldModule
 ## Magias fora de combate (docs/MAGIA_COMPLEXA.md): o comando CastSpell lança, fora de uma luta, a cura em si mesmo
 ## e as magias e versões de magia que agem sobre o mundo e não sobre a cena de combate (cadáveres, alimentos, áreas, sentidos).
 ## Em combate, as magias passam pelo CombatModule.
-## Estado: cadáveres preservados pela Bênção (criatura -> último dia preservado).
+## Estado: cadáveres preservados pela Bênção (criatura -> último dia preservado) e áreas consagradas e profanadas.
 
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
+const Area := preload("res://src/domain/combat/area.gd")
 
 ## Magias e aprimoramentos que funcionam fora de combate: spell -> aprimoramentos que tornam isso possível
 ## ([] = a versão básica já funciona fora de combate).
 const FORA_DE_COMBATE := {
 	"bencao": [0],   # 1 cadáver por 1 semana
+	"consagrar": [],
+	"profanar": [],
 }
+const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
+const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
+const TOTAL_PERMANENTE := 1000   # T$ de incenso e óleos da versão permanente
 const DIAS_SEMANA := 7
+const MINUTOS_DIA := 24 * 60
 
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
+var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim (-1 permanente), mod_mv:int, conjurador}
 
 
 func module_id() -> String: return "magia"
@@ -52,6 +60,11 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	match sp_id:
 		"bencao":
 			return _valida_cadaver(str(cmd.payload.get("target", "")), str(sp.get("alcance", "curto")))
+		"consagrar", "profanar":
+			if SpellRules.simbolo_impede(world.db, _tile_jogador(), Area.quadrados(9.0), str(sh.devotion)):
+				return PackedStringArray(["há um símbolo de outra divindade na área"])
+			if apr.has(2) and int(world.player.gold) < TOTAL_PERMANENTE:
+				return PackedStringArray(["faltam incenso e óleos (T$ %d)" % TOTAL_PERMANENTE])
 	return PackedStringArray()
 
 
@@ -65,13 +78,21 @@ func execute(cmd: GameCommand) -> Array:
 		"aprimoramentos": cmd.payload.get("aprimoramentos", [])}, ["player"])]
 	if sp.has("cura"):
 		# Cura em si mesmo (Curar Ferimentos e afins), na versão básica.
-		var r := Dice.roll(str(sp.cura), world.rng, "world")
-		sh.pv = mini(sh.pv_max, sh.pv + int(r.total))
+		var cura := Dice.maximo(str(sp.cura)) if maximiza("luz", _tile_jogador()) else int(Dice.roll(str(sp.cura), world.rng, "world").total)
+		sh.pv = mini(sh.pv_max, sh.pv + cura)
 		out[0].payload["pm_cost"] = custo
 		out[0].payload["pm_after"] = sh.pm
-		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": r.total, "pv_after": sh.pv, "source": sp_id}, ["player"]))
+		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"consagrar", "profanar":
+			var apr_a: Array = cmd.payload.get("aprimoramentos", [])
+			if apr_a.has(2):
+				# Versão permanente (Requer 4º círculo): execução de 1 hora e T$ 1.000 em incenso e óleos.
+				out.append(fact("GOLD_CHANGED", {"delta": -TOTAL_PERMANENTE, "reason": sp_id}))
+				out.append_array(world.advance_ticks(60 / world.clock.tick_minutes))
+			criar_area(sp_id, _tile_jogador(), apr_a, sh, "player")
+			out.append(fact("AREA_BLESSED", {"caster": "player", "spell": sp_id, "permanente": apr_a.has(2)}, ["player"]))
 		"bencao":
 			var alvo := str(cmd.payload.get("target", ""))
 			preservar_cadaver(alvo, DIAS_SEMANA)
@@ -82,6 +103,61 @@ func execute(cmd: GameCommand) -> Array:
 ## Bênção sobre cadáver (+1 PM): não se decompõe nem pode virar morto-vivo por `dias` dias a partir de hoje.
 func preservar_cadaver(id: String, dias: int) -> void:
 	cadaveres[id] = maxi(int(cadaveres.get(id, -1)), world.day_index() + dias - 1)
+
+
+## Consagrar / Profanar: esfera de 9m de raio por 1 dia (permanente com o aprimoramento de 9 PM). Uma anula a
+## outra: as áreas opostas que se sobrepõem à nova somem. Aprimoramento de 1 PM: mortos-vivos na área sofrem –2
+## (Consagrar) ou recebem +2 (Profanar) em Defesa e testes; +1 por aprimoramento de 2 PM, repetível.
+func criar_area(tipo: String, centro: Vector2i, apr: Array, sh: CharacterSheet, conj: String) -> void:
+	var raio := Area.quadrados(9.0)
+	var mantidas: Array = []
+	for ar in areas:
+		if not (str(ar.tipo) == str(OPOSTA[tipo]) and _dist(ar, centro) <= int(ar.raio) + raio):
+			mantidas.append(ar)
+	areas = mantidas
+	var mod := 0
+	if apr.has(0):
+		# Limite do aumento: o círculo máximo (interpretação: o –2/+2 básico não conta para o limite abaixo de 2).
+		mod = mini(2 + apr.count(1), maxi(2, SpellRules.circulo_maximo(sh, world.rules)))
+		if tipo == "consagrar":
+			mod = -mod
+	areas.append({"tipo": tipo, "centro": [centro.x, centro.y], "raio": raio, "ate": -1 if apr.has(2) else world.clock.total_minutes() + MINUTOS_DIA,
+		"mod_mv": mod, "conjurador": conj})
+
+
+func _areas_em(t: Vector2i) -> Array:
+	var agora := world.clock.total_minutes()
+	var out: Array = []
+	for ar in areas:
+		if (int(ar.ate) < 0 or int(ar.ate) > agora) and _dist(ar, t) <= int(ar.raio):
+			out.append(ar)
+	return out
+
+
+func _dist(ar: Dictionary, t: Vector2i) -> int:
+	return maxi(absi(int(ar.centro[0]) - t.x), absi(int(ar.centro[1]) - t.y))
+
+
+## Dados de luz maximizados em área consagrada; de trevas, em área profanada.
+func maximiza(tipo: String, t: Vector2i) -> bool:
+	if tipo == "":
+		return false
+	for ar in _areas_em(t):
+		if str(ENERGIA[str(ar.tipo)]) == tipo:
+			return true
+	return false
+
+
+## Modificador de Defesa e testes para mortos-vivos no quadrado (soma das áreas que o cobrem).
+func mod_morto_vivo_em(t: Vector2i) -> int:
+	var m := 0
+	for ar in _areas_em(t):
+		m += int(ar.mod_mv)
+	return m
+
+
+func _tile_jogador() -> Vector2i:
+	return world.db.world_to_tile(world.player.position)
 
 
 ## Consultado pelas magias que criam mortos-vivos.
@@ -105,8 +181,9 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 
 func to_dict() -> Dictionary:
-	return {"cadaveres": cadaveres.duplicate()}
+	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
 	cadaveres = (d.get("cadaveres", {}) as Dictionary).duplicate()
+	areas = (d.get("areas", []) as Array).duplicate(true)

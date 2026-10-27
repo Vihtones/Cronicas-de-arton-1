@@ -16,6 +16,8 @@ const COMPLETAS := {
 	"arma_magica": {"aprimoramentos": [0, 1, 2]},   # +1/+2 em ataque e dano; atributo-chave; dano elemental 1d6 / 2d6
 	"orientacao": {"aprimoramentos": [0, 1, 2]},   # vantagem em perícia (2 dados); por atributo; por grupo; alvos escolhidos
 	"bencao": {"aprimoramentos": [0, 1]},   # 1 cadáver por 1 semana (também fora de combate); +1 de bônus, repetível
+	"consagrar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, luz maximizada; –2 a mortos-vivos (+1, repetível); permanente
+	"profanar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, trevas maximizadas; +2 a mortos-vivos (+1, repetível); permanente
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -167,3 +169,18 @@ static func pode_lancar_no_turno(sp_id: String, apr: Array) -> bool:
 
 static func tipo_energia_valido(t: String) -> bool:
 	return TIPOS_ENERGIA.has(t)
+
+
+## Consagrar / Profanar: não podem ser lançadas em área com símbolo visível de outra divindade. Locais do mapa podem
+## ter "simbolo_divindade" (ex.: o Templo de Lena). Quem não tem devoção não tem divindade própria.
+static func simbolo_impede(db: ContentDB, centro: Vector2i, raio_q: int, devocao: String) -> bool:
+	for l in db.all_locations():
+		var dono := str(l.get("simbolo_divindade", ""))
+		if dono == "" or dono == devocao:
+			continue
+		var r: Array = l.rect
+		var px := clampi(centro.x, int(r[0]), int(r[0]) + int(r[2]) - 1)
+		var py := clampi(centro.y, int(r[1]), int(r[1]) + int(r[3]) - 1)
+		if maxi(absi(px - centro.x), absi(py - centro.y)) <= raio_q:
+			return true
+	return false

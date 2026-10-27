@@ -43,7 +43,8 @@ deve implementar o efeito, e os próximos passos são:
 
 Magia fora de combate: o `SpellsModule` (módulo `magia`, comando `CastSpell`) lança a cura em si mesmo e as
 versões de magia que agem no mundo (`FORA_DE_COMBATE`); guarda os cadáveres preservados pela Bênção
-(`cadaver_preservado`, que as magias de morto-vivo devem consultar).
+(`cadaver_preservado`, que as magias de morto-vivo devem consultar) e as áreas de Consagrar e Profanar
+(`maximiza`, `mod_morto_vivo_em`; o combate passa os dados de luz e trevas por `CombatModule._dados_energia`).
 
 Resolvido nesta fase: execução longa (`CombatSim.conjurando`, Banimento), concentração ao ser ferido na
 execução, ritual de um dia (`CombatModule.processar_rituais_do_dia`, Lágrimas de Wynna), registro de magias
@@ -58,9 +59,9 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (15): abencoar_alimentos, acalmar_animal, arma_espiritual, armamento_da_natureza,
-  caminhos_da_natureza, comando, consagrar, controlar_plantas, criar_elementos, despedacar,
-  detectar_ameacas, profanar, santuario, suporte_ambiental, tranquilidade.
+- Divinas de 1º círculo (13): abencoar_alimentos, acalmar_animal, arma_espiritual, armamento_da_natureza,
+  caminhos_da_natureza, comando, controlar_plantas, criar_elementos, despedacar,
+  detectar_ameacas, santuario, suporte_ambiental, tranquilidade.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
   controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
   raio_solar, rogar_maldicao, silencio, soco_de_arsenal, tempestade_divina, voz_divina.
@@ -76,7 +77,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação e Bênção (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar e Profanar (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

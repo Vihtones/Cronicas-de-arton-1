@@ -29,6 +29,13 @@ static func roll(expr: String, rng: RngStreams, stream: String, multiplier: int 
 	return {"expr": expr, "rolls": rolls, "bonus": d.bonus + extra_bonus, "total": total}
 
 
+## Resultado máximo (dados maximizados; o bônus soma uma vez).
+static func maximo(expr: String, multiplier: int = 1) -> int:
+	var d := parse(expr)
+	assert(not d.is_empty(), "expressão de dado inválida: " + expr)
+	return int(d.count) * multiplier * int(d.sides) + int(d.bonus)
+
+
 static func average(expr: String) -> float:
 	var d := parse(expr)
 	return d.count * (d.sides + 1) / 2.0 + d.bonus

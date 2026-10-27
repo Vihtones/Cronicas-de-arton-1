@@ -15,6 +15,7 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 	var mod := sheet.skill_value(skill_name, rules) + extra_mod + sheet.condition_skill_mod(rules, skill_name) + ClassFeatures.instinto_pericia(sheet, skill_name)
 	if chave_apt != "":
 		mod += sheet.bonus_aptidao(chave_apt)
+	mod += sheet.efeito_bonus("testes")   # efeitos sobre todos os testes (Consagrar e Profanar em mortos-vivos)
 	var eh_resistencia := skill_name in RESISTANCIAS
 	if eh_resistencia:
 		mod += sheet.efeito_bonus("resistencia") + sheet.efeito_bonus("proxima_resistencia")   # efeitos de magia
@@ -56,7 +57,7 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 
 static func attribute(sheet: CharacterSheet, attr: String, cd: int, rules: RuleRegistry, rng: RngStreams, stream: String = "world") -> Dictionary:
 	var d20: int = rng.roll(stream, 1, 20)[0]
-	var total: int = d20 + int(sheet.attrs.get(attr, 0)) + sheet.condition_attr_mod(rules, attr)
+	var total: int = d20 + int(sheet.attrs.get(attr, 0)) + sheet.condition_attr_mod(rules, attr) + sheet.efeito_bonus("testes")
 	return {"d20": d20, "total": total, "cd": cd, "success": total >= cd}
 
 

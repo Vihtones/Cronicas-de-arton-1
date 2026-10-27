@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Consagrar e Profanar (divinas, 1º círculo) completas: esfera de 9m por 1 dia, em combate ou fora dele; na área consagrada, cura e dano de luz saem no máximo (Curar Ferimentos cura 18), na profanada, os de trevas; uma anula a outra; mortos-vivos sofrem –2 ou recebem +2 em Defesa e todos os testes (+1 por aprimoramento, até o círculo máximo); versão permanente com 1 hora e T$ 1.000; recusadas perto de símbolo de outra divindade (o Templo de Lena tem o de Lena). Novo efeito de magia em todos os testes (`testes`) e `Dice.maximo`.
+
 - Bênção (divina, 1º círculo) completa: aliados escolhidos recebem +1 em ataque e dano pela cena, +1 por aprimoramento (repetível até o círculo máximo); anula Perdição e é anulada por ela; versão de cadáver preserva o corpo por uma semana, em combate ou fora dele. Perdição agora soma o aprimoramento repetido. Novo módulo `magia` (SpellsModule) assume o comando CastSpell fora de combate, antes no módulo de itens.
 
 - Névoa (universal, 1º círculo) completa: nuvem de 6m pela cena que dá camuflagem leve a 1,5m e total a partir de 3m (nova regra de camuflagem total, 50%, LB p.238); faro reduz a total a 20% em alcance curto; chuva (vento forte) a dispersa em 4 rodadas e tempestade (vendaval) em 1; não se forma em quadrados de água sem o aprimoramento de nuvem de tinta. Aprimoramentos: criaturas escolhidas enxergam através, cheiro (Fortitude ou enjoado, também para quem tem faro em alcance curto), ácido 2d4/4d4 no início dos turnos e névoa espessa (deslocamento 3m e –2 em ataque e dano).

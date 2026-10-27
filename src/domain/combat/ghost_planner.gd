@@ -133,6 +133,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "consagrar" or sp_id == "profanar":
+				if apr.has(2): return {"ok": false, "reason": "a versão permanente leva 1 hora: só fora de combate"}
+				if SpellRules.simbolo_impede(sim.db, A.tile, Area.quadrados(9.0), str(A.sheet.devotion)):
+					return {"ok": false, "reason": "há um símbolo de outra divindade na área"}
 			if sp_id == "bencao":
 				for tg in targets:
 					if not sim.combatants.has(tg):

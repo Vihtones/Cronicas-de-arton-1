@@ -467,6 +467,7 @@ const CONDICOES_AURA_DIVINA := ["esmorecido", "debilitado", "lento"]
 ## cada paladino ativo dá o próprio Carisma aos aliados do mesmo lado que estão no alcance e consciências.
 func _refresh_bencaos() -> void:
 	_refresh_aura_divina()
+	_refresh_areas_sagradas()
 	for id in sim.combatants:
 		var sh: CharacterSheet = sim.c(id).sheet
 		sh.remove_efeito("aura_sagrada")
@@ -914,7 +915,7 @@ func _aplicar_nuvem(z: Dictionary, facts: Array) -> void:
 		var sv := Checks.skill(ts, "fortitude", int(dados.get("cd", 10)), world.rules, world.rng, "combat")
 		sv = _pos_teste(tg, sv, int(dados.get("cd", 10)), facts)
 		var passou: bool = sv.get("success", false)
-		var dano := int(Dice.roll(str(dados.get("dano_turno", "2d8+8")), world.rng, "combat").total)
+		var dano := _dados_energia(str(dados.get("dano_turno", "2d8+8")), "trevas", sim.c(tg).tile)
 		if passou:
 			dano = dano / 2
 		dano = _dano_por_tipo(ts, "trevas", dano)
@@ -941,7 +942,7 @@ func _zonas_fim_de_turno(id: String, facts: Array) -> void:
 		if not dados.has("fim_turno") or not (z.tiles as Array).has(x.tile) or not _zona_afeta(z, id):
 			continue
 		var conj := str(dados.get("conjurador", id))
-		var n := int(Dice.roll(str(dados.fim_turno), world.rng, "combat").total)
+		var n := _dados_energia(str(dados.fim_turno), "luz", x.tile)
 		if _sofre_luz(s):
 			s.pm -= mini(s.pm, n)
 			var tags_f: Array = ["magia", "luz"]
@@ -965,7 +966,7 @@ func _sofre_luz(s: CharacterSheet) -> bool:
 
 ## Dano mágico por dados (zona ou marca): aplica e registra no mesmo formato de um ataque de magia.
 func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: String, facts: Array, tipo: String = "") -> void:
-	var dano := int(Dice.roll(dados, world.rng, "combat").total)
+	var dano := _dados_energia(dados, tipo, sim.c(id).tile)
 	var tags: Array = ["magia"]
 	if tipo != "":
 		dano = _dano_por_tipo(sim.c(id).sheet, tipo, dano)
@@ -974,6 +975,29 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 	facts.append(fact("ATTACK_RESOLVED", {"attacker": conj, "target": id, "weapon": origem, "d20": 0, "mod": 0,
 		"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
+
+
+## Consagrar e Profanar (SpellsModule): na área consagrada, dados de luz (cura e dano) saem no máximo; na
+## profanada, os de trevas. Fora delas, rolagem normal. `mult` multiplica os dados (crítico).
+func _dados_energia(expr: String, tipo: String, tile: Vector2i, mult: int = 1) -> int:
+	var magia_m = world.module("magia")
+	if magia_m != null and magia_m.maximiza(tipo, tile):
+		return Dice.maximo(expr, mult)
+	return int(Dice.roll(expr, world.rng, "combat", mult).total)
+
+
+## Consagrar e Profanar: mortos-vivos na área recebem o modificador da área na Defesa e em todos os testes.
+func _refresh_areas_sagradas() -> void:
+	var magia_m = world.module("magia")
+	for cid in sim.combatants:
+		var s: CharacterSheet = sim.c(cid).sheet
+		s.remove_efeito("magia.area_sagrada")
+		if magia_m == null or s.creature_type != "morto-vivo":
+			continue
+		var mod: int = magia_m.mod_morto_vivo_em(sim.c(cid).tile)
+		if mod != 0:
+			s.add_efeito("magia.area_sagrada", "defesa", mod, "cena")
+			s.add_efeito("magia.area_sagrada", "testes", mod, "cena")
 
 
 ## Criaturas não mortas cujo quadrado está em `tiles` (caídas também: áreas de dano as atingem).
@@ -1026,7 +1050,7 @@ func _manto_inicio_de_turno(id: String, facts: Array) -> void:
 			var ax: Dictionary = sim.c(a)
 			if ax.side != x.side or not sim.conscious(a) or CombatSim.cheb(x.tile, ax.tile) > curto:
 				continue
-			var cura := int(Dice.roll("2d8", world.rng, "combat").total)
+			var cura := _dados_energia("2d8", "luz", ax.tile)
 			cura = ax.sheet.curar(cura)
 			facts.append(fact("HEALED", {"actor": id, "target": a, "amount": cura, "pv_after": ax.sheet.pv, "source": "manto_do_cruzado", "tags": ["magia", "cura"]}, [id, a]))
 		return
@@ -1035,7 +1059,7 @@ func _manto_inicio_de_turno(id: String, facts: Array) -> void:
 		var ax: Dictionary = sim.c(a)
 		if not sim.is_enemy(id, a) or not sim.conscious(a) or CombatSim.cheb(x.tile, ax.tile) > curto:
 			continue
-		var dano := int(Dice.roll("4d8", world.rng, "combat").total)
+		var dano := _dados_energia("4d8", "trevas", ax.tile)
 		total += dano
 		var tags_t: Array = ["magia", "trevas"]
 		tags_t.append_array(sim.apply_damage(a, dano))
@@ -1200,13 +1224,13 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			if ts_m.creature_type == "morto-vivo":
 				var sv_m := Checks.skill(ts_m, "vontade", 10 + int(sh_m.attrs["car"]), world.rules, world.rng, "combat")
 				sv_m = _pos_teste(alvo_m, sv_m, 10 + int(sh_m.attrs["car"]), out)
-				var dano_m := int(Dice.roll("%dd8+%d" % [dados_m, dados_m], world.rng, "combat").total)
+				var dano_m := _dados_energia("%dd8+%d" % [dados_m, dados_m], "luz", sim.c(alvo_m).tile)
 				if sv_m.get("success", false):
 					dano_m = maxi(1, dano_m / 2)
 				out.append_array(sim.apply_damage(alvo_m, dano_m))
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "damage": dano_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id, alvo_m]))
 			else:
-				var cura_m := int(Dice.roll("%dd8+%d" % [dados_m, dados_m], world.rng, "combat").total)
+				var cura_m := _dados_energia("%dd8+%d" % [dados_m, dados_m], "luz", sim.c(alvo_m).tile)
 				cura_m = ts_m.curar(cura_m)
 				if v.get("remover", false):
 					for cond in ["abalado", "apavorado", "atordoado", "cego", "doente", "exausto", "fatigado", "surdo"]:
@@ -1234,7 +1258,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sh_a.allihanna_ativa = true
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "armadura_de_allihanna", "defense": sh_a.allihanna_defense(true), "pm_after": sh_a.pm, "tags": ["racial"]}, [id]))
 		"drink":
-			var heal := Dice.roll(str(world.rules.value("magia.curar_ferimentos").cura), world.rng, "combat")
+			var heal := {"total": _dados_energia(str(world.rules.value("magia.curar_ferimentos").cura), "luz", sim.c(id).tile)}
 			var sh: CharacterSheet = sim.c(id).sheet
 			var curado_i := sh.curar(int(heal.total))
 			out.append(fact("ITEM_LOST", {"item": a.item}, [id]))
@@ -1351,6 +1375,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"consagrar", "profanar":
+			# Consagrar / Profanar (divina 1): esfera de 9m de raio em volta do conjurador por 1 dia (SpellsModule).
+			var magia_c = world.module("magia")
+			if magia_c != null:
+				magia_c.criar_area(str(a.spell), sim.c(id).tile, a.get("aprimoramentos", []), sh, id)
+			_refresh_areas_sagradas()
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": str(a.spell), "tags": ["magia", "area"]}, [id]))
 		"bencao":
 			# Bênção (divina 1): aliados escolhidos em alcance curto recebem +1 em ataques e dano pela cena (+1 por
 			# aprimoramento de 2 PM, até o círculo máximo). Anula Perdição. Aprimoramento de 1 PM: 1 cadáver por 1 semana
@@ -1403,10 +1434,9 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if not golpe_ok:
 					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": a.spell}, [id, tg]))
 					continue
-				var dado := Dice.roll("2d8+2", world.rng, "combat")
-				var total := int(dado.total)
+				var total := _dados_energia("2d8+2", "trevas", sim.c(tg).tile)
 				if apr.has(1):
-					total += int(Dice.roll("1d8+1", world.rng, "combat").total)
+					total += _dados_energia("1d8+1", "trevas", sim.c(tg).tile)
 				var passou := false
 				if not apr.has(2):
 					_reacao_protecao(id, tg, out)
@@ -1422,7 +1452,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				var tags_d: Array = ["magia", "impacto"]
 				tags_d.append_array(sim.apply_damage(tg, total + golpe_dano))
 				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Infligir Ferimentos", "d20": 0, "mod": 0, "mods": [],
-					"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": total + golpe_dano, "rolls": dado.rolls,
+					"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": total + golpe_dano, "rolls": [],
 					"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "tags": tags_d}, [id, tg]))
 				if apr.has(0) and not passou:
 					ts.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
@@ -1715,9 +1745,9 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				var fogo := int(Dice.roll("6d6", world.rng, "combat").total)
 				if apr_cl.has(0):
 					fogo += int(Dice.roll("1d6", world.rng, "combat").total)
-				var luz := int(Dice.roll("6d6", world.rng, "combat").total)
+				var luz := _dados_energia("6d6", "luz", sim.c(tg_cl).tile)
 				if apr_cl.has(1):
-					luz += int(Dice.roll("1d6", world.rng, "combat").total)
+					luz += _dados_energia("1d6", "luz", sim.c(tg_cl).tile)
 				var dano_cl := _dano_por_tipo(ts_cl, "fogo", fogo) + _dano_por_tipo(ts_cl, "luz", luz)
 				var sv_cl := Checks.skill(ts_cl, "reflexos", cd_cl, world.rules, world.rng, "combat")
 				sv_cl = _pos_teste(tg_cl, sv_cl, cd_cl, out)
@@ -1739,9 +1769,9 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var cone_s: Array = Area.cone(origem_s, Vector2i(signi(alvo_s.x - origem_s.x), signi(alvo_s.y - origem_s.y)), Area.quadrados(9.0))
 			for tg_s in _aliados_vivos_em(id, cone_s):
 				var ts_s: CharacterSheet = sim.c(tg_s).sheet
-				var cura_s := int(Dice.roll("2d8+4", world.rng, "combat").total)
+				var cura_s := _dados_energia("2d8+4", "luz", sim.c(tg_s).tile)
 				if apr_s.has(0):
-					cura_s += int(Dice.roll("1d8+2", world.rng, "combat").total)
+					cura_s += _dados_energia("1d8+2", "luz", sim.c(tg_s).tile)
 				if apr_s.has(1) and ts_s.pv < 0:
 					ts_s.pv = 0
 				cura_s = ts_s.curar(cura_s)
@@ -1762,7 +1792,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					var cd_c := spell_dc(sh, a)
 					var sv_c := Checks.skill(ts, "vontade", cd_c, world.rules, world.rng, "combat")
 					sv_c = _pos_teste(tgt, sv_c, cd_c, out)
-					var dano_c := int(Dice.roll("1d8", world.rng, "combat").total)
+					var dano_c := _dados_energia("1d8", "luz", sim.c(tgt).tile)
 					if sv_c.get("success", false):
 						dano_c = maxi(1, dano_c / 2)
 					var tags_c: Array = ["magia", "luz"]
@@ -1772,9 +1802,9 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 						"mods": [], "total": int(sv_c.get("total", 0)), "defense": cd_c, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_c, "rolls": [],
 						"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "save": "vontade", "saved": sv_c.get("success", false), "tags": tags_c}, [id, tgt]))
 					continue
-				var cura_c := int(Dice.roll(str(sp.cura), world.rng, "combat").total)
+				var cura_c := _dados_energia(str(sp.cura), "luz", sim.c(tgt).tile)
 				if apr_c.has(0):
-					cura_c += int(Dice.roll("1d8+1", world.rng, "combat").total)
+					cura_c += _dados_energia("1d8+1", "luz", sim.c(tgt).tile)
 				cura_c = ts.curar(cura_c)
 				ts.anular_magia("magia.infligir_ferimentos")   # Curar Ferimentos anula Infligir Ferimentos (LB p.189)
 				if apr_c.has(1):
@@ -1999,7 +2029,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		if golpe_n > 0:
 			dmg += int(Dice.roll("%dd8" % golpe_n, world.rng, "combat", int(atk.mult) if crit else 1).total)   # Golpe Divino
 		if not bool(v.get("ranged", false)) and A.sheet.manto_cruzado == "luz":
-			dmg += int(Dice.roll("2d8", world.rng, "combat", int(atk.mult) if crit else 1).total)   # Manto do Cruzado (versão luz): +2d8 de luz
+			dmg += _dados_energia("2d8", "luz", T.tile, int(atk.mult) if crit else 1)   # Manto do Cruzado (versão luz): +2d8 de luz
 			tags.append("luz")
 		rolls = r.rolls
 		# Ataque Furtivo (LB p.73): 1/rodada, alvo desprevenido ou flanqueado; dados extras não multiplicam.

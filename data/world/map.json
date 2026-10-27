@@ -219,6 +219,7 @@
   {
    "id": "templo",
    "name": "Templo de Lena",
+   "simbolo_divindade": "Lena",
    "zone": "vila",
    "rect": [
     26,

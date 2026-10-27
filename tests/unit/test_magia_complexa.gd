@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1524,3 +1524,113 @@ func test_bencao_em_cadaver_fora_de_combate() -> void:
 	check(w.module("magia").cadaver_preservado("bandido_1"), "cadáver preservado")
 	WorldHelpers.put(w, int(t[0]) + 20, int(t[1]))
 	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "fora do alcance curto")
+
+
+# --- Consagrar e Profanar (divinas, 1º círculo) ---------------------------------------------------
+func test_consagrar_maximiza_a_cura_de_luz_na_area() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	sim.c("bandido_1").sheet.pv = 500
+	sim.c("bandido_2").tile = Vector2i(45, 57)
+	check(_lanca(m, {"type": "cast", "spell": "consagrar", "target": "player"}).ok, "Consagrar válida")
+	m[2].next_turn()
+	m[2].budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]})
+	eq(sim.c("bandido_1").sheet.pv, 518, "Curar Ferimentos cura 18 PV (máximo de 2d8+2) na área consagrada")
+
+
+func test_consagrar_penaliza_mortos_vivos_e_o_aumento_respeita_o_circulo() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var mv: CharacterSheet = sim.c("bandido_2").sheet
+	mv.creature_type = "morto-vivo"
+	var def0 := mv.defense(m[3], true)
+	_lanca(m, {"type": "cast", "spell": "consagrar", "target": "player", "aprimoramentos": [0, 1]})
+	eq(mv.defense(m[3], true), def0 - 2, "nível 1: –2 (o aumento não passa do limite)")
+	eq(mv.efeito_bonus("testes"), -2, "–2 em testes")
+	var m9 := _cena_grupo(9)
+	var mv9: CharacterSheet = m9[2].c("bandido_2").sheet
+	mv9.creature_type = "morto-vivo"
+	_lanca(m9, {"type": "cast", "spell": "consagrar", "target": "player", "aprimoramentos": [0, 1]})
+	eq(mv9.efeito_bonus("testes"), -3, "nível 9: –3")
+	eq(m9[2].c("bandido_1").sheet.efeito_bonus("testes"), 0, "vivos não são afetados")
+	m9[2].c("bandido_2").tile = Vector2i(45, 57)
+	m9[1]._refresh_bencaos()
+	eq(mv9.efeito_bonus("testes"), 0, "fora da área, sem penalidade")
+
+
+func test_profanar_maximiza_trevas_e_anula_consagrar() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var w = m[0]
+	_lanca(m, {"type": "cast", "spell": "consagrar", "target": "player"})
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "profanar", "target": "player"})
+	eq(w.module("magia").areas.size(), 1, "Profanar anula Consagrar")
+	check(w.module("magia").maximiza("trevas", Vector2i(26, 57)), "trevas maximizadas")
+	check(not w.module("magia").maximiza("luz", Vector2i(26, 57)), "luz já não é maximizada")
+	var mv: CharacterSheet = sim.c("bandido_1").sheet
+	mv.creature_type = "morto-vivo"
+	mv.pv = 500
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "infligir_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]})
+	eq(mv.pv, 518, "Infligir cura o morto-vivo no máximo (18)")
+
+
+func test_profanar_da_bonus_aos_mortos_vivos() -> void:
+	var m := _cena_grupo(1)
+	var mv: CharacterSheet = m[2].c("bandido_2").sheet
+	mv.creature_type = "morto-vivo"
+	_lanca(m, {"type": "cast", "spell": "profanar", "target": "player", "aprimoramentos": [0]})
+	eq(mv.efeito_bonus("defesa"), 2, "+2 na Defesa")
+	eq(mv.efeito_bonus("testes"), 2, "+2 em testes")
+
+
+func _mundo_clerigo(nivel: int) -> WorldState:
+	var w := WorldHelpers.world(5)
+	var sh := CharacterBuilder.build(w.rules, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.level = nivel
+	sh.spells = PackedStringArray(["consagrar", "profanar", "curar_ferimentos"])
+	sh.pm = 40
+	w.player_sheet = sh
+	return w
+
+
+func test_consagrar_fora_de_combate_dura_um_dia() -> void:
+	var w := _mundo_clerigo(1)
+	WorldHelpers.put(w, 50, 40)
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "consagrar"}).accepted, "Consagrar fora de combate")
+	check(w.module("magia").maximiza("luz", Vector2i(52, 40)), "área consagrada")
+	w.player_sheet.pv = 1
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "curar_ferimentos"})
+	eq(w.player_sheet.pv, mini(w.player_sheet.pv_max, 19), "cura maximizada fora de combate")
+	WorldHelpers.advance_hours(w, 25)
+	check(not w.module("magia").maximiza("luz", Vector2i(52, 40)), "depois de 1 dia, acabou")
+
+
+func test_consagrar_recusada_perto_de_simbolo_de_outra_divindade() -> void:
+	var w := _mundo_clerigo(1)
+	WorldHelpers.put(w, 30, 13)   # Templo de Lena
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "consagrar"}).accepted, "sem devoção a Lena, recusada")
+	w.player_sheet.devotion = "Lena"
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "consagrar"}).accepted, "devoto de Lena pode")
+
+
+func test_consagrar_permanente_exige_4o_circulo_ouro_e_uma_hora() -> void:
+	var baixo := _mundo_clerigo(9)
+	baixo.player.gold = 5000
+	check(not WorldHelpers.cmd(baixo, "CastSpell", {"spell": "consagrar", "aprimoramentos": [2]}).accepted, "requer 4º círculo")
+	var w := _mundo_clerigo(13)
+	WorldHelpers.put(w, 50, 40)
+	w.player.gold = 500
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "consagrar", "aprimoramentos": [2]}).accepted, "sem T$ 1.000, recusada")
+	w.player.gold = 1500
+	var antes := w.clock.total_minutes()
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "consagrar", "aprimoramentos": [2]}).accepted, "versão permanente")
+	eq(int(w.player.gold), 500, "gastou T$ 1.000")
+	check(w.clock.total_minutes() - antes >= 60, "levou 1 hora")
+	WorldHelpers.advance_hours(w, 24 * 30)
+	check(w.module("magia").maximiza("luz", Vector2i(50, 40)), "permanente")
+	var m := _cena_grupo(13)
+	check(not GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "consagrar", "target": "player", "aprimoramentos": [2]}).ok, "em combate, não")

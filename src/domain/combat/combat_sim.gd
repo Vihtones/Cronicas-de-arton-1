@@ -350,6 +350,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		mods.append(["combate defensivo", -2])
 	if not ranged and ClassFeatures.furia_bonus(sheet) > 0: mods.append(["fúria", ClassFeatures.furia_bonus(sheet)])   # Fúria do bárbaro
 	if sheet.efeito_bonus("ataque") != 0: mods.append(["magia", sheet.efeito_bonus("ataque")])
+	if sheet.efeito_bonus("testes") != 0: mods.append(["área sagrada", sheet.efeito_bonus("testes")])
 	# Arma Mágica (1º círculo): encanto da arma empunhada; quem a empunha usa o atributo-chave de magia no ataque.
 	var arma_empunhada := str(sheet.equipment.get("weapon", ""))
 	if arma_empunhada != "" and sheet.efeito_bonus_tipo("encanto_arma", arma_empunhada) != 0:
