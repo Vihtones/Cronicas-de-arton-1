@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3098,3 +3098,33 @@ func test_controlar_fogo_modelar_labaredas_e_criatura_de_fogo() -> void:
 	check(b1.pv < antes_l, "4d6 de fogo")
 	var m3 := _cena_grupo(5)
 	check(not _lanca(m3, {"type": "cast", "spell": "controlar_fogo", "target": "bandido_1", "aprimoramentos": [2]}).ok, "só criatura de fogo")
+
+
+func test_miasma_mefitico_nuvem_e_truque() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	var b2 := _bandido(m, "bandido_2", 99)
+	sim.c("bandido_2").tile = Vector2i(30, 57)
+	check(_lanca(m, {"type": "cast", "spell": "miasma_mefitico", "tile": Vector2i(29, 57), "aprimoramentos": [0]}).ok, "Miasma")
+	var d1 := 999 - b1.pv
+	check(d1 >= 6 and d1 <= 36, "6d6 de ácido (%d)" % d1)
+	check(b1.conditions.has("enjoado"), "falhou: enjoado")
+	check(not b2.conditions.has("enjoado"), "passou: não fica enjoado")
+	check(999 - b2.pv <= 18, "passou: metade")
+	var m2 := _cena_grupo(5)
+	var s2: CombatSim = m2[2]
+	var v1 := _bandido(m2, "bandido_1", -50)
+	check(not _lanca(m2, {"type": "cast", "spell": "miasma_mefitico", "target": "bandido_1", "truque": true}).ok, "truque: só com 0 PV ou menos")
+	v1.pv = -1
+	var cd_antes: int = m2[1].spell_dc(s2.c("player").sheet, {})
+	check(_lanca(m2, {"type": "cast", "spell": "miasma_mefitico", "target": "bandido_1", "truque": true}).ok, "truque")
+	check(v1.is_dead(), "a vítima morre")
+	eq(m2[1].spell_dc(s2.c("player").sheet, {}), cd_antes + 2, "+2 na CD por um dia")
+	var m3 := _cena_grupo(5)
+	var v3 := _bandido(m3, "bandido_1", 99)
+	v3.pv = 0
+	_lanca(m3, {"type": "cast", "spell": "miasma_mefitico", "target": "bandido_1", "truque": true})
+	check(not v3.is_dead(), "passou: sobrevive")
+	m3[2].budget.std = 1
+	check(not GhostPlanner.validate_action(m3[2], "player", {"type": "cast", "spell": "miasma_mefitico", "target": "bandido_1", "truque": true}).ok, "imune ao truque por um dia")

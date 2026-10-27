@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Miasma Mefítico (divina, 2º círculo) completa: nuvem de 6m em alcance médio, 5d6 de ácido e enjoado (Fortitude: metade, sem enjoo), +1d6, dano de trevas; truque com pó de ônix (T$ 10) que mata quem está com 0 PV ou menos (Fortitude anula; falhou: +2 na CD das magias por um dia; passou: imune por um dia).
+
 - Controlar Fogo (divina, 2º círculo) completa: chamejar (+1d6 de fogo nas armas, também naturais), esquentar (1d6 por rodada em quem segura ou veste o objeto; ação completa resfriar, ou largar), extinguir (fumaça de 3m com camuflagem leve), modelar (a chama anda 9m por rodada e queima quem atravessa); labaredas sustentadas (4d6, Reflexos metade), +1d6 e criatura de fogo (Fortitude: 0 PV ou 5d6). Danos de energia de armas de magias diferentes agora somam (Arma Mágica + Chamejar).
 
 - Augúrio (divina, 2º círculo) completa: sobre entrar e explorar um lugar do mapa, responde felicidade (baú com algo ou pista não descoberta), miséria (criatura hostil ou armadilha armada), ambos ou nada; falha secreta em 1 no 1d6 (1d12, 1d20); o mesmo assunto repete a primeira resposta. Consulta à divindade (uma pista e um fato do lugar) e perguntas de sim, não ou não sei, fora de combate.

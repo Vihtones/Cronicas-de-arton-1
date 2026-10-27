@@ -164,6 +164,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]
+			if sp_id == "miasma_mefitico":
+				if a.get("truque", false):
+					var TM2 := sim.c(a.get("target", ""))
+					if TM2.is_empty() or TM2.sheet.pv > 0 or TM2.sheet.is_dead() or CombatSim.cheb(A.tile, TM2.tile) > 1: return {"ok": false, "reason": "toque uma criatura com 0 PV ou menos"}
+					if TM2.sheet.efeito_bonus("imune", "miasma_truque") > 0: return {"ok": false, "reason": "ela está imune a este truque hoje"}
+				else:
+					if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 20)): return {"ok": false, "reason": "fora do alcance"}
+					targets = [actor]
 			if sp_id == "controlar_fogo":
 				var curto_f := int(sim.rules.value("alcance.quadrados", {}).get("curto", 6))
 				if apr.has(2):

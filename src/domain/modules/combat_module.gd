@@ -164,6 +164,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					var custo_or := GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, "oracao"), act)
 					if int(world.player.gold) < 20 * custo_or:
 						return PackedStringArray(["faltam T$ %d em incensos e oferendas" % (20 * custo_or)])
+				if act.get("type", "") == "cast" and act.get("spell", "") == "miasma_mefitico" and act.get("truque", false) and int(world.player.gold) < SpellRules.PO_DE_ONIX:
+					return PackedStringArray(["faltam T$ %d de pó de ônix" % SpellRules.PO_DE_ONIX])
 			var g := GhostPlanner.simulate(sim, "player", actions)
 			if not g.valid:
 				return PackedStringArray(["plano inválido: " + str(g.steps[-1].reason)])
@@ -1705,6 +1707,53 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Miasma Mefítico (divina 2): nuvem de 6m de raio em alcance médio; 5d6 de ácido e enjoado por 1 rodada, Fortitude
+## reduz à metade e evita o enjoo. Aprimoramentos: +1d6 (repetível); dano de trevas. Truque (pó de ônix, T$ 10): toque
+## numa criatura com 0 PV ou menos; Fortitude anula — falhou, morre e o conjurador tem +2 na CD das magias por um dia;
+## passou, fica imune ao truque por um dia.
+func _miasma(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var cd := spell_dc(sh, a)
+	if a.get("truque", false):
+		var tg: String = a.get("target", "")
+		var T: CharacterSheet = sim.c(tg).sheet
+		if id == "player":
+			out.append(fact("GOLD_CHANGED", {"delta": -SpellRules.PO_DE_ONIX, "reason": "pó de ônix do Miasma"}))
+		if _resiste(tg, "fortitude", cd, out):
+			T.add_efeito("magia.miasma_mefitico", "imune", 1, "dia", "miasma_truque", world.day_index() + 1)
+			out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": "miasma_mefitico", "saved": true}, [id, tg]))
+			return out
+		var tags: Array = ["magia", "trevas"]
+		tags.append_array(sim.apply_damage(tg, maxi(0, T.pv - T.death_threshold())))
+		sh.remove_efeito("magia.miasma_mefitico_cd")
+		sh.add_efeito("magia.miasma_mefitico_cd", "cd_magias", 2, "dia", "", world.day_index() + 1)
+		out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Miasma Mefítico", "d20": 0, "mod": 0, "mods": [], "total": 0,
+			"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": 0, "rolls": [], "pv_after": T.pv, "special": false,
+			"ranged": false, "spell": true, "save": "fortitude", "saved": false, "tags": tags}, [id, tg]))
+		return out
+	var apr: Array = a.get("aprimoramentos", [])
+	var tipo := "trevas" if apr.has(1) else "acido"
+	var centro: Vector2i = a.get("tile", sim.c(a.get("target", id)).tile)
+	for tg in _criaturas_vivas_em(Area.esfera(centro, Area.quadrados(6.0))):
+		var T: CharacterSheet = sim.c(tg).sheet
+		var dano := _dados_energia("%dd6" % (5 + apr.count(0)), tipo, sim.c(tg).tile)
+		var passou := _resiste(tg, "fortitude", cd, out)
+		if passou:
+			dano = dano / 2
+		dano = _dano_por_tipo(T, tipo, dano)
+		var tags: Array = ["magia", tipo]
+		if passou:
+			tags.append("resistiu")
+		tags.append_array(sim.apply_damage(tg, dano))
+		if not passou and sim.add_condicao(tg, "enjoado", 1, "miasma_mefitico"):
+			tags.append("enjoado")
+		out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Miasma Mefítico", "d20": 0, "mod": 0, "mods": [], "total": 0,
+			"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [], "pv_after": T.pv, "special": false,
+			"ranged": true, "spell": true, "save": "fortitude", "saved": passou, "tags": tags}, [id, tg]))
+	return out
+
+
 ## Controlar Fogo (divina 2, LB p.186): alcance curto, pela cena. Chamejar: armas escolhidas causam +1d6 de fogo
 ## (também armas naturais e ataques desarmados). Esquentar: um objeto que alguém segura ou veste causa 1d6 de fogo por
 ## rodada a ele (ação completa "resfriar" cancela). Extinguir: apaga uma chama e deixa uma nuvem de fumaça de 3m
@@ -2641,7 +2690,7 @@ func spell_dc(sh: CharacterSheet, a: Dictionary) -> int:
 	var cd := 10 + sh.level / 2 + int(sh.attrs.get(sh.caster_attr, 0))
 	if a.get("pungente", false) and sh.has_power("magia_pungente"):
 		cd += int(world.rules.value("poder.magia_pungente").cd_bonus)
-	return cd
+	return cd + sh.efeito_bonus("cd_magias")   # Miasma Mefítico (truque): +2 por um dia
 
 
 ## Arcano de Batalha (LB p.38): soma o atributo-chave na rolagem de dano da magia.
@@ -2809,6 +2858,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_soco_de_arsenal(id, a))
 		"controlar_fogo":
 			out.append_array(_controlar_fogo(id, a))
+		"miasma_mefitico":
+			out.append_array(_miasma(id, a))
 		"augurio":
 			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
 			var magia_au = world.module("magia")
