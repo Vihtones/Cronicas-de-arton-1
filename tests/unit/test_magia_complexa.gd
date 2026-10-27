@@ -220,3 +220,141 @@ func test_marca_que_expirou_nao_age() -> void:
 	sim._passar_rodada()
 	c._begin_turn("bandido_1")
 	eq(inimigo.pv, 50, "expirada, a marca não causa mais dano")
+
+
+# --- Coluna de Chamas e Sopro da Salvação (3º círculo, ambos com área) --------------------
+func _cena_grupo(nivel: int) -> Array:
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.level = nivel
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao"])
+	sh.equipment["armor"] = ""
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1", "bandido_2"], true, false)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_2").tile = Vector2i(32, 57)
+	sim.walk_fn = func(_t: Vector2i) -> bool: return true
+	for id in ["player", "bandido_1", "bandido_2"]:
+		var s: CharacterSheet = sim.c(id).sheet
+		s.pv_max = 999
+		s.pv = 999
+	sim.c("player").sheet.pm = 99
+	return [w, c, sim, r]
+
+
+func test_coluna_so_exige_circulo_3_e_clerigo_de_nivel_5() -> void:
+	var baixo := _cena_grupo(4)
+	var v_baixo := GhostPlanner.validate_action(baixo[2], "player", {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"]})
+	check(not v_baixo.ok, "clérigo de nível 4 não lança magia de 3º círculo")
+	var alto := _cena_grupo(9)
+	var v_alto := GhostPlanner.validate_action(alto[2], "player", {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"]})
+	check(v_alto.ok, "clérigo de nível 9 lança a Coluna de Chamas")
+
+
+func test_coluna_aprimoramentos_custam_1_pm_cada() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var base := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"]})
+	var com := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0, 1]})
+	check(base.ok and com.ok, "coluna com e sem aprimoramentos é válida")
+	eq(com.cost, base.cost + 2, "dois aprimoramentos somam 2 PM")
+
+
+func test_coluna_atinge_quem_esta_no_raio_e_poupa_quem_esta_fora() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	c._cast("player", a, v)
+	check(sim.c("bandido_1").sheet.pv < 999, "alvo no centro leva dano")
+	check(sim.c("player").sheet.pv < 999, "conjurador na área também leva dano (livro: criaturas livres na área)")
+	eq(sim.c("bandido_2").sheet.pv, 999, "criatura a 5 quadrados, fora do raio de 3m, fica intocada")
+
+
+func test_coluna_emite_um_resultado_de_salvamento_por_alvo() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"]}
+	var fx: Array = c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	var alvos: Array = []
+	for f in fx:
+		if f.type == "ATTACK_RESOLVED" and f.payload.get("weapon", "") == "Coluna de Chamas":
+			alvos.append(f.payload.target)
+			check(f.payload.has("saved") and f.payload.save == "reflexos", "resultado informa o teste de Reflexos")
+	check(alvos.has("bandido_1") and alvos.has("player"), "um resultado por criatura atingida")
+	check(not alvos.has("bandido_2"), "criatura fora da área não aparece no resultado")
+
+
+func test_sopro_so_custa_pm_pelos_aprimoramentos_escolhidos() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var base := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"]})
+	var tudo := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [0, 1, 2]})
+	check(base.ok and tudo.ok, "sopro com e sem aprimoramentos é válido")
+	eq(tudo.cost, base.cost + 2 + 4 + 4, "aprimoramentos custam 2, 4 e 4 PM")
+
+
+func test_sopro_cura_aliados_no_cone_e_nao_curas_inimigos_nem_o_conjurador() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(30, 57)          # dentro do cone de 9m
+	sim.c("bandido_2")["side"] = "player"                # vira aliado
+	sim.c("bandido_2").sheet.pv = 10
+	sim.c("bandido_1").sheet.pv = 10                     # inimigo no mesmo cone: não é curado
+	sim.c("player").sheet.pv = 500
+	var a := {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(sim.c("bandido_2").sheet.pv >= 16, "aliado no cone recebe no mínimo 2d8+4 (6 PV) sobre 10")
+	eq(sim.c("bandido_1").sheet.pv, 10, "inimigo na área não é curado")
+	eq(sim.c("player").sheet.pv, 500, "o conjurador não é curado pelo próprio sopro")
+
+
+func test_sopro_remove_so_a_condicao_escolhida_sem_aprimoramento() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(30, 57)
+	sim.c("bandido_2")["side"] = "player"
+	var ts: CharacterSheet = sim.c("bandido_2").sheet
+	ts.conditions.append("cego")
+	ts.conditions.append("confuso")
+	var a := {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"], "condicao": "cego"}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not ts.conditions.has("cego"), "a condição escolhida (cego) é removida")
+	check(ts.conditions.has("confuso"), "sem aprimoramento, as outras condições permanecem")
+
+
+func test_sopro_com_aprimoramento_3_remove_todas_as_condicoes() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(30, 57)
+	sim.c("bandido_2")["side"] = "player"
+	var ts: CharacterSheet = sim.c("bandido_2").sheet
+	ts.conditions.append("cego")
+	ts.conditions.append("confuso")
+	ts.conditions.append("lento")
+	var a := {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [2]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not ts.conditions.has("cego") and not ts.conditions.has("confuso") and not ts.conditions.has("lento"), "todas as condições listadas são removidas")
+	check(ts.conditions.has("surpreendido"), "condição fora da lista (surpreendido, do início do combate) permanece")
+
+
+func test_sopro_com_aprimoramento_2_leva_pv_negativos_a_zero_antes_da_cura() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(30, 57)
+	sim.c("bandido_2")["side"] = "player"
+	sim.c("bandido_2").sheet.pv = -5
+	var a := {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [1]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(sim.c("bandido_2").sheet.pv >= 6, "PV negativos vão a 0 e só então recebem a cura (mínimo 6)")

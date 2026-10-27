@@ -2,6 +2,7 @@ class_name CombatModule
 extends WorldModule
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
+const Area := preload("res://src/domain/combat/area.gd")
 ## Combate tático híbrido (§9). Planejamento congelado no turno, fantasma sem
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
@@ -548,6 +549,44 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
 
 
+## Criaturas não mortas cujo quadrado está em `tiles` (caídas também: áreas de dano as atingem).
+func _criaturas_vivas_em(tiles: Array) -> Array:
+	var out: Array = []
+	for id in sim.combatants:
+		if tiles.has(sim.c(id).tile) and not sim.c(id).sheet.is_dead():
+			out.append(id)
+	return out
+
+
+## Aliados do conjurador (exceto ele) não mortos em `tiles`.
+func _aliados_vivos_em(caster: String, tiles: Array) -> Array:
+	var out: Array = []
+	for id in sim.combatants:
+		if id == caster:
+			continue
+		var X: Dictionary = sim.c(id)
+		if X.side == sim.c(caster).side and tiles.has(X.tile) and not X.sheet.is_dead():
+			out.append(id)
+	return out
+
+
+## Condição que o Sopro remove: a pedida, se ela estiver na lista e na criatura; senão a primeira da lista presente.
+func _condicao_do_sopro(ts: CharacterSheet, pedida: String) -> String:
+	if pedida != "" and SpellRules.SOPRO_CONDICOES.has(pedida) and ts.conditions.has(pedida):
+		return pedida
+	for c in SpellRules.SOPRO_CONDICOES:
+		if ts.conditions.has(c):
+			return c
+	return ""
+
+
+## Dano por tipo: imunidade zera; redução de dano por tipo (magia e raça) é descontada.
+func _dano_por_tipo(ts: CharacterSheet, tipo: String, dano: int) -> int:
+	if ts.efeito_bonus("imune", tipo) > 0:
+		return 0
+	return maxi(0, dano - ts.efeito_rd(tipo) - int(ts.dr.get(tipo, 0)))
+
+
 ## Manto do Cruzado no início de cada turno do conjurador (LB p.84 do 4º círculo, ver catálogo).
 ## Luz: 2d8 PV a você e aliados em alcance curto. Trevas: 4d8 de dano de trevas a inimigos em alcance curto;
 ## o conjurador cura metade do dano causado.
@@ -969,6 +1008,53 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if apr_v.has(2):
 					tsv.add_efeito("magia.vestimenta_da_fe", "rd", 5, "dia", "*", ate_v)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "vestimenta_da_fe", "tags": ["magia"]}, [id, tg]))
+		"coluna_de_chamas":
+			# Coluna de Chamas (3º círculo): cilindro de 3m de raio em volta do alvo; 6d6 de fogo e 6d6 de luz,
+			# Reflexos reduz à metade. Aprimoramentos: +1d6 de fogo e +1d6 de luz (1 PM cada).
+			var apr_cl: Array = a.get("aprimoramentos", [])
+			var cd_cl := spell_dc(sh, a)
+			for tg_cl in _criaturas_vivas_em(Area.esfera(sim.c(a.get("target", id)).tile, Area.quadrados(3.0))):
+				var ts_cl: CharacterSheet = sim.c(tg_cl).sheet
+				var fogo := int(Dice.roll("6d6", world.rng, "combat").total)
+				if apr_cl.has(0):
+					fogo += int(Dice.roll("1d6", world.rng, "combat").total)
+				var luz := int(Dice.roll("6d6", world.rng, "combat").total)
+				if apr_cl.has(1):
+					luz += int(Dice.roll("1d6", world.rng, "combat").total)
+				var dano_cl := _dano_por_tipo(ts_cl, "fogo", fogo) + _dano_por_tipo(ts_cl, "luz", luz)
+				var sv_cl := Checks.skill(ts_cl, "reflexos", cd_cl, world.rules, world.rng, "combat")
+				if sv_cl.get("success", false):
+					dano_cl = dano_cl / 2
+				var tags_cl: Array = ["magia", "fogo", "luz"]
+				if sv_cl.get("success", false):
+					tags_cl.append("resistiu")
+				tags_cl.append_array(sim.apply_damage(tg_cl, dano_cl))
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg_cl, "weapon": "Coluna de Chamas", "d20": 0, "mod": 0,
+					"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_cl, "rolls": [],
+					"pv_after": ts_cl.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": sv_cl.get("success", false), "tags": tags_cl}, [id, tg_cl]))
+		"sopro_da_salvacao":
+			# Sopro da Salvação (3º círculo): cone de 9m orientado para o alvo; cura os aliados na área (não o conjurador).
+			# 2d8+4 PV; aprimoramentos: +1d8+2 PV; PV negativos vão a 0 antes da cura; remove todas as condições listadas.
+			var apr_s: Array = a.get("aprimoramentos", [])
+			var origem_s: Vector2i = sim.c(id).tile
+			var alvo_s: Vector2i = sim.c(a.get("target", id)).tile
+			var cone_s: Array = Area.cone(origem_s, Vector2i(signi(alvo_s.x - origem_s.x), signi(alvo_s.y - origem_s.y)), Area.quadrados(9.0))
+			for tg_s in _aliados_vivos_em(id, cone_s):
+				var ts_s: CharacterSheet = sim.c(tg_s).sheet
+				var cura_s := int(Dice.roll("2d8+4", world.rng, "combat").total)
+				if apr_s.has(0):
+					cura_s += int(Dice.roll("1d8+2", world.rng, "combat").total)
+				if apr_s.has(1) and ts_s.pv < 0:
+					ts_s.pv = 0
+				ts_s.pv = mini(ts_s.pv_max, ts_s.pv + cura_s)
+				if apr_s.has(2):
+					for cond_s in SpellRules.SOPRO_CONDICOES:
+						ts_s.remove_condition(cond_s)
+				else:
+					var escolha := _condicao_do_sopro(ts_s, str(a.get("condicao", "")))
+					if escolha != "":
+						ts_s.remove_condition(escolha)
+				out.append(fact("HEALED", {"actor": id, "target": tg_s, "amount": cura_s, "pv_after": ts_s.pv, "source": "sopro_da_salvacao", "tags": ["magia", "cura"]}, [id, tg_s]))
 		"curar_ferimentos":
 			var apr_c: Array = a.get("aprimoramentos", [])
 			for tgt in a.get("targets", [a.get("target", id)]):

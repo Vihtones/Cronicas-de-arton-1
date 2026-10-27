@@ -1,6 +1,7 @@
 class_name GhostPlanner
 extends RefCounted
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
+const Area := preload("res://src/domain/combat/area.gd")
 ## Projeção fantasma (§9): recebe o estado (somente leitura), clona e simula o plano
 ## sem dados. Mostra custos, alcance, chance de acerto e onde o plano fica inválido.
 ## Regra crítica: nunca altera o CombatSim original.
@@ -124,6 +125,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):
 						return {"ok": false, "reason": "Perdição só afeta inimigos"}
+			if sp_id == "sopro_da_salvacao":
+				return _validar_sopro(sim, actor, A, a, cost)
 			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.alcance), apr)
 			if alc == "pessoal": targets = [actor]
 			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
@@ -294,3 +297,17 @@ static func simulate(sim: CombatSim, actor: String, actions: Array) -> Dictionar
 		g.spend(v.kind)
 		steps.append(step)
 	return {"valid": valid, "steps": steps, "budget_after": g.budget.duplicate(), "end_tile": g.c(actor).tile}
+
+
+## Sopro da Salvação (3º círculo): o cone de 9m aponta do conjurador para o alvo escolhido. O alvo tem de estar
+## dentro desse cone (até 6 quadrados). Não há custo extra além do das aprimoramentos.
+static func _validar_sopro(sim: CombatSim, actor: String, A: Dictionary, a: Dictionary, cost: int) -> Dictionary:
+	var alvo: String = a.get("target", "")
+	if alvo == "" or alvo == actor or sim.c(alvo).is_empty():
+		return {"ok": false, "reason": "escolha o alvo que orienta o cone"}
+	var T: Dictionary = sim.c(alvo)
+	var dir := Vector2i(signi(T.tile.x - A.tile.x), signi(T.tile.y - A.tile.y))
+	var cone: Array = Area.cone(A.tile, dir, Area.quadrados(9.0))
+	if not cone.has(T.tile):
+		return {"ok": false, "reason": "alvo fora do cone de 9m"}
+	return {"ok": true, "kind": "padrao", "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": 0.0, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
