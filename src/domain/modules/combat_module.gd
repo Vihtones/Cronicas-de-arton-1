@@ -1983,17 +1983,24 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			for tgt in a.get("targets", [a.get("target", id)]):
 				var ts: CharacterSheet = sim.c(tgt).sheet
 				if ts.creature_type == "morto-vivo":
-					# Truque (LB p.189): contra morto-vivo causa 1d8 de dano de luz; Vontade reduz à metade
+					# Mortos-vivos sofrem dano de efeitos mágicos de cura de luz (Ameaças p.13): Vontade reduz à metade.
+					# Truque (0 PM, LB p.189): 1d8 de dano de luz em vez da cura.
 					var cd_c := spell_dc(sh, a)
 					var sv_c := Checks.skill(ts, "vontade", cd_c, world.rules, world.rng, "combat")
 					sv_c = _pos_teste(tgt, sv_c, cd_c, out)
-					var dano_c := _dados_energia("1d8", "luz", sim.c(tgt).tile)
+					var dano_c := 0
+					if a.get("truque", false):
+						dano_c = _dados_energia("1d8", "luz", sim.c(tgt).tile)
+					else:
+						dano_c = _dados_energia(str(sp.cura), "luz", sim.c(tgt).tile)
+						if apr_c.has(0):
+							dano_c += _dados_energia("1d8+1", "luz", sim.c(tgt).tile)
 					if sv_c.get("success", false):
 						dano_c = maxi(1, dano_c / 2)
 					var tags_c: Array = ["magia", "luz"]
 					if sv_c.get("success", false): tags_c.append("resistiu")
 					tags_c.append_array(sim.apply_damage(tgt, dano_c))
-					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Curar Ferimentos (truque)", "d20": int(sv_c.get("d20", 0)), "mod": int(sv_c.get("mod", 0)),
+					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Curar Ferimentos (truque)" if a.get("truque", false) else "Curar Ferimentos", "d20": int(sv_c.get("d20", 0)), "mod": int(sv_c.get("mod", 0)),
 						"mods": [], "total": int(sv_c.get("total", 0)), "defense": cd_c, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_c, "rolls": [],
 						"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "save": "vontade", "saved": sv_c.get("success", false), "tags": tags_c}, [id, tgt]))
 					continue

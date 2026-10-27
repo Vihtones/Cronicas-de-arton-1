@@ -382,11 +382,28 @@ func test_curar_ferimentos_truque_contra_morto_vivo_causa_dano() -> void:
 	var alvo: CharacterSheet = sim.c("bandido_1").sheet
 	alvo.creature_type = "morto-vivo"
 	alvo.pv = 10
-	var a := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]}
+	var a := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"], "truque": true}
 	var v := GhostPlanner.validate_action(sim, "player", a)
 	check(v.ok, "truque válido contra morto-vivo adjacente: %s" % str(v))
+	eq(int(v.cost), 0, "truque custa 0 PM")
 	c._cast("player", a, v)
-	check(alvo.pv < 10, "contra morto-vivo causa dano, não cura (PV %d)" % alvo.pv)
+	check(alvo.pv < 10 and alvo.pv >= 2, "contra morto-vivo causa 1d8, não cura (PV %d)" % alvo.pv)
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"], "truque": true, "aprimoramentos": [0]}).ok, "truque não se combina com aprimoramentos")
+
+
+func test_curar_ferimentos_normal_fere_morto_vivo_com_a_cura() -> void:
+	var m := _cena_com("curar_ferimentos", 1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	alvo.creature_type = "morto-vivo"
+	alvo.pv = 100
+	alvo.add_efeito("teste", "resistencia", -50, "cena")
+	var a := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(100 - alvo.pv >= 4 and 100 - alvo.pv <= 18, "2d8+2 de dano de luz (%d)" % (100 - alvo.pv))
+	var vivo := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_2", "targets": ["bandido_2"], "truque": true}
+	check(not GhostPlanner.validate_action(sim, "player", vivo).ok, "truque só em morto-vivo")
 
 
 func test_vestimenta_da_fe_defesa_resistencia_e_reducao() -> void:

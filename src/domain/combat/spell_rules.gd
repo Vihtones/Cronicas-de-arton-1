@@ -234,3 +234,9 @@ static func armamento_ataque(rules: RuleRegistry, sheet: CharacterSheet, nome: S
 		if bool(atk.get("natural", false)) or bool(atk.get("desarmado", false)) or bool(rules.value("arma." + arma_id, {}).get("primitiva", false)):
 			return atk
 	return {}
+
+
+## Truque (LB p.171): versão mais simples descrita no texto da magia ("Truque: ..."); custa 0 PM e não se combina
+## com aprimoramentos.
+static func tem_truque(rules: RuleRegistry, sp_id: String) -> bool:
+	return str(rules.value("magia." + sp_id, {}).get("texto", "")).contains("Truque:")

@@ -115,6 +115,13 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				return {"ok": false, "reason": "Escudo da Fé é reação: age quando um aliado é atacado (ou escolha execução padrão)"}
 			if int(sp.get("circulo", 0)) > SpellRules.circulo_maximo(A.sheet, sim.rules):
 				return {"ok": false, "reason": "magia de %dº círculo acima do que você conjura" % int(sp.get("circulo", 0))}
+			if a.get("truque", false):
+				if not SpellRules.tem_truque(sim.rules, sp_id): return {"ok": false, "reason": "essa magia não tem truque"}
+				if not apr.is_empty() or a.get("pungente", false): return {"ok": false, "reason": "truques não se combinam com aprimoramentos"}
+				if sp_id == "curar_ferimentos":
+					for tg in targets:
+						if not sim.combatants.has(tg) or sim.c(tg).sheet.creature_type != "morto-vivo":
+							return {"ok": false, "reason": "o truque de Curar Ferimentos só afeta mortos-vivos"}
 			if not SpellRules.aprimoramentos_validos(sp_id, apr, A.sheet, sim.rules):
 				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}
 			if sp_id == "resistencia_a_energia" and not SpellRules.tipo_energia_valido(str(a.get("tipo_energia", "fogo"))):
@@ -310,6 +317,8 @@ static func spell_rule(rules: RuleRegistry, sp_id: String) -> Dictionary:
 
 
 static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary) -> int:
+	if a.get("truque", false):
+		return 0   # Truque: custo zero
 	var base := 0 if int(sp.get("circulo", 1)) == 0 else int(rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
 	if a.get("pungente", false):
 		base += int(rules.value("poder.magia_pungente").custo_pm)

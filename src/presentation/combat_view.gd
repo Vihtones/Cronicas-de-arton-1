@@ -22,6 +22,7 @@ var spell_alvos: Array = []   # magias de alvos escolhidos: inimigos marcados an
 var spell_apr: Array = []     # aprimoramentos ligados na próxima magia (tecla B; G troca o aprimoramento em foco)
 var apr_cursor := 0           # aprimoramento em foco (tecla G avança)
 var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla T)
+var truque := false          # truque da magia em foco (tecla T): 0 PM, sem aprimoramentos
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var cura_passos := 0        # Cura pelas Mãos: passos extras (+1 PM cada, a cada 4 níveis) no próximo toque (tecla N)
 var cura_remover := false   # Cura pelas Mãos: remove uma condição da lista (+1 PM, 6º nível; tecla H)
@@ -118,6 +119,7 @@ func cycle_spell() -> void:
 	spell_apr.clear()
 	spell_alvos.clear()
 	apr_cursor = 0
+	truque = false
 	var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 	var cost := GhostPlanner.spell_cost(Game.world.rules, sp, {"pungente": pungente})
 	var c: Dictionary = Game.world.modules.combat.casting_cd(Game.world.player_sheet, sp, cost)
@@ -236,7 +238,7 @@ func candidate_actions(t: Vector2i) -> Array:
 				return [{"type": "cast", "spell": spell, "targets": ["player"], "pungente": pungente}]
 			if target == "" or not gs.is_enemy("player", target):
 				return []
-			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo}]
+			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo, "truque": truque}]
 	return []
 
 
@@ -304,8 +306,13 @@ func cycle_aprimoramento() -> void:
 
 
 func cycle_energia() -> void:
+	if spell != "resistencia_a_energia" and SpellRules.tem_truque(Game.world.rules, spell):
+		truque = not truque   # Truque: versão de 0 PM, sem aprimoramentos
+		message.emit("Truque (0 PM): %s (T troca)." % ("ligado" if truque else "desligado"))
+		_update_preview()
+		return
 	if spell != "resistencia_a_energia":
-		message.emit("Tipo de energia só se aplica à Resistência a Energia.")
+		message.emit("T troca o tipo de energia (Resistência a Energia) ou liga o truque das magias que têm.")
 		return
 	var lista: Array = SpellRules.TIPOS_ENERGIA
 	energia_tipo = lista[(lista.find(energia_tipo) + 1) % lista.size()]
@@ -314,7 +321,7 @@ func cycle_energia() -> void:
 
 func confirm() -> void:
 	if not spell_alvos.is_empty() and my_turn():
-		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo})
+		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo, "truque": truque})
 		spell_alvos.clear()
 		mode = "mover"
 	if plan.is_empty() or not my_turn():
