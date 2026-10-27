@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -544,3 +544,76 @@ func test_invulnerabilidade_aprimoramento_aceita_outro_alvo_a_curto_alcance() ->
 	sim.c("bandido_2").tile = Vector2i(40, 57)   # 14 quadrados: fora do curto (6)
 	check(GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "invulnerabilidade", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]}).ok, "com o aprimoramento, a magia vai para outra criatura a curto alcance")
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "invulnerabilidade", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [0]}).ok, "fora do alcance curto, é recusada")
+
+
+# --- Premonição (4º círculo) ----------------------------------------------------------------
+func test_premonicao_exige_circulo_4_e_nivel_13() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(12)[2], "player", {"type": "cast", "spell": "premonicao"}).ok, "clérigo de nível 12 não lança magia de 4º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(13)[2], "player", {"type": "cast", "spell": "premonicao"}).ok, "clérigo de nível 13 lança a Premonição")
+
+
+func test_premonicao_reacao_nao_pode_ser_lancada_como_acao() -> void:
+	var sim: CombatSim = _cena_grupo(13)[2]
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "premonicao", "aprimoramentos": [0]}).ok, "o aprimoramento de reação não é lançado no próprio turno")
+
+
+func test_premonicao_rola_de_novo_um_teste_que_falhou_uma_vez_por_rodada() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var r: RuleRegistry = m[3]
+	var ts: CharacterSheet = sim.c("player").sheet
+	c._cast("player", {"type": "cast", "spell": "premonicao"}, {"ok": true, "cost": 0})
+	check(ts.efeito_bonus("premonicao_uso") == 1, "uso disponível na rodada após lançar")
+	ts.add_efeito("teste", "resistencia", -50, "cena")   # o teste sempre falha, então a rerrolagem é usada
+	Checks.skill(ts, "vontade", 10, r, m[0].rng, "combat")
+	eq(ts.efeito_bonus("premonicao_uso"), 0, "o primeiro teste que falhou gasta o uso")
+	Checks.skill(ts, "vontade", 10, r, m[0].rng, "combat")
+	eq(ts.efeito_bonus("premonicao_uso"), 0, "o segundo teste da rodada não rola de novo")
+	c._begin_turn("player")
+	eq(ts.efeito_bonus("premonicao_uso"), 1, "o uso volta no próximo turno do conjurador")
+
+
+func test_premonicao_aliado_que_falhou_e_rerolado_pela_reacao() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(28, 57)
+	sim.c("bandido_2")["side"] = "player"
+	var pm_antes: int = sim.c("player").sheet.pm
+	var sv := {"success": false, "total": 3, "cd": 15, "mod": 0, "skill": "fortitude"}
+	var nova: Dictionary = c._pos_teste("bandido_2", sv, 15, [])
+	check(sim.c("player").sheet.pm < pm_antes, "a reação custa PM")
+	check(nova.has("d20"), "aliado que falhou tem uma nova rolagem aceita")
+
+
+func test_premonicao_inimigo_que_passou_pode_ser_empurrado_se_nao_negar() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")   # Vontade falha: não nega
+	var sv := {"success": true, "total": 20, "cd": 10, "mod": 0, "skill": "fortitude"}
+	var nova: Dictionary = c._pos_teste("bandido_1", sv, 10, [])
+	check(nova.has("d20"), "inimigo que passou é rerolado quando não nega a magia")
+
+
+func test_premonicao_inimigo_que_nega_com_vontade_nao_e_rerolado() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")   # Vontade passa: nega
+	var sv := {"success": true, "total": 20, "cd": 10, "mod": 0, "skill": "fortitude"}
+	var nova: Dictionary = c._pos_teste("bandido_1", sv, 10, [])
+	check(not nova.has("d20"), "inimigo que nega com Vontade mantém o resultado original")
+
+
+func test_premonicao_politica_nunca_desliga_a_reacao() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	c.power_policy["premonicao_reacao"] = "nunca"
+	sim.c("bandido_2").tile = Vector2i(28, 57)
+	sim.c("bandido_2")["side"] = "player"
+	var pm_antes: int = sim.c("player").sheet.pm
+	c._pos_teste("bandido_2", {"success": false, "total": 3, "cd": 15, "mod": 0, "skill": "fortitude"}, 15, [])
+	eq(sim.c("player").sheet.pm, pm_antes, "com a política em nunca, nada é gasto")

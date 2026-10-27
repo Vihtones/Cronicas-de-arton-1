@@ -13,6 +13,7 @@ const COMPLETAS := {
 	"vestimenta_da_fe": {"aprimoramentos": [0, 1, 2]},
 	"manto_do_cruzado": {"aprimoramentos": []},   # sem aprimoramentos; versão luz ou trevas escolhida ao aprender
 	"coluna_de_chamas": {"aprimoramentos": [0, 1]},   # cilindro de 3m de raio em volta do alvo; +1 PM por +1d6 de fogo ou de luz
+	"premonicao": {"aprimoramentos": [0, 1]},   # reação de 3 PM após um teste; 10 PM: dura um dia
 	"invulnerabilidade": {"aprimoramentos": [0]},   # proteção mental ou física (escolha) até o fim da cena
 	"poeira_da_podridao": {"aprimoramentos": [0]},   # nuvem de 6m; dano de trevas no início do turno do conjurador; bloqueia cura
 	"circulo_da_restauracao": {"aprimoramentos": [0]},   # esfera de 3m por 5 rodadas; cura no fim do turno de quem está dentro
@@ -30,7 +31,7 @@ const INVULN_FISICA := ["atordoado", "cego", "debilitado", "doente", "enjoado", 
 const REACAO := ["escudo_da_fe"]
 const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
 ## Aprimoramentos que trocam a execução para reação mesmo sem a magia ser reação no base (Proteção Divina +2 PM).
-const REACAO_APR := {"protecao_divina": [1]}
+const REACAO_APR := {"protecao_divina": [1], "premonicao": [0]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.

@@ -207,6 +207,11 @@ func curar(n: int) -> int:
 	return pv - antes
 
 
+## Remove os efeitos de um tipo de bônus (ex.: uso de Premonição gasto).
+func remove_efeito_stat(stat: String) -> void:
+	efeitos = efeitos.filter(func(e): return e.stat != stat)
+
+
 func remove_efeito(id_efeito: String) -> void:
 	efeitos = efeitos.filter(func(e): return e.id != id_efeito)
 

@@ -16,11 +16,11 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
-const POWER_POLICIES := {"escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
+const POWER_POLICIES := {"premonicao_reacao": ["auto", "nunca"], "escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"],
 	"golpe_divino": ["auto", "nunca"], "golpe_divino_extra": ["nunca", "auto"]}
-const DEFAULT_POLICY := {"escudo_da_fe": "auto", "protecao_divina": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
+const DEFAULT_POLICY := {"premonicao_reacao": "auto", "escudo_da_fe": "auto", "protecao_divina": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
 	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto", "golpe_divino": "auto", "golpe_divino_extra": "nunca"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
@@ -550,6 +550,42 @@ func _nuvens_do_conjurador(id: String, facts: Array) -> void:
 			_aplicar_nuvem(z, facts)
 
 
+## Reação Premonição (3 PM, aprimoramento de reação): logo após um teste de resistência, o conjurador força nova rolagem.
+## Aliados: só quando falharam. Inimigos (involuntários) têm Vontade para negar; sem negar, se tiverem passado, a nova rolagem vale.
+func _pos_teste(alvo: String, sv: Dictionary, cd: int, out: Array) -> Dictionary:
+	if str(power_policy.get("premonicao_reacao", "auto")) == "nunca":
+		return sv
+	var P := sim.c("player")
+	if P.is_empty() or not P.sheet.spells.has("premonicao") or sim.c(alvo).sheet.is_dead():
+		return sv
+	var flag := "premonicao_%d" % sim.round_no
+	if P.flags.has(flag) or CombatSim.cheb(P.tile, sim.c(alvo).tile) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
+		return sv
+	var inimigo := sim.is_enemy("player", alvo)
+	if inimigo and not sv.get("success", false):
+		return sv   # inimigo que já falhou não precisa de empurrão
+	if not inimigo and sv.get("success", false):
+		return sv   # aliado que passou não precisa de nova rolagem
+	var sp := GhostPlanner.spell_rule(world.rules, "premonicao")
+	var custo := GhostPlanner.spell_cost(world.rules, sp, {"spell": "premonicao", "aprimoramentos": [0]})
+	if P.sheet.pm < custo:
+		return sv
+	P.sheet.pm -= custo
+	P.flags.append(flag)
+	if inimigo:
+		var dc := spell_dc(P.sheet, {"spell": "premonicao"})
+		var negou := Checks.skill(sim.c(alvo).sheet, "vontade", dc, world.rules, world.rng, "combat")
+		if negou.get("success", false):
+			out.append(fact("REACTION", {"actor": "player", "power": "premonicao", "target": alvo, "negado": true}, ["player", alvo]))
+			return sv
+	var d: int = int(world.rng.roll("combat", 1, 20)[0])
+	var mod := int(sv.get("mod", 0))
+	var total := d + mod
+	out.append(fact("REACTION", {"actor": "player", "power": "premonicao", "target": alvo, "reroll": true, "d20": d, "total": total}, ["player", alvo]))
+	return {"allowed": true, "skill": sv.get("skill", ""), "d20": d, "mod": mod, "total": total, "cd": cd,
+		"success": total >= cd, "margin": total - cd, "sorte": false, "falha_automatica": false}
+
+
 ## Nuvem (Poeira da Podridão): cada criatura viva dentro faz Fortitude; sofre o dano de trevas (metade no teste)
 ## e quem falha fica sem recuperar PV por uma rodada.
 func _aplicar_nuvem(z: Dictionary, facts: Array) -> void:
@@ -558,6 +594,7 @@ func _aplicar_nuvem(z: Dictionary, facts: Array) -> void:
 	for tg in _criaturas_vivas_em(z.tiles):
 		var ts: CharacterSheet = sim.c(tg).sheet
 		var sv := Checks.skill(ts, "fortitude", int(dados.get("cd", 10)), world.rules, world.rng, "combat")
+		sv = _pos_teste(tg, sv, int(dados.get("cd", 10)), facts)
 		var passou: bool = sv.get("success", false)
 		var dano := int(Dice.roll(str(dados.get("dano_turno", "2d8+8")), world.rng, "combat").total)
 		if passou:
@@ -700,6 +737,8 @@ func _begin_turn(id: String) -> Dictionary:
 	s.limpar_efeitos("rodada")
 	_manto_inicio_de_turno(id, facts)
 	_nuvens_do_conjurador(id, facts)
+	if s.has_efeito("magia.premonicao"):
+		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
@@ -794,6 +833,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var alvo: CharacterSheet = sim.c(a.target).sheet
 			_reacao_protecao(id, a.target, out)
 			var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
+			res = _pos_teste(a.target, res, 19, out)
 			if res.get("success", false):
 				out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": a.target, "tags": ["racial"]}, [id]))
 			else:
@@ -809,6 +849,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var dados_m := 1 + int(v.get("passos", 0))
 			if ts_m.creature_type == "morto-vivo":
 				var sv_m := Checks.skill(ts_m, "vontade", 10 + int(sh_m.attrs["car"]), world.rules, world.rng, "combat")
+				sv_m = _pos_teste(alvo_m, sv_m, 10 + int(sh_m.attrs["car"]), out)
 				var dano_m := int(Dice.roll("%dd8+%d" % [dados_m, dados_m], world.rng, "combat").total)
 				if sv_m.get("success", false):
 					dano_m = maxi(1, dano_m / 2)
@@ -918,6 +959,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var metal := bool(world.rules.value("armadura." + str(T.equipment.get("armor", "")), {}).get("metal", false))
 			_reacao_protecao(id, tgt, out)
 			var sv := Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat", int(sp.penalidade_metal) if metal else 0)
+			sv = _pos_teste(tgt, sv, cd, out)
 			var r := Dice.roll(sp.dano, world.rng, "combat", 1, battle_bonus(sh))
 			var dmg := int(r.total)
 			if sv.get("success", false):
@@ -935,6 +977,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var cd := spell_dc(sh, a)
 			_reacao_protecao(id, tgt, out)
 			var sv := Checks.skill(T, "reflexos", cd, world.rules, world.rng, "combat")
+			sv = _pos_teste(tgt, sv, cd, out)
 			var r := Dice.roll(GhostPlanner.raio_dice(sh), world.rng, "combat", 1, battle_bonus(sh))
 			var dmg := int(r.total)
 			if sv.get("success", false): dmg = maxi(1, dmg / 2)
@@ -993,6 +1036,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if not apr.has(2):
 					_reacao_protecao(id, tg, out)
 					var res := Checks.skill(ts, "fortitude", dc, world.rules, world.rng, "combat")
+					res = _pos_teste(tg, res, dc, out)
 					passou = res.get("success", false)
 				if ts.creature_type == "morto-vivo":
 					total = ts.curar(total)
@@ -1088,6 +1132,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.add_zona("poeira_da_podridao_%d" % sim.zonas.size(), Area.esfera(centro_p, Area.quadrados(6.0)), "poeira_da_podridao", -1, "poeira_da_podridao",
 				{"conjurador": id, "dano_turno": dano_p, "cd": spell_dc(sh, a), "afeta": "todos"})
 			_aplicar_nuvem(sim.zonas[sim.zonas.size() - 1], out)
+		"premonicao":
+			# Premonição (4º círculo): pela cena, uma vez por rodada, rola de novo um teste próprio que falhou (ver Checks.skill).
+			# O aprimoramento de 10 PM dura um dia. O de 3 PM é reação, tratada em _pos_teste.
+			var dur_pr := "dia" if a.get("aprimoramentos", []).has(1) else "cena"
+			sh.add_efeito("magia.premonicao", "premonicao", 1, dur_pr)
+			sh.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "premonicao", "tags": ["magia"]}, [id]))
 		"invulnerabilidade":
 			# Invulnerabilidade (5º círculo): até o fim da cena, imune à proteção escolhida: mental (condições mentais, e os
 			# efeitos de encantamento e ilusão, que chegam ao jogo como essas condições) ou física (condições físicas, doenças,
@@ -1126,6 +1177,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					luz += int(Dice.roll("1d6", world.rng, "combat").total)
 				var dano_cl := _dano_por_tipo(ts_cl, "fogo", fogo) + _dano_por_tipo(ts_cl, "luz", luz)
 				var sv_cl := Checks.skill(ts_cl, "reflexos", cd_cl, world.rules, world.rng, "combat")
+				sv_cl = _pos_teste(tg_cl, sv_cl, cd_cl, out)
 				if sv_cl.get("success", false):
 					dano_cl = dano_cl / 2
 				var tags_cl: Array = ["magia", "fogo", "luz"]
@@ -1166,6 +1218,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					# Truque (LB p.189): contra morto-vivo causa 1d8 de dano de luz; Vontade reduz à metade
 					var cd_c := spell_dc(sh, a)
 					var sv_c := Checks.skill(ts, "vontade", cd_c, world.rules, world.rng, "combat")
+					sv_c = _pos_teste(tgt, sv_c, cd_c, out)
 					var dano_c := int(Dice.roll("1d8", world.rng, "combat").total)
 					if sv_c.get("success", false):
 						dano_c = maxi(1, dano_c / 2)
