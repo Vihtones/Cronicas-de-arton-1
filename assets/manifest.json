@@ -27,7 +27,7 @@
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    576,
+    640,
     96
    ],
    "pivot": [
@@ -36,7 +36,7 @@
    ],
    "animacoes": [],
    "dependencias": [],
-   "hash": "6be1c4d3dd0d55a3534a6ec7212613cad39fe5c2e7c62c82548cce2fd7dc1da5",
+   "hash": "98d3281e4f878a4c275703d49ce9b78656b7c562d96b6a2bd2276df5edb6f443",
    "caminho": "res://assets/tiles/tileset.png",
    "indice": {
     ".": {
@@ -110,6 +110,14 @@
     "r": {
      "col": 17,
      "name": "piso_ruina"
+    },
+    "p": {
+     "col": 18,
+     "name": "ponte"
+    },
+    "B": {
+     "col": 19,
+     "name": "barranco"
     }
    },
    "variantes": 3

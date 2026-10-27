@@ -105,11 +105,26 @@ def tile_void(img, x0, s): ImageDraw.Draw(img).rectangle([x0, 0, x0 + 31, 31], f
 def tile_ruin_floor(img, x0, s):
     noise(img, x0, 0, ["#77736a", "#6a665e", "#827e74", "#5f6b4a"], 1.0, s)
 
+def tile_ponte(img, x0, s):
+    r = random.Random(s); d = ImageDraw.Draw(img)
+    for i in range(4):   # tábuas horizontais
+        y0 = i * 8
+        d.rectangle([x0, y0, x0 + T - 1, y0 + 6], fill=hexc(r.choice(["#8a6a40", "#7d5f38", "#947348"])), outline=hexc("#4e3a22"))
+        for _ in range(3): img.putpixel((x0 + r.randrange(1, T - 2), y0 + r.randrange(1, 6)), hexc("#6a5030"))
+    d.rectangle([x0, 0, x0 + T - 1, 1], fill=hexc("#5a4328")); d.rectangle([x0, T - 2, x0 + T - 1, T - 1], fill=hexc("#5a4328"))
+def tile_abismo(img, x0, s):
+    r = random.Random(s)
+    for y in range(T):
+        for x in range(T): img.putpixel((x0 + x, y), hexc(r.choice(["#2b2420", "#241e1b", "#332a25", "#1d1816"])))
+    for _ in range(3):
+        x, y = r.randrange(2, 28), r.randrange(2, 28)
+        for k in range(r.randrange(4, 9)): img.putpixel((x0 + x + k // 2, y + k), hexc("#4a3d34"))
+
 TILES = [(".", "grama", tile_grass), ("=", "estrada", tile_road), (":", "trilha", tile_path), (",", "chao_floresta", tile_forest),
  ("c", "plantacao", tile_crop), ("T", "arvore", tile_tree), ("~", "rio", tile_water), ("#", "parede", tile_wall), ("_", "piso", tile_floor),
  ("%", "entulho", tile_rubble), ("D", "porta_fechada", lambda i, x, s: tile_door(i, x, s, False)), ("d", "porta_aberta", lambda i, x, s: tile_door(i, x, s, True)),
  ("S", "escada_desce", lambda i, x, s: tile_stairs(i, x, s, False)), ("U", "escada_sobe", lambda i, x, s: tile_stairs(i, x, s, True)),
- ("o", "poco", tile_well), ("X", "vazio", tile_void), ("k", "piso_cripta", tile_crypt_floor), ("r", "piso_ruina", tile_ruin_floor)]
+ ("o", "poco", tile_well), ("X", "vazio", tile_void), ("k", "piso_cripta", tile_crypt_floor), ("r", "piso_ruina", tile_ruin_floor), ("p", "ponte", tile_ponte), ("B", "barranco", tile_abismo)]
 VARIANTS = 3
 
 def build_tileset():
