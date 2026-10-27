@@ -649,6 +649,41 @@ func _tile_voo(origem: Vector2i, alvo: Vector2i) -> Vector2i:
 	return melhor
 
 
+## Ritual de Lágrimas de Wynna (um dia): o efeito fica na ficha do conjurador até o dia seguinte. Na virada do dia,
+## se o alvo ainda está no mesmo lugar, faz Vontade; falha perde as magias arcanas para sempre. Se o alvo se afastou,
+## o ritual se perde sem efeito. Quem passa resiste e pode ser alvo de novo.
+func processar_rituais_do_dia() -> Array:
+	var out: Array = []
+	var ps: CharacterSheet = world.player_sheet
+	if ps == null:
+		return out
+	var dia := world.day_index()
+	for e in ps.efeitos.duplicate(true):
+		if e.id != "magia.lagrimas_de_wynna" or e.fim != "ritual" or dia < int(e.ate):
+			continue
+		var npc := str(e.tipo)
+		ps.remove_efeito_de("magia.lagrimas_de_wynna", "ritual")
+		var st: Dictionary = creature_state.get(npc, {})
+		if st.is_empty() or not bool(st.get("present", false)) or not _mesmo_lugar_do_jogador(st):
+			out.append(fact("SPELL_MISSED", {"caster": "player", "target": npc, "spell": "lagrimas_de_wynna", "reason": "alvo se afastou"}, ["player", npc]))
+			continue
+		var nsh := CharacterSheet.from_dict(st.sheet)
+		var sv := Checks.skill(nsh, "vontade", int(e.bonus), world.rules, world.rng, "world")
+		if not sv.get("success", false):
+			nsh.arcana_perdida = true
+		st.sheet = nsh.to_dict()
+		out.append(fact("BUFF_APPLIED", {"actor": "player", "target": npc, "buff": "lagrimas_de_wynna", "passou": sv.get("success", false), "arcana_perdida": not sv.get("success", false), "tags": ["magia"]}, ["player", npc]))
+	return out
+
+
+func _mesmo_lugar_do_jogador(st: Dictionary) -> bool:
+	var t: Array = st.get("tile", [])
+	if t.size() < 2:
+		return false
+	var onde := world.db.location_at(world.db.world_to_tile(world.player.position))
+	return onde == world.db.location_at(Vector2i(int(t[0]), int(t[1])))
+
+
 ## Fim da execução do Banimento (no início do turno do conjurador): alvo fora de alcance ou já fora da cena não é afetado.
 ## Criatura de outro mundo (espírito) faz Vontade ou é banida; morto-vivo faz Vontade ou cai a 0 PV; quem passa fica
 ## enjoado por 1d4 rodadas. Nativo de Arton não é afetado. Com o aprimoramento, a criatura conjurada volta ao plano.
@@ -1444,6 +1479,31 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.c(guardiao).flags.append("incorporeo")
 			sim.c(guardiao).sheet.add_efeito("magia.guardiao_divino", "luz", LUZ_GUARDIAO, "cena")
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": guardiao, "buff": "guardiao_divino", "luz": LUZ_GUARDIAO, "tags": ["magia"]}, [id, guardiao]))
+		"lagrimas_de_wynna":
+			# Lágrimas de Wynna (5º círculo): alvo faz Vontade; falha, perde magias arcanas até o fim da cena; passou,
+			# perde por uma rodada. Aprimoramento 1 (2 PM): esfera de 6m com as criaturas escolhidas. Aprimoramento 2
+			# (5 PM + 1 PM): ritual de um dia com o alvo em alcance curto (`processar_rituais_do_dia`).
+			var cd_lw := spell_dc(sh, a)
+			var apr_lw: Array = a.get("aprimoramentos", [])
+			if apr_lw.has(1):
+				sh.add_efeito("magia.lagrimas_de_wynna", "ritual", cd_lw, "ritual", str(a.get("target", "")), world.day_index() + 1)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": a.get("target", ""), "buff": "lagrimas_ritual", "tags": ["magia"]}, [id]))
+			else:
+				var alvos_lw: Array = [str(a.get("target", ""))]
+				if apr_lw.has(0):
+					var centro_lw: Vector2i = sim.c(str(a.get("target", ""))).tile
+					alvos_lw = []
+					for tg in a.get("targets", []):
+						if tg != id and sim.combatants.has(tg) and sim.ids_em(Area.esfera(centro_lw, Area.quadrados(6.0))).has(tg):
+							alvos_lw.append(tg)
+				for tg in alvos_lw:
+					var sv_lw := Checks.skill(sim.c(tg).sheet, "vontade", cd_lw, world.rules, world.rng, "combat")
+					sv_lw = _pos_teste(tg, sv_lw, cd_lw, out)
+					if sv_lw.get("success", false):
+						sim.c(tg).sheet.add_efeito("magia.lagrimas_de_wynna", "bloqueio_arcana", 1, "rodada")
+					else:
+						sim.c(tg).sheet.add_efeito("magia.lagrimas_de_wynna", "bloqueio_arcana", 1, "cena")
+					out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "lagrimas_de_wynna", "passou": sv_lw.get("success", false), "tags": ["magia"]}, [id, tg]))
 		"banimento":
 			# Banimento (3º círculo): execução de 1d3+1 rodadas (`_resolver_conjuracao`). Concentração: ser ferido enquanto
 			# conjura exige Vontade com CD igual ao dano. Itens que se opõem ao alvo somam +2 na CD (`itens_opostos`).

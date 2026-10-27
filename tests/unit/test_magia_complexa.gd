@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1047,3 +1047,114 @@ func test_guardiao_divino_se_desfaz_sem_luz() -> void:
 	c._turno_guardiao(gid)
 	eq(sim.c(gid).sheet.efeito_bonus("luz"), 0, "a luz zera")
 	check(sim.c(gid).flags.has("fora") and not sim.conscious(gid), "sem luz, o elemental sai da cena")
+
+
+# --- Lágrimas de Wynna (5º círculo): bloqueio de magia arcana e ritual de um dia -----------------
+func _lagrimas(m: Array, apr: Array, targets: Array = []) -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var alvos := targets if not targets.is_empty() else ["bandido_1"]
+	var a := {"type": "cast", "spell": "lagrimas_de_wynna", "target": "bandido_1", "targets": alvos, "aprimoramentos": apr}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+
+
+func _ajusta_npc_do_mundo(c: CombatModule, id: String, bonus: int) -> void:
+	var d := CharacterSheet.from_dict(c.creature_state[id].sheet)
+	d.add_efeito("teste", "resistencia", bonus, "cena")
+	c.creature_state[id].sheet = d.to_dict()
+
+
+func test_lagrimas_de_wynna_exige_circulo_5() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(16)[2], "player", {"type": "cast", "spell": "lagrimas_de_wynna", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 16 não lança magia de 5º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(17)[2], "player", {"type": "cast", "spell": "lagrimas_de_wynna", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 17 lança Lágrimas de Wynna")
+
+
+func test_lagrimas_de_wynna_falha_bloqueia_magia_arcana_ate_o_fim_da_cena() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_lagrimas(m, [])
+	var sh: CharacterSheet = sim.c("bandido_1").sheet
+	check(sh.efeito_bonus("bloqueio_arcana") > 0, "quem falha perde magias arcanas")
+	sh.limpar_efeitos("rodada")
+	check(sh.efeito_bonus("bloqueio_arcana") > 0, "a falha dura até o fim da cena, não só uma rodada")
+
+
+func test_lagrimas_de_wynna_passar_bloqueia_so_uma_rodada() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	_lagrimas(m, [])
+	var sh: CharacterSheet = sim.c("bandido_1").sheet
+	check(sh.efeito_bonus("bloqueio_arcana") > 0, "quem passa perde a habilidade por uma rodada")
+	sh.limpar_efeitos("rodada")
+	eq(sh.efeito_bonus("bloqueio_arcana"), 0, "passada a rodada, volta a lançar")
+
+
+func test_lagrimas_de_wynna_bloqueio_recusa_magia_arcana_no_conjurador() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.spells.append("armadura_arcana")
+	sim.c("player").sheet.add_efeito("magia.lagrimas_de_wynna", "bloqueio_arcana", 1, "cena")
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "armadura_arcana", "target": "player", "targets": ["player"]})
+	check(not v.ok and str(v.reason).find("arcanas") >= 0, "com o bloqueio, a magia arcana é recusada")
+
+
+func test_lagrimas_de_wynna_ritual_de_um_dia_tira_as_arcanas_se_o_alvo_falha() -> void:
+	var m := _cena_grupo(17)
+	var w: WorldState = m[0]
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	pass
+	_lagrimas(m, [1])
+	var sh: CharacterSheet = sim.c("player").sheet
+	for e in sh.efeitos:
+		if e.id == "magia.lagrimas_de_wynna" and e.fim == "ritual":
+			e.ate = w.day_index()   # o dia termina
+	_ajusta_npc_do_mundo(c, "bandido_1", -50)
+	var st: Dictionary = c.creature_state["bandido_1"]
+	st.present = true
+	st.tile = [int(sim.c("player").tile.x), int(sim.c("player").tile.y)]
+	c.world.player.position = w.db.tile_to_world(sim.c("player").tile)
+	c.world.player_sheet = sh   # no fim do combate, a ficha da simulação volta para o mundo
+	var fatos: Array = c.processar_rituais_do_dia()
+	check(CharacterSheet.from_dict(st.sheet).arcana_perdida, "o alvo que falha no fim do ritual perde as magias arcanas")
+	check(not sh.efeitos.any(func(e): return e.id == "magia.lagrimas_de_wynna" and e.fim == "ritual"), "o ritual termina")
+	check(fatos.size() > 0, "o resultado do ritual é registrado")
+
+
+func test_lagrimas_de_wynna_ritual_que_o_alvo_passa_nao_tira_nada() -> void:
+	var m := _cena_grupo(17)
+	var w: WorldState = m[0]
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	pass
+	_lagrimas(m, [1])
+	for e in sim.c("player").sheet.efeitos:
+		if e.id == "magia.lagrimas_de_wynna" and e.fim == "ritual":
+			e.ate = w.day_index()
+	_ajusta_npc_do_mundo(c, "bandido_1", 99)
+	var st: Dictionary = c.creature_state["bandido_1"]
+	st.present = true
+	st.tile = [int(sim.c("player").tile.x), int(sim.c("player").tile.y)]
+	c.world.player.position = w.db.tile_to_world(sim.c("player").tile)
+	c.world.player_sheet = sim.c("player").sheet   # no fim do combate, a ficha da simulação volta para o mundo
+	c.processar_rituais_do_dia()
+	check(not CharacterSheet.from_dict(st.sheet).arcana_perdida, "quem passa no teste resiste")
+
+
+func test_lagrimas_de_wynna_ritual_se_perde_se_o_alvo_se_afastou() -> void:
+	var m := _cena_grupo(17)
+	var w: WorldState = m[0]
+	var sim: CombatSim = m[2]
+	var c: CombatModule = m[1]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_lagrimas(m, [1])
+	for e in sim.c("player").sheet.efeitos:
+		if e.id == "magia.lagrimas_de_wynna" and e.fim == "ritual":
+			e.ate = w.day_index()
+	var st: Dictionary = c.creature_state["bandido_1"]
+	st.present = false
+	c.world.player_sheet = sim.c("player").sheet   # no fim do combate, a ficha da simulação volta para o mundo
+	c.processar_rituais_do_dia()
+	check(not CharacterSheet.from_dict(st.sheet).arcana_perdida, "sem o alvo no lugar, o ritual se perde sem efeito")

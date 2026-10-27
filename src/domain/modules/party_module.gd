@@ -178,10 +178,14 @@ func on_event(e: GameEvent) -> Array:
 		last_day = world.day_index()
 		if world.player_sheet != null:
 			world.player_sheet.limpar_dia(world.day_index())   # efeitos de magia "por um dia" acabam
+		var rituais: Array = []
+		var combat = world.module("combat")
+		if combat != null:
+			rituais = combat.processar_rituais_do_dia()   # Lágrimas de Wynna: o ritual de um dia termina aqui
 		for id in members:
 			members[id].loyalty = minf(100.0, float(members[id].loyalty) + 1.0)
 			_descansa(id)
-		return _resolve_contracts()
+		return rituais + _resolve_contracts()
 	return []
 
 

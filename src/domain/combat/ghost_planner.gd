@@ -125,6 +125,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):
 						return {"ok": false, "reason": "Perdição só afeta inimigos"}
+			if sp_id == "lagrimas_de_wynna":
+				if apr.has(0) and apr.has(1):
+					return {"ok": false, "reason": "o ritual de um dia não combina com a esfera"}
+				if apr.has(1):
+					if A.sheet.arcana_perdida:
+						return {"ok": false, "reason": "você já perdeu as magias arcanas"}
+			if str(sp.get("tipo", "")) == "arcana" and (A.sheet.efeito_bonus("bloqueio_arcana") > 0 or A.sheet.arcana_perdida):
+				return {"ok": false, "reason": "você não consegue lançar magias arcanas"}
 			if sp_id == "banimento":
 				var tg_b: String = a.get("target", "")
 				if tg_b == actor or not sim.combatants.has(tg_b):
@@ -241,6 +249,8 @@ static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary) -> in
 	if a.get("pungente", false):
 		base += int(rules.value("poder.magia_pungente").custo_pm)
 	base += SpellRules.custo_aprimoramentos(rules, str(a.get("spell", "")), a.get("aprimoramentos", []))
+	if str(a.get("spell", "")) == "lagrimas_de_wynna" and a.get("aprimoramentos", []).has(1):
+		base += 1   # Lágrimas de Wynna (ritual): sacrifício de 1 PM além do custo do aprimoramento
 	return base
 
 
