@@ -7,6 +7,17 @@ const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 
 
 ## Validação compartilhada por fantasma e execução real.
+## Condições que a Cura pelas Mãos remove (LB p.82).
+const CONDICOES_CURA_MAOS := ["abalado", "apavorado", "atordoado", "cego", "doente", "exausto", "fatigado", "surdo"]
+
+
+static func _tem_condicao_de_cura(sh: CharacterSheet) -> bool:
+	for c in CONDICOES_CURA_MAOS:
+		if sh.conditions.has(c):
+			return true
+	return false
+
+
 static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dictionary:
 	var A := sim.c(actor)
 	if A.is_empty() or not sim.conscious(actor):
@@ -130,6 +141,22 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
 			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}
 			return {"ok": true, "kind": "padrao"}
+		"cura_maos":
+			# Cura pelas Mãos (LB p.82, paladino): ação de movimento; 1 PM, +1 PM por passo (a cada 4 níveis),
+			# +1 PM para remover uma condição da lista (a partir do 6º nível). Alcance corpo a corpo, inclusive você.
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "Cura pelas Mãos exige ação de movimento"}
+			if A.sheet.class_id != "paladino" or A.sheet.level < 2: return {"ok": false, "reason": "Cura pelas Mãos é do paladino a partir do 2º nível"}
+			var alvo_m: String = a.get("target", actor)
+			var TM := sim.c(alvo_m)
+			if TM.is_empty() or TM.sheet.is_dead(): return {"ok": false, "reason": "alvo inválido"}
+			if alvo_m != actor and CombatSim.cheb(A.tile, TM.tile) > 1: return {"ok": false, "reason": "alvo fora do corpo a corpo"}
+			var passos := clampi(int(a.get("passos", 0)), 0, A.sheet.level / 4)
+			var remover := bool(a.get("remover", false))
+			if remover and (A.sheet.level < 6 or not _tem_condicao_de_cura(TM.sheet)):
+				return {"ok": false, "reason": "remover condição exige 6º nível e uma condição da lista"}
+			var custo_m := 1 + passos + (1 if remover else 0)
+			if A.sheet.pm < custo_m: return {"ok": false, "reason": "PM insuficiente (%d)" % custo_m}
+			return {"ok": true, "kind": "movimento", "cost": custo_m, "passos": passos, "remover": remover}
 		"olhar_atordoante":
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
 			if not A.sheet.can_olhar_atordoante(): return {"ok": false, "reason": "só medusa, com PM, uma vez por cena"}
@@ -225,6 +252,8 @@ static func simulate(sim: CombatSim, actor: String, actions: Array) -> Dictionar
 				g.c(actor).tile = v.end
 				step["to"] = v.end
 				step["hit_chance"] = v.hit_chance; step["crit_chance"] = v.crit_chance; step["avg_damage"] = v.avg_damage; step["mods"] = v.mods
+			"cura_maos":
+				g.c(actor).sheet.pm -= int(v.cost)
 			"cast":
 				step["hit_chance"] = 1.0; step["crit_chance"] = 0.0; step["avg_damage"] = v.avg_damage; step["mods"] = []; step["pm_cost"] = v.cost
 				g.c(actor).sheet.pm -= int(v.cost)

@@ -544,6 +544,31 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			else:
 				alvo.add_condition("atordoado", world.rules)
 				out.append(fact("CONDITION_APPLIED", {"actor": id, "target": a.target, "condition": "atordoado", "tags": ["racial"]}, [id]))
+		"cura_maos":
+			# Cura pelas Mãos (LB p.82): 1d8+1 de PV por passo (+1d8+1 a cada passo extra); contra morto-vivo
+			# causa dano de luz, com Vontade (CD = 10 + Carisma) reduzindo à metade.
+			var sh_m: CharacterSheet = sim.c(id).sheet
+			sh_m.pm -= int(v.cost)
+			var alvo_m: String = a.get("target", id)
+			var ts_m: CharacterSheet = sim.c(alvo_m).sheet
+			var dados_m := 1 + int(v.get("passos", 0))
+			if ts_m.creature_type == "morto-vivo":
+				var sv_m := Checks.skill(ts_m, "vontade", 10 + int(sh_m.attrs["car"]), world.rules, world.rng, "combat")
+				var dano_m := int(Dice.roll("%dd8+%d" % [dados_m, dados_m], world.rng, "combat").total)
+				if sv_m.get("success", false):
+					dano_m = maxi(1, dano_m / 2)
+				out.append_array(sim.apply_damage(alvo_m, dano_m))
+				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "damage": dano_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id, alvo_m]))
+			else:
+				var cura_m := int(Dice.roll("%dd8+%d" % [dados_m, dados_m], world.rng, "combat").total)
+				ts_m.pv = mini(ts_m.pv_max, ts_m.pv + cura_m)
+				if v.get("remover", false):
+					for cond in ["abalado", "apavorado", "atordoado", "cego", "doente", "exausto", "fatigado", "surdo"]:
+						if ts_m.conditions.has(cond):
+							ts_m.remove_condition(cond)
+							break
+				out.append(fact("HEALED", {"actor": id, "target": alvo_m, "amount": cura_m, "pv_after": ts_m.pv, "source": "cura_pelas_maos", "tags": ["classe", "cura"]}, [id, alvo_m]))
+				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id]))
 		"allihanna":
 			var sh_a: CharacterSheet = sim.c(id).sheet
 			sh_a.pm -= 1

@@ -471,3 +471,27 @@ func test_golpe_divino_passos_extras_em_niveis_altos() -> void:
 	eq(int(pouco.golpe_dados), 2, "com 3 PM: 2 PM do golpe e só 1 passo")
 	sim.toggles["golpe_divino_extra"] = "nunca"
 	eq(int(sim.attack_profile("player", "bandido_1", 0, false, false).golpe_dados), 1, "extras desligados")
+
+
+func test_cura_pelas_maos_cura_custa_pm_e_remove_condicao() -> void:
+	var w := _cena_paladino(6)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	var P: CharacterSheet = sim.c("player").sheet
+	P.pm = 20
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	alvo.pv = 1
+	alvo.add_condition("cego", sim.rules)
+	var a := {"type": "cura_maos", "target": "bandido_1", "passos": 1, "remover": true}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "válida no 6º nível com alvo adjacente: %s" % str(v))
+	eq(int(v.cost), 3, "1 PM + 1 passo + 1 PM por remover condição")
+	c._execute_action("player", a, v)
+	check(alvo.pv > 1, "cura PV (%d)" % alvo.pv)
+	check(not alvo.conditions.has("cego"), "remove cego")
+	eq(P.pm, 17, "gasta os 3 PM")
+	var longe := {"type": "cura_maos", "target": "bandido_2", "passos": 0, "remover": false}
+	check(not GhostPlanner.validate_action(sim, "player", longe).ok, "alvo ausente não é válido")
+	P.level = 1
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "não existe antes do 2º nível")
