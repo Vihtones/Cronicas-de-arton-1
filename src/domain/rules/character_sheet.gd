@@ -515,6 +515,7 @@ static func from_creature(rules: RuleRegistry, rule_id: String, p_id: String) ->
 	s.senses = PackedStringArray(c.get("sentidos", []))
 	s.habilidades = PackedStringArray(c.get("habilidades", []))
 	s.source_rule = rule_id
+	s.creature_type = str(c.get("tipo", "humanoide"))   # tipo do bestiário (animal, humanoide, morto-vivo, espirito...)
 	return s
 
 

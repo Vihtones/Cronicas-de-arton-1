@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Correção: criaturas do bestiário recebem o tipo da ficha (animal, humanoide...), antes todas eram humanoides; o elemental de luz é do tipo espírito, como os elementais de T20.
+
 - Comando (divina, 1º círculo) completa: humanoide (qualquer criatura com aprimoramento; +1 alvo por aprimoramento) que ouça faz Vontade ou obedece no próprio turno: Fuja e Venha tomam o turno inteiro, Largue solta a arma (só a pega de novo no turno seguinte; a IA vai buscá-la; recolhida ao fim da luta), Pare deixa pasmo (uma vez por cena), Senta deixa caído sem poder levantar naquele turno. Tecla T escolhe a ordem.
 
 - Santuário (divina, 1º círculo) completa: quem tenta ação hostil contra o protegido faz Vontade; falhando, perde a ação e não tenta de novo (a IA procura outro alvo); não protege de área; o protegido que age com hostilidade dissipa a magia. Aprimoramentos: criaturas não inteligentes do tipo escolhido não o percebem; proteção contra área (quem falha só tenta de novo se o alvo sair da área).
