@@ -502,6 +502,52 @@ func invocar(caster: String, rule_id: String, rodadas: int, fonte: String) -> St
 	return nova
 
 
+## Zonas e marcas no início do turno da criatura afetada (docs/MAGIA_COMPLEXA.md). Dano e cura por dados.
+## Zona: quem está dentro dela, conforme "afeta" (todos | inimigos | aliados) em relação ao "lado" do conjurador.
+func _zonas_e_marcas_inicio_de_turno(id: String, facts: Array) -> void:
+	var x: Dictionary = sim.c(id)
+	if not sim.conscious(id):
+		return
+	for z in sim.zonas.duplicate(true):
+		var dados: Dictionary = z.get("dados", {})
+		if not (z.tiles as Array).has(x.tile) or not dados.has("dano_inicio_turno") or not _zona_afeta(z, id):
+			continue
+		_efeito_magico_no_turno(id, str(dados.dano_inicio_turno), str(dados.get("conjurador", id)), str(z.fonte), facts)
+	for m in sim.marcas.duplicate(true):
+		if m.alvo != id or not sim.conscious(id):
+			continue
+		var dados_m: Dictionary = m.get("dados", {})
+		var conj: String = str(dados_m.get("conjurador", id))
+		if dados_m.has("dano_inicio_turno"):
+			_efeito_magico_no_turno(id, str(dados_m.dano_inicio_turno), conj, str(m.fonte), facts)
+		if dados_m.has("cura_inicio_turno") and sim.conscious(id):
+			var s: CharacterSheet = x.sheet
+			var cura := int(Dice.roll(str(dados_m.cura_inicio_turno), world.rng, "combat").total)
+			s.pv = mini(s.pv_max, s.pv + cura)
+			facts.append(fact("HEALED", {"actor": conj, "target": id, "amount": cura, "pv_after": s.pv, "source": str(m.fonte), "tags": ["magia", "cura"]}, [conj, id]))
+
+
+func _zona_afeta(z: Dictionary, id: String) -> bool:
+	var dados: Dictionary = z.get("dados", {})
+	var afeta := str(dados.get("afeta", "todos"))
+	if afeta == "todos":
+		return true
+	var lado := str(dados.get("lado", ""))
+	if afeta == "inimigos":
+		return sim.c(id).side != lado
+	return sim.c(id).side == lado
+
+
+## Dano mágico por dados (zona ou marca): aplica e registra no mesmo formato de um ataque de magia.
+func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: String, facts: Array) -> void:
+	var dano := int(Dice.roll(dados, world.rng, "combat").total)
+	var tags: Array = ["magia"]
+	tags.append_array(sim.apply_damage(id, dano))
+	facts.append(fact("ATTACK_RESOLVED", {"attacker": conj, "target": id, "weapon": origem, "d20": 0, "mod": 0,
+		"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
+		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
+
+
 ## Manto do Cruzado no início de cada turno do conjurador (LB p.84 do 4º círculo, ver catálogo).
 ## Luz: 2d8 PV a você e aliados em alcance curto. Trevas: 4d8 de dano de trevas a inimigos em alcance curto;
 ## o conjurador cura metade do dano causado.
@@ -545,6 +591,7 @@ func _begin_turn(id: String) -> Dictionary:
 	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
 	s.limpar_efeitos("rodada")
 	_manto_inicio_de_turno(id, facts)
+	_zonas_e_marcas_inicio_de_turno(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
 	if x.surprised:

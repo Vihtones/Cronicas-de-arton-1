@@ -376,9 +376,10 @@ func sides_alive() -> Dictionary:
 
 
 ## --- Zonas e marcas (magias complexas: ver docs/MAGIA_COMPLEXA.md) ----------------------
-func add_zona(id: String, tiles: Array, tipo: String, rodadas: int, fonte: String) -> void:
+## dados: efeitos da zona. Ex.: {"dano_inicio_turno": "1d6", "afeta": "inimigos", "lado": "player", "conjurador": "player"}.
+func add_zona(id: String, tiles: Array, tipo: String, rodadas: int, fonte: String, dados: Dictionary = {}) -> void:
 	zonas = zonas.filter(func(z): return z.id != id)
-	zonas.append({"id": id, "tiles": tiles.duplicate(), "tipo": tipo, "rodadas": rodadas, "fonte": fonte})
+	zonas.append({"id": id, "tiles": tiles.duplicate(), "tipo": tipo, "rodadas": rodadas, "fonte": fonte, "dados": dados.duplicate(true)})
 
 
 func remove_zona(id: String) -> void:
@@ -392,9 +393,10 @@ func zona_em(t: Vector2i, tipo: String) -> bool:
 	return false
 
 
-func add_marca(id: String, alvo: String, fonte: String, tipo: String, rodadas: int) -> void:
+## dados: efeitos da marca. Ex.: {"dano_inicio_turno": "1d4", "conjurador": "player"}.
+func add_marca(id: String, alvo: String, fonte: String, tipo: String, rodadas: int, dados: Dictionary = {}) -> void:
 	marcas = marcas.filter(func(m): return not (m.id == id and m.alvo == alvo))
-	marcas.append({"id": id, "alvo": alvo, "fonte": fonte, "tipo": tipo, "rodadas": rodadas})
+	marcas.append({"id": id, "alvo": alvo, "fonte": fonte, "tipo": tipo, "rodadas": rodadas, "dados": dados.duplicate(true)})
 
 
 func remove_marca(id: String, alvo: String) -> void:

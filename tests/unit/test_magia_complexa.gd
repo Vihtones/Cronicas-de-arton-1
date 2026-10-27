@@ -50,7 +50,8 @@ func test_linha_segue_a_direcao() -> void:
 
 # --- Zonas ---------------------------------------------------------------------------------
 func test_zona_de_terreno_dificil_dobra_o_custo_do_passo() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	var sem := sim.step_cost(Vector2i(26, 57), Vector2i(27, 57))
 	sim.add_zona("z", [Vector2i(27, 57)], "terreno_dificil", 2, "teste")
 	eq(sim.step_cost(Vector2i(26, 57), Vector2i(27, 57)), sem * 2, "dentro da zona custa o dobro")
@@ -58,7 +59,8 @@ func test_zona_de_terreno_dificil_dobra_o_custo_do_passo() -> void:
 
 
 func test_zona_expira_depois_das_rodadas_e_zona_permanente_nao() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	sim.add_zona("temp", [Vector2i(3, 3)], "terreno_dificil", 2, "teste")
 	sim.add_zona("perm", [Vector2i(4, 4)], "terreno_dificil", -1, "teste")
 	sim._passar_rodada()
@@ -69,7 +71,8 @@ func test_zona_expira_depois_das_rodadas_e_zona_permanente_nao() -> void:
 
 
 func test_clone_copia_zonas() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	sim.add_zona("z", [Vector2i(9, 9)], "terreno_dificil", 3, "teste")
 	var g := sim.clone()
 	check(g.zona_em(Vector2i(9, 9), "terreno_dificil"), "o clone (usado pelo planejamento) tem a zona")
@@ -79,7 +82,8 @@ func test_clone_copia_zonas() -> void:
 
 # --- Marcas --------------------------------------------------------------------------------
 func test_marca_expira_e_fica_registrada() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	sim.add_marca("maldicao_x", "bandido_1", "teste", "maldicao", 1)
 	check(sim.tem_marca("bandido_1", "maldicao"), "marca ativa")
 	sim._passar_rodada()
@@ -88,7 +92,8 @@ func test_marca_expira_e_fica_registrada() -> void:
 
 
 func test_ids_em_area_pega_so_criaturas_conscientes() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	eq(sim.ids_em([Vector2i(27, 57)]), ["bandido_1"], "criatura no quadrado")
 	sim.c("bandido_1").sheet.pv = -20
 	eq(sim.ids_em([Vector2i(27, 57)]).size(), 0, "caída não entra")
@@ -96,7 +101,8 @@ func test_ids_em_area_pega_so_criaturas_conscientes() -> void:
 
 # --- Invocações ----------------------------------------------------------------------------
 func test_invocacao_entra_do_lado_do_conjurador_e_expira() -> void:
-	var c: CombatModule = _cena()[1]
+	var r := _cena()
+	var c: CombatModule = r[1]
 	var sim: CombatSim = c.sim
 	var nova := c.invocar("player", "criatura.hiena", 2, "servo")
 	check(sim.combatants.has(nova), "criatura criada na simulação")
@@ -111,7 +117,8 @@ func test_invocacao_entra_do_lado_do_conjurador_e_expira() -> void:
 
 
 func test_remover_criatura_antes_da_vez_atual_ajusta_a_vez() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	sim.order = ["player", "bandido_1"]
 	sim.turn_idx = 1
 	sim.remove_combatant("player")
@@ -121,7 +128,8 @@ func test_remover_criatura_antes_da_vez_atual_ajusta_a_vez() -> void:
 
 # --- PV temporários ------------------------------------------------------------------------
 func test_pv_temporario_absorve_dano_antes_dos_pv() -> void:
-	var sim: CombatSim = _cena()[2]
+	var r := _cena()
+	var sim: CombatSim = r[2]
 	var sh: CharacterSheet = sim.c("player").sheet
 	sh.pv = 20
 	sh.pv_temp = 10
@@ -140,7 +148,8 @@ func test_pv_temporario_sobrevive_ao_salvar() -> void:
 
 
 func test_zonas_e_marcas_vao_para_o_save_da_simulacao() -> void:
-	var c: CombatModule = _cena()[1]
+	var r := _cena()
+	var c: CombatModule = r[1]
 	c.sim.add_zona("z", [Vector2i(9, 9)], "terreno_dificil", 2, "teste")
 	c.sim.add_marca("m", "bandido_1", "teste", "maldicao", 2)
 	var d := c.to_dict()
@@ -148,3 +157,66 @@ func test_zonas_e_marcas_vao_para_o_save_da_simulacao() -> void:
 	eq((d.sim.marcas as Array).size(), 1, "marca salva")
 
 
+
+
+# --- Efeitos no início do turno (zonas e marcas) ----------------------------------------
+func test_zona_com_dano_ataca_inimigos_que_comecam_o_turno_dentro_dela() -> void:
+	var r := _cena()
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var inimigo: CharacterSheet = sim.c("bandido_1").sheet
+	inimigo.pv = 50
+	sim.add_zona("fogo_x", [Vector2i(27, 57)], "fogo", 3, "magia.teste",
+		{"dano_inicio_turno": "2d6", "afeta": "inimigos", "lado": "player", "conjurador": "player"})
+	c._begin_turn("bandido_1")
+	check(inimigo.pv < 50, "inimigo dentro da zona leva o dano (pv %d)" % inimigo.pv)
+
+
+func test_zona_so_afeta_quem_o_filtro_manda() -> void:
+	var r := _cena()
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var P: CharacterSheet = sim.c("player").sheet
+	P.pv = 30
+	sim.add_zona("fogo_y", [Vector2i(26, 57)], "fogo", 3, "magia.teste",
+		{"dano_inicio_turno": "2d6", "afeta": "inimigos", "lado": "player", "conjurador": "player"})
+	c._begin_turn("player")
+	eq(P.pv, 30, "o conjurador, do lado da zona, não é atingido por uma zona que pega só inimigos")
+
+
+func test_zona_sem_dano_nao_faz_nada() -> void:
+	var r := _cena()
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var inimigo: CharacterSheet = sim.c("bandido_1").sheet
+	inimigo.pv = 50
+	sim.add_zona("neblina", [Vector2i(27, 57)], "neblina", 3, "magia.teste")
+	c._begin_turn("bandido_1")
+	eq(inimigo.pv, 50, "zona sem dados de dano não causa dano")
+
+
+func test_marca_de_cura_e_dano_agem_no_inicio_do_turno_do_alvo() -> void:
+	var r := _cena()
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var inimigo: CharacterSheet = sim.c("bandido_1").sheet
+	inimigo.pv = 1
+	sim.add_marca("regen", "bandido_1", "magia.teste", "bencao", 3, {"cura_inicio_turno": "2d8"})
+	c._begin_turn("bandido_1")
+	check(inimigo.pv > 1, "marca de cura recupera PV (pv %d)" % inimigo.pv)
+	inimigo.pv = 50
+	sim.add_marca("sombra", "bandido_1", "magia.teste", "maldicao", 3, {"dano_inicio_turno": "1d4", "conjurador": "player"})
+	c._begin_turn("bandido_1")
+	check(inimigo.pv < 50, "marca de dano tira PV (pv %d)" % inimigo.pv)
+
+
+func test_marca_que_expirou_nao_age() -> void:
+	var r := _cena()
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var inimigo: CharacterSheet = sim.c("bandido_1").sheet
+	inimigo.pv = 50
+	sim.add_marca("sombra2", "bandido_1", "magia.teste", "maldicao", 1, {"dano_inicio_turno": "1d4", "conjurador": "player"})
+	sim._passar_rodada()
+	c._begin_turn("bandido_1")
+	eq(inimigo.pv, 50, "expirada, a marca não causa mais dano")

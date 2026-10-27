@@ -8,8 +8,8 @@ testado em `tests/unit/test_magia_complexa.gd`. Medidas em quadrados de 1,5m (`A
 | Sistema | Onde | O que faz |
 |---|---|---|
 | Geometria de área | `src/domain/combat/area.gd` | `esfera` (também cilindro e cubo), `cone` (90 graus), `linha`, `quadrados(metros)`. Funções puras. |
-| Zonas | `CombatSim.zonas`, `add_zona`, `zona_em` | Área persistente no terreno (muralha, névoa, terreno difícil). Terreno difícil já dobra o custo do passo. Expira em N rodadas, ou nunca (`rodadas = -1`). |
-| Marcas | `CombatSim.marcas`, `add_marca`, `tem_marca` | Efeito preso a uma criatura (maldição, vínculo, invocação). Expira em N rodadas. |
+| Zonas | `CombatSim.zonas`, `add_zona`, `zona_em` | Área persistente no terreno (muralha, névoa, terreno difícil). Terreno difícil já dobra o custo do passo. Expira em N rodadas, ou nunca (`rodadas = -1`). Dados opcionais: dano ou cura por turno, quem é afetado. |
+| Marcas | `CombatSim.marcas`, `add_marca`, `tem_marca` | Efeito preso a uma criatura (maldição, vínculo, invocação). Expira em N rodadas. Dados opcionais: dano ou cura por turno. |
 | Invocação | `CombatModule.invocar` | Cria uma criatura do bestiário (`criatura.*`) do lado do conjurador, logo depois dele na ordem. Com marca `invocacao`, sai da simulação ao expirar. |
 | PV temporários | `CharacterSheet.pv_temp`, `CombatSim.apply_damage` | Absorvem dano antes dos PV. Zeram ao fim do combate. |
 | Ids em área | `CombatSim.ids_em(tiles)` | Criaturas conscientes cujo quadrado está na área. |
@@ -22,7 +22,9 @@ Tudo isso é salvo com o combate (zonas e marcas em `CombatModule.to_dict`).
 - **Área**: `var alvos := Area.esfera(centro, Area.quadrados(6.0))` e depois `sim.ids_em(alvos)`.
 - **Terreno persistente**: `sim.add_zona("muralha_x", tiles, "terreno_dificil", 3, "magia.muralha_de_ossos")`.
   Para outro tipo de zona, use um tipo novo e trate-o onde ele tem efeito.
-- **Maldição ou vínculo**: `sim.add_marca(id, alvo, "magia.ligacao_sombria", "maldicao", rodadas)`.
+- **Maldição ou vínculo**: `sim.add_marca(id, alvo, "magia.ligacao_sombria", "maldicao", rodadas, {"dano_inicio_turno": "1d6", "conjurador": conj})`.
+- **Zona com efeito por turno**: `sim.add_zona(id, tiles, "fogo", rodadas, fonte, {"dano_inicio_turno": "2d6", "afeta": "inimigos", "lado": lado_do_conjurador, "conjurador": conj})`.
+  Dano e cura são aplicados no início do turno de cada criatura afetada (`_zonas_e_marcas_inicio_de_turno`).
 - **Invocação**: `c.invocar(conjurador, "criatura.hiena", rodadas, "servo_divino")`.
 - **PV temporários**: `sheet.pv_temp += 40` (Heroísmo).
 
@@ -31,8 +33,7 @@ Tudo isso é salvo com o combate (zonas e marcas em `CombatModule.to_dict`).
 Estes sistemas guardam o estado, mas ainda não produzem efeito por si. Cada magia que precisar deles
 deve implementar o efeito, e os próximos passos são:
 
-1. **Efeito no início do turno e na entrada da zona**: nada ainda causa dano ou cura por zona ou por marca.
-   Falta um gancho em `_begin_turn` (o Manto do Cruzado já tem um caso específico que serve de modelo).
+1. **Entrada na zona**: o efeito acontece só no início do turno. Não há efeito ao entrar na zona no meio do turno.
 2. **Movimento bloqueado por zona** (Cúpula de Repulsão, Muralha): hoje a zona só dobra o custo.
 3. **Expiração com aviso**: `expiradas` guarda os ids, mas nenhum fato de jogo é emitido ainda.
 4. **Invocações com habilidades próprias** (Guardião Divino, Montaria): a criatura usa o bestiário, sem
