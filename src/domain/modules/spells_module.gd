@@ -32,6 +32,7 @@ const FORA_DE_COMBATE := {
 	"voz_divina": [],
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
+	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
 	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
 	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
@@ -204,6 +205,13 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 				if interrogados.has(alvo_vd):
 					return PackedStringArray(["esse corpo já respondeu uma vez"])
 				return _valida_cadaver(alvo_vd, "toque")
+		"controlar_madeira":
+			if apr.has(1):
+				return PackedStringArray(["a vegetação afiada só é lançada em combate"])
+			var p_cm := _tile_jogador()
+			var err_cm := SpellRules.erro_madeira(world.rules, world.db, cmd.payload, p_cm, p_cm, sh)
+			if err_cm != "":
+				return PackedStringArray([err_cm])
 		"controlar_plantas":
 			if not cmd.payload.get("truque", false) and not apr.has(0) and not apr.has(2):
 				return PackedStringArray(["fora de combate, só a poda, falar com plantas ou o truque"])
@@ -218,6 +226,32 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			if apr.has(2) and int(world.player.gold) < TOTAL_PERMANENTE:
 				return PackedStringArray(["faltam incenso e óleos (T$ %d)" % TOTAL_PERMANENTE])
 	return PackedStringArray()
+
+
+## Controlar Madeira fora de combate: objetos e paredes de madeira, o equipamento do próprio conjurador, ou a forma de árvore.
+func _controlar_madeira(payload: Dictionary, sh: CharacterSheet) -> Array:
+	var out: Array = []
+	var dia := world.day_index()
+	if (payload.get("aprimoramentos", []) as Array).has(0):
+		sh.add_efeito("magia.controlar_madeira_arvore", "arvore", 1, "dia", "", dia + 1)
+		sh.add_efeito("magia.controlar_madeira_arvore", "sobrevivencia_disfarce", 30, "dia", "", dia + 1)
+		out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "arvore", "tags": ["magia"]}, ["player"]))
+		return out
+	var ef := str(payload.get("efeito", ""))
+	var objs = world.module("objects")
+	match str(payload.get("alvo", "")):
+		"objeto":
+			var oid := str(payload.get("object_id", ""))
+			match ef:
+				"fortalecer": out.append_array(objs.fortalecer(oid, dia + 1))
+				"retorcer": out.append_array(objs.retorcer(oid))
+				_: out.append_array(objs.repelir(oid))
+		"parede":
+			out.append_array(objs.abrir_passagem(payload.get("tile", _tile_jogador())))
+		_:
+			SpellRules.aplicar_madeira_equip(world.rules, ef, str(payload.alvo), sh, "player", str(payload.get("forma", "")))
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "controlar_madeira_" + ef, "tags": ["magia"]}, ["player"]))
+	return out
 
 
 func execute(cmd: GameCommand) -> Array:
@@ -360,6 +394,8 @@ func execute(cmd: GameCommand) -> Array:
 					sh.add_efeito("magia.acalmar_animal", "diplomacia_vs", 10, "cena", tg)
 					sh.add_efeito("magia.acalmar_animal", "adestramento_vs", 10, "cena", tg)
 				out.append(fact("BUFF_APPLIED", {"actor": "player", "target": tg, "buff": sp_id, "tags": ["magia"]}, ["player", tg]))
+		"controlar_madeira":
+			out.append_array(_controlar_madeira(cmd.payload, sh))
 		"controlar_plantas":
 			var apr_p: Array = cmd.payload.get("aprimoramentos", [])
 			var p_cp := _tile_jogador()

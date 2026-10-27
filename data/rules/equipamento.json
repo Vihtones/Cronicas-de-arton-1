@@ -40,7 +40,8 @@
     "mult": 2,
     "tipo": "impacto",
     "maos": 1,
-    "primitiva": true
+    "primitiva": true,
+    "madeira": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
@@ -55,7 +56,8 @@
     "mult": 2,
     "tipo": "impacto",
     "maos": 2,
-    "primitiva": true
+    "primitiva": true,
+    "madeira": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
@@ -70,7 +72,8 @@
     "mult": 2,
     "tipo": "impacto",
     "maos": 2,
-    "primitiva": true
+    "primitiva": true,
+    "madeira": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
@@ -85,7 +88,8 @@
     "mult": 2,
     "alcance": "curto",
     "tipo": "perfuracao",
-    "maos": 1
+    "maos": 1,
+    "madeira": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
@@ -120,7 +124,8 @@
     "alcance": "medio",
     "tipo": "perfuracao",
     "maos": 2,
-    "disparo": true
+    "disparo": true,
+    "madeira": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
@@ -195,7 +200,8 @@
    "id": "escudo.leve",
    "valor": {
     "defesa": 1,
-    "penalidade": -1
+    "penalidade": -1,
+    "madeira": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 153,

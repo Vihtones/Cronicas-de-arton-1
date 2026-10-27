@@ -62,6 +62,8 @@ func apply_command(cmd: GameCommand, _legacy_bus: EventBus = null) -> GameComman
 	if cmd.expected_world_revision >= 0 and cmd.expected_world_revision != revision:
 		return GameCommand.Result.rejected(["revisão desatualizada: esperado %d, atual %d" % [cmd.expected_world_revision, revision]], revision)
 	var facts: Array = []
+	if player_sheet != null and player_sheet.efeito_bonus("arvore") > 0 and not ["AdvanceTime", "SetXpMode", "SetPolicy", "SetOrder", "SetPowerPolicy"].has(cmd.type):
+		return GameCommand.Result.rejected(["você é uma árvore: não pode falar nem fazer ações físicas (Controlar Madeira)"], revision)
 	match cmd.type:
 		"MovePlayer":
 			var to = cmd.payload.get("to")

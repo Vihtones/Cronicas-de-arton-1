@@ -20,6 +20,9 @@ func on_event(e: GameEvent) -> Array:
 	return []
 
 
+var passagens: Dictionary = {}   # "x,y" -> true: passagem aberta em parede de madeira (Controlar Madeira, modelar)
+
+
 func _ensure() -> void:
 	if not state.is_empty():
 		return
@@ -46,7 +49,7 @@ func blocks(t: Vector2i) -> bool:
 
 
 func walkable(t: Vector2i) -> bool:
-	return world.db.static_walkable(t) and not blocks(t)
+	return (world.db.static_walkable(t) or passagens.has("%d,%d" % [t.x, t.y])) and not blocks(t)
 
 
 func player_tile() -> Vector2i:
@@ -113,6 +116,11 @@ func execute(cmd: GameCommand) -> Array:
 	var loc := world.db.location_at(Vector2i(int(d.tile[0]), int(d.tile[1])))
 	match action:
 		"open":
+			if bool(s.get("emperrada", false)):   # Controlar Madeira (retorcer): Força CD 25
+				var rf := Checks.skill(world.player_sheet, "atletismo", 25, world.rules, world.rng)
+				if not rf.success:
+					return [fact("CHECK_FAILED", {"object": id, "check": rf, "reason": "emperrada"}, ["player"])]
+				s.emperrada = false
 			s.open = true
 			return [fact("OBJECT_OPENED", {"object": id, "location": loc}, ["player"])]
 		"close":
@@ -176,7 +184,7 @@ func danificar(id: String, dano: int, ignora_rd: bool, fonte: String) -> Array:
 	if d.is_empty() or not d.has("break") or not state.has(id) or state[id].broken:
 		return []
 	var s: Dictionary = state[id]
-	var final := dano if ignora_rd else maxi(0, dano - int(d["break"].rd))
+	var final := dano if ignora_rd else maxi(0, dano - int(d["break"].rd) - int(s.get("rd_extra", 0)))
 	s.pv = int(s.pv) - final
 	var loc := world.db.location_at(Vector2i(int(d.tile[0]), int(d.tile[1])))
 	var out: Array = [fact("OBJECT_DAMAGED", {"object": id, "hit": true, "damage": final, "pv": s.pv, "noise": true, "location": loc, "source": fonte}, ["player"])]
@@ -187,6 +195,64 @@ func danificar(id: String, dano: int, ignora_rd: bool, fonte: String) -> Array:
 	return out
 
 
+## Controlar Madeira. Fortalecer: +5 na RD e dobra os PV (uma vez) até o fim do dia. Retorcer: a porta emperra (Força
+## CD 25 para abrir). Repelir: porta ou baú se abre sozinho e destranca. Modelar: abre passagem numa parede de madeira.
+func fortalecer(id: String, ate_dia: int) -> Array:
+	_ensure()
+	var s: Dictionary = state.get(id, {})
+	if s.is_empty() or bool(s.get("fortalecida", false)):
+		return []
+	s.fortalecida = true
+	s.rd_extra = int(s.get("rd_extra", 0)) + 5
+	s.pv = int(s.pv) * 2
+	s.fortalecida_ate = ate_dia
+	return [fact("OBJECT_STRENGTHENED", {"object": id}, ["player"])]
+
+
+func retorcer(id: String) -> Array:
+	_ensure()
+	var s: Dictionary = state.get(id, {})
+	if s.is_empty() or world.db.object_def(id).type != "door":
+		return []
+	s.emperrada = true
+	return [fact("OBJECT_TWISTED", {"object": id}, ["player"])]
+
+
+func repelir(id: String) -> Array:
+	_ensure()
+	var s: Dictionary = state.get(id, {})
+	if s.is_empty() or not ["door", "chest"].has(str(world.db.object_def(id).type)):
+		return []
+	s.locked = false
+	s.emperrada = false
+	s.open = true
+	return [fact("OBJECT_OPENED", {"object": id, "location": world.db.location_at(Vector2i(int(world.db.object_def(id).tile[0]), int(world.db.object_def(id).tile[1]))), "by": "repelir"}, ["player"])]
+
+
+## Parede de madeira: o quadrado é '#' dentro de um lugar com "parede_madeira".
+func parede_de_madeira(t: Vector2i) -> bool:
+	return world.db.tile_info(t).get("name", "") == "parede" and bool(world.db.location(world.db.location_at(t)).get("parede_madeira", false))
+
+
+func abrir_passagem(t: Vector2i) -> Array:
+	if not parede_de_madeira(t):
+		return []
+	passagens["%d,%d" % [t.x, t.y]] = true
+	return [fact("WALL_OPENED", {"tile": [t.x, t.y]}, ["player"])]
+
+
+## O dia virou: as melhorias de Controlar Madeira acabam (PV voltam ao normal, sem passar do que restava).
+func fim_do_dia(dia: int) -> void:
+	_ensure()
+	for id in state:
+		var s: Dictionary = state[id]
+		if bool(s.get("fortalecida", false)) and dia >= int(s.get("fortalecida_ate", 0)):
+			s.fortalecida = false
+			s.rd_extra = 0
+			s.pv = maxi(1, int(s.pv) / 2) if int(s.pv) > 0 else int(s.pv)
+		s.emperrada = false
+
+
 ## Categoria de tamanho do objeto quebrável ("" se não é quebrável).
 func tamanho(id: String) -> String:
 	return str(world.db.object_def(id).get("break", {}).get("tamanho", ""))
@@ -194,10 +260,11 @@ func tamanho(id: String) -> String:
 
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"state": state.duplicate(true)}
+	return {"state": state.duplicate(true), "passagens": passagens.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
 	state = d.get("state", {}).duplicate(true)
+	passagens = (d.get("passagens", {}) as Dictionary).duplicate()
 	for k in state:
 		state[k].pv = int(state[k].pv)

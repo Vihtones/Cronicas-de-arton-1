@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Controlar Madeira (divina, 2º círculo) completa: fortalecer (armas +1 passo de dano, escudos +2 na Defesa, objetos +5 RD e PV dobrados), modelar (arma de madeira vira outra; porta ou baú se molda; passagem em parede de madeira), repelir (ataques da arma contra o conjurador falham; porta ou baú se abre) e retorcer (arma –5 nos ataques, escudo sem bônus, porta emperrada); Vontade anula em objetos de inimigos. Aprimoramentos: forma de árvore por um dia (atacado, dissipa; o personagem não age), vegetação afiada (terreno difícil e 1d6 de corte por quadrado), Enorme e Colossal. Com isso todas as magias divinas de 2º círculo estão feitas.
+
 - Aliado Animal (divina, 2º círculo) completa, com o novo sistema de parceiros do livro (LB p.260): ajudante, combatente, fortão, guardião, montaria e perseguidor nos poderes iniciante, veterano e mestre, limite de 1, 2 ou 3 parceiros por nível e bônus aplicados na ficha (ataque, Defesa, resistência, perícias, dano extra do fortão, ataque extra do combatente mestre, Sentidos Aguçados e Percepção às Cegas). A magia vincula um animal prestativo por um dia (mestre e dois animais com os aprimoramentos) ou envia um mensageiro Minúsculo com um item até um local.
 
 - Tempestade Divina (divina, 2º círculo) completa: cilindro de 15m (ou 90m) em alcance longo, sustentado, só ao ar livre; vendaval (–5 em ataques à distância, apaga chamas, dissipa névoas); chuva (–5 em Percepção), neve (terreno difícil; 2d6 de frio com aprimoramento) ou granizo (1 ou 2d6 de impacto por rodada); raios de 3d8 (+1d8) uma vez por rodada; chuva grossa (Médios ou menores lentos; voadores fazem Atletismo ou caem).

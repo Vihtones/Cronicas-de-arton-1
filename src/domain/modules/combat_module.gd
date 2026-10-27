@@ -1712,6 +1712,71 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Controlar Madeira (divina 2, LB p.187): alcance médio, cena. Fortalecer: armas +1 passo de dano; escudos +2 na Defesa;
+## objetos +5 RD e PV dobrados. Modelar: a arma de madeira vira outra; porta ou baú se molda e abre; parede de madeira
+## ganha uma passagem. Repelir: ataques da arma contra você falham; porta ou baú se abre e destranca. Retorcer: arma
+## com –5 nos ataques; escudo sem bônus; porta emperrada (Força CD 25). Involuntário: Vontade anula (objeto dele).
+## Aprimoramentos: árvore Grande por um dia (atacado, dissipa); vegetação afiada num quadrado de 9m (terreno difícil e
+## 1d6 de corte por quadrado percorrido); Enorme; Colossal.
+func _controlar_madeira(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var dia := world.day_index()
+	if apr.has(0):
+		sh.add_efeito("magia.controlar_madeira_arvore", "arvore", 1, "dia", "", dia + 1)
+		sh.add_efeito("magia.controlar_madeira_arvore", "sobrevivencia_disfarce", 30, "dia", "", dia + 1)
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "arvore", "tags": ["magia"]}, [id]))
+		return out
+	if apr.has(1):
+		var centro: Vector2i = a.get("tile", sim.c(id).tile)
+		var area := Area.quadrado(centro, Area.quadrados(9.0)).filter(func(t): return world.db.is_vegetation(t))
+		sim.add_zona("madeira_afiada_" + id, area, "madeira_afiada", -1, "controlar_madeira", {"conjurador": id})
+		sim.add_zona("madeira_afiada_dificil_" + id, area, "terreno_dificil", -1, "controlar_madeira", {"conjurador": id})
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "madeira_afiada", "tags": ["magia", "area"]}, [id]))
+		return out
+	var ef := str(a.get("efeito", ""))
+	var objs = world.module("objects")
+	match str(a.get("alvo", "")):
+		"objeto":
+			var oid := str(a.object_id)
+			if objs == null:
+				return out
+			match ef:
+				"fortalecer": out.append_array(objs.fortalecer(oid, dia + 1))
+				"retorcer": out.append_array(objs.retorcer(oid))
+				"repelir", "modelar":
+					out.append_array(objs.repelir(oid))
+		"parede":
+			if objs != null:
+				out.append_array(objs.abrir_passagem(a.tile))
+		_:
+			var tg: String = a.get("target", id)
+			var T: CharacterSheet = sim.c(tg).sheet
+			if sim.is_enemy(id, tg) and _resiste(tg, "vontade", spell_dc(sh, a), out):
+				out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": "controlar_madeira", "saved": true}, [id, tg]))
+				return out
+			SpellRules.aplicar_madeira_equip(world.rules, ef, str(a.alvo), T, id, str(a.get("forma", "")))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "controlar_madeira_" + ef, "tags": ["magia"]}, [id, tg]))
+	return out
+
+
+## Vegetação afiada: 1d6 de corte por quadrado percorrido dentro da área (por cada quadrado em que a criatura entra).
+func _dano_vegetacao_afiada(id: String, caminho: Array) -> Array:
+	var out: Array = []
+	for t in caminho:
+		if sim.zona_em(t, "madeira_afiada") and sim.c(id) != null and not sim.c(id).sheet.is_dead():
+			out.append_array(_dano_de_energia(str(_conjurador_da_zona(t, "madeira_afiada")), id, "1d6", 0, "", "corte", "Vegetação afiada"))
+	return out
+
+
+func _conjurador_da_zona(t: Vector2i, tipo: String) -> String:
+	for z in sim.zonas:
+		if str(z.tipo) == tipo and (z.tiles as Array).has(t):
+			return str(z.get("dados", {}).get("conjurador", ""))
+	return ""
+
+
 ## Tempestade Divina (divina 2): cilindro de 15m de raio em alcance longo, sustentado, só ao ar livre. Vendaval:
 ## ataques à distância de dentro ou contra quem está dentro sofrem –5, chamas se apagam e névoas se dissipam. Clima
 ## opcional: chuva (–5 em Percepção), neve (chuva e terreno difícil), granizo (chuva e 1 de impacto no início dos turnos).
@@ -2469,6 +2534,9 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 		"rogar_maldicao":
 			for cid in sim.combatants:
 				sim.c(cid).sheet.anular_magia("magia.rogar_maldicao_" + id)
+		"controlar_madeira":
+			sim.remove_zona("madeira_afiada_" + id)
+			sim.remove_zona("madeira_afiada_dificil_" + id)
 		"tempestade_divina":
 			sim.remove_zona("tempestade_" + id)
 			sim.remove_zona("tempestade_neve_" + id)
@@ -2679,6 +2747,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var reactors := _reflex_watchers(id, from)
 			sim.c(id).tile = v.end
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y])}, [id]))
+			out.append_array(_dano_vegetacao_afiada(id, path))
 			out.append_array(_aura_divina_entrada(id, from, path))
 			for r_id in reactors:
 				if CombatSim.cheb(sim.c(r_id).tile, v.end) > 1:
@@ -3089,6 +3158,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_rogar_maldicao(id, a))
 		"tempestade_divina":
 			out.append_array(_tempestade(id, a))
+		"controlar_madeira":
+			out.append_array(_controlar_madeira(id, a))
 		"aliado_animal":
 			var magia_aa = world.module("magia")
 			if id == "player" and magia_aa != null and magia_aa.validar_aliado_animal(a, sh) == "":
@@ -3986,7 +4057,8 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			camo_roll = world.rng.roll("combat", 1, 10)[0]
 			camo_miss = camo_roll <= int(v.miss_chance) / 10
 	var total := d20 + int(v.mod)
-	var hit := total >= int(v.defense) and not camo_miss
+	var repelido: bool = A.sheet.efeito_bonus_tipo("repele_arma", target) > 0   # Controlar Madeira (repelir)
+	var hit := total >= int(v.defense) and not camo_miss and not repelido
 	var imune_critico: bool = int(T.sheet.efeito_bonus("imune", "critico")) > 0   # Invulnerabilidade (física)
 	var crit: bool = hit and d20 >= int(atk.margem) and not imune_critico
 	var dmg := 0

@@ -98,7 +98,9 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 
 func armor_penalty(rules: RuleRegistry) -> int:
 	var arm: String = equipment.get("armor", "")
-	return (int(rules.value("armadura." + arm, {}).get("penalidade", 0)) if arm != "" else 0) + extra_armor_penalty
+	var esc: String = equipment.get("shield", "")
+	return (int(rules.value("armadura." + arm, {}).get("penalidade", 0)) if arm != "" else 0) + extra_armor_penalty \
+		+ (int(rules.value("escudo." + esc, {}).get("penalidade", 0)) if esc != "" else 0)
 
 
 func has_power(p: String) -> bool:
@@ -346,10 +348,22 @@ func defense(rules: RuleRegistry, vs_melee: bool = true) -> int:
 	var d := defense_fixed if defense_fixed >= 0 else defense_base + int(attrs.des)
 	d += condition_mod(rules, "defesa") + scene_defense + allihanna_defense(allihanna_ativa) + (race_defense if defense_fixed < 0 else 0)
 	d += efeito_bonus("defesa")
+	d += escudo_defesa(rules)
 	if powers.has("esquiva"): d += 2   # Esquiva (LB p.125)
 	if has_effective_condition(rules, "caido"):
 		d += -5 if vs_melee else 5
 	return d
+
+
+## Bônus do escudo empunhado (equipment.shield). Melhorias de magia somam (Controlar Madeira: +2); um escudo retorcido
+## deixa de dar bônus, mas ainda impõe a penalidade (armor_penalty).
+func escudo_defesa(rules: RuleRegistry) -> int:
+	var esc := str(equipment.get("shield", ""))
+	if esc == "":
+		return 0
+	if efeito_bonus("escudo_retorcido") > 0:
+		return 0
+	return int(rules.value("escudo." + esc, {}).get("defesa", 0)) + efeito_bonus("escudo_defesa")
 
 
 func death_threshold() -> int:

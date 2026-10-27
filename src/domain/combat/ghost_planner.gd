@@ -26,6 +26,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 	if not A.sheet.can_act(sim.rules):
 		return {"ok": false, "reason": "condição impede ações"}
 	var t: String = a.get("type", "")
+	if A.sheet.efeito_bonus("arvore") > 0:
+		return {"ok": false, "reason": "na forma de árvore não pode falar nem fazer ações físicas"}
 	match t:
 		"move":
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
@@ -174,6 +176,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if apr.has(2): return {"ok": false, "reason": "a versão permanente é lançada fora de combate"}
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
+			if sp_id == "controlar_madeira":
+				var tg_m: String = a.get("target", actor)
+				var TM3 := sim.c(tg_m)
+				var erro_m := SpellRules.erro_madeira(sim.rules, sim.db, a, A.tile, TM3.tile if not TM3.is_empty() else A.tile, TM3.sheet if not TM3.is_empty() else null)
+				if erro_m != "": return {"ok": false, "reason": erro_m}
 				targets = [actor]
 			if sp_id == "tempestade_divina":
 				var tt: Vector2i = a.get("tile", A.tile)

@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3304,3 +3304,31 @@ func test_aliado_animal_parceiro_e_mensageiro() -> void:
 	WorldHelpers.advance_hours(w, 26)
 	eq(party.parceiros.size(), 0, "dura um dia")
 	eq(m[1].efeito_bonus("ataque"), 0, "bônus some")
+
+
+func test_controlar_madeira_equipamento_objetos_e_arvore() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var P: CharacterSheet = sim.c("player").sheet
+	P.equipment["weapon"] = "clava"
+	P.equipment["shield"] = "leve"
+	check(_lanca(m, {"type": "cast", "spell": "controlar_madeira", "efeito": "fortalecer", "alvo": "escudo", "target": "player"}).ok, "fortalecer escudo")
+	eq(P.efeito_bonus("escudo_defesa"), 2, "+2 na Defesa do escudo")
+	check(not _lanca(m, {"type": "cast", "spell": "controlar_madeira", "efeito": "fortalecer", "alvo": "arma", "target": "bandido_1"}).ok, "bandido não empunha arma de madeira")
+	var b1 := _bandido(m, "bandido_1", -50)
+	b1.equipment["weapon"] = "clava"
+	check(_lanca(m, {"type": "cast", "spell": "controlar_madeira", "efeito": "repelir", "alvo": "arma", "target": "bandido_1"}).ok, "repelir a arma do bandido")
+	eq(b1.efeito_bonus_tipo("repele_arma", "player"), 1, "ataques dele contra o conjurador falham")
+	var m2 := _cena_grupo(5)
+	check(_lanca(m2, {"type": "cast", "spell": "controlar_madeira", "aprimoramentos": [0]}).ok, "forma de árvore")
+	check(m2[2].c("player").sheet.efeito_bonus("arvore") > 0, "virou árvore")
+	m2[2].apply_damage("player", 1)
+	eq(m2[2].c("player").sheet.efeito_bonus("arvore"), 0, "atacado: a magia se dissipa")
+	var m3 := _cena_grupo(5)
+	check(not _lanca(m3, {"type": "cast", "spell": "controlar_madeira", "aprimoramentos": [1], "tile": Vector2i(30, 57)}).ok, "sem vegetação na cripta")
+	check(not _lanca(m3, {"type": "cast", "spell": "controlar_madeira", "efeito": "fortalecer", "alvo": "objeto", "object_id": "porta_inexistente"}).ok, "objeto inválido")
+	var m4 := _clerigo_mundo(["controlar_madeira"])
+	var w4 = m4[0]
+	var r4 := WorldHelpers.cmd(w4, "CastSpell", {"spell": "controlar_madeira", "aprimoramentos": [0]})
+	check(r4.accepted, "árvore fora de combate")
+	check(not WorldHelpers.cmd(w4, "MovePlayer", {"dx": 1, "dy": 0}).accepted, "árvore não anda")

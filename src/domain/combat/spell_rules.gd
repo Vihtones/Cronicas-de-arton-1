@@ -3,6 +3,7 @@ extends RefCounted
 ## com todos os aprimoramentos implementados. COMPLETAS guarda, por magia, os índices de aprimoramento
 ## (ordem do catálogo `magia.<id>.aprimoramentos`) que já têm efeito.
 
+const Area := preload("res://src/domain/combat/area.gd")
 const COMPLETAS := {
 	"perdicao": {"aprimoramentos": [0]},
 	"infligir_ferimentos": {"aprimoramentos": [0, 1, 2, 3]},
@@ -46,6 +47,7 @@ const COMPLETAS := {
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
 	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
 	"circulo_da_justica": {"aprimoramentos": [0, 1, 2]},   # pessoal: ver o invisível em alcance curto; –10/–20; permanente
+	"controlar_madeira": {"aprimoramentos": [0, 1, 2, 3]},   # árvore (pessoal, um dia); vegetação afiada; Enorme; Colossal
 	"aliado_animal": {"aprimoramentos": [0, 1, 2]},   # mensageiro Minúsculo; parceiro mestre (3º); 2 animais (4º)
 	"tempestade_divina": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # raios; +1d8; chuva grossa; granizo 2d6; neve 2d6 de frio; 90m
 	"rogar_maldicao": {"aprimoramentos": [0, 1]},   # +1 efeito (repetível); permanente, Fortitude parcial
@@ -85,10 +87,10 @@ const REACAO_APR := {"armadura_arcana": [0], "protecao_divina": [1], "premonicao
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
-const ALVO_QUADRADO := ["tempestade_divina", "enxame_de_pestes", "miasma_mefitico", "circulo_da_justica", "criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
+const ALVO_QUADRADO := ["controlar_madeira", "tempestade_divina", "enxame_de_pestes", "miasma_mefitico", "circulo_da_justica", "criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
@@ -255,6 +257,80 @@ static func despedacar_dano(apr: Array) -> String:
 
 static func tamanho_indice(nome: String) -> int:
 	return TAMANHOS.find(nome)
+
+
+const EFEITOS_MADEIRA := ["fortalecer", "modelar", "repelir", "retorcer"]
+
+
+static func objeto_de_madeira(db: ContentDB, id: String) -> bool:
+	var d := db.object_def(id)
+	return not d.is_empty() and (str(d.type) == "chest" or str(d.get("break", {}).get("rule", "")).contains("madeira"))
+
+
+## Controlar Madeira (divina 2, LB p.186): erro de validação ("" se válido). `a`: efeito, alvo (objeto, arma, escudo,
+## parede), object_id / target / tile / forma. `de` é o quadrado do conjurador; `alvo` a ficha de quem empunha (arma, escudo).
+static func erro_madeira(rules: RuleRegistry, db: ContentDB, a: Dictionary, de: Vector2i, alvo_tile: Vector2i, alvo: CharacterSheet) -> String:
+	var apr: Array = a.get("aprimoramentos", [])
+	if apr.has(0):
+		return "" if apr.size() == 1 else "a forma de árvore não se combina com outros aprimoramentos"
+	var medio := int(rules.value("alcance.quadrados", {}).get("medio", 20))
+	if apr.has(1):
+		var c: Vector2i = a.get("tile", de)
+		if maxi(absi(de.x - c.x), absi(de.y - c.y)) > medio: return "fora do alcance"
+		return "" if Area.quadrado(c, Area.quadrados(9.0)).any(func(t): return db.is_vegetation(t)) else "sem vegetação na área"
+	var ef := str(a.get("efeito", ""))
+	if not EFEITOS_MADEIRA.has(ef): return "escolha: fortalecer, modelar, repelir ou retorcer"
+	var tam_max := 5 if apr.has(3) else (4 if apr.has(2) else 3)
+	match str(a.get("alvo", "")):
+		"objeto":
+			var id := str(a.get("object_id", ""))
+			if not objeto_de_madeira(db, id): return "escolha um objeto de madeira"
+			var d := db.object_def(id)
+			var o: Array = d.tile
+			if maxi(absi(de.x - int(o[0])), absi(de.y - int(o[1]))) > medio: return "fora do alcance"
+			var tam := tamanho_indice(str(d.get("break", {}).get("tamanho", "Grande")))
+			if tam < 0 or tam > tam_max: return "objeto grande demais"
+			if ef == "modelar" and not ["door", "chest"].has(str(d.type)): return "só portas e baús"
+			if ef == "retorcer" and str(d.type) != "door": return "só portas emperram"
+			if ef == "repelir" and not ["door", "chest"].has(str(d.type)): return "só portas e baús se abrem"
+		"parede":
+			if ef != "modelar": return "numa parede só se modela uma passagem"
+			var t: Vector2i = a.get("tile", de)
+			if maxi(absi(de.x - t.x), absi(de.y - t.y)) > medio: return "fora do alcance"
+			if db.tile_info(t).get("name", "") != "parede" or not bool(db.location(db.location_at(t)).get("parede_madeira", false)): return "não é uma parede de madeira"
+		"arma", "escudo":
+			if alvo == null: return "escolha quem empunha"
+			if maxi(absi(de.x - alvo_tile.x), absi(de.y - alvo_tile.y)) > medio: return "fora do alcance"
+			var item := str(alvo.equipment.get("weapon" if a.alvo == "arma" else "shield", ""))
+			if item == "": return "ele não empunha isso"
+			if not bool(rules.value(("arma." if a.alvo == "arma" else "escudo.") + item, {}).get("madeira", false)): return "não é de madeira"
+			if a.alvo == "escudo" and (ef == "repelir" or ef == "modelar"): return "escudos só podem ser fortalecidos ou retorcidos"
+			if ef == "modelar":
+				var forma := str(a.get("forma", ""))
+				if forma == "" or not bool(rules.value("arma." + forma, {}).get("madeira", false)): return "escolha uma arma de madeira como forma"
+		_:
+			return "escolha o alvo: objeto, arma, escudo ou parede"
+	return ""
+
+
+## Efeito de Controlar Madeira sobre arma ou escudo de madeira empunhados. `conj`: id de quem lançou.
+static func aplicar_madeira_equip(rules: RuleRegistry, ef: String, alvo_item: String, sh: CharacterSheet, conj: String, forma: String) -> void:
+	var arma := str(sh.equipment.get("weapon", ""))
+	var nome := arma.capitalize().replace("_", " ")
+	match [ef, alvo_item]:
+		["fortalecer", "arma"]:
+			sh.add_efeito("magia.controlar_madeira", "armamento_passos", 1, "cena", nome)
+		["fortalecer", "escudo"]:
+			sh.add_efeito("magia.controlar_madeira", "escudo_defesa", 2, "cena")
+		["repelir", "arma"]:
+			sh.add_efeito("magia.controlar_madeira", "repele_arma", 1, "cena", conj)
+		["retorcer", "arma"]:
+			sh.add_efeito("magia.controlar_madeira", "ataque", -5, "cena")
+		["retorcer", "escudo"]:
+			sh.add_efeito("magia.controlar_madeira", "escudo_retorcido", 1, "cena")
+		["modelar", "arma"]:
+			sh.equipment["weapon"] = forma
+			CharacterBuilder.apply_equipment(rules, sh)
 
 
 ## Arma Espiritual: tipo de dano da arma preferida da divindade ("" se a divindade não tem arma preferida).

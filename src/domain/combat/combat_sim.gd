@@ -655,6 +655,8 @@ func _dano_bruto(target: String, amount: int) -> Array:
 	s.pv_temp -= absorvido
 	amount -= absorvido
 	var was_down := s.is_down()
+	if amount > 0 and s.has_efeito("magia.controlar_madeira_arvore"):
+		s.anular_magia("magia.controlar_madeira_arvore")   # atacado na forma de árvore: a magia se dissipa
 	s.pv -= amount
 	T.damaged_round = round_no
 	var tags: Array = []

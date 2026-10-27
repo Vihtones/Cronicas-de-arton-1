@@ -190,6 +190,9 @@ func on_event(e: GameEvent) -> Array:
 			doentes.append_array(_teste_de_doencas(id_d, f_d))
 			if members[id_d].has("sheet") or not f_d.doencas.is_empty():
 				members[id_d].sheet = f_d.to_dict()
+		var objs_d = world.module("objects")
+		if objs_d != null:
+			objs_d.fim_do_dia(world.day_index())   # melhorias de Controlar Madeira acabam
 		var rituais: Array = doentes
 		rituais.append_array(_parceiros_expirados())
 		var combat = world.module("combat")
