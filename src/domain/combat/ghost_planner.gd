@@ -94,7 +94,9 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if T.sheet.is_dead(): return {"ok": false, "reason": "alvo já morto"}
 			return {"ok": true, "kind": "completa"}
 		"cast":
-			if not sim.can_spend("padrao"): return {"ok": false, "reason": "lançar magia exige ação padrão"}
+			# Armamento da Natureza (aprimoramento de 2 PM): execução de ação de movimento.
+			var kind_c := "movimento" if str(a.get("spell", "")) == "armamento_da_natureza" and (a.get("aprimoramentos", []) as Array).has(1) else "padrao"
+			if not sim.can_spend(kind_c): return {"ok": false, "reason": "lançar magia exige ação padrão" if kind_c == "padrao" else "sem ação de movimento"}
 			var sp_id: String = a.get("spell", "")
 			var sp := spell_rule(sim.rules, sp_id)
 			if sp_id == "raio_arcano":
@@ -133,6 +135,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "armamento_da_natureza":
+				var alvo_an: String = a.get("target", actor)
+				if not sim.combatants.has(alvo_an) or SpellRules.armamento_ataque(sim.rules, sim.c(alvo_an).sheet, str(a.get("arma", ""))).is_empty():
+					return {"ok": false, "reason": "Armamento da Natureza precisa de arma primitiva, arma natural ou ataque desarmado"}
+				if a.has("tipo_dano") and not ["corte", "impacto", "perfuracao"].has(str(a.tipo_dano)):
+					return {"ok": false, "reason": "tipo de dano: corte, impacto ou perfuração"}
+				if apr.has(2) and not apr.has(0):
+					return {"ok": false, "reason": "o aumento no ataque exige o bônus de ataque"}
 			if sp_id == "arma_espiritual":
 				if SpellRules.arma_espiritual_tipo(sim.rules, str(A.sheet.devotion), str(a.get("tipo_dano", ""))) == "":
 					return {"ok": false, "reason": "sua divindade não tem arma preferida (Nimb: escolha corte, impacto ou perfuração)"}
@@ -195,7 +205,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
 			if alc == "toque":
 				for tg in targets:
-					if tg == actor and sp_id != "arma_magica": return {"ok": false, "reason": "escolha um alvo adjacente"}   # Arma Mágica: a própria arma empunhada
+					if tg == actor and not ["arma_magica", "armamento_da_natureza"].has(sp_id): return {"ok": false, "reason": "escolha um alvo adjacente"}   # a própria arma empunhada
 			for tg in targets:
 				var T := sim.c(tg)
 				if T.is_empty(): return {"ok": false, "reason": "alvo inválido"}
@@ -204,7 +214,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp.has("dano_por_seta"): avg = Dice.average(sp.dano_por_seta) * int(sp.setas)
 			elif sp.has("dano"): avg = Dice.average(raio_dice(A.sheet) if sp_id == "raio_arcano" else str(sp.dano)) * 0.75   # resistência reduz à metade: média aproximada
 			if avg > 0.0 and A.sheet.has_power("arcano_de_batalha"): avg += maxi(0, int(A.sheet.attrs.get(A.sheet.caster_attr, 0)))
-			return {"ok": true, "kind": "padrao", "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": avg, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
+			return {"ok": true, "kind": kind_c, "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": avg, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
 		"drink":
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
 			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}

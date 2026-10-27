@@ -1508,6 +1508,22 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"armamento_da_natureza":
+			# Armamento da Natureza (divina 1): arma primitiva, natural ou desarmado do alvo (toque) tem o dano aumentado
+			# em um passo e é considerada mágica, pela cena; pode mudar o tipo de dano (corte, impacto, perfuração).
+			# Aprimoramentos: +1 no ataque (1 PM); execução de movimento (2 PM); +1 a mais no ataque (3 PM, repetível);
+			# mais um passo de dano (5 PM, repetível).
+			var apr_an: Array = a.get("aprimoramentos", [])
+			var alvo_an: String = a.get("target", id)
+			var ts_an: CharacterSheet = sim.c(alvo_an).sheet
+			var nome_an := str(SpellRules.armamento_ataque(world.rules, ts_an, str(a.get("arma", ""))).nome)
+			ts_an.remove_efeito("magia.armamento_da_natureza")
+			ts_an.add_efeito("magia.armamento_da_natureza", "armamento_passos", 1 + apr_an.count(3), "cena", nome_an)
+			if apr_an.has(0):
+				ts_an.add_efeito("magia.armamento_da_natureza", "armamento_ataque", 1 + apr_an.count(2), "cena", nome_an)
+			if a.has("tipo_dano"):
+				ts_an.add_efeito("magia.armamento_da_natureza", "armamento_tipo", 1, "cena", nome_an + "|" + str(a.tipo_dano))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_an, "buff": "armamento_da_natureza", "arma": nome_an, "tags": ["magia"]}, [id, alvo_an]))
 		"arma_espiritual":
 			# Arma Espiritual (divina 1): a arma preferida da divindade flutua ao lado do conjurador pela cena. Uma vez por
 			# rodada, como reação a um ataque corpo a corpo sofrido, causa 2d6 do tipo da arma no atacante

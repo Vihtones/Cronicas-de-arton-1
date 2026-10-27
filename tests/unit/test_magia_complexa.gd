@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1829,3 +1829,60 @@ func test_sustentada_uma_por_vez_e_manto_custa_pm() -> void:
 	c.power_policy["sustentar"] = "nunca"
 	c._begin_turn_base("player")
 	check(not sim.sustentadas.has("player"), "o jogador pode deixar de sustentar")
+
+
+# --- Armamento da Natureza (divina, 1º círculo) ----------------------------------------------------
+func _com_arma(m: Array, arma: String) -> CharacterSheet:
+	var sh: CharacterSheet = m[2].c("player").sheet
+	sh.equipment["weapon"] = arma
+	CharacterBuilder.apply_equipment(m[3], sh)
+	return sh
+
+
+func test_passos_de_dano_seguem_a_tabela_3_2() -> void:
+	var r := RuleRegistry.load_default()
+	eq(CombatSim.dano_em_passos(r, "1d6", 1), "1d8", "1d6 +1 passo")
+	eq(CombatSim.dano_em_passos(r, "1d6", 2), "1d10", "1d6 +2 passos")
+	eq(CombatSim.dano_em_passos(r, "2d4", 1), "1d10", "2d4 conta como 1d8")
+	eq(CombatSim.dano_em_passos(r, "1d4", -1), "1d3", "–1 passo")
+	eq(CombatSim.dano_em_passos(r, "1d10", 3), "4d6", "+3 passos")
+
+
+func test_armamento_da_natureza_so_em_arma_primitiva_ou_natural() -> void:
+	var m := _cena_grupo(1)
+	_com_arma(m, "espada_longa")
+	check(not GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "armamento_da_natureza", "target": "player"}).ok, "espada longa não é primitiva")
+	_com_arma(m, "clava")
+	check(_lanca(m, {"type": "cast", "spell": "armamento_da_natureza", "target": "player"}).ok, "clava é primitiva (no próprio conjurador)")
+	var prof: Dictionary = m[2].attack_profile("player", "bandido_1", 0, false, false)
+	eq(str(prof.atk.dano), "1d8", "dano da clava sobe um passo")
+	check(bool(prof.atk.get("magica", false)), "considerada mágica")
+
+
+func test_armamento_da_natureza_tipo_ataque_e_passo_extra() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	_com_arma(m, "clava")
+	_lanca(m, {"type": "cast", "spell": "armamento_da_natureza", "target": "player", "tipo_dano": "perfuracao", "aprimoramentos": [0, 2, 3]})
+	var prof := sim.attack_profile("player", "bandido_1", 0, false, false)
+	eq(str(prof.atk.tipo), "perfuracao", "tipo de dano mudado")
+	eq(str(prof.atk.dano), "1d10", "dois passos")
+	check((prof.mods as Array).any(func(x): return x[0] == "armamento da natureza" and int(x[1]) == 2), "+2 no ataque")
+
+
+func test_armamento_da_natureza_execucao_de_movimento() -> void:
+	var m := _cena_grupo(1)
+	_com_arma(m, "clava")
+	var v := GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "armamento_da_natureza", "target": "player", "aprimoramentos": [1]})
+	check(v.ok and v.kind == "movimento", "ação de movimento")
+	m[2].budget.std = 0
+	check(GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "armamento_da_natureza", "target": "player", "aprimoramentos": [1]}).ok, "sem ação padrão, ainda pode")
+
+
+func test_armamento_da_natureza_em_arma_natural() -> void:
+	var m := _cena_grupo(1)
+	var sh: CharacterSheet = m[2].c("player").sheet
+	sh.equipment["weapon"] = ""
+	sh.attacks = [{"nome": "Chifres", "skill": "luta", "dano": "1d6", "for_no_dano": true, "margem": 20, "mult": 2, "alcance_q": 1, "distancia": false, "tipo": "perfuracao", "natural": true}]
+	check(_lanca(m, {"type": "cast", "spell": "armamento_da_natureza", "target": "player"}).ok, "arma natural")
+	eq(str(m[2].attack_profile("player", "bandido_1", 0, false, false).atk.dano), "1d8", "chifres sobem um passo")

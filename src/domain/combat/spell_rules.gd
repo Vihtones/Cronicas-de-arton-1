@@ -20,6 +20,7 @@ const COMPLETAS := {
 	"profanar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, trevas maximizadas; +2 a mortos-vivos (+1, repetível); permanente
 	"despedacar": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1d8+2 (repetível); objeto Médio/Grande/Enorme/Colossal; esfera de 6m
 	"arma_espiritual": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1 Defesa (+1 repetível); sustentada com ataque livre; essência; +1d6; duas armas
+	"armamento_da_natureza": {"aprimoramentos": [0, 1, 2, 3]},   # +1 ataque; execução de movimento; +1 ataque (repetível); +1 passo (repetível)
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -221,3 +222,15 @@ static func arma_espiritual_tipo(rules: RuleRegistry, devocao: String, escolha: 
 	if v is String and str(v) == "qualquer":
 		return escolha if ["corte", "impacto", "perfuracao"].has(escolha) else ""
 	return str((v as Dictionary).get("dano", ""))
+
+
+## Armamento da Natureza: o ataque (pelo nome; "" = o primeiro válido) que a magia pode fortalecer: arma mundana
+## primitiva (sem custo em T$: "primitiva" no catálogo), arma natural ou ataque desarmado. {} se não há.
+static func armamento_ataque(rules: RuleRegistry, sheet: CharacterSheet, nome: String) -> Dictionary:
+	for atk in sheet.attacks:
+		if nome != "" and str(atk.get("nome", "")) != nome:
+			continue
+		var arma_id := str(atk.get("arma_id", ""))
+		if bool(atk.get("natural", false)) or bool(atk.get("desarmado", false)) or bool(rules.value("arma." + arma_id, {}).get("primitiva", false)):
+			return atk
+	return {}

@@ -56,6 +56,9 @@ ativas por escola (dissipar), reação após teste (Premonição) e condições 
 
 Objetos: as portas têm tamanho (`break.tamanho`, Tabela 5-4) e `ObjectsModule.danificar` aplica dano de magia.
 Transmutar Objetos (que Despedaçar anula) não está no catálogo.
+Armas: Tabela 3-2 (passos de dano) em `arma.passos_de_dano` e `CombatSim.dano_em_passos`; os efeitos de magia na
+arma entram em `CombatSim.ataque_efetivo`. Ataque desarmado ainda não existe como ataque da ficha (vem com o lutador);
+o Armamento já o aceita (`desarmado: true`).
 
 ## Escopo decidido
 
@@ -66,7 +69,7 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (11): abencoar_alimentos, acalmar_animal, armamento_da_natureza,
+- Divinas de 1º círculo (10): abencoar_alimentos, acalmar_animal,
   caminhos_da_natureza, comando, controlar_plantas, criar_elementos,
   detectar_ameacas, santuario, suporte_ambiental, tranquilidade.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
@@ -84,7 +87,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar e Arma Espiritual (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual e Armamento da Natureza (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

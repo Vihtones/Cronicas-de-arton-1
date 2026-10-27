@@ -250,7 +250,7 @@ static func apply_equipment(rules: RuleRegistry, s: CharacterSheet) -> void:
 		s.attacks.append({"nome": w_id.capitalize().replace("_", " "), "skill": "pontaria" if ranged else "luta", "dano": w.dano,
 			"for_no_dano": (not ranged) or bool(w.get("soma_for", false)), "margem": int(w.margem), "mult": int(w.mult),
 			"alcance_q": int(rules.value("alcance.quadrados", {}).get(str(w.get("alcance", "medio")), 20)) if ranged else 1,
-			"distancia": ranged, "tipo": w.tipo, "leve": w.get("leve", false)})
+			"distancia": ranged, "tipo": w.tipo, "leve": w.get("leve", false), "arma_id": w_id})
 	# Arma natural da raça (Chifres do minotauro, Mordida do trog — LB p.25, 31)
 	var rn: Dictionary = {} if s.race_id in ["", "humano"] else rules.value("raca." + s.race_id, {}).get("arma_natural", {})
 	if not rn.is_empty():

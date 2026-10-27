@@ -39,7 +39,38 @@
     "margem": 20,
     "mult": 2,
     "tipo": "impacto",
-    "maos": 1
+    "maos": 1,
+    "primitiva": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.bordao",
+   "valor": {
+    "dano": "1d6",
+    "margem": 20,
+    "mult": 2,
+    "tipo": "impacto",
+    "maos": 2,
+    "primitiva": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.tacape",
+   "valor": {
+    "dano": "1d10",
+    "margem": 20,
+    "mult": 2,
+    "tipo": "impacto",
+    "maos": 2,
+    "primitiva": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 144,
@@ -71,7 +102,8 @@
     "tipo": "impacto",
     "disparo": true,
     "soma_for": true,
-    "recarga": "movimento"
+    "recarga": "movimento",
+    "primitiva": true
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 148,
@@ -195,6 +227,102 @@
    "pagina": 143,
    "pdf_page": 149,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.passos_de_dano",
+   "valor": {
+    "linhas": [
+     {
+      "normal": [
+       "1d3"
+      ],
+      "-2": "1",
+      "-1": "1d2",
+      "1": "1d4",
+      "2": "1d6",
+      "3": "1d8"
+     },
+     {
+      "normal": [
+       "1d4"
+      ],
+      "-2": "1d2",
+      "-1": "1d3",
+      "1": "1d6",
+      "2": "1d8",
+      "3": "1d10"
+     },
+     {
+      "normal": [
+       "1d6"
+      ],
+      "-2": "1d3",
+      "-1": "1d4",
+      "1": "1d8",
+      "2": "1d10",
+      "3": "1d12"
+     },
+     {
+      "normal": [
+       "1d8",
+       "2d4"
+      ],
+      "-2": "1d4",
+      "-1": "1d6",
+      "1": "1d10",
+      "2": "1d12",
+      "3": "3d6"
+     },
+     {
+      "normal": [
+       "1d10"
+      ],
+      "-2": "1d6",
+      "-1": "1d8",
+      "1": "1d12",
+      "2": "3d6",
+      "3": "4d6"
+     },
+     {
+      "normal": [
+       "1d12",
+       "2d6",
+       "3d4"
+      ],
+      "-2": "1d8",
+      "-1": "1d10",
+      "1": "3d6",
+      "2": "4d6",
+      "3": "4d8"
+     },
+     {
+      "normal": [
+       "2d8"
+      ],
+      "-2": "1d10",
+      "-1": "2d6",
+      "1": "3d8",
+      "2": "4d8",
+      "3": "4d10"
+     },
+     {
+      "normal": [
+       "2d10"
+      ],
+      "-2": "2d6",
+      "-1": "2d8",
+      "1": "3d10",
+      "2": "4d10",
+      "3": "4d12"
+     }
+    ],
+    "maximo": "4d12"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 143,
+   "pdf_page": 149,
+   "status": "VERIFICADA",
+   "nota": "Tabela 3-2: Dano de Armas"
   }
  ]
 }

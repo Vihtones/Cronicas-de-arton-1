@@ -130,6 +130,36 @@ func step_cost(from: Vector2i, to: Vector2i) -> int:
 	return base
 
 
+## Tabela 3-2 (LB p.143): o dano `expr` deslocado `n` passos (negativo diminui). Acima de +3, aplica de novo a
+## partir do resultado; limite 4d12. Dano fora da tabela não muda.
+static func dano_em_passos(rules: RuleRegistry, expr: String, n: int) -> String:
+	if n == 0:
+		return expr
+	var tab: Dictionary = rules.value("arma.passos_de_dano", {})
+	for linha in tab.get("linhas", []):
+		if (linha.normal as Array).has(expr):
+			var k := clampi(n, -2, 3)
+			var novo := str(linha[str(k)])
+			return dano_em_passos(rules, novo, n - k) if n - k != 0 and novo != str(tab.get("maximo", "")) else novo
+	return expr
+
+
+## Ataque com os efeitos de magia sobre a arma: Armamento da Natureza (passos de dano, tipo e bônus de ataque).
+## Os efeitos ficam na ficha, com o nome do ataque como tipo.
+static func ataque_efetivo(rules: RuleRegistry, sheet: CharacterSheet, atk: Dictionary) -> Dictionary:
+	var nome := str(atk.get("nome", ""))
+	if not sheet.efeito_tipo_existe("armamento_passos", nome):
+		return atk
+	var out := atk.duplicate()
+	out.dano = dano_em_passos(rules, str(atk.dano), sheet.efeito_bonus_tipo("armamento_passos", nome))
+	out.bonus_armamento = sheet.efeito_bonus_tipo("armamento_ataque", nome)
+	out.magica = true
+	for e in sheet.efeitos:
+		if e.stat == "armamento_tipo" and str(e.tipo).begins_with(nome + "|"):
+			out.tipo = str(e.tipo).get_slice("|", 1)
+	return out
+
+
 ## Arma Espiritual: índice de uma arma livre para contra-atacar ou atacar nesta rodada, ou -1. Cada arma age uma vez
 ## por rodada; a que atacou (ação livre do aprimoramento) não contra-ataca até o próximo turno do conjurador.
 func arma_espiritual_livre(id: String) -> int:
@@ -321,7 +351,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	var sheet: CharacterSheet = A.sheet
 	if atk_index < 0 or atk_index >= sheet.attacks.size():
 		return {"ok": false, "reason": "ataque inexistente"}
-	var atk: Dictionary = sheet.attacks[atk_index]
+	var atk: Dictionary = ataque_efetivo(rules, sheet, sheet.attacks[atk_index])
 	var dist := cheb(A.tile, T.tile)
 	var ranged: bool = atk.get("distancia", false)
 	var reach := int(atk.get("alcance_q", 1))
@@ -362,6 +392,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		mods.append(["combate defensivo", -2])
 	if not ranged and ClassFeatures.furia_bonus(sheet) > 0: mods.append(["fúria", ClassFeatures.furia_bonus(sheet)])   # Fúria do bárbaro
 	if sheet.efeito_bonus("ataque") != 0: mods.append(["magia", sheet.efeito_bonus("ataque")])
+	if int(atk.get("bonus_armamento", 0)) != 0: mods.append(["armamento da natureza", int(atk.bonus_armamento)])
 	if sheet.efeito_bonus("testes") != 0: mods.append(["área sagrada", sheet.efeito_bonus("testes")])
 	# Arma Mágica (1º círculo): encanto da arma empunhada; quem a empunha usa o atributo-chave de magia no ataque.
 	var arma_empunhada := str(sheet.equipment.get("weapon", ""))

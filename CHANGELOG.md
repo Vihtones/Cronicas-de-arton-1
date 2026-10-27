@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Armamento da Natureza (divina, 1º círculo) completa: arma primitiva (clava, funda, bordão e tacape, os dois últimos novos no catálogo), arma natural ou ataque desarmado ganha um passo de dano (Tabela 3-2, nova), conta como mágica e pode mudar o tipo de dano; +1 e +1 a mais no ataque, execução de movimento e mais um passo.
+
 - Arma Espiritual (divina, 1º círculo) completa: a arma preferida da divindade (tabela nova para os 20 deuses; Lena e Marah não têm, Nimb escolhe o tipo) contra-ataca com 2d6 do tipo da arma uma vez por rodada quando o conjurador sofre ataque corpo a corpo; some se ele morrer. Aprimoramentos: +1 na Defesa e +1 a mais, versão sustentada com ataque livre a alvo adjacente (tecla W), dano de essência, +1d6 até o círculo máximo e duas armas.
 - Duração sustentada (LB p.227): 1 PM como ação livre no início de cada turno, uma magia sustentada por vez; o jogador pode soltar (Shift+W). Correção: o Manto do Cruzado agora cobra a manutenção.
 
