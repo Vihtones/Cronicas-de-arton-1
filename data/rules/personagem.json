@@ -3987,6 +3987,1795 @@
    "pagina": 80,
    "pdf_page": 86,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.bucaneiro",
+   "valor": {
+    "pv_inicial": 16,
+    "pv_nivel": 4,
+    "soma_con": true,
+    "pm_nivel": 3,
+    "pericias_fixas": [
+     "luta|pontaria",
+     "reflexos"
+    ],
+    "pericias_escolha": 4,
+    "lista": [
+     "acrobacia",
+     "atletismo",
+     "atuacao",
+     "enganacao",
+     "fortitude",
+     "furtividade",
+     "iniciativa",
+     "intimidacao",
+     "jogatina",
+     "luta",
+     "oficio",
+     "percepcao",
+     "pontaria",
+     "pilotagem"
+    ],
+    "proficiencias": [
+     "armas_marciais"
+    ],
+    "habilidades": [
+     "Audácia (2 PM: +Car em teste de perícia, exceto ataque)",
+     "Insolência (Car na Defesa, limitado pelo nível, sem armadura pesada)",
+     "Evasão (2º nível)",
+     "Esquiva sagaz +1 (3º nível; +1 a cada 4 níveis)",
+     "Panache: recupera 1 PM em crítico ou inimigo reduzido a 0 PV (5º nível)",
+     "Evasão aprimorada (10º nível)",
+     "Sorte de Nimb (20º nível: 5 PM para rolar de novo, 11+ vira 20 natural)"
+    ],
+    "poderes": [
+     "abusar_dos_fracos",
+     "amigos_no_porto",
+     "aparar",
+     "apostador",
+     "ataque_acrobatico",
+     "aumento_atributo",
+     "aventureiro_avido",
+     "bravata_audaz",
+     "bravata_imprudente",
+     "en_garde",
+     "esgrimista",
+     "flagelo_dos_mares",
+     "foliao",
+     "grudar_o_cano",
+     "pernas_do_mar",
+     "pistoleiro",
+     "presenca_paralisante",
+     "ripostar",
+     "touche"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.abusar_dos_fracos",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Ao atacar criatura sob condição de medo, o dano aumenta em um passo",
+    "implementado": false,
+    "prereq": {
+     "poder": "flagelo_dos_mares"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.amigos_no_porto",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Em comunidade portuária, teste de Carisma CD 10 para encontrar um amigo (favor ou parceiro veterano por um dia)",
+    "implementado": false,
+    "prereq": {
+     "car": 1,
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aparar",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Uma vez por rodada, ao ser atingido, gasta 1 PM e faz teste de ataque com bônus igual ao nível para evitar o golpe (arma leve ou ágil)",
+    "implementado": false,
+    "prereq": {
+     "treinado": "luta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.apostador",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Gasta um dia e faz Jogatina contra CD conforme a aposta (T$ 100 = CD 15, T$ 200 = CD 20 ...)",
+    "implementado": false,
+    "prereq": {
+     "treinado": "jogatina"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ataque_acrobatico",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Se chega ao inimigo com salto ou pirueta e ataca no mesmo turno, recebe +2 no ataque e no dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aventureiro_avido",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Uma vez por rodada, gasta 5 PM para uma ação padrão ou de movimento adicional (com Surto Heroico, custa –2 PM)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 47,
+   "pdf_page": 53,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bravata_audaz",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Jura uma façanha específica; se cumprir, PM sobem +2 por nível de bucaneiro até o fim da aventura",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bravata_imprudente",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Na primeira rodada de combate, jura vencer com uma restrição; sofre a penalidade e, se vencer, recebe +2 em ataque e margem de ameaça",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.en_garde",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Ação de movimento e 1 PM: até o fim da cena, +2 na margem de ameaça e +2 na Defesa com arma leve ou ágil",
+    "implementado": false,
+    "prereq": {
+     "poder": "esgrimista"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.flagelo_dos_mares",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Aprende Amedrontar (Carisma) como habilidade não mágica",
+    "implementado": false,
+    "prereq": {
+     "treinado": "intimidacao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.foliao",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Em festas e tavernas: +2 em testes de Carisma e atitude das pessoas melhora uma categoria",
+    "implementado": false,
+    "prereq": {
+     "car": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.grudar_o_cano",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Com arma de fogo contra oponente adjacente, sem penalidade de –5 no ataque e dano sobe um passo",
+    "implementado": false,
+    "prereq": {
+     "treinado": "luta",
+     "poder": "pistoleiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pernas_do_mar",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "+2 em Acrobacia e Atletismo; equilibrando-se ou escalando, não fica desprevenido e não tem deslocamento reduzido",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pistoleiro",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Proficiência com armas de fogo e +2 no dano com elas",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.presenca_paralisante",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Soma Carisma na Iniciativa; se for o primeiro, ganha ação padrão extra na primeira rodada",
+    "implementado": false,
+    "prereq": {
+     "car": 1,
+     "nivel": 4
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ripostar",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Ao evitar com Aparar, gasta 1 PM para ataque corpo a corpo imediato contra quem o atacou",
+    "implementado": false,
+    "prereq": {
+     "poder": "aparar",
+     "nivel": 12
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.touche",
+   "valor": {
+    "classe": "bucaneiro",
+    "efeito": "Ao se aproximar e atacar com arma leve ou ágil, gasta 2 PM para +1 passo de dano e +5 na margem de ameaça",
+    "implementado": false,
+    "prereq": {
+     "poder": "esgrimista",
+     "nivel": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 48,
+   "pdf_page": 54,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.cavaleiro",
+   "valor": {
+    "pv_inicial": 20,
+    "pv_nivel": 5,
+    "soma_con": true,
+    "pm_nivel": 3,
+    "pericias_fixas": [
+     "fortitude",
+     "luta"
+    ],
+    "pericias_escolha": 2,
+    "lista": [
+     "adestramento",
+     "atletismo",
+     "cavalgar",
+     "diplomacia",
+     "guerra",
+     "iniciativa",
+     "intimidacao",
+     "nobreza",
+     "percepcao",
+     "vontade"
+    ],
+    "proficiencias": [
+     "armas_marciais",
+     "armaduras_pesadas",
+     "escudos"
+    ],
+    "habilidades": [
+     "Código de honra (não ataca pelas costas, caído, desprevenido ou incapaz de lutar)",
+     "Baluarte +2 (1º; +4 no 5º, +6 no 9º, +8 no 13º, +10 no 17º)",
+     "Duelo +2 (2º; +3 no 7º, +4 no 12º, +5 no 17º)",
+     "Caminho do cavaleiro: Bastião ou Montaria (5º)",
+     "Resoluto (11º)",
+     "Bravura final (20º)"
+    ],
+    "poderes": [
+     "armadura_da_honra",
+     "autoridade_feudal",
+     "aumento_atributo",
+     "desprezar_os_covardes",
+     "escudeiro",
+     "especializacao_armadura",
+     "estandarte",
+     "etiqueta",
+     "investida_destruidora",
+     "montaria_corajosa",
+     "pajem",
+     "postura_aries_implacavel",
+     "postura_castigo_de_ferro",
+     "postura_foco_de_batalha",
+     "postura_muralha_intransponivel",
+     "postura_provocacao_petulante",
+     "postura_torre_inabalavel",
+     "solidez",
+     "titulo",
+     "torre_armada"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 53,
+   "pdf_page": 59,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadura_da_honra",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "No início de cada cena, recebe PV temporários igual ao nível + Carisma",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 53,
+   "pdf_page": 59,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.desprezar_os_covardes",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Redução de dano 5 se estiver caído, desprevenido ou flanqueado",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escudeiro",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Parceiro que cuida do equipamento: +1 de dano nas armas e +1 na Defesa pela armadura; gasta 1 PM para ajuda em combate",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estandarte",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "No início da cena, você e aliados que veem o estandarte recebem PM temporários igual ao Carisma",
+    "implementado": false,
+    "prereq": {
+     "nivel": 14,
+     "poder": "titulo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.etiqueta",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "+2 em Diplomacia e Nobreza; pode gastar 1 PM para rolar de novo teste dessas perícias",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.investida_destruidora",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Gasta 2 PM ao investir (antes do ataque): +2d8 de dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.montaria_corajosa",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "A montaria concede +1d6 de dano corpo a corpo",
+    "implementado": false,
+    "prereq": {
+     "texto": "Montaria (caminho do cavaleiro)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pajem",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Parceiro que faz pequenas tarefas; +2 em Diplomacia e descanso uma categoria acima",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.postura_aries_implacavel",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Postura (ação de movimento e 2 PM): +2 no ataque de investidas (+1 a cada 2 PM extras); investida contra construto ou objeto causa +2d8",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.postura_castigo_de_ferro",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Postura: quando aliado adjacente sofre ataque corpo a corpo, gasta 1 PM para atacar quem o atacou",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.postura_foco_de_batalha",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Postura: ao ser atacado, recebe 1 PM temporário (máximo por cena igual ao nível)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.postura_muralha_intransponivel",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Postura com escudo: +1 em Defesa e Reflexos (+1 a cada 2 PM extras); Reflexos de metade passa a não causar dano; deslocamento 3m",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.postura_provocacao_petulante",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Postura: inimigos que começam o turno em alcance curto fazem Vontade (CD Car) ou têm você como alvo de ações hostis",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 54,
+   "pdf_page": 60,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.postura_torre_inabalavel",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Postura: imune a ser deslocado; soma Constituição na Defesa e pode trocar Reflexos e Vontade por Fortitude; não pode se deslocar",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 55,
+   "pdf_page": 61,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.torre_armada",
+   "valor": {
+    "classe": "cavaleiro",
+    "efeito": "Quando inimigo erra ataque contra você, gasta 1 PM para +5 no dano contra ele até o fim do seu próximo turno",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 55,
+   "pdf_page": 61,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.cacador",
+   "valor": {
+    "pv_inicial": 16,
+    "pv_nivel": 4,
+    "soma_con": true,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "luta|pontaria",
+     "sobrevivencia"
+    ],
+    "pericias_escolha": 6,
+    "lista": [
+     "adestramento",
+     "atletismo",
+     "cavalgar",
+     "cura",
+     "fortitude",
+     "furtividade",
+     "iniciativa",
+     "investigacao",
+     "luta",
+     "oficio",
+     "percepcao",
+     "pontaria",
+     "reflexos"
+    ],
+    "proficiencias": [
+     "armas_marciais",
+     "escudos"
+    ],
+    "habilidades": [
+     "Marca da presa (+1d4 no dano contra a criatura marcada, a cada 4 níveis +1 PM para aumentar)",
+     "Rastreador (+2 em Sobrevivência)",
+     "Explorador (3º nível: terreno escolhido, Sab na Defesa e em perícias)",
+     "Caminho do explorador (5º nível)",
+     "Mestre caçador (20º nível)"
+    ],
+    "poderes": [
+     "ambidestria",
+     "armadilha_arataca",
+     "armadilha_espinhos",
+     "armadilha_laco",
+     "armadilha_rede",
+     "armadilheiro",
+     "arqueiro",
+     "aumento_atributo",
+     "bote",
+     "camuflagem",
+     "chuva_de_laminas",
+     "companheiro_animal",
+     "elo_com_a_natureza",
+     "emboscar",
+     "empatia_selvagem",
+     "ervas_curativas",
+     "escaramuca",
+     "escaramuca_superior",
+     "espreitar",
+     "impeto",
+     "inimigo_de_criatura",
+     "olho_do_falcao",
+     "ponto_fraco"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadilha_arataca",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Vítima sofre 2d6 de perfuração e fica agarrada (escapa com Força ou Acrobacia CD Sab)",
+    "implementado": false,
+    "prereq": {
+     "texto": "Armadilha (preparar: ação completa e 3 PM)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadilha_espinhos",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Vítima sofre 6d6 de perfuração; Reflexos CD Sab reduz à metade",
+    "implementado": false,
+    "prereq": {
+     "texto": "Armadilha"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadilha_laco",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Vítima faz Reflexos CD Sab: passa, fica caída; falha, fica agarrada",
+    "implementado": false,
+    "prereq": {
+     "texto": "Armadilha"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadilha_rede",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Criaturas na área ficam enredadas; libertar-se com Força ou Acrobacia CD 25; área vira terreno difícil",
+    "implementado": false,
+    "prereq": {
+     "texto": "Armadilha"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadilheiro",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Soma Sabedoria no dano e na CD das armadilhas (cumulativo)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 5,
+     "texto": "um poder de armadilha"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bote",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Empunhando duas armas, na investida gasta 1 PM para um ataque extra com a arma secundária",
+    "implementado": false,
+    "prereq": {
+     "poder": "ambidestria",
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.camuflagem",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Gasta 2 PM para se esconder mesmo sem camuflagem ou cobertura",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.chuva_de_laminas",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Com Ambidestria, gasta 2 PM para um ataque extra com a arma primária (uma vez por rodada)",
+    "implementado": false,
+    "prereq": {
+     "des": 4,
+     "poder": "ambidestria",
+     "nivel": 12
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 50,
+   "pdf_page": 56,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.elo_com_a_natureza",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Soma Sabedoria nos PM e aprende Caminhos da Natureza (atributo-chave Sabedoria)",
+    "implementado": false,
+    "prereq": {
+     "sab": 1,
+     "nivel": 3
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.empatia_selvagem",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Comunica-se com animais e usa Adestramento para mudar atitude e persuadir animais",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ervas_curativas",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Ação completa e PM (limitado pela Sabedoria): cada PM cura 2d6 PV ou remove envenenado do alvo adjacente",
+    "implementado": false,
+    "prereq": {
+     "sab": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escaramuca",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Ao se mover 6m ou mais: +2 na Defesa e Reflexos e +1d8 no dano em alcance curto até o próximo turno (sem armadura pesada)",
+    "implementado": false,
+    "prereq": {
+     "des": 2,
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escaramuca_superior",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Bônus de Escaramuça passa a +5 na Defesa e Reflexos e +1d12 no dano",
+    "implementado": false,
+    "prereq": {
+     "poder": "escaramuca",
+     "nivel": 12
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.espreitar",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Com Marca da Presa, +1 em testes de perícia contra a criatura marcada (+1 por PM extra)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inimigo_de_criatura",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Escolhe tipo (animal, construto, espírito, monstro, morto-vivo) ou duas raças humanoides; contra eles, dobra os dados de bônus da Marca da Presa",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.olho_do_falcao",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Pode usar Marca da Presa em criaturas em alcance longo",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ponto_fraco",
+   "valor": {
+    "classe": "cacador",
+    "efeito": "Com Marca da Presa, +2 na margem de ameaça contra a criatura marcada",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 51,
+   "pdf_page": 57,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.inventor",
+   "valor": {
+    "pv_inicial": 12,
+    "pv_nivel": 3,
+    "soma_con": true,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "oficio",
+     "vontade"
+    ],
+    "pericias_escolha": 4,
+    "lista": [
+     "conhecimento",
+     "cura",
+     "diplomacia",
+     "fortitude",
+     "iniciativa",
+     "investigacao",
+     "luta",
+     "misticismo",
+     "oficio",
+     "pilotagem",
+     "percepcao",
+     "pontaria"
+    ],
+    "proficiencias": [],
+    "habilidades": [
+     "Engenhosidade (2 PM: +Int em teste de perícia, exceto ataque)",
+     "Protótipo (item superior ou 10 itens alquímicos até T$ 500 no início)",
+     "Fabricar item superior (2º nível; melhorias nos 5º, 8º e 11º)",
+     "Fabricar item mágico (9º nível; médio no 13º e maior no 17º)",
+     "Olho do dragão (10º nível)"
+    ],
+    "poderes": [
+     "agite_antes_de_usar",
+     "ajuste_de_mira",
+     "alquimista_de_batalha",
+     "alquimista_iniciado",
+     "armeiro",
+     "ativacao_rapida",
+     "aumento_atributo",
+     "automato",
+     "automato_prototipado",
+     "balistica",
+     "blindagem",
+     "cano_raiado",
+     "catalisador_instavel",
+     "chutes_e_palavroes",
+     "comerciante",
+     "conhecimento_de_formulas",
+     "couraceiro",
+     "encontrar_fraqueza",
+     "engenhoqueiro",
+     "farmaceutico",
+     "ferreiro",
+     "granadeiro",
+     "homunculo",
+     "invencao_potente",
+     "maestria_em_pericia",
+     "manutencao_eficiente",
+     "mestre_alquimista",
+     "mestre_cuca",
+     "mistura_fervilhante",
+     "oficina_de_campo",
+     "pedra_de_amolar",
+     "sintese_rapida"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.agite_antes_de_usar",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Com preparado alquímico de dano, gasta PM (limitado pela Int): cada PM dá um dado extra do mesmo tipo",
+    "implementado": false,
+    "prereq": {
+     "treinado": "oficio"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ajuste_de_mira",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ação padrão e PM (limitado pela Int): +1 no dano à distância por PM até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "poder": "balistica"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.alquimista_de_batalha",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Com preparado ou poção de dano, soma Int na rolagem de dano",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_iniciado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.alquimista_iniciado",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Recebe livro de fórmulas e pode fabricar poções de 1º e 2º círculos",
+    "implementado": false,
+    "prereq": {
+     "int": 1,
+     "sab": 1,
+     "treinado": "oficio"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armeiro",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Proficiência com armas marciais corpo a corpo; usa Int no lugar de For no ataque e dano",
+    "implementado": false,
+    "prereq": {
+     "treinado": "luta",
+     "texto": "Ofício (armeiro)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ativacao_rapida",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ativa engenhoca como ação de movimento por 2 PM",
+    "implementado": false,
+    "prereq": {
+     "poder": "engenhoqueiro",
+     "nivel": 7
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 68,
+   "pdf_page": 74,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.automato",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Constrói um autômato, parceiro iniciante (ajudante, assassino, atirador, combatente, guardião, montaria ou vigilante)",
+    "implementado": false,
+    "prereq": {
+     "poder": "engenhoqueiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.automato_prototipado",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ação padrão e 2 PM: 1d6 (2 a 6) melhora o autômato; 1 o enguiça",
+    "implementado": false,
+    "prereq": {
+     "poder": "automato"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.balistica",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Proficiência com armas à distância ou de fogo; usa Int no lugar de Des no ataque",
+    "implementado": false,
+    "prereq": {
+     "treinado": "pontaria",
+     "texto": "Ofício (armeiro)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.blindagem",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Usa Int na Defesa com armadura pesada (sem somar Destreza)",
+    "implementado": false,
+    "prereq": {
+     "poder": "couraceiro",
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.cano_raiado",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Arma de disparo feita por você tem +1 na margem de ameaça",
+    "implementado": false,
+    "prereq": {
+     "poder": "balistica",
+     "nivel": 5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.catalisador_instavel",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ação completa e 3 PM: fabrica item alquímico ou poção de fórmula conhecida com custo à metade, que dura até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_iniciado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.chutes_e_palavroes",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Uma vez por rodada, gasta 1 PM para rolar de novo Ofício (engenhoqueiro) ao ativar engenhoca",
+    "implementado": false,
+    "prereq": {
+     "poder": "engenhoqueiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.comerciante",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Vende itens 10% mais caro (não cumulativo com barganha)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 3
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 70,
+   "pdf_page": 76,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.conhecimento_de_formulas",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Aprende três fórmulas de qualquer círculo que possa aprender; pode ser escolhido várias vezes",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_iniciado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.couraceiro",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Usa Int na Defesa com armadura (sem somar atributo com armadura pesada)",
+    "implementado": false,
+    "prereq": {
+     "treinado": "oficio",
+     "texto": "Ofício (armeiro)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.encontrar_fraqueza",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ação de movimento e 2 PM: analisa objeto ou inimigo; ignora redução de dano do objeto; +2 em ataques contra armadura ou construto",
+    "implementado": false,
+    "prereq": {
+     "nivel": 7
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 70,
+   "pdf_page": 76,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.engenhoqueiro",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Pode fabricar engenhocas (regras na página 70 do livro)",
+    "implementado": false,
+    "prereq": {
+     "int": 3,
+     "treinado": "oficio"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.farmaceutico",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Com item alquímico de cura, gasta PM (limitado pela Int): cada PM dá um dado extra",
+    "implementado": false,
+    "prereq": {
+     "sab": 1,
+     "treinado": "oficio"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ferreiro",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Arma corpo a corpo feita por você tem o dano aumentado em um passo",
+    "implementado": false,
+    "prereq": {
+     "poder": "armeiro",
+     "nivel": 5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.granadeiro",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Arremessa itens alquímicos e poções em alcance médio; usa Int na CD",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_de_batalha"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.homunculo",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Criatura Minúscula alquímica: parceiro ajudante iniciante; pode perder 1d6 PV para virar guardião até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_iniciado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.invencao_potente",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ao usar item ou engenhoca de sua fabricação, gasta 1 PM para +2 na CD de resistência",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.maestria_em_pericia",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Escolhe perícias treinadas em número igual à Int; gasta 1 PM para escolher 10 nelas (exceto ataque)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.manutencao_eficiente",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Mantém +3 engenhocas; cada uma ocupa meio espaço",
+    "implementado": false,
+    "prereq": {
+     "poder": "engenhoqueiro",
+     "nivel": 5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_alquimista",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Fabrica poções de fórmulas de qualquer círculo",
+    "implementado": false,
+    "prereq": {
+     "int": 3,
+     "sab": 3,
+     "poder": "alquimista_iniciado",
+     "nivel": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_cuca",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Comidas que cozinha têm o bônus numérico +1",
+    "implementado": false,
+    "prereq": {
+     "treinado": "oficio",
+     "texto": "Ofício (cozinheiro)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mistura_fervilhante",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Gasta 2 PM ao usar item alquímico ou poção: dobra a área de efeito",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_iniciado",
+     "nivel": 5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 69,
+   "pdf_page": 75,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.oficina_de_campo",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Gasta 1 hora e 2 PM: manutenção de equipamento do grupo (+1 em ataques ou na Defesa) por um dia",
+    "implementado": false,
+    "prereq": {
+     "treinado": "oficio",
+     "texto": "Ofício (armeiro)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 70,
+   "pdf_page": 76,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pedra_de_amolar",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Ação de movimento e PM (limitado pela Int): +1 no dano corpo a corpo por PM até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "poder": "armeiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 70,
+   "pdf_page": 76,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sintese_rapida",
+   "valor": {
+    "classe": "inventor",
+    "efeito": "Fabrica o dobro de doses no mesmo tempo, pagando a matéria-prima de cada uma",
+    "implementado": false,
+    "prereq": {
+     "poder": "alquimista_iniciado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 70,
+   "pdf_page": 76,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.lutador",
+   "valor": {
+    "pv_inicial": 20,
+    "pv_nivel": 5,
+    "soma_con": true,
+    "pm_nivel": 3,
+    "pericias_fixas": [
+     "fortitude",
+     "luta"
+    ],
+    "pericias_escolha": 4,
+    "lista": [
+     "acrobacia",
+     "adestramento",
+     "atletismo",
+     "enganacao",
+     "furtividade",
+     "iniciativa",
+     "intimidacao",
+     "oficio",
+     "percepcao",
+     "pontaria",
+     "reflexos"
+    ],
+    "proficiencias": [],
+    "habilidades": [
+     "Briga (dano desarmado 1d6, letal ou não letal, aumenta a cada 4 níveis pela tabela)",
+     "Golpe relâmpago (1 PM: ataque desarmado extra com a ação agredir)",
+     "Casca grossa (3º nível: Con na Defesa sem armadura pesada)",
+     "Golpe cruel (5º nível: +1 na margem de ameaça desarmada)",
+     "Golpe violento (9º nível: +1 no multiplicador desarmado)",
+     "Dono da rua (20º nível: 2d10 desarmado; dois ataques)"
+    ],
+    "poderes": [
+     "arma_improvisada",
+     "ate_acertar",
+     "aumento_atributo",
+     "bracos_calejados",
+     "cabecada",
+     "chave",
+     "confianca_dos_ringues",
+     "convencido",
+     "golpe_baixo",
+     "golpe_imprudente",
+     "imobilizacao",
+     "lingua_dos_becos",
+     "lutador_de_chao",
+     "nome_na_arena",
+     "punhos_de_adamante",
+     "rasteira",
+     "sarado",
+     "sequencia_destruidora",
+     "trincado",
+     "trocacao",
+     "trocacao_tumultuosa",
+     "valentao",
+     "voadora"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arma_improvisada",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ataque com arma improvisada conta como desarmado com +1 passo de dano; procurar uma arma exige Percepção CD 20",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ate_acertar",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ao errar desarmado, +2 cumulativo em ataque e dano desarmado contra o mesmo oponente até acertar ou fim da cena",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bracos_calejados",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Sem armadura, soma Força na Defesa (limitado pelo nível)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.cabecada",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ataque desarmado com 2 PM deixa o oponente desprevenido contra ele (uma vez por cena por alvo)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.chave",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Agarrando, com manobra para causar dano, o dano desarmado sobe um passo",
+    "implementado": false,
+    "prereq": {
+     "int": 1,
+     "poder": "lutador_de_chao",
+     "nivel": 4
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.confianca_dos_ringues",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ao ser errado por ataque corpo a corpo, ganha 2 PM temporários cumulativos (máximo por cena igual ao nível)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.convencido",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Resistência a medo e mental +5",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_baixo",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ataque desarmado com 2 PM: se acertar, o alvo faz Fortitude (CD For) ou fica atordoado por uma rodada (uma vez por cena)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 76,
+   "pdf_page": 82,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_imprudente",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Com Golpe Relâmpago, +1 dado de dano desarmado, mas –5 na Defesa até o próximo turno",
+    "implementado": false,
+    "prereq": {
+     "poder": "golpe_relampago"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.imobilizacao",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Agarrando, ação completa e manobra: imobiliza (indefeso); ainda fica agarrado se soltar",
+    "implementado": false,
+    "prereq": {
+     "poder": "chave",
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lingua_dos_becos",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Em teste de Carisma, gasta 1 PM para usar Força no lugar",
+    "implementado": false,
+    "prereq": {
+     "for": 1,
+     "treinado": "intimidacao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lutador_de_chao",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "+2 em testes de ataque para agarrar e derrubar; ao agarrar, gasta 1 PM para derrubar como ação livre",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.nome_na_arena",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Uma vez por cena, teste de Luta CD 10 para impressionar: +2 em perícias de Carisma e atitude de fãs melhora (+2 a cada 10 acima da CD)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 11
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.punhos_de_adamante",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ataques desarmados ignoram 10 de redução de dano do alvo",
+    "implementado": false,
+    "prereq": {
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.rasteira",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ataque desarmado contra criatura até uma categoria maior, com 2 PM e acerto: fica caída",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sarado",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Soma Força em PV e Fortitude; usa Força no lugar de Carisma em Diplomacia com quem admira físicos",
+    "implementado": false,
+    "prereq": {
+     "for": 3
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sequencia_destruidora",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "No início do turno, gasta 2 PM e diz um número: se acertar essa quantidade de ataques, o último recebe +4 cumulativo no dano",
+    "implementado": false,
+    "prereq": {
+     "poder": "trocacao",
+     "nivel": 12
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.trincado",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Soma Constituição no dano desarmado",
+    "implementado": false,
+    "prereq": {
+     "con": 3,
+     "poder": "sarado",
+     "nivel": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.trocacao",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Ao acertar desarmado, faz outro ataque contra o mesmo alvo pagando PM igual aos ataques já feitos na rodada",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.trocacao_tumultuosa",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Com a ação agredir, gasta 2 PM para atingir todas as criaturas adjacentes (inclusive aliados)",
+    "implementado": false,
+    "prereq": {
+     "poder": "trocacao",
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.voadora",
+   "valor": {
+    "classe": "lutador",
+    "efeito": "Investida desarmada com 2 PM: +1d6 de dano para cada 3m deslocados (limitado pelo nível)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 77,
+   "pdf_page": 83,
+   "status": "VERIFICADA"
   }
  ]
 }
