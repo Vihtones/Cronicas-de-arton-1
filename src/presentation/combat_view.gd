@@ -421,6 +421,13 @@ func use_aura() -> void:
 
 
 ## Égide Sagrada (poder do 5º nível): ação de movimento e 2 PM, até o fim da cena.
+## Libertar-se (Controlar Plantas): ação padrão e Acrobacia ou Atletismo.
+func escape() -> void:
+	plan.append({"type": "escapar"})
+	message.emit("Libertar-se: ação padrão (Acrobacia ou Atletismo, a melhor).")
+	_update_preview()
+
+
 func use_egide() -> void:
 	if not Game.world.player_sheet.pode_egide_sagrada():
 		message.emit("Égide Sagrada: escolha o poder no 5º nível (Bênção da Justiça).")
@@ -502,6 +509,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_Y: use_allihanna()
 			KEY_S: use_aura()
 			KEY_E: use_egide()
+			KEY_C: escape()
 			KEY_F: cycle_policy("golpe_divino")
 			KEY_Z: cycle_policy("golpe_divino_extra")
 			KEY_X: extra_attack()

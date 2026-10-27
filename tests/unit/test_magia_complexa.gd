@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1965,3 +1965,100 @@ func test_fuga_sem_rastreador_treinado_nao_ha_perseguicao() -> void:
 	var m := _cena_grupo(1)
 	var out: Array = m[1]._end_combat("fuga")
 	check(not out.any(func(f): return f.type == "PLAYER_TRACKED"), "sem treino em Sobrevivência, ninguém rastreia")
+
+
+# --- Controlar Plantas (divina, 1º círculo) ---------------------------------------------------------
+func _cena_na_plantacao(nivel: int) -> Array:
+	var m := _cena_grupo(nivel)
+	var sim: CombatSim = m[2]
+	var planta := _tile_de(sim.db, "c")
+	sim.c("player").tile = planta + Vector2i(-3, 0)
+	sim.c("bandido_1").tile = planta
+	sim.c("bandido_2").tile = planta + Vector2i(1, 0)
+	m.append(planta)
+	return m
+
+
+func test_controlar_plantas_exige_vegetacao() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var piso := _tile_de(sim.db, "_")
+	sim.c("player").tile = piso
+	sim.c("bandido_1").tile = piso + Vector2i(1, 0)
+	var a := {"type": "cast", "spell": "controlar_plantas", "target": "bandido_1", "tile": piso + Vector2i(1, 0)}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(not v.ok or Area.quadrado(piso + Vector2i(1, 0), 6).any(func(t): return sim.db.is_vegetation(t)), "sem vegetação na área, recusada")
+
+
+func test_controlar_plantas_enreda_e_vira_terreno_dificil() -> void:
+	var m := _cena_na_plantacao(1)
+	var sim: CombatSim = m[2]
+	var planta: Vector2i = m[4]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	sim.c("bandido_2").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "controlar_plantas", "target": "bandido_1", "tile": planta}).ok, "lançada na plantação")
+	check(sim.c("bandido_1").sheet.conditions.has("enredado"), "quem falha fica enredado")
+	check(not sim.c("bandido_2").sheet.conditions.has("enredado"), "quem passa, não")
+	check(sim.zona_em(planta + Vector2i(0, 1), "terreno_dificil"), "terreno difícil mágico")
+	sim.c("bandido_2").sheet.remove_efeito("teste")
+	sim.c("bandido_2").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	m[1]._zonas_e_marcas_inicio_de_turno("bandido_2", [])
+	check(sim.c("bandido_2").sheet.conditions.has("enredado"), "no início do turno, a vegetação tenta de novo")
+
+
+func test_controlar_plantas_libertar_se_e_imovel() -> void:
+	var m := _cena_na_plantacao(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_lanca(m, {"type": "cast", "spell": "controlar_plantas", "target": "bandido_1", "tile": m[4], "aprimoramentos": [1]})
+	check(sim.c("bandido_1").sheet.conditions.has("imovel"), "também imóvel")
+	sim.c("bandido_1").sheet.flat_skills["acrobacia"] = 99
+	sim.c("bandido_1").sheet.remove_condition("surpreendido")   # a cena começa com os bandidos surpreendidos
+	var v := GhostPlanner.validate_action(sim, "bandido_1", {"type": "escapar"})
+	check(v.ok, "pode tentar se libertar: %s" % str(v.get("reason", "")))
+	c._execute_action("bandido_1", {"type": "escapar"}, v)
+	check(not sim.c("bandido_1").sheet.conditions.has("enredado") and not sim.c("bandido_1").sheet.conditions.has("imovel"), "libertou-se")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "escapar"}).ok, "quem não está preso não escapa")
+
+
+func test_controlar_plantas_poda_dissipa_e_fica_no_mundo() -> void:
+	var m := _cena_na_plantacao(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var w = m[0]
+	var planta: Vector2i = m[4]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_lanca(m, {"type": "cast", "spell": "controlar_plantas", "target": "bandido_1", "tile": planta})
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "controlar_plantas", "target": "bandido_1", "tile": planta, "aprimoramentos": [0]})
+	check(not sim.c("bandido_1").sheet.conditions.has("enredado"), "a poda dissipa e solta")
+	eq(sim.step_cost(planta + Vector2i(-1, 0), planta, "player"), 1, "plantação podada: terreno normal")
+	check(w.module("magia").podas.has("%d,%d" % [planta.x, planta.y]), "a poda fica no mundo")
+	c._end_combat("vitoria")
+	check(w.module("magia").tiles_podados().has(planta), "na próxima cena, a vegetação continua podada")
+
+
+func test_controlar_plantas_truque_e_falar_com_plantas() -> void:
+	var m := _cena_na_plantacao(1)
+	var out: Array = m[1]._cast("player", {"type": "cast", "spell": "controlar_plantas", "target": "bandido_1", "tile": m[4], "truque": true}, {"cost": 0})
+	check(out.any(func(f): return f.type == "PLANT_ANIMATED"), "truque anima uma planta")
+	var m5 := _cena_na_plantacao(5)
+	var v := GhostPlanner.validate_action(m5[2], "player", {"type": "cast", "spell": "controlar_plantas", "target": "player", "aprimoramentos": [2]})
+	check(v.ok, "falar com plantas: %s" % str(v.get("reason", "")))
+	var out2: Array = m5[1]._cast("player", {"type": "cast", "spell": "controlar_plantas", "target": "player", "aprimoramentos": [2]}, v)
+	check(out2.any(func(f): return f.type == "PLANTS_TALKED" and int(f.payload.criaturas_perto) >= 0), "as plantas respondem")
+
+
+func test_controlar_plantas_ia_presa_e_imovel_tenta_se_libertar() -> void:
+	var m := _cena_na_plantacao(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b: CharacterSheet = sim.c("bandido_2").sheet
+	b.remove_condition("surpreendido")
+	b.add_efeito("teste", "resistencia", -50, "cena")
+	sim.c("bandido_1").tile = Vector2i(1, 1)
+	_lanca(m, {"type": "cast", "spell": "controlar_plantas", "target": "bandido_2", "tile": m[4], "aprimoramentos": [1]})
+	sim.budget = {"std": 1, "move": 1}
+	var out: Array = c._ai_turn("bandido_2")
+	check(out.any(func(f): return f.type == "ESCAPE_ATTEMPT"), "a IA tenta se libertar")

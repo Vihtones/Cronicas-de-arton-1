@@ -128,7 +128,7 @@ func step_cost(from: Vector2i, to: Vector2i, mover: String = "") -> int:
 	var base := 2 if (from.x != to.x and from.y != to.y) else 1
 	if zona_em(to, "terreno_dificil"):
 		base *= 2   # terreno difícil criado por magia vale para todos
-	elif db.is_difficult(to) and not (mover != "" and db.is_natural(to) and c(mover).sheet.efeito_bonus("ignora_dificil_natural") > 0):
+	elif db.is_difficult(to) and not zona_em(to, "poda") and not (mover != "" and db.is_natural(to) and c(mover).sheet.efeito_bonus("ignora_dificil_natural") > 0):
 		base *= 2   # Caminhos da Natureza: ignora terreno difícil natural
 	return base
 

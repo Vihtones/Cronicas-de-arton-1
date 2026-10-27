@@ -40,3 +40,13 @@ static func linha(origem: Vector2i, direcao: Vector2i, comprimento: int) -> Arra
 	for k in range(1, comprimento + 1):
 		out.append(origem + direcao * k)
 	return out
+
+
+## Quadrado de `lado` quadrados (visto de cima) com `centro` no meio (lado par: o centro fica no quadrante inferior direito).
+static func quadrado(centro: Vector2i, lado: int) -> Array:
+	var out: Array = []
+	var ini := -(lado / 2)
+	for dx in range(ini, ini + lado):
+		for dy in range(ini, ini + lado):
+			out.append(centro + Vector2i(dx, dy))
+	return out

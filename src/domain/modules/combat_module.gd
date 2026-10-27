@@ -362,6 +362,9 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	if dlg != null and not dlg.session.is_empty():
 		pre.append(fact("DIALOGUE_ENDED", {"npc": dlg.session.npc, "reason": "combate"}))
 	sim = _new_sim()
+	var magia_p = world.module("magia")
+	if magia_p != null and not magia_p.podas.is_empty():
+		sim.add_zona("poda_mundo", magia_p.tiles_podados(), "poda", -1, "controlar_plantas")   # vegetação podada antes
 	active = true
 	log.clear()
 	stats = {"rounds": 0, "dmg_dealt": 0, "dmg_taken": 0, "crits": 0, "tactics": {}, "adverse": {}, "pv_start": world.player_sheet.pv,
@@ -776,6 +779,8 @@ func _zonas_e_marcas_inicio_de_turno(id: String, facts: Array) -> void:
 		return
 	for z in sim.zonas.duplicate(true):
 		var dados: Dictionary = z.get("dados", {})
+		if str(z.tipo) == "controlar_plantas" and (z.tiles as Array).has(x.tile) and sim.conscious(id):
+			_enredar_plantas(id, z, facts)   # a vegetação tenta enredar de novo
 		if bool(dados.get("cheiro", false)) and sim.conscious(id) and _sente_cheiro(id, z):
 			# Névoa (aprimoramento de 2 PM): quem está dentro, ou tem faro em alcance curto, faz Fortitude ou fica enjoado.
 			var cd_ch := int(dados.get("cd", 10))
@@ -983,6 +988,61 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 	facts.append(fact("ATTACK_RESOLVED", {"attacker": conj, "target": id, "weapon": origem, "d20": 0, "mod": 0,
 		"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
+
+
+## Controlar Plantas: Reflexos ou fica enredado (e imóvel, com o aprimoramento) enquanto não se libertar.
+func _enredar_plantas(tg: String, z: Dictionary, out: Array) -> void:
+	if not _marca_presa(tg).is_empty():
+		return
+	var dados: Dictionary = z.get("dados", {})
+	var cd := int(dados.get("cd", 10))
+	var sv := Checks.skill(sim.c(tg).sheet, "reflexos", cd, world.rules, world.rng, "combat")
+	sv = _pos_teste(tg, sv, cd, out)
+	if sv.get("success", false):
+		return
+	var conds: Array = ["enredado"]
+	if bool(dados.get("imovel", false)):
+		conds.append("imovel")
+	var postas: Array = []
+	for cnd in conds:
+		if sim.add_condicao(tg, cnd, -1, "controlar_plantas"):
+			postas.append(cnd)
+	if postas.is_empty():
+		return
+	sim.add_marca("presa_" + str(z.id), tg, "controlar_plantas", "preso", -1, {"cd": cd, "condicoes": postas, "zona": z.id})
+	out.append(fact("BUFF_APPLIED", {"actor": str(dados.get("conjurador", "")), "target": tg, "buff": "enredado", "tags": ["magia", "condicao"]},
+		[str(dados.get("conjurador", "")), tg]))
+
+
+func _marca_presa(id: String) -> Dictionary:
+	for m in sim.marcas:
+		if m.alvo == id and m.tipo == "preso":
+			return m
+	return {}
+
+
+func _soltar(id: String, m: Dictionary) -> void:
+	for cnd in m.dados.get("condicoes", []):
+		sim.c(id).sheet.remove_condition(str(cnd))
+	sim.remove_marca(str(m.id), id)
+
+
+## Poda (Controlar Plantas, aprimoramento de 1 PM, instantânea): a vegetação da área diminui; terreno difícil vira
+## normal e não há camuflagem. Dissipa a versão normal que se sobreponha. A mudança fica no mundo (SpellsModule).
+func _podar(area: Array, out: Array) -> void:
+	for z in sim.zonas.duplicate(true):
+		if str(z.fonte) == "controlar_plantas" and str(z.tipo) == "controlar_plantas" and _alguma_em(z.tiles, area):
+			for m in sim.marcas.duplicate(true):
+				if m.tipo == "preso" and str(m.dados.get("zona", "")) == str(z.id) and sim.combatants.has(m.alvo):
+					_soltar(m.alvo, m)
+			sim.remove_zona(str(z.id))
+			sim.remove_zona(str(z.id) + "_dificil")
+	var podadas: Array = area.filter(func(t): return world.db.is_vegetation(t))
+	sim.add_zona("poda_%d" % sim.zonas.size(), podadas, "poda", -1, "controlar_plantas")
+	var magia_m = world.module("magia")
+	if magia_m != null:
+		magia_m.podar(podadas)
+	out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, []))
 
 
 ## Arma Espiritual: 2d6 (+1d6 por aprimoramento) do tipo da arma, automaticamente, em `alvo`.
@@ -1427,6 +1487,15 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 							break
 				out.append(fact("HEALED", {"actor": id, "target": alvo_m, "amount": cura_m, "pv_after": ts_m.pv, "source": "cura_pelas_maos", "tags": ["classe", "cura"]}, [id, alvo_m]))
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id]))
+		"escapar":
+			# Libertar-se (Controlar Plantas): Acrobacia ou Atletismo, a melhor, contra a CD do efeito.
+			var sh_x: CharacterSheet = sim.c(id).sheet
+			var marca_x: Dictionary = _marca_presa(id)
+			var pericia_x := "acrobacia" if sh_x.skill_value("acrobacia", world.rules) >= sh_x.skill_value("atletismo", world.rules) else "atletismo"
+			var r_x := Checks.skill(sh_x, pericia_x, int(marca_x.dados.cd), world.rules, world.rng, "combat")
+			if r_x.get("success", false):
+				_soltar(id, marca_x)
+			out.append(fact("ESCAPE_ATTEMPT", {"actor": id, "skill": pericia_x, "check": r_x, "success": r_x.get("success", false)}, [id]))
 		"arma_espiritual":
 			var i_ae := sim.arma_espiritual_livre(id)
 			(sim.c(id).flags as Array).append("ae_atk_%d" % i_ae)
@@ -1568,6 +1637,29 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"controlar_plantas":
+			# Controlar Plantas (divina 1): quadrado de 9m de lado com vegetação, pela cena. Quem falha em Reflexos fica
+			# enredado (libertar-se: ação padrão e Acrobacia ou Atletismo, ação "escapar"); a área vira terreno difícil e,
+			# no início de cada turno, tenta enredar de novo quem está nela. Truque: anima 1 planta, sem dano nem efeito
+			# na concentração. Aprimoramentos: poda (instantânea, terreno normal, dissipa a versão normal); também imóvel;
+			# falar com plantas (pessoal, pela cena; ver SpellsModule).
+			var apr_cp: Array = a.get("aprimoramentos", [])
+			var centro_cp: Vector2i = a.get("tile", sim.c(a.get("target", id)).tile)
+			var area_cp := Area.quadrado(centro_cp, Area.quadrados(9.0))
+			if a.get("truque", false):
+				out.append(fact("PLANT_ANIMATED", {"caster": id, "tile": [centro_cp.x, centro_cp.y]}, [id]))
+			elif apr_cp.has(2):
+				var magia_cp = world.module("magia")
+				if magia_cp != null:
+					out.append(magia_cp.falar_com_plantas(sim.c(id).tile))
+			elif apr_cp.has(0):
+				_podar(area_cp, out)
+			else:
+				var zid := "controlar_plantas_%d" % sim.zonas.size()
+				sim.add_zona(zid, area_cp, "controlar_plantas", -1, "controlar_plantas", {"conjurador": id, "cd": spell_dc(sh, a), "imovel": apr_cp.has(1)})
+				sim.add_zona(zid + "_dificil", area_cp, "terreno_dificil", -1, "controlar_plantas", {"zona": zid})
+				for tg_cp in _criaturas_vivas_em(area_cp):
+					_enredar_plantas(tg_cp, sim.zonas[sim.zonas.size() - 2], out)
 		"caminhos_da_natureza":
 			# Caminhos da Natureza (divina 1): criaturas escolhidas em alcance curto, por 1 dia (SpellRules.aplicar_caminhos).
 			var truque_cn: bool = a.get("truque", false)
@@ -2455,6 +2547,10 @@ func _ai_turn(id: String) -> Array:
 			best = d; target = oid
 	if target == "":
 		return out
+	# preso e imóvel (Controlar Plantas) longe do alvo: tenta se libertar
+	if best > 1 and not _marca_presa(id).is_empty() and me.sheet.has_effective_condition(world.rules, "imovel"):
+		out.append_array(_try(id, {"type": "escapar"}))
+		return out
 	if me.sheet.conditions.has("caido"):
 		out.append_array(_try(id, {"type": "stand"}))
 	var melee := -1
@@ -2626,6 +2722,9 @@ func _check_end() -> Array:
 
 func _end_combat(outcome: String) -> Array:
 	var out: Array = []
+	for m in sim.marcas.duplicate(true):   # presos por efeitos da cena (Controlar Plantas) ficam livres com o fim da cena
+		if m.tipo == "preso" and sim.combatants.has(m.alvo):
+			_soltar(m.alvo, m)
 	var loc := world.db.location_at(sim.c("player").tile)
 	var P := sim.c("player")
 	world.player_sheet = P.sheet

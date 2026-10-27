@@ -98,6 +98,11 @@ func is_natural(t: Vector2i) -> bool:
 	return bool(tile_info(t).get("natural", false))
 
 
+## Vegetação (grama, floresta, plantação, árvore): onde Controlar Plantas pode ser lançada.
+func is_vegetation(t: Vector2i) -> bool:
+	return bool(tile_info(t).get("vegetacao", false))
+
+
 ## Solo para rastrear (LB p.123): macio, comum ou duro.
 func solo(t: Vector2i) -> String:
 	return str(tile_info(t).get("solo", "comum"))

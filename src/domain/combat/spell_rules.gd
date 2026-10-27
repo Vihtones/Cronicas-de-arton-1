@@ -22,6 +22,7 @@ const COMPLETAS := {
 	"arma_espiritual": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1 Defesa (+1 repetível); sustentada com ataque livre; essência; +1d6; duas armas
 	"armamento_da_natureza": {"aprimoramentos": [0, 1, 2, 3]},   # +1 ataque; execução de movimento; +1 ataque (repetível); +1 passo (repetível)
 	"caminhos_da_natureza": {"aprimoramentos": [0, 1]},   # rastrear os alvos: CD +10; +3m (repetível); truque: +5 em Sobrevivência para se orientar
+	"controlar_plantas": {"aprimoramentos": [0, 1, 2]},   # poda (instantânea); também imóvel; falar com plantas; truque: anima 1 planta
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz

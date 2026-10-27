@@ -15,6 +15,7 @@ const FORA_DE_COMBATE := {
 	"profanar": [],
 	"despedacar": [],   # contra um objeto mundano
 	"caminhos_da_natureza": [],   # você e os companheiros presentes
+	"controlar_plantas": [],   # poda, falar com plantas e truque (enredar só tem efeito numa cena de combate)
 }
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
@@ -23,6 +24,7 @@ const DIAS_SEMANA := 7
 const MINUTOS_DIA := 24 * 60
 
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
+var podas: Dictionary = {}       # "x,y" -> true: vegetação podada por Controlar Plantas (instantânea, fica)
 var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim (-1 permanente), mod_mv:int, conjurador}
 
 
@@ -82,6 +84,14 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var p := _tile_jogador()
 			if maxi(absi(p.x - int(od.tile[0])), absi(p.y - int(od.tile[1]))) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
 				return PackedStringArray(["objeto fora do alcance"])
+		"controlar_plantas":
+			if not cmd.payload.get("truque", false) and not apr.has(0) and not apr.has(2):
+				return PackedStringArray(["fora de combate, só a poda, falar com plantas ou o truque"])
+			if not apr.has(2):
+				var p_cp := _tile_jogador()
+				var tiles_cp: Array = [p_cp] if cmd.payload.get("truque", false) else Area.quadrado(p_cp, Area.quadrados(9.0))
+				if not tiles_cp.any(func(t): return world.db.is_vegetation(t)):
+					return PackedStringArray(["Controlar Plantas precisa de vegetação"])
 		"consagrar", "profanar":
 			if SpellRules.simbolo_impede(world.db, _tile_jogador(), Area.quadrados(9.0), str(sh.devotion)):
 				return PackedStringArray(["há um símbolo de outra divindade na área"])
@@ -107,6 +117,17 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"controlar_plantas":
+			var apr_p: Array = cmd.payload.get("aprimoramentos", [])
+			var p_cp := _tile_jogador()
+			if cmd.payload.get("truque", false):
+				out.append(fact("PLANT_ANIMATED", {"caster": "player", "tile": [p_cp.x, p_cp.y]}, ["player"]))
+			elif apr_p.has(0):
+				var podadas: Array = Area.quadrado(p_cp, Area.quadrados(9.0)).filter(func(t): return world.db.is_vegetation(t))
+				podar(podadas)
+				out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, ["player"]))
+			else:
+				out.append(falar_com_plantas(p_cp))
 		"caminhos_da_natureza":
 			var truque: bool = cmd.payload.get("truque", false)
 			var apr_c: Array = cmd.payload.get("aprimoramentos", [])
@@ -198,6 +219,34 @@ func _tile_jogador() -> Vector2i:
 	return world.db.world_to_tile(world.player.position)
 
 
+## Controlar Plantas (poda): a vegetação fica podada (terreno difícil natural vira normal) nas próximas cenas.
+func podar(tiles: Array) -> void:
+	for t in tiles:
+		podas["%d,%d" % [t.x, t.y]] = true
+
+
+func tiles_podados() -> Array:
+	var out: Array = []
+	for k in podas:
+		out.append(Vector2i(int(str(k).get_slice(",", 0)), int(str(k).get_slice(",", 1))))
+	return out
+
+
+## Controlar Plantas (falar com plantas, 2 PM): plantas prestativas dão respostas simplórias sobre os arredores —
+## quantas criaturas estão por perto agora (percepção limitada: até alcance longo).
+func falar_com_plantas(p: Vector2i) -> Dictionary:
+	var combat = world.module("combat")
+	var perto: Array = []
+	var longo := int(world.rules.value("alcance.quadrados", {}).get("longo", 60))
+	if combat != null:
+		for id in combat.creature_state:
+			var st_c: Dictionary = combat.creature_state[id]
+			var t: Array = st_c.get("tile", [0, 0])
+			if bool(st_c.get("alive", false)) and bool(st_c.get("present", false)) and maxi(absi(p.x - int(t[0])), absi(p.y - int(t[1]))) <= longo:
+				perto.append(id)
+	return fact("PLANTS_TALKED", {"caster": "player", "criaturas_perto": perto.size(), "atitude": "prestativa"}, ["player"])
+
+
 ## Consultado pelas magias que criam mortos-vivos.
 func cadaver_preservado(id: String) -> bool:
 	return cadaveres.has(id) and int(cadaveres[id]) >= world.day_index()
@@ -219,9 +268,10 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 
 func to_dict() -> Dictionary:
-	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true)}
+	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
 	cadaveres = (d.get("cadaveres", {}) as Dictionary).duplicate()
 	areas = (d.get("areas", []) as Array).duplicate(true)
+	podas = (d.get("podas", {}) as Dictionary).duplicate()

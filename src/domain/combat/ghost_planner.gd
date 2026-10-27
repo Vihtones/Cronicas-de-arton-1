@@ -142,6 +142,19 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "controlar_plantas":
+				var centro_cp: Vector2i = a.get("tile", sim.c(a.get("target", actor)).tile) if sim.combatants.has(a.get("target", actor)) else a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, centro_cp) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)):
+					return {"ok": false, "reason": "fora do alcance"}
+				if not apr.has(2):
+					var tiles_cp: Array = [centro_cp] if a.get("truque", false) else Area.quadrado(centro_cp, Area.quadrados(9.0))
+					if not tiles_cp.any(func(t): return sim.db.is_vegetation(t)):
+						return {"ok": false, "reason": "Controlar Plantas precisa de vegetação"}
+				if apr.has(2) and (apr.has(0) or apr.has(1)):
+					return {"ok": false, "reason": "falar com plantas não se combina com os outros aprimoramentos"}
+				if apr.has(0) and apr.has(1):
+					return {"ok": false, "reason": "a poda é instantânea: não prende ninguém"}
+				targets = [actor]
 			if sp_id == "caminhos_da_natureza" and not a.get("truque", false):
 				for tg in targets:
 					if not sim.combatants.has(tg) or sim.is_enemy(actor, tg):
@@ -253,6 +266,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if T.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, T.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
 			return {"ok": true, "kind": "movimento", "cost": 1}
+		"escapar":
+			# Libertar-se de efeito que prende (Controlar Plantas): ação padrão e Acrobacia ou Atletismo.
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "libertar-se exige ação padrão"}
+			var preso := false
+			for m in sim.marcas:
+				if m.alvo == actor and m.tipo == "preso": preso = true
+			if not preso: return {"ok": false, "reason": "você não está preso"}
+			return {"ok": true, "kind": "padrao"}
 		"arma_espiritual":
 			# Arma Espiritual (aprimoramento sustentado): ação livre; a arma acerta automaticamente um alvo adjacente.
 			if A.sheet.efeito_bonus("arma_espiritual_ataque") <= 0: return {"ok": false, "reason": "sem Arma Espiritual que ataca"}

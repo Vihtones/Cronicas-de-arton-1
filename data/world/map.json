@@ -77,7 +77,8 @@
    "name": "grama",
    "walk": true,
    "natural": true,
-   "solo": "comum"
+   "solo": "comum",
+   "vegetacao": true
   },
   "=": {
    "name": "estrada",
@@ -95,21 +96,24 @@
    "name": "chão de floresta",
    "walk": true,
    "natural": true,
-   "solo": "comum"
+   "solo": "comum",
+   "vegetacao": true
   },
   "c": {
    "name": "plantação",
    "walk": true,
    "difficult": true,
    "natural": true,
-   "solo": "macio"
+   "solo": "macio",
+   "vegetacao": true
   },
   "T": {
    "name": "árvore",
    "walk": false,
    "cover": true,
    "natural": true,
-   "solo": "comum"
+   "solo": "comum",
+   "vegetacao": true
   },
   "~": {
    "name": "rio",
