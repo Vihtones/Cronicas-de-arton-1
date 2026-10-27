@@ -11078,6 +11078,1492 @@
    "pagina": 43,
    "pdf_page": 45,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.aeronauta_goblin",
+   "valor": {
+    "nome": "Aeronauta Goblin",
+    "admissao": "Ser goblin. Construir uma máquina voadora com as próprias mãos e testá-la. Projetar, construir e testar três outras, cada uma mais complexa, provocando quedas e falhas nos testes. Por fim, criar a aeronave definitiva e voar com ela sem cair.",
+    "marca": {
+     "nome": "Combate Aéreo",
+     "texto": "Recebe uma ação de movimento extra por rodada, usada só para pilotar a aeronave; não sofre penalidades para atacar à distância ou lançar magias a bordo."
+    },
+    "poderes": [
+     {
+      "nome": "Cabeça nas Nuvens",
+      "texto": "Pilotando uma aeronave, +1 em perícias, rolagens de dano e CD das habilidades e itens; +1 a cada dois outros poderes da distinção. Pré-requisitos: Int 2, treinado em Ofício (artesão) e Pilotagem."
+     },
+     {
+      "nome": "Engenharia Aeronáutica",
+      "texto": "Pode fabricar ornitópteros superiores e acoplar até duas engenhocas (não contam no limite, só ativadas pilotando). Pré-requisitos: Cabeça nas Nuvens, Engenhoqueiro."
+     },
+     {
+      "nome": "Estou Bem, Pessoal!",
+      "texto": "Redução de fogo e impacto 5; sofre apenas metade do dano de quedas. Pré-requisito: Cabeça nas Nuvens."
+     },
+     {
+      "nome": "Manobras Defensivas",
+      "texto": "Soma Int na Defesa de qualquer aeronave pilotada; ao sofrer dano (você ou a aeronave), gasta 2 PM para teste de Pilotagem e subtrai o resultado do dano. Pré-requisitos: treinado em Reflexos, Estou Bem, Pessoal!."
+     },
+     {
+      "nome": "Senhor dos Céus",
+      "texto": "Uma vez por rodada, pilotando, gasta 3 PM para uma ação padrão adicional. Pré-requisitos: Manobras Defensivas, derrotar cinco aeronaves e/ou inimigos voadores enquanto pilota."
+     }
+    ],
+    "especial": {
+     "nome": "Ornitópteros goblins",
+     "texto": "Veículo Grande que transporta criatura Pequena e 10 espaços; deslocamento de voo 15m, Defesa 15 (+Des do piloto), RD 5 e PV iguais à metade do criador. Dentro, cobertura leve e investidas montadas. Fabricado com Ofício (artesão) CD 20, uma semana e T$ 300; só o criador opera. Melhorias (ornitóptero superior): Armado, Blindado (+10 Defesa), Bombardeiro (4 preparados/poções), Camuflado (+10 Furtividade), Dobrável, Durável (PV = do criador), Espaçoso, Estável (+5 Pilotagem), Resistente (RD +5), Veloz (+6m voo). Materiais: aço-rubi, adamante, casco de monstro, cristal de sol, couro de bulette, couraça de kaiju, gelo eterno, lanajuste, madeira tollon, matéria vermelha, mitral, prata, pena de kraken."
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 106,
+   "pdf_page": 108,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.algoz_tormenta",
+   "valor": {
+    "nome": "Algoz da Tormenta",
+    "admissao": "Ser aceito por um Lorde da Tormenta após adentrar uma área de Tormenta. Cometer um ato terrível e irremediável contra algo ou alguém que o candidato ama. Cumprir várias tarefas do Lorde (assassinatos, roubos, rituais profanos). Passar por um momento de traição, em que o candidato tem chance de trair o Lorde; qualquer escolha termina em manipulação e traição pelos Lordes.",
+    "marca": {
+     "nome": "Servo e Senhor",
+     "texto": "Imune à Insanidade da Tormenta e a efeitos de medo e mentais, exceto os causados pelo lekael a quem serve."
+    },
+    "poderes": [
+     {
+      "nome": "Lar Infernal",
+      "texto": "Imune aos efeitos de áreas de Tormenta; nessas áreas, +5 em testes de perícia e descanso conta como luxuoso. Pré-requisitos: dois poderes da Tormenta."
+     },
+     {
+      "nome": "Abraçar Anticriação",
+      "texto": "Tipo muda para monstro (lefeu) e recebe as habilidades lefeu; Insanidade da Tormenta causa perda de 1d6 PM por poder da distinção (Sab). Pré-requisitos: General Rubro, 17º nível."
+     },
+     {
+      "nome": "Ataque Corrupto",
+      "texto": "Ataques recebem o benefício de matéria vermelha, cumulativo com materiais especiais, mas sem seus efeitos nocivos; +1d6 de dano extra por dois outros poderes da distinção. Pré-requisitos: treinado em Luta ou Pontaria, Lar Infernal."
+     },
+     {
+      "nome": "Desprezo Profano",
+      "texto": "Resistência a magia +1 por poder da distinção; pode lançar Dissipar Magia substituindo o teste de Misticismo por Vontade (habilidade simulada). Pré-requisitos: treinado em Vontade, Ataque Corrupto, não ser devoto (exceto de Aharadak)."
+     },
+     {
+      "nome": "General Rubro",
+      "texto": "Lefeu de ND menor que o seu nível são prestativos; criaturas tocadas pela Tormenta que o percebam ficam enfeitiçadas (Vontade CD Sab +2 por poder da Tormenta que evitam). Parceiro existente vira parceiro aberrante iniciante. Pré-requisitos: Desprezo Profano, 11º nível."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 109,
+   "pdf_page": 111,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.amazona",
+   "valor": {
+    "nome": "Amazona",
+    "admissao": "Dois caminhos, ambos só para mulheres. Quem nasce entre as amazonas precisa abandonar o povo por anos e voltar após vencer os desafios das anciãs (perder é aceitável, mas é preciso relatar o aprendizado). Quem vem de fora precisa encontrar um grupo, perseguí-lo até ser aceita, passar por provações (sem armas sofisticadas, sem tocar o chão, com uma ração) e vencer uma amazona em um desafio escolhido. Por fim, libertar uma mulher oprimida.",
+    "marca": {
+     "nome": "Armadura das Amazonas",
+     "texto": "Se não estiver usando armadura pesada, +2 na Defesa."
+    },
+    "poderes": [
+     {
+      "nome": "Predadora",
+      "texto": "Ação de movimento e 2 PM para analisar inimigo em alcance médio: +1 em perícias e rolagens de dano contra ele e criaturas do mesmo tipo até o fim da cena; +1 PM por outro poder da distinção para +1 extra. Pré-requisito: treinada em Sobrevivência."
+     },
+     {
+      "nome": "Arquearia Montada",
+      "texto": "Montada, aplica bônus de ataque e dano fornecidos pela montaria em ataques à distância. Pré-requisito: Bênção de Hippion."
+     },
+     {
+      "nome": "Bênção de Hippion",
+      "texto": "Recebe um cavalo de guerra parceiro veterano; se já tiver montaria de outra habilidade, ela fornece +2 em Destreza. Vínculo emocional com a montaria (sem testes de Adestramento); treina outra com uma semana de trabalho. Pré-requisitos: Ginete, Predadora."
+     },
+     {
+      "nome": "Estilo da Amazona",
+      "texto": "Uma vez por rodada, em ataque corpo a corpo com uma mão livre ou escudo leve, gasta 2 PM para ataque adicional com arma de arremesso nessa mão. Pré-requisitos: Estilo de Arremesso, Predadora."
+     },
+     {
+      "nome": "Nunca Ceder",
+      "texto": "Ao falhar em teste de resistência contra efeito de inimigo, gasta 2 PM para repetir com bônus igual ao total de poderes da distinção (uma vez por efeito). Pré-requisito: Estilo da Amazona."
+     },
+     {
+      "nome": "Rainha Amazona",
+      "texto": "+1 em Carisma; ao usar Predadora, o bônus vira RD contra criaturas desse tipo. Pré-requisitos: Arquearia Montada, Nunca Ceder e um grande feito ou missão em nome das amazonas."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 112,
+   "pdf_page": 114,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.armadilheiro_mestre",
+   "valor": {
+    "nome": "Armadilheiro Mestre",
+    "admissao": "Encontrar informações sobre fabricação e uso de armadilhas com um mentor veterano ou em bibliotecas (com risco e favores a guildas). Depois, invadir uma masmorra com muitas armadilhas complexas, desarmando todas sem ajuda, em exploração de mais de um dia. Por fim, preparar uma área com no mínimo dez armadilhas e atrair pelo menos cinco vítimas intrusas (não aliadas), até que cinco sejam mortas, capturadas ou afugentadas.",
+    "marca": {
+     "nome": "Armadilheiro Experiente",
+     "texto": "+2 em testes de perícia relacionados a armadilhas (encontrar, desarmar, resistir). Sempre que desarma armadilha que não seja sua, recupera 1 PM."
+    },
+    "poderes": [
+     {
+      "nome": "Armadilha Instantânea",
+      "texto": "Escolha duas armadilhas entre as de armadilheiro e as de caçador (escolha fixa). Pode preparar conforme as regras de Armadilhas, sem precisar de ambiente propício; usa Inteligência como atributo-chave da CD. A cada novo poder da distinção, escolha uma nova armadilha. Pré-requisitos: treinado em Ladinagem e Ofício (artesão)."
+     },
+     {
+      "nome": "Armadilha Distante",
+      "texto": "Ao preparar armadilha, gasta 1 PM para prepará-la em qualquer espaço desocupado em alcance curto. Pré-requisitos: Destreza 1, Armadilha Instantânea."
+     },
+     {
+      "nome": "Armadilha Furtiva",
+      "texto": "A CD para encontrar, desarmar e resistir às armadilhas aumenta em +5 e adiciona o dano de Ataque Furtivo ao dano delas. Não funciona contra criaturas que não estejam desprevenidas ou surpreendidas. Pré-requisitos: Armadilha Instantânea, Ataque Furtivo."
+     },
+     {
+      "nome": "Armadilha Recarregável",
+      "texto": "Quando uma armadilha em alcance médio é disparada, gasta 1 PM para rearmá-la automaticamente no início do seu próximo turno. Pré-requisito: Armadilha Instantânea."
+     },
+     {
+      "nome": "Aumentar Complexidade",
+      "texto": "Soma Inteligência no dano e na CD das armadilhas (cumulativo); elas ocupam área de 4,5m de lado. Se estiver em alcance médio de uma armadilha, pode dispará-la como ação livre. Pré-requisito: Armadilha Instantânea."
+     },
+     {
+      "nome": "Tripla Ameaça",
+      "texto": "Gasta 10 PM para preparar até três armadilhas ao mesmo tempo, cada uma em ponto diferente em alcance curto. Pré-requisito: Aumentar Complexidade."
+     }
+    ],
+    "arsenal_armadilhas": [
+     "Atordoante",
+     "Barril de Óleo",
+     "Buraco Portátil",
+     "Constrangedora",
+     "Fumaça",
+     "Luz",
+     "Mola",
+     "Mina",
+     "Substância Enervante"
+    ],
+    "observacao": "Lista de armadilhas do arsenal (4d8 atordoante, etc.) registrada como texto de referência; as escolhas são feitas pelo poder Armadilha Instantânea."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 115,
+   "pdf_page": 117,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.arqueiro_lenorienn",
+   "valor": {
+    "nome": "Arqueiro de Lenórienn",
+    "admissao": "Atrair a atenção de um mentor e provar aptidão em arquearia e magia arcana, além de conhecer e respeitar os valores élficos (goblinoides não são aceitos). Passar pela Provação das Três Setas (atingir o alvo três vezes com arco e duas flechas, sem se deslocar; mentores rígidos exigem também recitar os arqueiros de Lenórienn). Estudar pelo menos uma estação em isolamento com o mentor; qualquer interrupção reinicia o treinamento. Por fim, cumprir um desafio final proposto pelo mentor, sempre em serviço ao povo élfico.",
+    "marca": {
+     "nome": "O Arco Arcano",
+     "texto": "A arma do candidato se transforma em arco arcano. Além dos benefícios normais, conta como item esotérico de um tipo à escolha e pode receber melhorias e encantos de armas e esotéricos (escolher a qual se aplica quando ambos). Se perder, transforma outro com ritual de 1 dia e T$ 100 em componentes."
+    },
+    "poderes": [
+     {
+      "nome": "Energizar Arco",
+      "texto": "Pode lançar Arma Mágica no arco arcano como ação de movimento. Se aprender novamente essa magia, seu custo diminui em 1 PM. Pré-requisitos: treinado em Misticismo e Pontaria, habilidade de classe Magias, Foco em Arma (qualquer arco)."
+     },
+     {
+      "nome": "Chuva de Flechas",
+      "texto": "Ação padrão e 2 PM: faz um ataque à distância e compara com a Defesa de inimigos escolhidos no alcance do arco, limitado por seu atributo-chave de magias arcanas. Uma única rolagem de dano para todos os atingidos; gasta só uma munição. Pré-requisitos: Energizar Arco, lançar magias arcanas de 3º círculo."
+     },
+     {
+      "nome": "Encantar Flechas",
+      "texto": "Recebe 20 flechas mágicas menores à escolha e pode fabricá-las. Com magias arcanas de 3º círculo, fabrica médias; com 4º círculo, maiores. Disparar todo o pacote devolve a energia mística a você. Pré-requisitos: treinado em Ofício (armeiro), Energizar Arco, lançar magias arcanas de 2º círculo."
+     },
+     {
+      "nome": "Flecha de Toque",
+      "texto": "Ao lançar magia que permita ataque corpo a corpo como parte de sua execução (como Infligir Ferimentos ou Toque Chocante aprimoradas), pode substituir esse ataque por um ataque à distância com o arco arcano. Pré-requisito: Energizar Arco."
+     },
+     {
+      "nome": "Flecha Explosiva",
+      "texto": "Magias de área recebem novo aprimoramento: +2 PM, como parte da execução, faz ataque à distância com o arco arcano contra criatura ou objeto; se acertar, causa o dano do ataque e o efeito da magia (centrado no alvo atingido). Pré-requisito: Flecha de Toque."
+     },
+     {
+      "nome": "Flecha Fantasma",
+      "texto": "Gasta 2 PM ao atacar com arco para transformar a flecha em munição etérea: +5 no teste de ataque, ignora cobertura leve e 20 pontos de RD do alvo. Pré-requisitos: Energizar Arco, Forma Etérea."
+     },
+     {
+      "nome": "Flecha da Morte",
+      "texto": "Gasta 1 dia e T$ 100 para criar flecha mágica: 1 dado extra de dano, +2 na margem de ameaça e, com Flecha de Toque ou Flecha Explosiva, +2 na CD para resistir às magias. Para cada dois outros poderes da distinção, esses bônus e os dados extras aumentam em +1. Máximo de flechas igual ao total de poderes da distinção (a mais antiga perde o poder ao excedente). Pré-requisitos: Encantar Flechas e acerto crítico com arco em uma criatura de cada tipo."
+     }
+    ],
+    "bonus_por_poderes": "Flecha da Morte escala com o total de poderes da distinção (+1 a cada dois outros poderes)."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 118,
+   "pdf_page": 120,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.bruxo_da_tormenta",
+   "valor": {
+    "nome": "Bruxo da Tormenta",
+    "admissao": "Encontrar centro de ensino arcano avançado para lidar com a Tempestade Rubra (ex.: Academia Arcana, que só ensina Tormenta a alunos avançados; é preciso provar conhecimento arcano). Verificar lealdade a Arton. Estudar com aulas e materiais (relatando o progresso; alunos sem empenho são dispensados). Por fim, pesquisa independente: entrar em área de Tormenta ou invadir um culto, descobrir algo novo sobre os lefeu e apresentar um tratado acadêmico a uma banca de professores.",
+    "marca": {
+     "nome": "Insanidade Controlada",
+     "texto": "Ao lançar magia, pode receber pontos de insanidade (PI) limitados pelo círculo da magia; cada PI recebido paga 1 PM do custo da magia."
+    },
+    "pontos_de_insanidade": {
+     "limite": "5 vezes o total de poderes da Tormenta",
+     "frustrado": "acima da metade do limite",
+     "alquebrado_esmorecido": "ao atingir o limite (não pode receber mais PI que o limite)",
+     "remocao": "descanso: 1 PI por nível, modificado pelas condições do descanso"
+    },
+    "poderes": [
+     {
+      "nome": "Conjuração Insana",
+      "texto": "Ao lançar magia, pode receber PI limitados pelo total de poderes da distinção; a CD dessa magia aumenta em +1 por PI recebido. Pré-requisitos: Int 2, Caminho do Arcanista (Mago ou Bruxo), um poder da Tormenta."
+     },
+     {
+      "nome": "Corromper Magia",
+      "texto": "Ao lançar magia de dano, pode receber PI limitados pelo total de poderes da distinção; para cada PI, a magia causa +1d6 de dano de essência. Pré-requisitos: Magia Antiaberrante, Resistência à Tormenta."
+     },
+     {
+      "nome": "Escudo Rubro",
+      "texto": "Em teste de resistência ou ao sofrer dano, pode receber PI limitados pelo total de poderes da distinção; para cada PI recebido, recebe +2 nesse teste de resistência ou 5 pontos de RD contra esse dano. Dobrado contra efeitos da Tormenta, suas criaturas e devotos de Aharadak. Pré-requisito: Resistência à Tormenta."
+     },
+     {
+      "nome": "Magia Antiaberrante",
+      "texto": "Ao lançar magia, pode receber PI igual ao círculo da magia; ela ignora 10 pontos de RD dos alvos e, se algum for lefeu, ignora também suas imunidades. Pré-requisito: Conjuração Insana."
+     },
+     {
+      "nome": "Resistência à Tormenta",
+      "texto": "Aprende e pode lançar Resistência a Energia; ao aprender de novo, custo diminui em 1 PM. Aprimoramento (+2 PM): alvo protegido de certos efeitos de áreas de Tormenta e templos de Aharadak; não fica frustrado, itens encantados não perdem encantos e recebe +5 em testes de resistência contra Fenômenos Rubros. Pré-requisito: Conjuração Insana."
+     }
+    ],
+    "pendencias": [
+     "Tabela de limite de PI por círculo (citada como 'veja o quadro' na marca) não aparece no texto extraído de PDF 123–125; conferir visualmente antes de finalizar."
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 121,
+   "pdf_page": 123,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.cacador_de_cabecas",
+   "valor": {
+    "nome": "Caçador de Cabeças",
+    "admissao": "Apenas duyshidakk. Encontrar um caçador experiente (difícil, pois são discretos), convencê-lo de que o treinamento contribui para o Mundo Como Deve Ser e ser aceito. Segue-se um isolamento que pode durar meses ou anos, com o mestre decidindo as provas. O candidato escolhe quando se considera pronto e passa por três testes: fabricar um truque (bomba de fumaça, veneno, armadilha ou ferramenta inusitada); permanecer oculto um dia inteiro enquanto o mestre tenta achá-lo; e assassinar um alvo indicado, trazendo a cabeça como prova. Qualquer falha encerra o treinamento, sem segundas chances.",
+    "marca": {
+     "nome": "Terror de Lamnor",
+     "texto": "+2 em Furtividade e +2 na margem de ameaça de ataques contra criaturas desprevenidas."
+    },
+    "poderes": [
+     {
+      "nome": "Predador Alfa",
+      "texto": "Uma vez por rodada, gasta ação de movimento e 2 PM para fazer teste de Furtividade oposto à Percepção de criatura em alcance curto. Se vencer, surge adjacente ao alvo e fica invisível contra ele até o início do seu próximo turno. Exige liberdade de movimentos (não usável de armadura pesada ou imóvel). Pré-requisitos: treinado em Furtividade, Lobo Solitário, ser duyshidakk."
+     },
+     {
+      "nome": "Arsenal do Caçador",
+      "texto": "Soma Sabedoria na CD e nas rolagens de dano (ou perda de vida) dos preparados alquímicos e venenos; alcance de arremesso aumenta uma categoria (curto para médio, médio para longo). Preparar item que exija ação de movimento vira ação livre. Pré-requisitos: Predador Alfa, Saque Rápido."
+     },
+     {
+      "nome": "Camuflagem do Caçador",
+      "texto": "Quando está oculto, inimigos aplicam a chance de erro por camuflagem a qualquer efeito contra você (não apenas ataques). Pré-requisitos: Camuflagem, Predador Alfa."
+     },
+     {
+      "nome": "Exterminar Presa",
+      "texto": "Ao usar Marca da Presa, para cada poder da distinção recebe 1 PM temporário usável só contra a criatura marcada; acerto crítico contra ela multiplica também o dano adicional de Marca da Presa. Pré-requisitos: Espreitar, Predador Alfa."
+     },
+     {
+      "nome": "Sentidos de Caçada",
+      "texto": "Enxerga perfeitamente no escuro, incluindo escuridão mágica, e ignora camuflagem por fumaça ou névoa. Pré-requisitos: Predador Alfa, Sentidos Aguçados."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 124,
+   "pdf_page": 126,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.cacador_de_dragoes",
+   "valor": {
+    "nome": "Caçador de Dragões",
+    "admissao": "Não se aprende sozinho nem por livros: é preciso procurar uma organização que treine (guilda, ordem ou grupo como as Lanças de Sckharshantallas, o Bando da Lança Rubra ou os Escamas Vivas), passar por teste de aptidão e juramento de lealdade. O treino dura cerca de seis meses, com saídas periódicas. Depois, o candidato localiza um dragão específico (aprovado pela organização, não podendo ser fraco ou inofensivo), estuda suas fraquezas e poderes, planeja a aproximação e o ataque e caça e mata o dragão, trazendo um troféu à organização. Pode ter aliados, desde que obedeçam ao seu plano como líder.",
+    "marca": {
+     "nome": "Escama da Honra",
+     "texto": "Recebe um amuleto de escama da honra (vestuário, não ocupa espaço nem conta no limite de itens vestidos). Enquanto o usa, uma vez por rodada, ao causar dano corpo a corpo, pode causar +1d6 de dano de um tipo dos sopros de dragões que já derrotou. Se perder, confecciona outro em 1 dia com escama de dragão morto há menos de 30 dias."
+    },
+    "poderes": [
+     {
+      "nome": "Destemor Inflamado",
+      "texto": "Imune a medo (exceto fobias raciais). Contra efeito de medo de inimigo, recebe +2 em testes de perícia e rolagens de dano até o fim da cena; +1 para cada dois outros poderes da distinção. Pré-requisito: treinado em Vontade."
+     },
+     {
+      "nome": "Alçar aos Céus",
+      "texto": "Gasta 2 PM e ação completa para investida saltando sobre criatura em alcance médio: ataque causa um dado extra de dano, mais um para cada dois outros poderes da distinção (dobrado contra dragões). Aterrissa em espaço adjacente (ou sobre criatura maior, nas costas, durante o ataque). Pré-requisitos: treinado em Atletismo, Destemor Inflamado."
+     },
+     {
+      "nome": "Danificar as Asas",
+      "texto": "Ao atacar, gasta 2 PM para machucar asas ou membro locomotor; se acertar, alvo fica caído e lento (Fort CD For ou Des reduz para lento por 1 rodada; não pode ser afetado de novo por este poder na cena). CD +1 para cada poder da distinção (dobrado contra dragões). Pré-requisito: Destemor Inflamado."
+     },
+     {
+      "nome": "Entortar Escamas",
+      "texto": "Em acerto crítico, até o fim da cena o alvo sofre -2 na Defesa e -5 na redução de dano; com cinco poderes da distinção, sofre -5 na Defesa e -10 na RD. Pré-requisitos: Destemor Inflamado, outro poder da distinção."
+     },
+     {
+      "nome": "Evasão do Caçador",
+      "texto": "Em efeito com teste de Reflexos para reduzir dano à metade: passando, não sofre dano; falhando, sofre metade. Uma vez por rodada, ao passar em Reflexos, pode percorrer até metade do deslocamento (exige liberdade de movimentos). Pré-requisitos: treinado em Reflexos, Destemor Inflamado."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 127,
+   "pdf_page": 129,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.campeao_de_dojo",
+   "valor": {
+    "nome": "Campeão de Dojo",
+    "admissao": "Treinar em dojo tradicional tamuraniano durante toda a vida (ou boa parte dela), sem desviar do estilo. Voltar periodicamente ao dojo para relatar façanhas e treinar. Ao atingir a graduação máxima, pedir permissão para desafiar o dojo inteiro: vencer em um mesmo dia todos os colegas graduados (com pausa curta entre lutas, usando só técnicas do estilo), extraindo de cada luta uma lição relatada ao mestre; depois vencer o próprio mestre e, se houver, o campeão atual. O mestre então concede o título. O campeão deve defender o título com visitas regulares e vencer quem o desafiar.",
+    "marca": {
+     "nome": "Foco Marcial",
+     "texto": "Ação de movimento para receber +1d8 na rolagem de dano do próximo ataque desarmado feito na rodada."
+    },
+    "poderes": [
+     {
+      "nome": "Golpe Concentrado",
+      "texto": "Ação de movimento e 2 PM: até o fim da cena, +1d8 nas rolagens de dano desarmado. Pré-requisitos: Sab 2, Briga."
+     },
+     {
+      "nome": "Caminho da Mão Armada",
+      "texto": "Escolhe três armas corpo a corpo com proficiência; contam como ataques desarmados para efeitos que interajam com elas. Ao atacar com uma delas, pode usar o dano básico da arma ou o dano desarmado, o que for melhor. Pré-requisito: Golpe Concentrado."
+     },
+     {
+      "nome": "Caminhar do Dragão",
+      "texto": "+5 em Atletismo; gasta 1 PM para 'correr no ar' por 1 rodada, com deslocamento de voo igual ao base; deve terminar sobre superfície firme ou cai. Pré-requisitos: treinado em Atletismo, Golpe Concentrado."
+     },
+     {
+      "nome": "Controlar a Respiração",
+      "texto": "Ação de movimento e PM limitados pela Sabedoria: para cada PM gasto, recupera 2d6 PV; para cada dois outros poderes da distinção, cada dado de cura aumenta um passo. Pré-requisito: Golpe Concentrado."
+     },
+     {
+      "nome": "Sentidos do Tigre",
+      "texto": "Soma Sabedoria na Defesa e em Reflexos; exige liberdade de movimentos (não usável de armadura pesada ou imóvel). Pré-requisito: Golpe Concentrado."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 131,
+   "pdf_page": 133,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.capitao_do_conclave_pirata",
+   "valor": {
+    "nome": "Capitão do Conclave Pirata",
+    "admissao": "Adquirir o próprio navio (origem irrelevante; pode ser roubado, comprado, recebido ou construído). Obter tripulação leal ou obediente. Cruzar o Mar Negro com nau e tripulação, provando que enfrenta seus perigos (podem ser convidados após derrotar um vilão purista). Viajar ao Sentença, abaixar a bandeira, pedir audiência com a Dupla Coroa (Izzy Tarante e Sidrius Tirallis) e jurar lealdade: doar no mínimo 10% dos saques para a operação e ampliação do Sentença, ajudar outros membros e caçar todo purista, inclusive em terra. Depois, partir com a nau e tomar saque significativo de inimigos do Conclave, entregando-o à Dupla Coroa. Se aceito, hasteia a bandeira do Conclave ao lado da sua.",
+    "marca": {
+     "nome": "Membro do Conclave",
+     "texto": "Ao enfrentar um capitão do Conclave, enfrenta todos. +2 em Acrobacia e Pilotagem; não sofre penalidades por atacar à distância ou lançar magias a bordo de veículo. Pode recorrer à Solidariedade Pirata (uma vez por aventura, pedido ao Conclave com resposta em 1d3 dias: pessoal, equipamento até T$ 1.000 x nível ou informações, com contrapartida; pode-se pedir ajuda ao próprio Sentença, avaliado por Izzy e Sirius)."
+    },
+    "poderes": [
+     {
+      "nome": "Içar a Bandeira Preta",
+      "texto": "Uma vez por cena, ação de movimento e 5 PM: aliados em alcance curto recebem 5 PV e 1 PM temporários por poder da distinção (até o fim da cena); inimigos em alcance curto ficam abalados por 1d4 rodadas (Vontade CD Car evita). Se a bandeira já estiver visível no início da cena, usa com ação livre e 3 PM. Pré-requisitos: treinado em Intimidação e Pilotagem, Audácia."
+     },
+     {
+      "nome": "Língua Afiada",
+      "texto": "Ao vencer teste oposto de Enganação contra criatura inteligente (Int –3 ou maior), para cada poder da distinção causa 2d6 de dano psíquico não letal (uma vez por cena). Usar Audácia em Enganação, Diplomacia ou Intimidação custa –1 PM. Pré-requisito: Içar a Bandeira Preta."
+     },
+     {
+      "nome": "Lutar Sujo",
+      "texto": "Teste de manobra para truque sujo: se vencer, o inimigo fica cego, enjoado, lento ou surdo por 1 rodada (ou até usar ação padrão para se recompor). Pré-requisito: Içar a Bandeira Preta."
+     },
+     {
+      "nome": "Sentença de Bolso",
+      "texto": "+2 em Intimidação e na margem de ameaça com armas de fogo; +2d6 de dano com armas de fogo contra oponentes desprevenidos. Pré-requisitos: proficiência com armas de fogo, Içar a Bandeira Preta."
+     },
+     {
+      "nome": "Vento em Popa",
+      "texto": "Uma vez por rodada, gasta 2 PM para ação de movimento adicional no turno (com Velocidade Ladina, o custo dela diminui em 1 PM). Custo diminui em 1 PM a bordo de veículo aquático e, com Audácia em Acrobacia, Atletismo ou Pilotagem, diminui em 1 PM. Pré-requisitos: treinado em Pilotagem, Içar a Bandeira Preta, Pernas do Mar."
+     }
+    ],
+    "observacao": "Solidariedade Pirata é um quadro da marca (habilidade, não poder) e está registrado no texto da marca."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 133,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.carteador",
+   "valor": {
+    "nome": "Carteador",
+    "admissao": "Adquirir mentalidade fora da lei: candidatos que não são naturais de Ahlen, dos Três Mares, de Smokestone, de Fortuna ou de locais semelhantes devem passar tempo extenso nesses lugares. Dominar ao menos três jogos de azar (ex.: Wyrt, Cavillan, Dhagn'dir). Vencer no mínimo três partidas diferentes, com três apostas diferentes: (1) dinheiro que o afunde em dívidas; (2) a própria vida; (3) a alma. Uma partida depende de habilidade quando a sorte trai; outra só de sorte, sem técnica; outra trapaceando do início ao fim, quebrando ao menos uma regra básica sem ser percebido. Oponentes não podem ser amigos ou aliados. Por fim, desafiar um carteador a um jogo de azar: se vencer, torna-se carteador e o oponente deixa de ser (precisa repetir a admissão para voltar). Derrota no jogo faz perder os poderes.",
+    "marca": {
+     "nome": "Sorte de Principiante",
+     "texto": "Aprende Orientação, usável só em si mesmo e só em testes de Jogatina. Alternativamente, com Deuses de Arton, aprende Sorriso da Fortuna (Car; pode usá-la em jogos mágicos). Não é habilidade mágica: provém de torcer as regras do jogo a seu favor."
+    },
+    "poderes": [
+     {
+      "nome": "Dado Viciado",
+      "texto": "No início de cada cena, recebe 1d6 de auxílio, +1d6 para cada dois outros poderes da distinção. Em teste de perícia, pode pagar 1 PM por dado de auxílio e somar o resultado como bônus. Ao rolar dois ou mais dados de auxílio com resultado igual, ganha 1 PM temporário por dado igual. Pré-requisito: treinado em Jogatina."
+     },
+     {
+      "nome": "Ás na Manga",
+      "texto": "Em teste de perícia, gasta 2 PM para usar Jogatina no lugar da perícia (uma vez por perícia por cena). Pré-requisito: Dado Viciado."
+     },
+     {
+      "nome": "Jogo Perigoso",
+      "texto": "Ação completa para apostar com entidade sobrenatural: escolhe uma magia de 1º círculo (arcana ou divina) e faz teste de Jogatina (CD 20 + custo em PM da magia). Se passar, até o fim da cena (ou até usar o poder de novo) pode lançar a magia (Car) com aprimoramentos como um bardo do seu nível. Se falhar, perde 2 PM por círculo da magia. A cada dois outros poderes, pode escolher magias de um círculo acima do 1º. Pré-requisitos: treinado em Misticismo, Ás na Manga."
+     },
+     {
+      "nome": "Resultado Destinado",
+      "texto": "Uma vez por cena, paga 5 PM para receber uma habilidade de classe de até 5º nível de outra classe (usável como se tivesse 5 níveis nela; Magias aprende uma única magia sem somar o atributo-chave ao PM). Atributo-chave Car; não pode escolher a mesma habilidade duas vezes na mesma aventura. Pré-requisitos: Jogo Perigoso, 17º nível."
+     },
+     {
+      "nome": "Seduzir a Sorte",
+      "texto": "Ao rolar dados de auxílio, pode pagar 1 PM para apostar com o mestre: rola seus auxílios e o mestre rola a mesma quantidade em segredo; deve adivinhar qual total é maior. Acerto recupera os dados gastos; erro deixa frustrado. Pré-requisito: Dado Viciado."
+     }
+    ],
+    "observacao": "Marca e poderes lidos de PDF 138–140; poderes da Jogatina conferidos no texto."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 136,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.cavaleiro_do_corvo",
+   "valor": {
+    "nome": "Cavaleiro do Corvo",
+    "admissao": "Achar o Ninho do Corvo, nas Montanhas Lannestul (provação por si só). Qualquer artoniano pode ser admitido. O treinamento é um caminho sem volta: quem se voluntaria completa ou morre. Todos que chegam ao Ninho fazem juramento de segredo (grupos de aventureiros podem acompanhar, mas sem treinamento). Ritual de iniciação com horrores que simulam a corrupção da Tormenta. Depois, meses de treino com uma pequena turma, sem teste de aptidão: o próprio treinamento é o teste. Missões de recursos durante o processo. Ao sobreviver, recebe um codinome dado pelos superiores.",
+    "marca": {
+     "nome": "Não Tenho Nome",
+     "texto": "Aprende a Língua dos Corvos (quadro: uma ação de movimento e 1 PM para transmitir informações a aliado em alcance curto, como Aviso sem falar, exigindo que o alvo veja o gesto). Recebe imunidade a medo. Perde Código de Honra, se a tiver."
+    },
+    "poderes": [
+     {
+      "nome": "Reconhecimento e Infiltração",
+      "texto": "Deslocamento +3 m; não sofre penalidade por armadura; a penalidade por ação chamativa ao usar Furtividade muda para -10. Pré-requisitos: treinado em Furtividade e Guerra, proficiência com armaduras pesadas."
+     },
+     {
+      "nome": "A Qualquer Custo",
+      "texto": "Declara uma missão específica: prepara-a em 1 dia, gasta T$ 500 e recebe um benefício (Busca e Destruição: arma anticriatura contra um tipo; Guerra Não Convencional: treinado em duas perícias; Inteligência Militar: usa Guerra no lugar de duas perícias entre Conhecimento, Intuição, Investigação, Percepção e Sobrevivência). Um benefício extra por dois outros poderes. Só uma missão por vez. Pré-requisito: Reconhecimento e Infiltração."
+     },
+     {
+      "nome": "Atrás das Linhas Inimigas",
+      "texto": "Imunidade a atordoamento e cansaço; recuperação por descanso nunca inferior ao normal. Pré-requisito: Reconhecimento e Infiltração."
+     },
+     {
+      "nome": "Das Trevas",
+      "texto": "Contra oponente desprevenido ou flanqueado escolhido como alvo de Duelo, os bônus de Duelo aumentam em +2. Pré-requisitos: Duelo, Atrás das Linhas Inimigas."
+     },
+     {
+      "nome": "Ferramenta de Morte",
+      "texto": "Ação de movimento e PM (limitados pela Inteligência): até o início do próximo turno, você e aliados recebem bônus igual aos PM gastos em testes de ataque, rolagens de dano e margem de ameaça contra o oponente em alcance curto. Uma vez por cena contra a mesma criatura. Pré-requisitos: A Qualquer Custo; ter liderado grupo em pelo menos dois combates vitoriosos (liderar = auxiliar aliados)."
+     },
+     {
+      "nome": "Tomada Furtiva",
+      "texto": "Postura de combate: pode mirar como ação livre; não sofre penalidade em Furtividade ao se mover no deslocamento normal; +2 em testes de ataque e dano com ataques à distância (+1 para cada dois outros poderes). Pré-requisitos: treinado em Pontaria, Reconhecimento e Infiltração."
+     },
+     {
+      "nome": "Trazemos a Luz",
+      "texto": "Uma vez por combate, ação de movimento e 3 PM: teste de Guerra; recebe PV temporários igual ao resultado e +1 em ataque e dano a cada 10 pontos. Com resultado 30 ou mais, ignora imunidade a acertos críticos e ataques furtivos de inimigos. Efeitos duram a cena. Pré-requisito: Das Trevas."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 139,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.cavaleiro_feerico",
+   "valor": {
+    "nome": "Cavaleiro Feérico",
+    "admissao": "Sem ordem formal: encontrar um mestre e treinar um inverno isolado (com mestre e floresta) nas artes da guerra, história élfica e caminhos das fadas, dominando técnicas e demonstrando harmonia com a natureza. No inverno seguinte, levar uma oferenda digna ao mentor (cabeça de inimigo poderoso, armadura élfica ou flor única; cabe ao candidato escolher; pode ser recusada, e nesse caso tenta-se de novo no inverno seguinte). Se aceita, cerimônia de iniciação em clareira: o candidato coloca a oferenda num círculo de flores e bebe em três goles um chá de ervas de Lamnor enquanto responde às perguntas do mentor com 'Ainda não, mas sigo em busca da perfeição'. Ao final, o mentor o declara cavaleiro feérico 'Em nome de Glórienn e Lenórienn, por este inverno e por todos os outros que estão por vir'.",
+    "marca": {
+     "nome": "Conexão Feérica",
+     "texto": "Recebe a habilidade Empatia Selvagem e +1 PM para cada poder da distinção que possuir."
+    },
+    "poderes": [
+     {
+      "nome": "Arte Élfica",
+      "texto": "Uma vez por rodada, ao acertar ataque com espada longa ou florete, gasta 2 PM para ativar uma Música de bardo ou lançar magia arcana com execução de ação de movimento ou padrão como ação livre. Círculo máximo limitado pelo total de poderes da distinção. Pré-requisitos: habilidade de classe Magias, treinado em Atuação e Luta, Foco em Arma (espada longa ou florete)."
+     },
+     {
+      "nome": "Arma da Floresta",
+      "texto": "Gasta 1 PM para cobrir espada longa ou florete com elementos naturais (madeira, folhas, pólen): o dano é mágico e aumenta um passo até o fim da cena. Em uma floresta, o efeito dura 1 dia ou até sair dela. Pré-requisito: Arte Élfica."
+     },
+     {
+      "nome": "Armadura da Floresta",
+      "texto": "Armadura completa de madeira levíssima, folhas e flores: não reduz deslocamento; soma Destreza na Defesa e lança magias arcanas sem testes de Misticismo. A cada dois outros poderes, recebe uma melhoria à escolha (cumprindo seus pré-requisitos, exceto material especial). Outra criatura que vista murcha e morre; se destruída, renasce ao redor em 1 dia. Pré-requisito: Arte Élfica."
+     },
+     {
+      "nome": "Flagelo dos Duyshidakk",
+      "texto": "Soma o total de poderes da distinção em rolagens de dano contra bandos, enxames e duyshidakk. Uma vez por rodada, ao reduzir oponente a 0 PV ou menos com ataque corpo a corpo, gasta 2 PM para percorrer até o deslocamento e fazer outro ataque corpo a corpo. Pré-requisito: Arte Élfica."
+     },
+     {
+      "nome": "Lâminas Feéricas",
+      "texto": "Espadas longas são armas ágeis. Ao usar espada longa ou florete, soma o círculo máximo de magias que pode lançar ao dano e aumenta a margem de ameaça em +1 para cada dois poderes da distinção. Pré-requisito: Arte Élfica."
+     },
+     {
+      "nome": "Montaria Feérica",
+      "texto": "Recebe parceiro montaria veterano (cavalo de guerra, trobo ou criatura de natureza feérica, a critério do mestre); se já tem montaria de outra habilidade, esta vira parceiro combatente iniciante. +5 em Cavalgar para correr e saltar com a montaria. Se perdê-la, treina outra em uma semana. Pré-requisitos: treinado em Cavalgar, Arte Élfica."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 142,
+   "pdf_page": 144,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.chapeu_preto",
+   "valor": {
+    "nome": "Chapéu-preto",
+    "admissao": "Presenciar pelo menos três atos de maldade marcante, um deles diretamente ligado ao candidato (perda de ente querido, destruição de algo importante, derrota marcante, ou ato do próprio candidato, mesmo bem-intencionado). Os três atos devem causar prejuízos significativos (ex.: ficar sem dormir por um mês, cansado e exausto). Romper laços com organizações justas, guildas que o patrocinavam ou família, incluindo devoção a divindades e grupos de aventureiros justos. Sofrer um ferimento que o torne assustador ou prejudique sua habilidade de luta, magia ou outra tarefa importante. Então a maldição se manifesta: surge o objeto 'chapéu preto', marca de tudo que passou.",
+    "marca": {
+     "nome": "Esse Maldito Chapéu",
+     "texto": "Recebe um chapéu preto (item que representa a maldição, sempre visível, retorna ao corpo na cena seguinte se perdido; nem Purificação o separa permanentemente). +2 em Intimidação e na CD de seus efeitos de medo; -2 em Adestramento, Atuação e Diplomacia. Redenção possível a critério do mestre (perde a distinção e os poderes)."
+    },
+    "poderes": [
+     {
+      "nome": "Coração Duro",
+      "texto": "+2 em rolagens de dano com armas e imunidade a medo (ou +2 em Vontade, se já for imune). Não elimina fobias raciais. Pré-requisitos: treinado em Luta ou Pontaria, Presença Aterradora."
+     },
+     {
+      "nome": "Bala nas Costas",
+      "texto": "Ao atacar oponente pela primeira vez na cena, pode gastar 1 PM para receber +10 na margem de ameaça desse ataque. Pré-requisitos: Coração Duro, dois outros poderes da distinção."
+     },
+     {
+      "nome": "Congelar o Inferno",
+      "texto": "Ao usar efeito de medo, gasta 2 PM para ignorar imunidades a medo e efeitos mentais dos alvos. Pré-requisitos: Coração Duro, dois outros poderes da distinção."
+     },
+     {
+      "nome": "Dance!",
+      "texto": "Ao fazer teste de Intimidação, gasta 2 PM para demonstrar habilidade com a arma: recebe bônus igual ao atributo-chave de ataque com a arma. Pré-requisito: Coração Duro."
+     },
+     {
+      "nome": "Olhos de Chumbo",
+      "texto": "Aura de medo com 9 m de raio; criaturas escolhidas na aura sofrem -2 em rolagens de dano e na Defesa, penalidade que aumenta em -1 para cada dois outros poderes. Pré-requisitos: Coração Duro, ser procurado pelas autoridades por um crime."
+     },
+     {
+      "nome": "Rápido ou Morto",
+      "texto": "+2 em Iniciativa e +3 m de deslocamento; bônus aumentam em +1 e +1,5 m para cada dois outros poderes. Pré-requisitos: treinado em Iniciativa, Coração Duro."
+     },
+     {
+      "nome": "Tiro à Traição",
+      "texto": "O dano de ataques com armas contra alvos desprevenidos ou sob condição de medo aumenta um passo. Pré-requisitos: Coração Duro, ter feito pelo menos três acertos críticos em alvos desprevenidos."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 145,
+   "pdf_page": 147,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.cobaia_dos_medicos_monstros",
+   "valor": {
+    "nome": "Cobaia dos Médicos Monstros",
+    "admissao": "Ir até Vectora (bairro de Numen) e citar o nome de um padrinho, antigo paciente do Grêmio que cobra favor ou serviço. Famosos, autoridades ou ligados à lei são rejeitados. Após confirmação, consulta com cirurgião sobre as modificações desejadas (nem todas disponíveis; partes incomuns por encomenda).",
+    "marca": {
+     "nome": "Procedimento Inicial",
+     "texto": "Você se torna um monstro em adição ao seu tipo. A penalidade em perícias por implante cai de -2 para -1 por implante, e você paga 20% a menos pelos implantes."
+    },
+    "poderes": [
+     {
+      "nome": "Enxerto Experimental",
+      "texto": "Recebe um implante de até T$ 18.000 que não conta no limite de implantes. No início de cada cena, rola 1d4; com resultado 1, o implante não funciona na cena. Cada outro poder da distinção aumenta esse dado em um passo. Pré-requisito: Foco em Perícia (Fortitude)."
+     },
+     {
+      "nome": "Corpo Resiliente",
+      "texto": "Não sofre a penalidade em Fortitude por implantes; limite de implantes +1, e +1 para cada dois outros poderes. Pré-requisito: Enxerto Experimental."
+     },
+     {
+      "nome": "Extrapolar o próprio Corpo",
+      "texto": "Escolhe um poder racial (p. 84) cujos pré-requisitos cumpra, ignorando requisitos de raça, aprovado pelo mestre. Recebe um implante que fornece o benefício. Pré-requisito: Implante Exclusivo."
+     },
+     {
+      "nome": "Glândula de Infusão",
+      "texto": "Escolhe magia de até 2º círculo com alvo você ou 1 criatura. Recebe um implante que permite lançá-la como engenhoca, usando Constituição e Fortitude no lugar de Inteligência e Ofício (engenhoqueiro); só pode ter você como alvo; efeito orgânico. Pré-requisito: Enxerto Experimental."
+     },
+     {
+      "nome": "Implante Exclusivo",
+      "texto": "Escolhe um encanto de arma sem pré-requisito; gasta ação de movimento e 1 PM para colocá-lo em arma empunhada (não conta no limite de encantos; termina ao soltar a arma ou no fim da cena). Pré-requisito: Enxerto Experimental."
+     }
+    ],
+    "implantes": [
+     {
+      "nome": "Asas",
+      "efeito": "Voo com deslocamento igual ao base, mas fica vulnerável enquanto voa.",
+      "preco": "T$ 20.000"
+     },
+     {
+      "nome": "Braço de Ogro",
+      "efeito": "+2 em Força; alcance natural +1,5 m com o braço. Substitui um braço.",
+      "preco": "T$ 36.000"
+     },
+     {
+      "nome": "Cauda com Ferrão",
+      "efeito": "Arma natural de ferrão (1d6, x2, perfuração); 1 PM para ataque extra com ferrão; 1 PM para inocular veneno (1d12 PV).",
+      "preco": "T$ 27.000"
+     },
+     {
+      "nome": "Escamas",
+      "efeito": "+2 na Defesa; enxertar uma segunda vez eleva para +5.",
+      "preco": "T$ 12.000"
+     },
+     {
+      "nome": "Garras",
+      "efeito": "Armas naturais de garra (1d6, x2, corte); 1 PM para ataque extra com garra.",
+      "preco": "T$ 27.000"
+     },
+     {
+      "nome": "Olho Anulador",
+      "efeito": "Pode lançar Dissipar Magia em cone de 9 m, usando Vontade no lugar de Misticismo.",
+      "preco": "T$ 30.000"
+     },
+     {
+      "nome": "Olho Desintegrador",
+      "efeito": "Pode lançar Desintegrar (atributo-chave Constituição).",
+      "preco": "T$ 50.000"
+     },
+     {
+      "nome": "Olho Petrificante",
+      "efeito": "Habilidade Olhar Atordoante; CD para resistir +2 se já a tiver.",
+      "preco": "T$ 18.000"
+     },
+     {
+      "nome": "Patas de Aranha",
+      "efeito": "Deslocamento de escalada igual ao base (ou +6 m se já tiver).",
+      "preco": "T$ 12.000"
+     },
+     {
+      "nome": "Tentáculo com Garras",
+      "efeito": "Arma natural de tentáculo (1d4, x2, impacto), alcance +1,5 m; 1 PM para ataque extra.",
+      "preco": "T$ 27.000"
+     }
+    ],
+    "regras_implantes": "Cirurgia de 1 dia; recuperação por teste estendido de Fortitude (CD 25, 3 sucessos, um por dia); falha total exige remoção (que destrói o implante) ou leva à morte. Penalidade de -2 em Adestramento, Diplomacia e Fortitude por implante (vide marca). Máximo de implantes = Constituição (mínimo 1). Implantes contam como poderes para todos os efeitos. Partes trazidas pelo próprio aventureiro custam metade."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 148,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.dracomante_real",
+   "valor": {
+    "nome": "Dracomante Real",
+    "admissao": "Ser mago (ter algum poder arcano). Estudar um Dragão-Real indiretamente, sem mestre: (1) ter contato direto com um efeito de magia do Dragão-Real escolhido (analisar o dano, coletar resíduos, pesquisar o que ficou para trás, como visitar uma aldeia devastada por uma Bola de Fogo de Sckhar); (2) ter contato direto com o próprio Dragão-Real, a poucos passos, enquanto ele está na forma dracônica, podendo enxergar as escamas, sentir o cheiro e vislumbrar sua glória (é o passo que mais mata). Para Behluga, basta contato com uma presença viva da Dragoa-Rainha (voz espiritual, efeito mágico ou elemento parecido), não apenas o esquife. Para Benthos, que não domina magia arcana, é preciso invocá-lo de seu covil subaquático (feito raro), por meio do ritual dos xamãs de Khubar ou outro caminho.",
+    "marca": {
+     "nome": "Mestre Dracônico",
+     "texto": "Escolhe um Dragão-Real como mestre (Behluga: frio ou luz; Benthos: ácido; Hydora: eletricidade; Mzzileyn: trevas; Sckhar: fogo; Tarso: trevas; Zadbblein: veneno), escolha irrevogável. Magias de dano ou perda de PV do tipo da essência do mestre causam +2 de dano ou perda de PV."
+    },
+    "poderes": [
+     {
+      "nome": "Afinidade Dracônica",
+      "texto": "+2 na CD de magias de dano do tipo da essência do mestre e, para cada poder da distinção, redução de dano 3 contra esse tipo. Pré-requisito: 5º nível de Mago."
+     },
+     {
+      "nome": "Dracomancia",
+      "texto": "Ao lançar magia, recebe redução de dano 5 e resistência a magia +5 até o início do seu próximo turno. Pré-requisito: Afinidade Dracônica."
+     },
+     {
+      "nome": "Majestade Elemental",
+      "texto": "Magias de dano do tipo da essência do mestre ignoram até 20 pontos de RD e, contra criaturas imunes, causam metade do dano. Pré-requisitos: lançar magias arcanas de 3º círculo, Dracomancia."
+     },
+     {
+      "nome": "Memória Dracônica",
+      "texto": "Pode memorizar magias adicionais por dia igual ao total de poderes da distinção, mas apenas magias de dano do tipo da essência do mestre. Pré-requisito: Dracomancia."
+     },
+     {
+      "nome": "Verdadeiro Poder",
+      "texto": "Aprende e pode lançar Metamorfose; enquanto sob ela, pode lançar magias normalmente. Com Ameaças de Arton, pode aprender Transformação em Dragão (p. 405), sem componente material para se transformar em dragão do tipo do mestre. Aprender de novo reduz o custo em 1 PM. Pré-requisitos: lançar magias arcanas de 4º círculo, quatro poderes da distinção."
+     }
+    ],
+    "nota_benthos": "Benthos não possui magia arcana conhecida; o caminho é o ritual de invocação (ver admissão)."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 151,
+   "pdf_page": 153,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.drogadora",
+   "valor": {
+    "nome": "Drogadora",
+    "admissao": "Ser mulher humanoide (construtos e mortos-vivos não). Ser aceita em uma comunidade thera que tenha drogadoras, provando-se mais digna que as nascidas nela (serviços ou missões, debates, profecias ou duelos). Convencer a drogadora da comunidade a treiná-la (ela pode recusar), demonstrando por que vale a pena treinar alguém que não ficará. Treino de vários anos (ou uma estação, com provações físicas extremas), estudando fórmulas alquímicas, venenos e remédios aplicados em si mesma, e preparando um poderoso antídoto para o rito de iniciação. O rito: vários dias de reclusão com drogas especiais, sozinha com a mentora. Na última noite, toma o antídoto; na manhã seguinte emerge com as marcas da tradição.",
+    "marca": {
+     "nome": "Tradição da CURA",
+     "texto": "Usa Sabedoria como atributo-chave de Ofício (alquimista) no lugar de Inteligência; se já faz isso por outro efeito, recebe +2 nessa perícia. Receitas: começa com receitas de 1º círculo iguais à Sabedoria (ganha uma receita adicional, de até 2º círculo, por poder da distinção), aprendidas pela tradição oral. Requer Remédios da Floresta para aprender as receitas."
+    },
+    "poderes": [
+     {
+      "nome": "Curandeira Exímia",
+      "texto": "Seu corpo conta como maleta de medicamentos e instrumentos de Ofício (alquimista), dando bônus igual ao total de poderes da distinção nessas perícias. Ao usar preparado de cura que ela mesma fabricou, soma Constituição à cura. Pré-requisitos: treinada em Cura e Ofício (alquimista), Vitalidade."
+     },
+     {
+      "nome": "Aspersão Curativa",
+      "texto": "Ação padrão e 3 PV (não temporários): secreta líquido curativo em criatura adjacente, que cura 3d6+3 PV ou remove uma condição entre abalado, apavorado, alquebrado, atordoado, cego, confuso, debilitado, enjoado, envenenado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, ofuscado, paralisado, pasmo ou surdo. Para cada dois outros poderes, gasta +3 PV para curar mais 3d6+3 PV ou mais uma condição. PV gastos só voltam com descanso. Pré-requisito: Curandeira Exímia."
+     },
+     {
+      "nome": "Laboratório Natural",
+      "texto": "Um número de vezes por dia igual ao total de poderes da distinção, faz teste de Ofício (alquimista) para fabricar item alquímico ou poção sem gastar tempo (mas gasta as matérias-primas). Pré-requisito: Remédios da Floresta."
+     },
+     {
+      "nome": "Perfume Intoxicante",
+      "texto": "+2 em Adestramento e Diplomacia; ao sofrer ataque corpo a corpo (acertada ou não), o atacante fica marcado por feromônios até o fim da cena. Você e aliados ignoram camuflagem de criaturas marcadas e recebem +2 em testes de ataque contra elas (em alcance curto para distância). Para cada dois outros poderes, os bônus aumentam em +1. Pré-requisito: Curandeira Exímia."
+     },
+     {
+      "nome": "Remédios da Floresta",
+      "texto": "Aprende suas primeiras receitas e pode gastar ação padrão para fabricar poção instantaneamente: não paga em tibares, mas gasta PV (não temporários) igual ao custo em PM da magia; a poção dura até o fim da cena. PV perdidos só voltam com descanso. Pré-requisito: Curandeira Exímia."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 154,
+   "pdf_page": 156,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.engenhoqueiro_goblin",
+   "valor": {
+    "nome": "Engenhoqueiro Goblin",
+    "admissao": "Ser goblin que tenha coragem de testar seus inventos. Por pelo menos duas estações, construir engenhocas sem medidas de segurança, escolhendo sempre o efeito mais espetacular e arriscado (sem falha proposital, nem falha por acaso ou poder externo). Ao menos uma engenhoca deve falhar de maneira absolutamente desastrosa (explosão ou falha espetacular). Fabricar pelo menos uma engenhoca improvisada com sucata, sem os materiais normais. Por fim, construir uma grande engenhoca, apresentá-la a engenhoqueiros goblins e testá-la diante deles; se funcionar, é reconhecido, e se explodir depois, já é engenhoqueiro.",
+    "marca": {
+     "nome": "Engenhocaria Goblinoide",
+     "texto": "Gasta 1 dia e metade do custo em tibares para fabricar engenhoca. Nunca pode escolher 0, 10 ou 20 para ativar engenhoca; se falhar no teste de ativação por 5 ou mais (ou rolar 1), a engenhoca explode: 2d6 de dano de impacto por círculo da magia em você e criaturas a até 3 m (Reflexos CD da engenhoca reduz à metade)."
+    },
+    "poderes": [
+     {
+      "nome": "Aprimorar Bugiganga",
+      "texto": "Gasta 1 hora de trabalho e T$ 100 para instalar uma gambiarra em uma engenhoca (uma por poder da distinção). Cada gambiarra aumenta a falha automática em 1. Gambiarras iguais não se acumulam; efeitos se somam com aparatos. Efeito rolado a cada uso. Gambiarras: Bateria Potente (CD para resistir +1d4); Bobina Poderosa (dados de cura ou dano +1 passo, máximo d12); Cristal Canalizador (limite de PM para aprimoramentos +1d4); Etiqueta de Instruções (CD de ativação -1d10); Luneta Aproximadora (alcance +1d3 -1 passos). Pré-requisitos: Engenhoqueiro, Vitalidade."
+     },
+     {
+      "nome": "Abandonar Geringonça",
+      "texto": "Ao falhar na ativação por 5 ou mais (ou falha automática), gasta 1 PM para arremessar a engenhoca em ponto de alcance curto antes que exploda. Pré-requisitos: Aprimorar Bugiganga; ter sofrido dano de uma engenhoca que falhou ao ativar pelo menos uma vez."
+     },
+     {
+      "nome": "Autodestruição",
+      "texto": "Gasta ação completa e PM (limitados pelo total de poderes da distinção) para forçar falha crítica em engenhoca e arremessá-la em alcance curto para explodir: esfera de 1d4 x 1,5 m de raio; +2d6 de dano por PM gasto. Pré-requisito: Abandonar Geringonça."
+     },
+     {
+      "nome": "Enjambração",
+      "texto": "Ação completa para fabricar engenhoca com magia de até um círculo abaixo do máximo de engenhocas que pode fabricar; não gasta tibares, mas gasta PM da magia para ativar (mesmo se falhar). Não conta no limite, dura a cena, e a chance de falha automática aumenta em +1d6. Pré-requisitos: Aprimorar Bugiganga, outro poder da distinção."
+     },
+     {
+      "nome": "Manutenção Precária",
+      "texto": "Entre aventuras, fabrica 1d3 + poderes da distinção engenhocas (paga custos e faz testes normais); não contam no limite e deixam de funcionar no fim da próxima aventura. Pré-requisito: Aprimorar Bugiganga."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 157,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.escapista_magnifico",
+   "valor": {
+    "nome": "Escapista Magnífico",
+    "admissao": "Não se escolhe o treinamento: a Guilda sem Nome (Valkaria) seleciona candidatos que tenham um 'defeito' evidente (ferimento permanente, categoria de idade como criança ou velho, ou algo incômodo como roupa com guizos). Se aceito, passa por longo treino com instrutores excêntricos (pode custar dinheiro ou serviços). Para o básico, basta uma temporada de seis meses na sede (podendo ser dividida). Não pode revelar o treinamento a ninguém, nem a companheiros de grupo; se descoberto, é interrompido sem reembolso. Não pode corrigir o defeito (curar, comprar equipamento caro etc.): fazê-lo perde automaticamente todas as capacidades adquiridas.",
+    "marca": {
+     "nome": "Vantagem Secreta",
+     "texto": "Escolhe uma fonte de penalidades (habilidade racial, poder da Tormenta ou complicação); não sofre as penalidades dessa fonte."
+    },
+    "poderes": [
+     {
+      "nome": "Não Há Ninguém Aqui",
+      "texto": "Gasta 2 PM para se esconder mesmo sem camuflagem ou cobertura disponível. Com Camuflagem, a penalidade em Furtividade para se esconder em ação chamativa cai à metade (após outras reduções). Pré-requisitos: Aparência Inofensiva, Escapista."
+     },
+     {
+      "nome": "Aparência Insignificante",
+      "texto": "Soma o total de poderes da distinção na CD para resistir a Aparência Inofensiva; pode usá-la uma vez contra cada inimigo por cena (em vez de uma vez). Pré-requisito: Não Há Ninguém Aqui."
+     },
+     {
+      "nome": "Fujão",
+      "texto": "Ao ser atingido por ataque ou efeito com teste de resistência, gasta 2 PM para fazer teste de Acrobacia e usar esse resultado no lugar da Defesa ou do teste de resistência. Pré-requisitos: treinado em Acrobacia, Não Há Ninguém Aqui."
+     },
+     {
+      "nome": "Mão Leve",
+      "texto": "Ao fazer manobra desarmar, gasta 2 PM para usar Ladinagem no lugar de Luta; se vencer e tiver ao menos uma mão livre, fica com o item. Pré-requisito: Não Há Ninguém Aqui."
+     },
+     {
+      "nome": "Peguei um Bobo",
+      "texto": "Gasta ação padrão e 2 PM para gerar o efeito de Comando (CD Car, +1 para cada dois outros poderes), ignorando a restrição de tipo de criatura. Não é efeito mental nem habilidade mágica (magia simulada). Pré-requisito: Aparência Insignificante."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 160,
+   "pdf_page": 162,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.gigante_furioso",
+   "valor": {
+    "nome": "Gigante Furioso",
+    "admissao": "Ouvir falar do ritual (por xamãs de Megalokk, histórias orais ou instinto). Derrotar em combate corporal um gigante que represente perigo real ao grupo, sendo o candidato um dos maiores responsáveis pela vitória; a criatura abatida deve ser muito maior que o candidato. Devorar o coração do gigante morto, cru e quente, inteiro e sem vomitar (se não conseguir, matar outro gigante e tentar de novo). Por fim, apresentar-se com o restante do corpo a um clérigo ou druida de Megalokk, que avalia e realiza o ritual sangrento de transferência de poder. Se sobreviver, torna-se gigante furioso. Há também provações de Megalokk, com monstros enviados por dias.",
+    "marca": {
+     "nome": "Desprezar os Pequenos",
+     "texto": "Contra atacantes menores, recebe redução de dano 2 por categoria de tamanho de diferença (ex.: Enorme contra Pequena = RD 6)."
+    },
+    "poderes": [
+     {
+      "nome": "Fúria dos Gigantes",
+      "texto": "Ao entrar em fúria, gasta 2 PM para aumentar o tamanho em uma categoria (+2 em Força; equipamento acompanha). Para cada dois outros poderes, gasta +2 PM para aumentar mais uma categoria (+2 em Força). Tamanho nunca maior que a maior criatura que já matou. Pré-requisitos: Con 3, treinado em Fortitude, Fúria."
+     },
+     {
+      "nome": "Arremesso de Rochas",
+      "texto": "Em fúria, gasta ação de movimento e 1 PM para arremessar rocha (arma de arremesso, alcance médio, 1d12 de impacto, x2) contra todas as criaturas num quadrado de 4,5 m; um ataque à distância contra cada Defesa e uma única rolagem de dano. +1d12 por categoria acima de Médio. Pré-requisito: Fúria dos Gigantes."
+     },
+     {
+      "nome": "Golpes Pesados",
+      "texto": "Em fúria, ataque corpo a corpo: gasta 1 PM; se acertar, além do dano faz manobra empurrar como ação livre (com o resultado do ataque). Obstáculo sólido no caminho causa 1d12 de impacto a cada 3 m. Com Ataque Pesado, executa uma única manobra com +5. Pré-requisito: Fúria dos Gigantes."
+     },
+     {
+      "nome": "Salto Tectônico",
+      "texto": "Como parte de Terremoto da Fúria, pode saltar a um ponto em alcance médio. Teste de Atletismo (CD 10): se passar, +3 m de raio e +2d12 de dano no terremoto; a cada 10 pontos acima da CD, +3 m de raio. Pré-requisitos: treinamento em Atletismo, Terremoto da Fúria."
+     },
+     {
+      "nome": "Terremoto da Fúria",
+      "texto": "Em fúria, ação de movimento e 3 PM para pisotear o chão: onda de choque de 9 m de raio, dano de impacto 1d12 + Força e criaturas caídas (Fort CD For reduz à metade e evita). +1d12 por categoria acima de Médio. Pré-requisito: Fúria dos Gigantes."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 163,
+   "pdf_page": 165,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.ginete_de_namalkah",
+   "valor": {
+    "nome": "Ginete de Namalkah",
+    "admissao": "Apenas nativos de Namalkah ou quem passou ali os anos formativos, recebendo o irmão cavalo na infância (o irmão cavalo deve ser adquirido antes da admissão). Encontrar um ginete mais experiente como mentor, juntar-se ao tropel e acompanhá-lo cruzando Namalkah e passando pelos principais pontos do reino. Viver ao menos uma longa aventura com o cavalo e passar por três outros reinos ou territórios além-Reinado. Vencer três desafios: uma corrida em cancha reta, domar um animal poderoso e xucro e derrotar um monstro poderoso (podem ser ajudados pelo grupo, mas o candidato deve vencer a corrida e domar o animal sem ajuda; o irmão cavalo não pode morrer). Voltar a Namalkah e contar os feitos ao mentor em volta de uma fogueira; se tudo estiver nos conformes, ganha um lenço como fim do ciclo formativo.",
+    "marca": {
+     "nome": "Amalkhan",
+     "texto": "Irmandade profunda com o irmão cavalo: ele fornece +1 na Defesa e em Reflexos, além de seus outros benefícios."
+    },
+    "poderes": [
+     {
+      "nome": "Irmão Campestre",
+      "texto": "Em teste de perícia montado no irmão cavalo, gasta 1 PM para +2 nesse teste (+1 PM para aumentar para +4). Pré-requisitos: Ginete, ter um irmão cavalo."
+     },
+     {
+      "nome": "Caminho das Coxilhas",
+      "texto": "Aumenta em um nível o parceiro do irmão cavalo (iniciante para veterano ou veterano para mestre). Enquanto monta o irmão cavalo, pode substituir testes de perícia baseados em Destreza por Cavalgar. Pré-requisito: Cavaleiro Rústico."
+     },
+     {
+      "nome": "Cavaleiro Rústico",
+      "texto": "Soma Sabedoria na Defesa; o irmão cavalo recebe os benefícios de parceiro guardião iniciante. Exige liberdade de movimentos (não usável de armadura pesada ou imóvel). Pré-requisitos: Sab 1, Irmão Campestre."
+     },
+     {
+      "nome": "Coice",
+      "texto": "Montado no irmão cavalo, usa arma natural de cascos (1d8, x2, impacto). Uma vez por rodada, ao usar agredir ou investida montada com outra arma, gasta 1 PM para ataque extra com os cascos. Dano aumenta um passo por nível do irmão acima de iniciante. Pré-requisitos: treinado em Luta ou Pontaria, Irmão Campestre."
+     },
+     {
+      "nome": "Irmãos Inseparáveis",
+      "texto": "Aumenta em um nível o parceiro do irmão cavalo (veterano para mestre; se já for mestre, aplica a outro tipo). Comunicação telepática enquanto estiverem em alcance longo. Pré-requisito: Caminho das Coxilhas."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 166,
+   "pdf_page": 168,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.guerreiro_magico",
+   "valor": {
+    "nome": "Guerreiro Mágico",
+    "admissao": "Ser arcanista experiente e guerreiro capaz, estudando os caminhos arcanos e marciais separadamente antes de uni-los. Escolher uma instituição de ensino: a Academia Arcana (processos seletivos e disciplinas introdutórias), Wynlla ou Ubani (requisitos próprios). O curso básico dura cerca de um mês, muito intenso; menos de um quarto dos alunos passa na primeira tentativa, e quem falha repete por mais um mês (quantas vezes forem necessárias). Desistentes nunca se tornam guerreiros mágicos, pois as provas medem a compreensão da técnica.",
+    "marca": {
+     "nome": "Arma Arcana",
+     "texto": "Ao lançar magia empunhando arma corpo a corpo, recebe +2 na rolagem de dano da magia e pode usar a mão que empunha a arma para os gestos dela."
+    },
+    "poderes": [
+     {
+      "nome": "Estilo de Combate Arcano",
+      "texto": "Escolhe Encouraçado Místico (lança magias arcanas vestindo armadura sem testes de Misticismo e recebe +1 em testes de resistência de armadura) ou Dançarino Marcial (+1 na Defesa e em rolagens de dano com armas). Escolha irrevogável; bônus +1 para cada outro poder da distinção. Pré-requisitos: habilidade de classe Magias, treinado em Luta."
+     },
+     {
+      "nome": "Aparar Magia",
+      "texto": "Uma vez por rodada, ao falhar em teste de resistência contra habilidade mágica, gasta 2 PM para fazer teste de ataque e usar seu resultado como teste de resistência. Se superar a CD em 10 ou mais, evita totalmente o efeito e o reflete contra a fonte. Pré-requisito: Fogo e Aço."
+     },
+     {
+      "nome": "Ataque Arcano",
+      "texto": "Uma vez por rodada, em ataque corpo a corpo, gasta 2 PM para desferir ataque arcano; se acertar, lança magia que tenha como alvo criatura ou afete uma área como ação livre, centrada na criatura atingida. Só magias de execução de movimento ou padrão. Pré-requisito: Fogo e Aço."
+     },
+     {
+      "nome": "Fogo e Aço",
+      "texto": "Ao lançar magia, recebe bônus em testes de ataque e rolagens de dano com armas igual ao círculo da magia, até o fim do próximo turno. Pré-requisito: Estilo de Combate Arcano."
+     },
+     {
+      "nome": "Preparação Veloz",
+      "texto": "Na primeira rodada de combate, pode lançar magia de alcance pessoal como ação livre. Pré-requisito: Fogo e Aço."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 169,
+   "pdf_page": 171,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.infiltrador_de_wynlla",
+   "valor": {
+    "nome": "Infiltrador de Wynlla",
+    "admissao": "Ser treinado exclusivamente em Wynlla, onde organizações secretas (apadrinhadas por casas nobres, guildas ou pelo Conselho) não existem oficialmente. Estrangeiros devem passar tempo no reino para conquistar a confiança de um patrono; saber usar magia arcana é requisito básico. Encontrar uma organização disposta a aceitá-lo (investigação e boa intuição, pois há boatos falsos). Provar talentos mágicos, furtivos e de enganação, geralmente invadindo locais com armadilhas mágicas (o patrono pode ordenar, por exemplo, assassinar um inocente ou descobrir um segredo). Depois, cumprir um pequeno conjunto de missões fora de Wynlla (etiqueta, furtividade, arrombamento, fuga), usando magia arcana. Ao retornar, é reconhecido em particular como infiltrador, leal a quem o treinou; o patrono nega qualquer ligação com ele.",
+    "marca": {
+     "nome": "Ladinagem Mágica",
+     "texto": "Cria um fluxo de energia que move objeto em alcance curto até 9 m com ação de movimento (apenas objetos que poderia manusear com uma mão). Com 1 PM, teste de Ladinagem para abrir fechaduras, ocultar itens, punga ou sabotar em alcance curto."
+    },
+    "poderes": [
+     {
+      "nome": "Trapaça Arcana",
+      "texto": "Pode lançar magias arcanas de 1º círculo; com pelo menos três poderes da distinção, também de 2º círculo. Começa com duas magias de 1º círculo e, a cada outro poder, aprende uma magia de qualquer círculo que possa lançar. Pode lançá-las vestindo armaduras leves sem testes de Misticismo. Atributo-chave Inteligência. Pré-requisitos: treinado em Enganação, Ladinagem e Misticismo; capacidade de lançar ao menos uma magia arcana."
+     },
+     {
+      "nome": "Criar Armadilha Mágica",
+      "texto": "Aprende a magia Conjurar Armadilha como magia arcana; ao aprender de novo, custo -1 PM. Pré-requisito: Trapaça Arcana."
+     },
+     {
+      "nome": "Disfarce Mental",
+      "texto": "Pode usar Inteligência no lugar de Carisma em Enganação. Ao usar Disfarce Ilusório em si mesmo, usa Inteligência no lugar do atributo-chave de uma perícia adequada ao disfarce e recebe +5 em testes de resistência contra efeitos mágicos de adivinhação. Pré-requisitos: Trapaça Arcana, Disfarce Ilusório."
+     },
+     {
+      "nome": "Enganar Item Mágico",
+      "texto": "Ao lançar magia através de item que só permite aprimoramentos se você conhecer a magia, pode usá-los mesmo sem conhecê-la. Pode ativar itens mágicos sem cumprir requisitos de raça, classe e devoção. Pré-requisito: Trapaça Arcana."
+     },
+     {
+      "nome": "Conjuração Furtiva",
+      "texto": "Criaturas desprevenidas sofrem -5 em testes de resistência contra suas habilidades mágicas. Pré-requisitos: treinado em Furtividade, Magia Traiçoeira."
+     },
+     {
+      "nome": "Magia Traiçoeira",
+      "texto": "Aprimoramento (+2 PM): ao lançar magia de dano em um ou mais alvos desprevenidos, pode usar seu ataque furtivo com ela em um deles. Pré-requisitos: Ataque Furtivo 3d6, Disfarce Mental."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 172,
+   "pdf_page": 174,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mago_da_ordem_do_vazio",
+   "valor": {
+    "nome": "Mago da Ordem do Vazio",
+    "admissao": "Não pode ser ensinado, mas incentivado; hoje o candidato age por iniciativa própria. Ser arcanista experiente e escolher um componente especial tão único quanto possível (não pode ser o de outro mago do Vazio; se houver, recomeça). Redescobrir a magia do zero com experimentos extensos, lançando todas as magias com esse componente como catalisador (que não traz benefício, mas impede outros catalisadores). Se lançar magia sem o componente, escolhe outro e recomeça. Dominar o componente após três desafios arcanos avançados (costuma durar alguns meses), a partir do que ele passa a dar efeitos positivos.",
+    "marca": {
+     "nome": "Componente Especial",
+     "texto": "Para lançar magias arcanas é preciso gastar o componente especial (funciona como material; sem ele, não lança). A CD para resistir a magias lançadas com ele aumenta em +2. Componentes são materiais mundanos (retalhos de tecido, queijo, fios de cabelo, sementes de maçã); 1 punhado por dia (1d3+1 se dedicar um dia inteiro), ocupando 1 espaço e servindo para 5 magias; a critério do mestre pode ser difícil encontrar."
+    },
+    "poderes": [
+     {
+      "nome": "Magia Experimental",
+      "texto": "Ao lançar magia, faz teste de Misticismo (CD 15 + custo em PM) para alterar seu funcionamento: sucesso dá um poder de aprimoramento que não possui (pagando o custo adicional), um que possui (sem custo), ou -1 PM no custo (cumulativo); com 20 natural, dois benefícios. Falha: magia não tem efeito, mas paga o custo; 1 natural gera explosão arcana de 9 m que causa 2d8 de dano de essência por círculo (Reflexos CD reduz à metade; o mago não tem direito ao teste). Pré-requisitos: habilidade de classe Magias, treinado em Misticismo, um poder de aprimoramento."
+     },
+     {
+      "nome": "Conhecimento Obscuro",
+      "texto": "Gasta 2 PM para substituir uma perícia por Misticismo (permite testes que exijam treinamento). Cada uso adicional na mesma cena causa fadiga cumulativa (mesmo se imune). Pré-requisito: Magia Experimental."
+     },
+     {
+      "nome": "Exercitar os Músculos Arcanos",
+      "texto": "Exercício mágico rápido: o custo da próxima magia lançada na cena diminui em -1 PM (cumulativo). Cada uso adicional na mesma cena causa fadiga cumulativa. Pré-requisito: Magia Experimental."
+     },
+     {
+      "nome": "Ingrediente Secreto",
+      "texto": "Ao lançar magia de dano que permita teste de resistência, pode gastar PM (limitados pelo total de poderes da distinção) para infundi-la com mana em estado bruto: cada criatura que falhar sofre +2d6 de dano de essência por PM gasto. Pré-requisito: Magia Experimental."
+     },
+     {
+      "nome": "Inovação Particular",
+      "texto": "Criatura que tente anular ou dissipar sua magia precisa fazer teste de Vontade (CD da magia +2 por poder da distinção); se falhar, o efeito que ela usava falha. Pré-requisito: Magia Experimental."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 175,
+   "pdf_page": 177,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mago_de_batalha_de_wynlla",
+   "valor": {
+    "nome": "Mago de Batalha de Wynlla",
+    "admissao": "Ser arcanista (candidatos quase sempre naturais de Wynlla; estrangeiros precisam de autorização especial e passam por teste mais rigoroso). Apresentar-se ao Centro de Treinamento Arcano Militar, em Sophand, apenas nas janelas de recrutamento (algumas vezes por ano). Passar na peneira inicial: um dia inteiro de exercícios físicos, provas arcanas, lutas com armas, exames de conhecimento e testes de coragem e disciplina (cerca de 1 em cada 10 é aceito; reprovados podem tentar na próxima janela). Seis meses de treinamento básico dentro do Centro (saídas só por magia e sob supervisão; cerca de metade é rejeitada e nunca mais pode tentar). Depois, dois anos de serviço no exército de Wynlla. Quem quiser autonomia passa por teste adicional com dilemas morais e duelos arcanos contra cinco instrutores (sem precisar vencer todos, mas com lealdade demonstrada); aprovados têm dois anos de dispensa especial e podem usar o título de Mago de Batalha independente.",
+    "marca": {
+     "nome": "Armamento Esotérico",
+     "texto": "Ao lançar magia usando item esotérico, a CD para resistir aumenta em +1."
+    },
+    "poderes": [
+     {
+      "nome": "Conjurador Encouraçado",
+      "texto": "Proficiência com armaduras pesadas; pode lançar magias arcanas de armadura sem testes de Misticismo. Para cada outro poder da distinção, +1 na Defesa com armaduras pesadas. Pré-requisitos: habilidade de classe Magias, lançar magias arcanas de 2º círculo, treinado em Misticismo, Arcano de Batalha."
+     },
+     {
+      "nome": "Arsenal Arcano",
+      "texto": "Proficiência com armas marciais; pode usar armas como itens esotéricos. Soma o bônus de dano de melhorias e encantos da arma ao dano do Arcano de Batalha; o material especial da arma afeta suas magias como esotérico; pode trocar o atributo de dano da arma pelo atributo-chave de magias. Pré-requisitos: treinado em Luta ou Pontaria, Conjurador Encouraçado."
+     },
+     {
+      "nome": "Conjuração Magibélica",
+      "texto": "Escolhe uma técnica de conjuração magibélica (Expandir, Fortalecer, Intensificar ou Potencializar), irrevogável; para cada outro poder da distinção (exceto Conjurador Encouraçado), pode escolher outra técnica. Pré-requisito: Conjurador Encouraçado."
+     },
+     {
+      "nome": "Guarda Mágica",
+      "texto": "Ao lançar magia arcana, recebe PV temporários igual aos PM gastos, até o início do próximo turno. Pré-requisitos: treinado em Fortitude, Conjurador Encouraçado."
+     },
+     {
+      "nome": "Infantaria Arcana",
+      "texto": "Ao lançar magia empunhando item esotérico, soma o número de poderes da distinção ao bônus de dano do Arcano de Batalha; criaturas que tirem 1 no teste de resistência contra sua magia de dano sofrem +50% de dano. Pré-requisitos: treinado em Guerra, Conjurador Encouraçado, vencer dez combates usando item esotérico (pelo menos uma vez em cada)."
+     }
+    ],
+    "conjuracao_magibelica_tecnicas": {
+     "Expandir": "Área +3 m (raio ou lado), +3 m a cada dois outros poderes.",
+     "Fortalecer": "Um dado de dano adicional do mesmo tipo, mais um a cada dois outros poderes.",
+     "Intensificar": "Ignora até 5 pontos de RD dos alvos, +5 a cada dois outros poderes.",
+     "Potencializar": "Limite de PM da magia +2, +1 a cada dois outros poderes (esses PM não aumentam a CD)."
+    },
+    "regra_conjuracao_magibelica": "Teste de Misticismo CD 10 + custo em PM + 5 por teste anterior na cena; sucesso aplica técnica; falha deixa fatigado (cumulativo). Tempo de conjuração aumenta um passo (livre->movimento, movimento->padrão, padrão->completa). Não se aplica a magias de reação ou com tempo maior que padrão; aplicado após outras reduções (ex.: Magia Acelerada)."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 178,
+   "pdf_page": 180,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.medico_de_salistick",
+   "valor": {
+    "nome": "Médico de Salistick",
+    "admissao": "Certificação do Colégio Real de Médicos de Salistick (quase uma década de estudo; sem diploma não há médico de Salistick). O candidato não pode ser devoto de nenhum deus. Solicitar audiência de avaliação (T$ 5.000), em duas etapas: provas teóricas e práticas ao longo de uma semana (duas audiências por ano, em Pomo e Contenda). Aprovados fazem um trabalho acadêmico sobre tema médico de interesse (pesquisa teórica e viagens; pode virar aventura), apresentado a uma banca. Aprovado, vira aluno iniciante e cursa um semestre de disciplinas obrigatórias em Salistick (pode haver breves ausências autorizadas). Na semana de provas, qualquer reprovação exige repetir o semestre; duas reprovações tiram a opção do curso em um semestre (deve-se passar o período de quase dez anos ou procurar outra profissão).",
+    "marca": {
+     "nome": "Ciências Médicas",
+     "texto": "Usa Inteligência como atributo-chave de Cura (em vez de Sabedoria). Se já faz isso por outro efeito, recebe +2 nessa perícia."
+    },
+    "poderes": [
+     {
+      "nome": "Medicina Avançada",
+      "texto": "Cada dado de cura do poder Medicina aumenta para d10. Para cada dois outros poderes da distinção, pode usar esse poder mais uma vez por criatura por dia. Pré-requisitos: Foco em Perícia (Cura), Medicina."
+     },
+     {
+      "nome": "Acompanhamento Médico",
+      "texto": "Ação exigida para primeiros socorros e uso de itens alquímicos que recuperam PV, ou condições, reduzida em um passo (mínimo ação de movimento). Com 5 PM e ação completa, faz teste de Cura (CD 30) em criatura adjacente morta há até uma rodada: se passar, ressuscita com 1 PV (uma vez por dia por criatura). Pré-requisito: Medicina Avançada."
+     },
+     {
+      "nome": "Medicina Preventiva",
+      "texto": "Gasta 1 hora para cuidar da saúde de número de pessoas igual ao seu nível. Para cada poder da distinção, cada pessoa recebe 5 PV temporários e +1 em testes de resistência por 1 dia (pode ser somado a cuidados prolongados nas mesmas pessoas). Pré-requisito: Medicina Avançada."
+     },
+     {
+      "nome": "Remédios",
+      "texto": "Preparados alquímicos que fornecem PV ou PM rendem +1 por dado; pode fabricá-los em 10 minutos (em vez de 1 dia), mas duram apenas até o fim da cena. Pré-requisitos: treinado em Ofício (alquimista), Medicina Avançada."
+     },
+     {
+      "nome": "Saúde Perfeita",
+      "texto": "+1 em Constituição e imunidade a veneno; +2 PM por poder da distinção. Pré-requisitos: treinado em Fortitude, Acompanhamento Médico."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 181,
+   "pdf_page": 183,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mestre_bebado",
+   "valor": {
+    "nome": "Mestre Bêbado",
+    "admissao": "Apenas pessoas hábeis em combate desarmado e acrobacias; quem não pode ficar bêbado (como ósteons) está excluído. Quem não foi treinado em escola tamuraniana precisa passar um mês numa delas. Achar um mestre bêbado (sempre isolado, sem escola própria), e convencê-lo a treinar: ele testa a perseverança com fugas de combate, roubos e confusão. Treino de meses com tarefas que podem ou não ter função real. No fim, tomar três porres (cerveja anã, saquê de Tamu-ra e dilínio de Lamnor; mentores podem trocar as bebidas). Por fim, vencer um combate desafiador estando realmente bêbado; o mentor então o encara com seriedade e ri.",
+    "marca": {
+     "nome": "Felicidade Engarrafada",
+     "texto": "Possui um recipiente (ocupa 0,5 espaço) com 5 goles de bebida, +2 goles por poder da distinção. Ação de movimento para tomar um gole e ganhar 1 PM temporário. Recupera os goles ao amanhecer. A bebida não causa penalidades, mas não conta como água."
+    },
+    "poderes": [
+     {
+      "nome": "Lógica Alcoólica",
+      "texto": "No início de cada rodada, rola 1d6 e recebe, por 1 rodada: 1) +2 em ataque; 2) +2 em dano; 3) +3 m de deslocamento; 4) +2 na Defesa; 5) +2 na margem de ameaça com ataques desarmados; 6) +2 em testes de resistência. Para cada dois outros poderes, +1 (ou +1,5 m). Pré-requisitos: treinado em Fortitude e Luta, Briga ou Estilo Desarmado."
+     },
+     {
+      "nome": "Bafo de Dragão",
+      "texto": "Uma vez por rodada, ação de movimento e goles (limitados pelos poderes da distinção) para cuspir sopro flamejante em cone de 9 m: 2d6 de dano de fogo por gole; criaturas ficam em chamas (Reflexos CD Con + poderes da distinção reduz à metade e evita). Pré-requisitos: Con 3, Bafo de Troll."
+     },
+     {
+      "nome": "Bafo de Troll",
+      "texto": "Ação padrão e um gole para expelir hálito contra criatura adjacente: fica enjoada por 1d4+1 rodadas (Fort CD Con + poderes da distinção reduz para 1 rodada). Criaturas com Faro sofrem -5 no teste de Fortitude. Pré-requisito: Lógica Alcoólica."
+     },
+     {
+      "nome": "Bebida Revigorante",
+      "texto": "Ação de movimento e um gole para recuperar 4d6 PV ou remover uma condição entre abalado, alquebrado, apavorado, atordoado, cego, confuso, enfeitiçado, esmorecido, exausto, fatigado, frustrado, pasmo ou surdo. Goles adicionais (limitados pelos poderes) removem outra condição ou aumentam a cura em +2d6 PV. Pré-requisito: Lógica Alcoólica."
+     },
+     {
+      "nome": "Luta Ridícula",
+      "texto": "Ao passar em finta contra criatura inteligente (Int -3 ou maior), além do normal, ela o subestima por 1 rodada: não pode fazer ações hostis contra você, exceto agredir (sem ataque adicional). Pode beber um gole ao fintar para somar os poderes da distinção no teste. Pré-requisitos: treinado em Enganação, Lógica Alcoólica."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 184,
+   "pdf_page": 186,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mestre_cozinheiro",
+   "valor": {
+    "nome": "Mestre Cozinheiro",
+    "admissao": "Saber cozinhar muito bem e conhecer criaturas (inclusive anatomia). Explorar pelo menos três masmorras, abater pelo menos seis monstros diferentes e cozinhar com suas partes. Adquirir um Tomo Divino de Deauvorimm (por leilão clandestino, em masmorra, roubado etc.; mestres não o emprestam nem se separam dele). Por fim, oferecer um banquete feito só com ingredientes fantásticos a no mínimo cinco pessoas (podendo ser o próprio grupo); se todos acharem deliciosa, ficarem satisfeitos e sem problemas estomacais depois, é mestre cozinheiro.",
+    "marca": {
+     "nome": "Panela de Estimação",
+     "texto": "Recebe uma arma ou escudo com que seja proficiente, usável como instrumento de cozinheiro, com +2 em Ofício (cozinheiro). Se perdê-lo, produz outro em 1 dia com T$ 100."
+    },
+    "poderes": [
+     {
+      "nome": "Tudo que Há de Bom",
+      "texto": "Pode coletar e usar ingredientes monstruosos (ver quadro). Ao fabricar prato especial, pode adicionar 1 ingrediente monstruoso, +1 diferente para cada dois outros poderes. Pré-requisito: Foco em Perícia (Ofício [cozinheiro])."
+     },
+     {
+      "nome": "À Moda da Casa",
+      "texto": "Prepara pratos especiais combinando os efeitos de dois pratos (mesmo tempo de um prato normal; consome os ingredientes de ambos; usa a CD mais alta). Sempre que uma receita pedir ingrediente específico, pode substituí-lo por ingrediente monstruoso. Pré-requisito: Tudo que Há de Bom."
+     },
+     {
+      "nome": "Banquete de Aventureiros",
+      "texto": "Uma vez por tempo entre aventuras, gasta ingredientes monstruosos igual ao total de poderes para preparar banquete ao grupo: durante a próxima aventura, os participantes recebem dados de auxílio (d6) iguais aos ingredientes gastos (d8 se 3 ou mais ingredientes diferentes); pode gastar 1 dado para somar em testes. Pré-requisito: três poderes da distinção."
+     },
+     {
+      "nome": "Guardar num potinho",
+      "texto": "Ao preparar prato especial, pode gastar 1 ingrediente monstruoso adicional para embalar os restos como lanche (consumido com ação padrão, com os mesmos benefícios; dura 1 dia por poder). Pré-requisito: À Moda da Casa."
+     },
+     {
+      "nome": "Mise en Place",
+      "texto": "Usa Ofício (cozinheiro) para identificar criaturas (exceto construtos e mortos-vivos) e extrair itens de criaturas mortas; ao extrair consumíveis, +1 item adicional a cada 10 pontos acima da CD. Pré-requisito: Tudo que Há de Bom."
+     }
+    ],
+    "ingredientes_monstruosos": [
+     "Carne Monstruosa (+5 PV temporários por poder)",
+     "Ervas Aromáticas (+1d4 em Misticismo, Ofício, Percepção ou Vontade até o fim do dia)",
+     "Especiarias Picantes (+1d4 em Acrobacia, Atletismo, Iniciativa ou Reflexos até o fim do dia)",
+     "Núcleo de Temperatura (+1 nos bônus numéricos e em dados do prato)",
+     "Raízes Curativas (+1d4 em teste de resistência até o fim do dia)",
+     "Sal Azul (+1 PM temporário, +1 por poder)"
+    ],
+    "obtencao_ingredientes": "1 dia de trabalho e teste de Ofício (cozinheiro) CD 20; +1 ingrediente a cada 10 pontos acima da CD. Ocupa 0,5 espaço."
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 187,
+   "pdf_page": 189,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mestre_dos_desejos",
+   "valor": {
+    "nome": "Mestre dos Desejos",
+    "admissao": "Apenas qareen (meio-gênios). Três etapas: (1) encontrar três mortais que desejem algo aparentemente inatingível, que os consuma, e realizar cada desejo por completo, sem pedir nada em troca, sem equivalências, realizações temporárias ou desejos 'tão bons quanto'; (2) encontrar um gênio verdadeiro do tipo de sua ascendência elemental e ajudá-lo a servir a seus amos (pode acompanhar o grupo, mas deve sempre ajudar o gênio e realizar as vontades dos amos); (3) realizar, sozinho, um desejo do próprio gênio acompanhado, descobrindo o que ele deseja e surpreendendo-o com a realização. Desejos grandiosos (com impacto profundo na vida de quem pede) são o caminho de quem deseja servir.",
+    "marca": {
+     "nome": "Desejo de Servir",
+     "texto": "A CD para resistir às magias lançadas com a habilidade Desejos aumenta em +2."
+    },
+    "poderes": [
+     {
+      "nome": "O Primeiro Desejo",
+      "texto": "A redução de custo das magias lançadas com a habilidade Desejos passa a ser -2 PM. Pré-requisitos: treinado em Intuição e Misticismo."
+     },
+     {
+      "nome": "O Segundo Desejo",
+      "texto": "Uma vez por rodada, um aliado pode gastar ação livre para pedir magia arcana de 1º círculo que você não conheça; até o fim do próximo turno, você pode lançá-la. Pré-requisito: O Primeiro Desejo."
+     },
+     {
+      "nome": "O Último Desejo",
+      "texto": "Uma vez por aventura, pode lançar Desejo sem pagar o custo em PM (outros custos continuam), apenas em resposta a pedido feito por aliado desde seu último turno. Pré-requisitos: O Segundo Desejo, realizar três desejos grandiosos."
+     },
+     {
+      "nome": "Gênio da Lâmpada",
+      "texto": "Recebe uma lâmpada mágica (item Minúsculo, RD 10, PV iguais à metade dos seus). Com ela, lança Refúgio sem pagar o custo básico. Se for reduzido a 0 PV ou menos, pode gastar 3 PM para ser transportado para dentro da lâmpada (interrompe perda de vida, deixa inconsciente em transe até 1 PV); dentro dela recupera PV por descanso e pode receber cura mágica. Se perdê-la, cria outra em uma semana com T$ 100. Pré-requisitos: O Primeiro Desejo, Refúgio."
+     },
+     {
+      "nome": "Sempre Disponível",
+      "texto": "Aprende e pode lançar Salto Dimensional (custo -1 PM se aprender de novo). Se um aliado empunhando sua lâmpada gastar ação livre para esfregá-la, até o fim do próximo turno pode lançar Salto Dimensional sem custo básico, com destino em espaço adjacente à lâmpada. Pré-requisito: Gênio da Lâmpada."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 190,
+   "pdf_page": 192,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mestre_mahou_jutsu",
+   "valor": {
+    "nome": "Mestre Mahou-jutsu",
+    "admissao": "Encontrar um mestre (raríssimos em Arton; conhecidos: Mestre Chibi, sílfide na Academia Arcana, e Mestre Masaru Yudai, em Vectora; rumores de um gênio das trevas em Lin-Wu). O mestre decide o valor do candidato: missões em lugares inóspitos ou tarefas banais (Chibi), ou missões contra a Tormenta e lefeus poderosos (Masaru). Provar aptidão em combate desarmado e magia com dois desafios próprios: 'Círculo de Luz' (sala escura com velas apagadas em dois círculos concêntricos e dois mashin de fogo, um imune a magia e outro a ataques físicos; o candidato precisa derrotá-los e acender todas as velas; se falhar, cumpre outra tarefa antes de tentar de novo). Treino de semanas a anos. Ao fim, vence desafio duplo em que usa só os punhos no desafio arcano e só magia no físico. Ao vencer, recebe um cumprimento do mestre e é mestre mahou-jutsu.",
+    "marca": {
+     "nome": "Palma Mística",
+     "texto": "Enquanto tiver pelo menos uma mão livre, +2 em testes de ataque feitos como parte de magias (ex.: Toque Chocante aprimorado) e na CD de magias arcanas contra alvos no seu alcance corpo a corpo."
+    },
+    "poderes": [
+     {
+      "nome": "Mahou-jutsu",
+      "texto": "Uma vez por rodada, ao usar agredir para fazer dois ou mais ataques desarmados, gasta 2 PM para lançar magia arcana com execução de movimento ou padrão como ação livre. Círculo máximo limitado pelos poderes da distinção. Pré-requisitos: lançar magias arcanas, treinado em Misticismo, Briga ou Estilo Desarmado."
+     },
+     {
+      "nome": "Defesa da Magia",
+      "texto": "Ao lançar magia arcana, recebe PV temporários igual a 5 x círculo da magia, até o início do próximo turno. Pré-requisito: Mahou-Jutsu."
+     },
+     {
+      "nome": "Determinação da Dor",
+      "texto": "Soma Constituição nos testes de Vontade para concentração em magias; ao sofrer dano, soma Constituição ao limite de PM para magias arcanas até o fim do próximo turno. Pré-requisitos: Con 1, Mahou-Jutsu."
+     },
+     {
+      "nome": "Punho Arcano",
+      "texto": "Uma vez por rodada, ao lançar magia arcana de alcance toque com execução de movimento ou padrão, gasta 2 PM para fazer ataque desarmado contra o alvo como ação livre; se acertar, a CD da magia aumenta em +1 (+1 para cada dois outros poderes). Pré-requisito: Mahou-Jutsu."
+     },
+     {
+      "nome": "Esplendor Vitorioso Inigualável",
+      "texto": "Ao lançar magia de dano, gasta 10 PV para infundi-la com sua força vital: soma Constituição à CD e o dano básico do ataque desarmado ao dano da magia. Pré-requisitos: lançar magias arcanas de 2º círculo, Punho Arcano."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 193,
+   "pdf_page": 195,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mosqueteiro_de_rishantor",
+   "valor": {
+    "nome": "Mosqueteiro de Rishantor",
+    "admissao": "Apresentar-se no Palácio Rishantor (Thartann, Ahlen) e requisitar treinamento; muitos candidatos são enganados (guardas mentem que o batalhão não existe, ou os mandam para tavernas perigosas). Nos alojamentos, passar por sabatina, questionários de ética e moral; agentes investigam a reputação em sua terra natal (exige histórico exemplar). Alguns meses de rotina: servir como guarda nos corredores enquanto treina exercícios e esgrima, com testes de honra e escolhas morais (há tentativas de corrupção; quem se associa a facínoras é expulso). Ao fim, duelo contra três Mosqueteiros experientes, para avaliar coragem e postura diante de um desafio impossível. Quem se portar bem é recebido em noite de festa, faz juramento na manhã seguinte e recebe chapéu, tabardo e espada.",
+    "marca": {
+     "nome": "Equipamento Real",
+     "texto": "Recebe tabardo, florete ou rapieira e chapéu emplumado. Enquanto os usa: +1 em Diplomacia, testes de ataque, rolagens de dano e na Defesa. Não pode ser devoto de divindades que canalizam energia negativa e deve seguir código de conduta (como Código de Honra); se violá-lo, não pode usar poderes de mosqueteiro até recuperar os PM."
+    },
+    "poderes": [
+     {
+      "nome": "Mestre Esgrimista",
+      "texto": "Multiplicador de crítico com florete e rapieira +1. Ao atacar com uma delas, gasta 1 PM para rolar dois dados e usar o melhor resultado. Pré-requisitos: proficiência com armas marciais, Estilo de Uma Arma."
+     },
+     {
+      "nome": "Heroísmo Galante",
+      "texto": "Quando aliado adjacente é alvo de ataque, gasta 1 PM para tornar-se o alvo, resolvido normalmente. Com todos os poderes da distinção, quando aliado em alcance curto é alvo, gasta 3 PM para se deslocar até espaço adjacente a ele e ao atacante (com caminho desimpedido) e se tornar o alvo. Uma vez por rodada; exige liberdade de movimentos. Pré-requisitos: treinado em Reflexos, Mestre Esgrimista."
+     },
+     {
+      "nome": "Todos Por Um",
+      "texto": "Ao usar Duelo, gasta +1 PM por aliado escolhido em alcance curto (limitado pelo Carisma); aliados recebem os benefícios de Duelo contra o alvo (perdem se atacarem outro oponente). Pré-requisitos: Duelo, Um por Todos."
+     },
+     {
+      "nome": "Um por Todos",
+      "texto": "Ao ajudar (exceto em ataques), o bônus fornecido aumenta em +2. Uma vez por rodada, ao acertar ataque de florete ou rapieira em inimigo, pode usar o resultado como teste para ajudar um ataque de aliado contra esse inimigo até a próxima rodada. Pré-requisito: Mestre Esgrimista."
+     },
+     {
+      "nome": "Valentia",
+      "texto": "Pode lançar Heroísmo apenas sobre si mesmo; não é habilidade mágica (magia simulada). Pré-requisitos: Mestre Esgrimista, dois outros poderes da distinção."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 196,
+   "pdf_page": 198,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.mutagenista",
+   "valor": {
+    "nome": "Mutagenista",
+    "admissao": "Ouvir falar das técnicas zarkhassianas (Deserto da Perdição / Halak-Tûr), ver seus poderes em ação e arrancar a origem, ou seguir boatos. Explorar o Deserto invadindo uma ruína zarkhassiana e encontrar uma tabuleta com segredos mutagênicos (nem todas as ruínas têm). Decifrar as tabuletas (língua perdida; magias comuns não funcionam; cada beberagem só funciona com quem a fabricou). Fabricar o primeiro mutagênico em laboratório alquímico, colocando partes de si mesmo na beberagem (às vezes em transe). Por fim, beber e lidar com as consequências (há quem não sobreviva à primeira ingestão; a maioria sente uma euforia avassaladora e passa a buscá-la para sempre).",
+    "marca": {
+     "nome": "Preparação Corporal",
+     "texto": "Recebe +2 em Fortitude e Ofício (alquimista)."
+    },
+    "poderes": [
+     {
+      "nome": "Fabricar Mutagênicos",
+      "texto": "Pode fabricar e usar tonificantes; para cada dois outros poderes, também energizantes e despersonalizantes. Pré-requisitos: treinado em Fortitude e Ofício (alquimista)."
+     },
+     {
+      "nome": "Ingestão Rápida",
+      "texto": "Uma vez por rodada, pode ingerir poção ou preparado como ação livre. Pré-requisito: Fabricar Mutagênicos."
+     },
+     {
+      "nome": "Mutagenia Adicional",
+      "texto": "Limite de mutagênicos ativos +1. Pré-requisito: Fabricar Mutagênicos."
+     },
+     {
+      "nome": "Organismo Reagente",
+      "texto": "Ao ingerir preparado alquímico: se fornece bônus em perícias, o bônus aumenta em +1; se fornece PV ou PM (temporários ou por cura), o efeito aumenta em +1 por dado. Para cada dois outros poderes, +1 nesses efeitos. Pré-requisito: Mutagenia Adicional."
+     },
+     {
+      "nome": "Potencializar Mutagênicos",
+      "texto": "O efeito básico de seus mutagênicos passa a ser o efeito de exaurir (pode exauri-lo com efeitos cumulativos). Pré-requisito: Organismo Reagente."
+     }
+    ],
+    "regras_mutagenicos": {
+     "biochoque": "Fortitude CD 10 (+5 por teste adicional no mesmo dia) ao ingerir; falha = biochoque de estágio 1, cada nova falha soma um estágio. Estágio 1: enjoado. Estágio 2: não funciona e perde 1d12 PV. Estágio 3: não funciona, perde 1d12 PV, confuso e em fúria. Estágio 4: mutações por 1d4 rodadas e depois morte.",
+     "ativacao": "Ação padrão para ingerir; dura 1 dia; máximo de mutagênicos ativos = total de poderes da distinção (ingerir outro encerra o mais antigo).",
+     "exaurir": "Ação livre para exaurir: efeito aumenta, mas termina ao fim da cena.",
+     "sobrecarga": "Ao ingerir acima do limite, novo teste de biochoque para manter o efeito mais antigo; falha perde os efeitos sobrecarregados. Limite de sobrecarga = limite de mutagênicos.",
+     "uso_exclusivo": "Ingerido por quem não é o fabricante, não gera efeito e causa perda de 2d12 PV por veneno.",
+     "tipos": {
+      "Tonificante": "+1 em um atributo específico (sem PV, PM ou perícias extras). Exaurir: +1 adicional. Preço T$ 60.",
+      "Energizante": "Pode lançar uma magia arcana de 1º círculo específica (atributo-chave Constituição) como arcanista de seu nível, sem ser habilidade mágica (magia simulada). Exaurir: -1 PM no custo. Preço T$ 90.",
+      "Despersonalizante": "Fornece uma habilidade de raça específica (exceto construtos e mortos-vivos). Exaurir: +1 em um atributo em que a raça tenha modificador positivo. Preço T$ 150."
+     }
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 199,
+   "pdf_page": 201,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.pistoleiro_de_smokestone",
+   "valor": {
+    "nome": "Pistoleiro de Smokestone",
+    "admissao": "Chegar a Smokestone (Cidade dos Fora da Lei) e permanecer vivo por um ou dois meses, sendo aceito pelos locais: aprender as leis não escritas (quem as quebra é educado por duelo até a morte ou preso em barril de pólvora na praça para apedrejamento). Não usar armadura pesada, nem armas como espadas, lanças e arcos; não usar magia arcana; não ter título de nobreza ou posição de autoridade (renegar publicamente, se houver); não cultuar deus algum. Por fim, desafiar e vencer (matar) outro pistoleiro igual ou mais experiente, com pistolas e nenhuma outra arma, seguindo as regras de duelo locais. Boato: na noite seguinte, um estranho pede assinatura de contrato de sangue (conteúdo desconhecido).",
+    "marca": {
+     "nome": "Honra do Pistoleiro",
+     "texto": "+2 em rolagens de dano com armas de fogo leves e de uma mão. Passa a seguir o Código do Pistoleiro: não usa armaduras pesadas nem escudos, nem armas que não sejam pistolas ou armas de fogo leves/de uma mão (exceção para híbridos e adagas); pode mentir, mas promessa dada é lei; não cultua deuses, não segue organizações formais, não tem título oficial, não lança magias. Violar o código faz perder os PM até o dia seguinte."
+    },
+    "poderes": [
+     {
+      "nome": "Rápido no Gatilho",
+      "texto": "+2 em Iniciativa para cada poder da distinção; se for o primeiro na iniciativa, inimigos ficam desprevenidos contra você na rodada. Multiplicador de crítico contra criaturas desprevenidas +1. Pré-requisitos: proficiência com armas de fogo, Saque Rápido."
+     },
+     {
+      "nome": "Balada do Pistoleiro",
+      "texto": "Com armas de fogo, gasta ação completa e PM (limitados pela munição) para série de disparos: um ataque à distância contra cada inimigo escolhido, até o número de PM gastos; uma única rolagem de dano com um dado extra do mesmo tipo aplicada a cada atingido. Pré-requisito: Morrer Não É Muita Vida."
+     },
+     {
+      "nome": "Buscar Cobertura",
+      "texto": "Uma vez por rodada, gasta 1 PM para mover-se até cobertura alcançável com seu deslocamento (caminho desimpedido). Pré-requisito: Rápido no Gatilho."
+     },
+     {
+      "nome": "Fornecedor de Smokestone",
+      "texto": "Em comunidade do porte de vila ou maior, gasta 2 PM e faz teste de Carisma (CD 10): se passar, pode comprar armas de fogo de qualquer tipo e munições com 20% de desconto (não cumulativo com barganha) e obter cuidado ou manutenção para elas. Pré-requisito: Rápido no Gatilho."
+     },
+     {
+      "nome": "Morrer Não É Muita Vida",
+      "texto": "Ao se mover 6 m ou mais, recebe +2 na Defesa e em Reflexos. Carrega um amuleto da sorte; uma vez por cena, quando sofreria dano que o levaria a 0 PV ou menos, ignora esse dano. Pré-requisito: Buscar Cobertura."
+     },
+     {
+      "nome": "Viajante das Planícies",
+      "texto": "Recebe um cavalo de guerra parceiro veterano (se já tiver montaria, esta vira parceiro vigilante iniciante); sem penalidade em ataques à distância montado. Se perdê-la, treina outra em uma semana. Pré-requisitos: treinado em Cavalgar, Rápido no Gatilho."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 202,
+   "pdf_page": 204,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.professor_de_magia",
+   "valor": {
+    "nome": "Professor de Magia",
+    "admissao": "Ter completado o curso na Academia Arcana ou, se não formado, passar em provas que comprovem saber equivalente (poder, lançamento de magias e teoria sobre manipulação de magias). Depois, seis meses na Academia sem se ausentar e sem fazer nada além de estudar (aulas avançadas de magia, história, ética do ensino, devoção a Wynna, pedagogia e todas as disciplinas, inclusive de masmorras e combate a monstros). Não se pode ter atividade lucrativa nesse período. Ao fim, provas de todas as disciplinas; então estágio probatório: montar um currículo sobre disciplina mágica e ministrar um semestre de aulas para uma turma sob supervisão de professor sênior (aventureiros podem levar turmas pequenas de quatro ou cinco alunos com supervisão mágica, desde que todos sejam aprovados e estejam vivos). Ao voltar, é formalmente admitido no corpo docente.",
+    "marca": {
+     "nome": "Pena e Pergaminho",
+     "texto": "Aprende e pode lançar uma magia de adivinhação, arcana ou divina, à escolha, de qualquer círculo a que tenha acesso."
+    },
+    "poderes": [
+     {
+      "nome": "Pedagogia Mágica",
+      "texto": "Gasta 1 hora e 1 PM para lecionar a número de alunos igual à Inteligência. Cada aluno pode lançar uma magia de 1º círculo escolhida por você uma vez no dia (custo normal, atributo-chave Inteligência); cada dois outros poderes, mais uma vez no mesmo dia; se já conhecia a magia, lança esse número de vezes com -1 PM. Pré-requisitos: lançar magias de 2º círculo, Foco em Perícia (Misticismo)."
+     },
+     {
+      "nome": "Introdução à Magia",
+      "texto": "Você e aliados em alcance curto recebem +2 em Misticismo e Vontade; ao lançar magia, o custo das magias dos aliados diminui em -1 PM por 1 rodada. Pré-requisito: Pedagogia Mágica."
+     },
+     {
+      "nome": "Demonstrações Práticas",
+      "texto": "Quando um inimigo falha em teste de resistência contra sua magia, pode fazer teste de Misticismo para ajudar; até a próxima rodada, cada aliado em alcance curto recebe bônus em Misticismo e na CD de suas magias igual ao bônus da ajuda. Pré-requisito: não indicado no texto."
+     },
+     {
+      "nome": "Notório Saber Arcano",
+      "texto": "Recebe um assistente, parceiro veterano à escolha entre adepto e magivocador. O custo adicional de seus poderes de aprimoramento diminui em -1 PM (somente com magias arcanas). Pré-requisitos: Orgulho do Mestre, dois poderes de aprimoramento."
+     },
+     {
+      "nome": "Orgulho do Mestre",
+      "texto": "Sempre que inimigo falha em teste de resistência contra magia de aliado em alcance curto, se a magia custou pelo menos 1 PM, recebe 1 PM temporário cumulativo; máximo por cena igual ao dobro dos poderes da distinção; some no fim da cena. Pré-requisito: Demonstrações Práticas."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 205,
+   "pdf_page": 207,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.senador",
+   "valor": {
+    "nome": "Senador",
+    "admissao": "Ser cidadão do Império de Tauron com plenos direitos políticos (estrangeiros em geral não são aceitos; não minotauros são poucos e desprezados). Servir em alguma legião por alguns meses (não precisa ter lutado) e exercer cargo burocrático (ou pular essa etapa por família prestigiosa ou heroísmo reconhecido). Vencer uma eleição: meses em Tiberus fazendo campanha, angariando eleitores, favores de nobres e senadores, discursos e gastos com arautos e jogos (sem certeza do resultado). Caminho do Curso de Honra: serviço militar (legião), serviço público (cobrança de impostos, rações, jogos na Arena ou clericato em templo oficial), Senado (vaga por eleição, às vezes após morte ou aposentadoria de veterano), governo de província (vitalício, escolhido pelo Triunvirato) e, para os mais ambiciosos, membro do Triunvirato (exige apoio do Senado, população, legiões e nobres).",
+    "marca": {
+     "nome": "Retórica Impecável",
+     "texto": "+2 em Nobreza; pode usar Carisma como atributo-chave de Nobreza (em vez de Inteligência)."
+    },
+    "poderes": [
+     {
+      "nome": "Cofres Fundos",
+      "texto": "Uma vez por aventura, faz teste de Carisma com +4 por poder da distinção; recebe tibares de ouro iguais ao resultado. Com três poderes, pode requisitar item mágico menor (devolvido ao Senado no fim da aventura); com cinco, item médio. Condicionado ao local e à possibilidade de contatar o Senado. Pré-requisitos: treinado em Diplomacia e Nobreza."
+     },
+     {
+      "nome": "Apoio Popular",
+      "texto": "Pode usar Autoridade Feudal (Tormenta20, p. 79); se já a possui, pode conclamar dois parceiros pagando os custos de cada um. Para cada dois outros poderes, o nível dos parceiros aumenta em um. Pré-requisito: Um Minotauro de Bem."
+     },
+     {
+      "nome": "Deliberação Desnorteante",
+      "texto": "Ao usar habilidade que exija teste de Vontade, gasta 1 PM: criaturas que falharem ficam pasmas por 1 rodada (uma vez por cena). Pré-requisito: Cofres Fundos."
+     },
+     {
+      "nome": "Inocência Convicta",
+      "texto": "Ao falhar em teste de resistência, gasta 2 PM para rolar novamente usando Nobreza no lugar da perícia original, com bônus igual aos poderes da distinção. Pré-requisito: Um Minotauro de Bem."
+     },
+     {
+      "nome": "Um Minotauro de Bem",
+      "texto": "+1 em testes de perícias baseadas em Carisma e na CD de Vontade para resistir às suas habilidades; +1 para cada outro poder. Pré-requisito: Cofres Fundos."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 208,
+   "pdf_page": 210,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "distincao.vigarista",
+   "valor": {
+    "nome": "Vigarista",
+    "admissao": "Aceitar que é um otário por enquanto: buscar um ou mais golpistas e aprender seus truques caindo em vários golpes (não basta fingir; clérigos de Hyninn costumam aplicar o golpe). Quando julgar estar pronto, aplicar um grande golpe com várias etapas e pessoas (ex.: convencer uma cidade de uma divindade e fugir com as oferendas; vender contas coloridas como Rubis da Virtude). Se bem-sucedido, torna-se vigarista; se não, perde seus 'lucros' para outro vigarista e precisa recomeçar.",
+    "marca": {
+     "nome": "Tirar Leite de Pedra",
+     "texto": "Em qualquer comunidade, usa Enganação para testes de sustento com pequenos golpes (vender poções falsas, relíquias sagradas etc.), levando 1 dia em vez de uma semana, com bônus de +2 em cidades, +5 em vilas e +10 em aldeias. Falha: não pode tentar de novo na mesma comunidade por um mês; 1 natural = desmascarado pela população."
+    },
+    "poderes": [
+     {
+      "nome": "Aquele Papinho",
+      "texto": "+1 em Diplomacia, Enganação e Intuição e na CD de habilidades (exceto magias) baseadas em Carisma; +1 para cada outro poder. Pré-requisitos: treinado em Enganação, Aparência Inofensiva."
+     },
+     {
+      "nome": "Calma Lá",
+      "texto": "Não sofre a penalidade de -10 para mudar atitude como ação completa com Diplomacia; ao iniciar a primeira rodada de combate, pode fazer esse teste antes de todos agirem. Se mudar a atitude de inimigo para indiferente ou melhor, ele fica pasmo por 1 rodada em vez disso. Pré-requisito: Aquele Papinho."
+     },
+     {
+      "nome": "Efeito Placebo",
+      "texto": "Para cada poder da distinção, escolhe uma magia de 1º círculo (arcana ou divina) que possa virar poção. Gasta ação completa e 3 PM para transformar um elixir de água com açúcar em poção dessa magia instantaneamente (Carisma; custo do item reduzido à metade, sem teste de Ofício; dura até o fim da cena). Pré-requisito: Aquele Papinho."
+     },
+     {
+      "nome": "Na Cara Não!",
+      "texto": "Ao usar Rolamento Defensivo, recebe um uso adicional de Aparência Inofensiva na cena. Pré-requisitos: Aquele Papinho, Rolamento Defensivo."
+     },
+     {
+      "nome": "Relíquias Sagradas",
+      "texto": "Enfeita item mundano com motivos religiosos para parecer acessório mágico menor (1 hora e 1/100 do preço do acessório). Para ativar: empunhar/vestir, ação de movimento e 2 PM para professar seus poderes; funciona como verdadeira até o fim da cena ou até ativar outra. Até uma relíquia por poder da distinção. Pré-requisitos: Calma Lá, Efeito Placebo."
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 211,
+   "pdf_page": 213,
+   "status": "VERIFICADA"
   }
  ]
 }
