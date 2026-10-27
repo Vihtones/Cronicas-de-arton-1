@@ -16,7 +16,7 @@ var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regi
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "WORK_DONE", "TOOL_BOUGHT", "MEAL_SERVED", "TORMENTA_DAY"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "WORK_DONE", "TOOL_BOUGHT", "MEAL_SERVED", "TORMENTA_DAY", "BUILDING_DONE"])
 
 
 func _ensure() -> void:
@@ -137,6 +137,13 @@ func on_event(e: GameEvent) -> Array:
 			for g in e.payload.get("goods", {}):
 				if regions.vila.stock.has(g):
 					regions.vila.stock[g] = int(regions.vila.stock[g]) + int(e.payload.goods[g])
+		"BUILDING_DONE":
+			# construção paga pelo tesouro da vila; efeito de produção entra na região (Arton Viva, Fase 5)
+			treasury -= int(e.payload.get("custo", 0))
+			var prod: Dictionary = e.payload.get("efeito", {}).get("producao", {})
+			if not prod.is_empty() and regions.has(prod.regiao):
+				var reg: Dictionary = regions[prod.regiao]
+				reg.production[prod.bem] = int(reg.production.get(prod.bem, 0)) + int(prod.delta)
 		"TOOL_BOUGHT":
 			# ferramenta comprada por morador: o ouro vai ao tesouro e sai uma unidade do estoque da vila
 			treasury += int(e.payload.get("price", 0))

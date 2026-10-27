@@ -377,6 +377,14 @@ for _reg, _vals in {"vila": (40, 0, 2, 40), "valkaria": (3000, 200, 190, 3000), 
     economy["regions"][_reg]["production"]["madeira"] = _prod
     economy["regions"][_reg]["consumption"]["madeira"] = _cons
     economy["regions"][_reg]["target"]["madeira"] = _alvo
+# Arton Viva, Fase 5: construções que a vila faz com o próprio tesouro (comando Build).
+economy["construcoes"] = {
+ "celeiro": {"nome": "Celeiro", "custo": 120, "efeito": {"producao": {"regiao": "vila", "bem": "comida", "delta": 6}},
+             "descricao": "guarda grãos: a vila produz mais comida todo dia"},
+ "casa": {"nome": "Casa nova", "custo": 150, "efeito": {"vagas": 2},
+          "descricao": "abre duas vagas para famílias apertadas"},
+ "guarita": {"nome": "Guarita", "custo": 100, "efeito": {"guardas": 1},
+             "descricao": "posto de vigia: conta como mais um guarda"}}
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
 distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "events": [

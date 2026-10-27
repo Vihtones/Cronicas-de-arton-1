@@ -190,5 +190,35 @@
    "to": "vila",
    "open": true
   }
+ },
+ "construcoes": {
+  "celeiro": {
+   "nome": "Celeiro",
+   "custo": 120,
+   "efeito": {
+    "producao": {
+     "regiao": "vila",
+     "bem": "comida",
+     "delta": 6
+    }
+   },
+   "descricao": "guarda grãos: a vila produz mais comida todo dia"
+  },
+  "casa": {
+   "nome": "Casa nova",
+   "custo": 150,
+   "efeito": {
+    "vagas": 2
+   },
+   "descricao": "abre duas vagas para famílias apertadas"
+  },
+  "guarita": {
+   "nome": "Guarita",
+   "custo": 100,
+   "efeito": {
+    "guardas": 1
+   },
+   "descricao": "posto de vigia: conta como mais um guarda"
+  }
  }
 }

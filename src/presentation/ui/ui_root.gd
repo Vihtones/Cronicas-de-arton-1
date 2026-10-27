@@ -555,6 +555,17 @@ func _h(text: String) -> Label:
 	return l
 
 
+func _botao_construir(id: String, d: Dictionary, tesouro: int) -> Button:
+	var b := _button("Construir por T$ %d" % int(d.custo), func(): _construir(id))
+	b.disabled = tesouro < int(d.custo)
+	return b
+
+
+func _construir(id: String) -> void:
+	Game.send("Build", {"id": id})
+	refresh_journal()
+
+
 func refresh_journal() -> void:
 	for c in journal_body.get_children():
 		c.queue_free()
@@ -656,6 +667,17 @@ func refresh_journal() -> void:
 	var cr: CrimeModule = w.modules.crime
 	if cr.enabled and cr.total_fines() > 0:
 		journal_body.add_child(_label("Multas pendentes: T$ %d (pague à Guarda)." % cr.total_fines(), 9))
+	# cidade (Arton Viva, Fase 5): indicadores e construções pagas pelo tesouro da vila
+	journal_body.add_child(_h("Cidade da vila"))
+	var ind: Dictionary = w.modules.cities.indicators()
+	var nomes_ind := {"abastecimento": "Abastecimento", "saude": "Saúde", "prosperidade": "Prosperidade", "estabilidade": "Estabilidade", "seguranca": "Segurança", "moradia": "Moradia", "influencia": "Influência"}
+	for chave in nomes_ind:
+		journal_body.add_child(_label("• %s: %d%%" % [nomes_ind[chave], int(round(float(ind[chave]) * 100.0))], 9))
+	var tesouro: int = int(w.modules.economy.treasury)
+	journal_body.add_child(_label("Tesouro da vila: T$ %d" % tesouro, 9))
+	for id in w.db.economy.get("construcoes", {}):
+		journal_body.add_child(_label("%s: %s." % [w.db.economy.construcoes[id].nome, w.db.economy.construcoes[id].descricao], 9))
+		journal_body.add_child(_botao_construir(id, w.db.economy.construcoes[id], tesouro))
 	# rotas comerciais (Arton Viva, Fase 4): estado da estrada e quando o mensageiro chega
 	journal_body.add_child(_h("Rotas comerciais"))
 	for rota in w.modules.economy.route_summary():
