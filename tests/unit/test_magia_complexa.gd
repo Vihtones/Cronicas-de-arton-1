@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2134,3 +2134,92 @@ func test_santuario_nao_inteligentes_do_tipo_nao_percebem() -> void:
 	var out := _ataque_planejado(m, "bandido_1", "player")
 	check(out.any(func(f): return f.type == "SANCTUARY_BLOCKED" and f.payload.reason == "nao_percebe"), "o zumbi não percebe o protegido")
 	check(not m[1]._pode_mirar("bandido_1", "player"), "e não o escolhe como alvo")
+
+
+# --- Comando (divina, 1º círculo) -------------------------------------------------------------------
+func _comandar(m: Array, alvo: String, ordem: String, extra: Dictionary = {}) -> Dictionary:
+	var sim: CombatSim = m[2]
+	sim.c(alvo).sheet.add_efeito("teste", "resistencia", -50, "cena")
+	sim.c(alvo).sheet.remove_condition("surpreendido")
+	sim.c(alvo).surprised = false
+	var a := {"type": "cast", "spell": "comando", "target": alvo, "targets": [alvo], "ordem": ordem}
+	a.merge(extra, true)
+	return _lanca(m, a)
+
+
+func test_comando_so_humanoides_e_ordem_valida() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "comando", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "precisa da ordem")
+	sim.c("bandido_1").sheet.creature_type = "animal"
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "comando", "target": "bandido_1", "targets": ["bandido_1"], "ordem": "pare"}).ok, "animal não, sem aprimoramento")
+	check(GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "comando", "target": "bandido_1", "targets": ["bandido_1"], "ordem": "pare", "aprimoramentos": [0]}).ok, "qualquer criatura com o aprimoramento")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "comando", "targets": ["bandido_1", "bandido_2"], "ordem": "pare", "aprimoramentos": [0]}).ok, "dois alvos pedem +1 alvo")
+
+
+func test_comando_pare_deixa_pasmo_uma_vez_por_cena() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	check(_comandar(m, "bandido_1", "pare").ok, "Comando: Pare")
+	var r := c._begin_turn_base("bandido_1")
+	check(r.skip, "pasmo: perde o turno")
+	sim.c("bandido_1").sheet.remove_condition("pasmo")
+	sim.budget.std = 1
+	_comandar(m, "bandido_1", "pare")
+	check(not c._begin_turn_base("bandido_1").skip, "Pare só uma vez por cena")
+
+
+func test_comando_senta_e_largue() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_comandar(m, "bandido_1", "senta")
+	c._begin_turn_base("bandido_1")
+	check(sim.c("bandido_1").sheet.conditions.has("caido"), "sentou no chão")
+	sim.budget = {"std": 1, "move": 1}
+	check(not GhostPlanner.validate_action(sim, "bandido_1", {"type": "stand"}).ok, "não se levanta neste turno")
+	var m2 := _cena_grupo(1)
+	var c2: CombatModule = m2[1]
+	var sim2: CombatSim = m2[2]
+	var n_atk: int = sim2.c("bandido_2").sheet.attacks.size()
+	_comandar(m2, "bandido_2", "largue")
+	c2._begin_turn_base("bandido_2")
+	check(sim2.c("bandido_2").sheet.attacks.size() < n_atk, "largou a arma")
+	sim2.budget = {"std": 1, "move": 1}
+	check(not GhostPlanner.validate_action(sim2, "bandido_2", {"type": "pegar_arma"}).ok, "não pega de novo neste turno")
+	sim2.turn_counter += 1
+	check(GhostPlanner.validate_action(sim2, "bandido_2", {"type": "pegar_arma"}).ok, "no próximo turno, pega")
+	c2._end_combat("fuga")
+
+
+func test_comando_fuja_e_venha_tomam_o_turno() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_comandar(m, "bandido_2", "fuja")
+	var d0 := CombatSim.cheb(sim.c("bandido_2").tile, sim.c("player").tile)
+	c._begin_turn_base("bandido_2")
+	sim.budget = {"std": 1, "move": 1}
+	var cmd_t: Dictionary = sim.c("bandido_2").comando_turno
+	c._turno_comando("bandido_2", str(cmd_t.ordem), str(cmd_t.conj))
+	check(CombatSim.cheb(sim.c("bandido_2").tile, sim.c("player").tile) > d0, "fugiu do conjurador")
+	var m2 := _cena_grupo(1)
+	var sim2: CombatSim = m2[2]
+	_comandar(m2, "bandido_2", "venha")
+	m2[1]._begin_turn_base("bandido_2")
+	sim2.budget = {"std": 1, "move": 1}
+	m2[1]._turno_comando("bandido_2", "venha", "player")
+	eq(CombatSim.cheb(sim2.c("bandido_2").tile, sim2.c("player").tile), 1, "veio até o conjurador")
+
+
+func test_comando_resistido_ou_surdo_nao_obedece() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	_lanca(m, {"type": "cast", "spell": "comando", "target": "bandido_1", "targets": ["bandido_1"], "ordem": "pare"})
+	check(not sim.tem_marca("bandido_1", "comando"), "passou na Vontade")
+	sim.c("bandido_2").sheet.add_condition("surdo", m[3])
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "comando", "target": "bandido_2", "targets": ["bandido_2"], "ordem": "pare"})
+	check(not sim.tem_marca("bandido_2", "comando"), "surdo não ouve a ordem")

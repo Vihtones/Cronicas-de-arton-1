@@ -438,7 +438,11 @@ func _run_until_player() -> Array:
 		if not end.is_empty():
 			out.append_array(end)
 			return out
-		if not start.skip:
+		if not start.skip and sim.c(id).has("comando_turno"):
+			var cmd_t: Dictionary = sim.c(id).comando_turno
+			sim.c(id).erase("comando_turno")
+			out.append_array(_turno_comando(id, str(cmd_t.ordem), str(cmd_t.conj)))   # Comando: Fuja / Venha
+		elif not start.skip:
 			if id == "player":
 				return out
 			if sim.c(id).flags.has("guardiao"):
@@ -990,6 +994,94 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
 
 
+## Comando no início do turno de quem obedece: Pare (pasmo, uma vez por cena), Senta (caído, sem se levantar neste
+## turno), Largue (solta o que segura; só pega de novo no próximo turno). Fuja e Venha tomam o turno (_turno_comando).
+func _obedecer_comando(id: String, facts: Array) -> Dictionary:
+	var m := {}
+	for mk in sim.marcas:
+		if mk.alvo == id and mk.tipo == "comando":
+			m = mk
+	if m.is_empty():
+		return {}
+	var ordem := str(m.dados.ordem)
+	var x: Dictionary = sim.c(id)
+	var s: CharacterSheet = x.sheet
+	sim.remove_marca("comando", id)
+	match ordem:
+		"pare":
+			if not x.flags.has("comando_pare"):
+				x.flags.append("comando_pare")   # apenas uma vez por cena
+				sim.add_condicao(id, "pasmo", 1, "comando")
+		"senta":
+			s.add_condition("caido", world.rules)
+			x.flags.append("comando_senta_%d" % sim.turn_counter)   # não se levanta até o próximo turno
+		"largue":
+			_largar_arma(id)
+	facts.append(fact("COMMAND_OBEYED", {"actor": id, "ordem": ordem, "caster": str(m.dados.conjurador)}, [id]))
+	return {"ordem": ordem, "conj": str(m.dados.conjurador)}
+
+
+## Largue: a arma empunhada (e os ataques com ela) fica no chão do quadrado. Armas naturais ficam.
+func _largar_arma(id: String) -> void:
+	var x: Dictionary = sim.c(id)
+	var s: CharacterSheet = x.sheet
+	var largados: Array = s.attacks.filter(func(at): return not bool(at.get("natural", false)))
+	if largados.is_empty():
+		return
+	x["arma_no_chao"] = {"arma": str(s.equipment.get("weapon", "")), "ataques": largados.duplicate(true), "tile": [x.tile.x, x.tile.y], "turno": sim.turn_counter}
+	s.attacks = s.attacks.filter(func(at): return bool(at.get("natural", false)))
+	s.equipment["weapon"] = ""
+
+
+func _devolver_arma(id: String) -> void:
+	var x: Dictionary = sim.c(id)
+	var chao: Dictionary = x.get("arma_no_chao", {})
+	if chao.is_empty():
+		return
+	var s: CharacterSheet = x.sheet
+	s.equipment["weapon"] = str(chao.arma)
+	var ataques: Array = (chao.ataques as Array).duplicate(true)
+	ataques.append_array(s.attacks)
+	s.attacks = ataques
+	x.erase("arma_no_chao")
+
+
+## Fuja / Venha: o turno inteiro (todas as ações) afastando-se do conjurador ou indo até ele.
+func _turno_comando(id: String, ordem: String, conj: String) -> Array:
+	var out: Array = []
+	for i in 2:
+		if not sim.can_spend("movimento"):
+			break
+		var me: Dictionary = sim.c(id)
+		var alvo: Vector2i = sim.c(conj).tile
+		var caminho: Array = []
+		var pos: Vector2i = me.tile
+		for passo in sim.speed_squares(id):
+			var melhor := pos
+			var melhor_d := CombatSim.cheb(pos, alvo)
+			for dx in [-1, 0, 1]:
+				for dy in [-1, 0, 1]:
+					var t: Vector2i = pos + Vector2i(dx, dy)
+					if (dx == 0 and dy == 0) or caminho.has(t) or not sim.passable(t, id) or sim.occupant(t, id) != "":
+						continue
+					var d := CombatSim.cheb(t, alvo)
+					if (ordem == "fuja" and d > melhor_d) or (ordem == "venha" and d < melhor_d and d >= 1):
+						melhor = t
+						melhor_d = d
+			if melhor == pos:
+				break
+			caminho.append(melhor)
+			pos = melhor
+		if caminho.is_empty():
+			break
+		var trecho := sim.trim_path(id, caminho, sim.speed_squares(id))
+		if trecho.is_empty():
+			break
+		out.append_array(_try(id, {"type": "move", "path": trecho.map(func(t): return [t.x, t.y])}))
+	sim.budget.std = 0   # usa todas as ações
+	return out
+
+
 ## Santuário: marca do alvo protegido ({} se não tem).
 func _santuario_de(alvo: String) -> Dictionary:
 	for m in sim.marcas:
@@ -1434,6 +1526,9 @@ func _begin_turn_base(id: String) -> Dictionary:
 	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
 	s.limpar_efeitos("rodada")
 	_sustentar(id, facts)
+	var ordem_cmd := _obedecer_comando(id, facts)
+	if ["fuja", "venha"].has(str(ordem_cmd.get("ordem", ""))) and sim.combatants.has(str(ordem_cmd.conj)):
+		x["comando_turno"] = ordem_cmd
 	for f_ae in (x.flags as Array).duplicate():
 		if str(f_ae).begins_with("ae_atk_"):
 			(x.flags as Array).erase(f_ae)   # Arma Espiritual: a arma que atacou volta a poder contra-atacar
@@ -1595,6 +1690,11 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 							break
 				out.append(fact("HEALED", {"actor": id, "target": alvo_m, "amount": cura_m, "pv_after": ts_m.pv, "source": "cura_pelas_maos", "tags": ["classe", "cura"]}, [id, alvo_m]))
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id]))
+		"pegar_arma":
+			var X: Dictionary = sim.c(id)
+			var chao_p: Dictionary = X.arma_no_chao
+			_devolver_arma(id)
+			out.append(fact("ITEM_PICKED", {"actor": id, "item": chao_p.get("arma", "")}, [id]))
 		"escapar":
 			# Libertar-se (Controlar Plantas): Acrobacia ou Atletismo, a melhor, contra a CD do efeito.
 			var sh_x: CharacterSheet = sim.c(id).sheet
@@ -1745,6 +1845,23 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"comando":
+			# Comando (divina 1): ordem irresistível a humanoides (qualquer criatura com o aprimoramento de 1 PM) que ouçam;
+			# +1 alvo por aprimoramento de 2 PM. Vontade anula; quem falha obedece no próprio turno (_obedecer_comando).
+			var ordem_c := str(a.get("ordem", "pare"))
+			var cd_c := spell_dc(sh, a)
+			for tg_c in a.get("targets", [a.get("target", "")]):
+				var ts_c: CharacterSheet = sim.c(tg_c).sheet
+				if ts_c.has_effective_condition(world.rules, "surdo"):
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg_c, "spell": "comando", "reason": "nao_ouve"}, [id, tg_c]))
+					continue
+				var sv_c := Checks.skill(ts_c, "vontade", cd_c, world.rules, world.rng, "combat")
+				sv_c = _pos_teste(tg_c, sv_c, cd_c, out)
+				if sv_c.get("success", false):
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg_c, "spell": "comando", "saved": true}, [id, tg_c]))
+					continue
+				sim.add_marca("comando", tg_c, "comando", "comando", -1, {"ordem": ordem_c, "conjurador": id})
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_c, "buff": "comando", "ordem": ordem_c, "tags": ["magia"]}, [id, tg_c]))
 		"santuario":
 			# Santuário (divina 1): toque, pela cena. Quem tentar ação hostil contra o alvo faz Vontade; se falhar, não
 			# consegue, perde a ação e não tenta de novo (_santuario_impede). Não protege de área. O alvo que fizer ação
@@ -2665,6 +2782,15 @@ func _ai_turn(id: String) -> Array:
 			best = d; target = oid
 	if target == "":
 		return out
+	# largou a arma (Comando): vai até ela e a pega
+	if me.has("arma_no_chao"):
+		var chao_ai: Dictionary = me.arma_no_chao
+		var tc_ai := Vector2i(int(chao_ai.tile[0]), int(chao_ai.tile[1]))
+		if CombatSim.cheb(me.tile, tc_ai) > 1:
+			var cam_ai := sim.trim_path(id, sim.find_path(id, tc_ai), sim.speed_squares(id))
+			if not cam_ai.is_empty():
+				out.append_array(_try(id, {"type": "move", "path": cam_ai.map(func(t): return [t.x, t.y])}))
+		out.append_array(_try(id, {"type": "pegar_arma"}))
 	# preso e imóvel (Controlar Plantas) longe do alvo: tenta se libertar
 	if best > 1 and not _marca_presa(id).is_empty() and me.sheet.has_effective_condition(world.rules, "imovel"):
 		out.append_array(_try(id, {"type": "escapar"}))
@@ -2843,6 +2969,8 @@ func _end_combat(outcome: String) -> Array:
 	for m in sim.marcas.duplicate(true):   # presos por efeitos da cena (Controlar Plantas) ficam livres com o fim da cena
 		if m.tipo == "preso" and sim.combatants.has(m.alvo):
 			_soltar(m.alvo, m)
+	for cid in sim.combatants:   # armas largadas (Comando) são recolhidas depois da luta
+		_devolver_arma(cid)
 	var loc := world.db.location_at(sim.c("player").tile)
 	var P := sim.c("player")
 	world.player_sheet = P.sheet

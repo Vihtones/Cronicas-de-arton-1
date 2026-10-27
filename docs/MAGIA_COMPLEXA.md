@@ -77,8 +77,8 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (7): abencoar_alimentos, acalmar_animal,
-  comando, criar_elementos,
+- Divinas de 1º círculo (6): abencoar_alimentos, acalmar_animal,
+  criar_elementos,
   detectar_ameacas, suporte_ambiental, tranquilidade.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
   controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
@@ -95,7 +95,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas e Santuário (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas, Santuário e Comando (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

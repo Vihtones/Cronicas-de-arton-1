@@ -24,6 +24,7 @@ const COMPLETAS := {
 	"caminhos_da_natureza": {"aprimoramentos": [0, 1]},   # rastrear os alvos: CD +10; +3m (repetível); truque: +5 em Sobrevivência para se orientar
 	"controlar_plantas": {"aprimoramentos": [0, 1, 2]},   # poda (instantânea); também imóvel; falar com plantas; truque: anima 1 planta
 	"santuario": {"aprimoramentos": [0, 1]},   # não inteligentes do tipo escolhido não percebem; também contra área
+	"comando": {"aprimoramentos": [0, 1]},   # qualquer criatura; +1 alvo (repetível); ordens fuja, largue, pare, senta, venha
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -51,7 +52,7 @@ const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
 ## Aprimoramentos que trocam a execução para reação mesmo sem a magia ser reação no base (Proteção Divina +2 PM).
 const REACAO_APR := {"protecao_divina": [1], "premonicao": [0]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
-const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3]}
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
 const ALCANCE_APR := {"invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
@@ -257,3 +258,6 @@ static func aplicar_caminhos(sh: CharacterSheet, apr: Array, truque: bool, ate_d
 	sh.add_efeito("magia.caminhos_da_natureza", "ignora_dificil_natural", 1, "dia", "", ate_dia)
 	if apr.has(0):
 		sh.add_efeito("magia.caminhos_da_natureza", "rastro_dificil", 10, "dia", "", ate_dia)
+
+
+const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]

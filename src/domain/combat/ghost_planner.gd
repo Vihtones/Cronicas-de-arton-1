@@ -83,6 +83,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			return prof
 		"stand":
 			if not A.sheet.conditions.has("caido"): return {"ok": false, "reason": "não está caído"}
+			if (A.flags as Array).has("comando_senta_%d" % sim.turn_counter): return {"ok": false, "reason": "Comando (Senta): não se levanta neste turno"}
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
 			return {"ok": true, "kind": "movimento"}
 		"coup":
@@ -142,6 +143,16 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "comando":
+				if not SpellRules.ORDENS_COMANDO.has(str(a.get("ordem", ""))):
+					return {"ok": false, "reason": "escolha a ordem: fuja, largue, pare, senta ou venha"}
+				if targets.size() > 1 + apr.count(1):
+					return {"ok": false, "reason": "alvos demais para o Comando"}
+				for tg in targets:
+					if not sim.combatants.has(tg) or tg == actor:
+						return {"ok": false, "reason": "alvo inválido"}
+					if not apr.has(0) and sim.c(tg).sheet.creature_type != "humanoide":
+						return {"ok": false, "reason": "Comando afeta humanoides (aprimoramento: qualquer criatura)"}
 			if sp_id == "santuario" and apr.has(0) and not ["animal", "construto", "morto-vivo"].has(str(a.get("tipo_criatura", ""))):
 				return {"ok": false, "reason": "escolha o tipo: animal, construto ou morto-vivo"}
 			if sp_id == "controlar_plantas":
@@ -266,6 +277,17 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if T.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, T.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
 			return {"ok": true, "kind": "movimento", "cost": 1}
+		"pegar_arma":
+			# Pegar a arma largada (Comando, "Largue"): ação de movimento, no mesmo quadrado ou adjacente; só a partir do
+			# turno seguinte ao que largou.
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			var chao: Dictionary = A.get("arma_no_chao", {})
+			if chao.is_empty(): return {"ok": false, "reason": "nada largado"}
+			if sim.turn_counter <= int(chao.get("turno", -1)):
+				return {"ok": false, "reason": "só no próximo turno"}
+			var tc := Vector2i(int(chao.tile[0]), int(chao.tile[1]))
+			if CombatSim.cheb(A.tile, tc) > 1: return {"ok": false, "reason": "longe da arma"}
+			return {"ok": true, "kind": "movimento"}
 		"escapar":
 			# Libertar-se de efeito que prende (Controlar Plantas): ação padrão e Acrobacia ou Atletismo.
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "libertar-se exige ação padrão"}

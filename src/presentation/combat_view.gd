@@ -23,6 +23,7 @@ var spell_apr: Array = []     # aprimoramentos ligados na próxima magia (tecla 
 var apr_cursor := 0           # aprimoramento em foco (tecla G avança)
 var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla T)
 var truque := false          # truque da magia em foco (tecla T): 0 PM, sem aprimoramentos
+var comando_ordem := "pare"   # ordem do Comando (tecla T)
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var cura_passos := 0        # Cura pelas Mãos: passos extras (+1 PM cada, a cada 4 níveis) no próximo toque (tecla N)
 var cura_remover := false   # Cura pelas Mãos: remove uma condição da lista (+1 PM, 6º nível; tecla H)
@@ -238,7 +239,7 @@ func candidate_actions(t: Vector2i) -> Array:
 				return [{"type": "cast", "spell": spell, "targets": ["player"], "pungente": pungente}]
 			if target == "" or not gs.is_enemy("player", target):
 				return []
-			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo, "truque": truque}]
+			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo, "truque": truque, "ordem": comando_ordem}]
 	return []
 
 
@@ -306,6 +307,11 @@ func cycle_aprimoramento() -> void:
 
 
 func cycle_energia() -> void:
+	if spell == "comando":
+		var ordens: Array = SpellRules.ORDENS_COMANDO
+		comando_ordem = ordens[(ordens.find(comando_ordem) + 1) % ordens.size()]
+		message.emit("Comando: %s (T troca)." % comando_ordem)
+		return
 	if spell != "resistencia_a_energia" and SpellRules.tem_truque(Game.world.rules, spell):
 		truque = not truque   # Truque: versão de 0 PM, sem aprimoramentos
 		message.emit("Truque (0 PM): %s (T troca)." % ("ligado" if truque else "desligado"))
@@ -321,7 +327,7 @@ func cycle_energia() -> void:
 
 func confirm() -> void:
 	if not spell_alvos.is_empty() and my_turn():
-		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo, "truque": truque})
+		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo, "truque": truque, "ordem": comando_ordem})
 		spell_alvos.clear()
 		mode = "mover"
 	if plan.is_empty() or not my_turn():
