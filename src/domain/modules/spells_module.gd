@@ -27,7 +27,8 @@ const FORA_DE_COMBATE := {
 	"compreensao": [],   # NPC no mesmo lugar (toque ou curto)
 	"visao_mistica": [],
 	"silencio": [0, 1],   # fora de combate, o objeto que você carrega, pela cena: nenhum som sai (furtividade)
-	"escuridao": [],   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
+	"escuridao": [],
+	"voz_divina": [],   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
 const RAIO_DETECTAR := 12   # esfera de 18m
@@ -37,6 +38,7 @@ const TOTAL_PERMANENTE := 1000   # T$ de incenso e óleos da versão permanente
 const DIAS_SEMANA := 7
 const MINUTOS_DIA := 24 * 60
 
+var interrogados: Dictionary = {}   # Voz Divina: cadáveres que já responderam (um corpo só uma vez)
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
 var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
@@ -166,6 +168,12 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["fora do alcance"])
 				if not SpellRules.alvo_social_valido(sp_id, apr, CharacterSheet.from_dict(combat_v.creature_state[tg].sheet)):
 					return PackedStringArray(["tipo de criatura que a magia não afeta"])
+		"voz_divina":
+			if apr.has(0):
+				var alvo_vd := str(cmd.payload.get("target", ""))
+				if interrogados.has(alvo_vd):
+					return PackedStringArray(["esse corpo já respondeu uma vez"])
+				return _valida_cadaver(alvo_vd, "toque")
 		"controlar_plantas":
 			if not cmd.payload.get("truque", false) and not apr.has(0) and not apr.has(2):
 				return PackedStringArray(["fora de combate, só a poda, falar com plantas ou o truque"])
@@ -331,6 +339,15 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, ["player"]))
 			else:
 				out.append(falar_com_plantas(p_cp))
+		"voz_divina":
+			var apr_vd: Array = cmd.payload.get("aprimoramentos", [])
+			if apr_vd.has(0):
+				out.append_array(interrogar_cadaver(str(cmd.payload.get("target", ""))))
+			else:
+				sh.add_efeito("magia.voz_divina", "voz_divina", 1, "cena")
+				out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "voz_divina", "tags": ["magia"]}, ["player"]))
+				if apr_vd.has(1):
+					out.append(falar_com_plantas(_tile_jogador(), true))
 		"caminhos_da_natureza":
 			var truque: bool = cmd.payload.get("truque", false)
 			var apr_c: Array = cmd.payload.get("aprimoramentos", [])
@@ -437,7 +454,7 @@ func tiles_podados() -> Array:
 
 ## Controlar Plantas (falar com plantas, 2 PM): plantas prestativas dão respostas simplórias sobre os arredores —
 ## quantas criaturas estão por perto agora (percepção limitada: até alcance longo).
-func falar_com_plantas(p: Vector2i) -> Dictionary:
+func falar_com_plantas(p: Vector2i, rochas: bool = false) -> Dictionary:
 	var combat = world.module("combat")
 	var perto: Array = []
 	var longo := int(world.rules.value("alcance.quadrados", {}).get("longo", 60))
@@ -447,7 +464,20 @@ func falar_com_plantas(p: Vector2i) -> Dictionary:
 			var t: Array = st_c.get("tile", [0, 0])
 			if bool(st_c.get("alive", false)) and bool(st_c.get("present", false)) and maxi(absi(p.x - int(t[0])), absi(p.y - int(t[1]))) <= longo:
 				perto.append(id)
-	return fact("PLANTS_TALKED", {"caster": "player", "criaturas_perto": perto.size(), "atitude": "prestativa"}, ["player"])
+	return fact("PLANTS_TALKED", {"caster": "player", "criaturas_perto": perto.size(), "atitude": "prestativa", "rochas": rochas}, ["player"])
+
+
+## Voz Divina (cadáver, 1 PM): o corpo responde com o que sabia em vida (respostas curtas: os fatos do diálogo que
+## o jogador ainda não sabe). Um corpo só pode ser alvo uma vez.
+func interrogar_cadaver(id: String) -> Array:
+	var out: Array = []
+	interrogados[id] = true
+	out.append(fact("CORPSE_QUESTIONED", {"caster": "player", "target": id}, ["player"]))
+	var ex = world.module("exploration")
+	for f in fatos_que_sabe(id):
+		if ex == null or not ex.knows(f):
+			out.append(fact("FACT_REVEALED", {"fact": f, "source": "cadaver:" + id}, ["player"]))
+	return out
 
 
 ## Abençoar Alimentos (divina 1): purifica e abençoa porções de comida ou bebida do inventário. Consumidas na cena,
@@ -663,14 +693,14 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 	var t: Array = st_c.get("tile", [0, 0])
 	var p: Vector2i = world.db.world_to_tile(world.player.position)
 	var dist := maxi(absi(p.x - int(t[0])), absi(p.y - int(t[1])))
-	if dist > int(world.rules.value("alcance.quadrados", {}).get(alcance, 6)):
+	if dist > int(world.rules.value("alcance.quadrados", {}).get(alcance, 1)):   # toque = 1
 		return PackedStringArray(["cadáver fora do alcance"])
 	return PackedStringArray()
 
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate()}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -683,3 +713,4 @@ func from_dict(d: Dictionary) -> void:
 	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
+	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()

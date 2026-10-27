@@ -2659,6 +2659,21 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_raio_solar(id, a))
 		"soco_de_arsenal":
 			out.append_array(_soco_de_arsenal(id, a))
+		"voz_divina":
+			# Voz Divina (divina 2): pessoal, pela cena; conversa com criaturas de qualquer tipo (Mudar Atitude passa a valer
+			# para elas). Aprimoramentos: um cadáver responde (uma vez por corpo); falar com plantas e rochas.
+			var apr_vd: Array = a.get("aprimoramentos", [])
+			var magia_vd = world.module("magia")
+			if apr_vd.has(0):
+				if magia_vd != null and magia_vd.interrogados.has(str(a.get("target", ""))):
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": a.get("target", ""), "spell": "voz_divina", "reason": "ja_respondeu"}, [id]))
+				elif magia_vd != null:
+					out.append_array(magia_vd.interrogar_cadaver(str(a.get("target", ""))))
+			else:
+				sh.add_efeito("magia.voz_divina", "voz_divina", 1, "cena")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "voz_divina", "tags": ["magia"]}, [id]))
+				if apr_vd.has(1) and magia_vd != null:
+					out.append(magia_vd.falar_com_plantas(sim.c(id).tile, true))
 		"silencio":
 			# Silêncio (divina 2): esfera de 6m em alcance médio, sustentada; quem está dentro fica surdo e não lança magias.
 			# Aprimoramentos: objeto que emana 3m (Vontade de involuntário); cena, e o som só não sai da área.

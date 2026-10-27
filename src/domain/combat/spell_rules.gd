@@ -45,6 +45,7 @@ const COMPLETAS := {
 	"purificacao": {"aprimoramentos": [0, 1, 2, 3]},   # PV de veneno; todas as condições; soltar item amaldiçoado; dissipar
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
 	"silencio": {"aprimoramentos": [0, 1]},
+	"voz_divina": {"aprimoramentos": [0, 1]},   # interrogar um cadáver (uma vez por corpo); falar com plantas e rochas
 	"soco_de_arsenal": {"aprimoramentos": [0, 1, 2, 3]},   # alcance natural +3m (cena); +1d6 (repetível); +3m de empurrão (repetível); essência   # objeto que emana 3m; nenhum som sai da área (cena)
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
@@ -296,6 +297,13 @@ const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]
 
 ## Acalmar Animal: animal; monstro ou espírito com Int –5 ou –4 (1 PM); qualquer monstro ou espírito (5 PM).
 ## Tranquilidade: animal ou humanoide; qualquer criatura (1 PM, ou criaturas escolhidas com o de 5 PM).
+## Comunicação para Mudar Atitude: humanoides falam; outros tipos só com Voz Divina (ou Compreensão nesse alvo).
+static func pode_conversar(fala: CharacterSheet, alvo_id: String, alvo: CharacterSheet) -> bool:
+	if alvo.creature_type == "" or alvo.creature_type == "humanoide":
+		return true
+	return fala.efeito_bonus("voz_divina") > 0 or fala.efeitos.any(func(e): return e.stat == "compreende" and str(e.tipo) == alvo_id)
+
+
 static func alvo_social_valido(sp_id: String, apr: Array, alvo: CharacterSheet) -> bool:
 	var tipo := alvo.creature_type
 	if sp_id == "acalmar_animal":

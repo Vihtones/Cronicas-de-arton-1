@@ -159,6 +159,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				targets = [actor]
 			if sp_id == "oracao":
 				targets = [actor]
+			if sp_id == "voz_divina":
+				if apr.has(0):
+					var TC := sim.c(a.get("target", ""))
+					if TC.is_empty() or not TC.sheet.is_dead() or CombatSim.cheb(A.tile, TC.tile) > 1: return {"ok": false, "reason": "toque um cadáver"}
+				else:
+					targets = [actor]
 			if sp_id == "aviso":
 				if not ["alerta", "mensagem", "localizacao"].has(str(a.get("modo", "alerta"))): return {"ok": false, "reason": "escolha alerta, mensagem ou localização"}
 				if targets.size() > 1 + apr.count(3): return {"ok": false, "reason": "alvos demais"}
@@ -353,6 +359,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if TD.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, TD.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "longe demais para conversar"}
 			if int(TD.get("diplomacia_dia", -1)) == sim.dia: return {"ok": false, "reason": "já tentou mudar a atitude dele hoje"}
+			if not SpellRules.pode_conversar(A.sheet, str(a.target), TD.sheet): return {"ok": false, "reason": "não há como conversar com essa criatura (Voz Divina)"}
 			return {"ok": true, "kind": "completa"}
 		"adestrar":
 			# Adestramento, Acalmar Animal (LB p.115): ação completa, apenas treinado, CD 25.

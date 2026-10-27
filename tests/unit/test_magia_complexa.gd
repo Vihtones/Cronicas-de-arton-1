@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2934,3 +2934,35 @@ func test_soco_de_arsenal_dano_empurrao_e_alcance_natural() -> void:
 	check(not s3.attack_profile("player", "bandido_1", 0, false, false).ok, "3 quadrados: fora do corpo a corpo")
 	check(_lanca(m3, {"type": "cast", "spell": "soco_de_arsenal", "target": "player", "aprimoramentos": [0]}).ok, "versão pessoal")
 	check(s3.attack_profile("player", "bandido_1", 0, false, false).ok, "alcance natural +3m")
+
+
+func test_voz_divina_conversa_com_qualquer_criatura_e_plantas() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.creature_type = "animal"
+	var dip := {"type": "diplomacia", "target": "bandido_1"}
+	check(not GhostPlanner.validate_action(sim, "player", dip).ok, "sem Voz Divina, não conversa com o animal")
+	check(_lanca(m, {"type": "cast", "spell": "voz_divina", "aprimoramentos": [1]}).ok, "Voz Divina")
+	sim.budget.std = 1
+	sim.budget.move = 1
+	check(GhostPlanner.validate_action(sim, "player", dip).ok, "com Voz Divina, pode mudar a atitude")
+
+
+func test_voz_divina_cadaver_responde_uma_vez() -> void:
+	var w := WorldHelpers.world(5)
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.level = 5
+	sh.spells = PackedStringArray(["voz_divina"])
+	sh.pm = 20
+	w.player_sheet = sh
+	var combat = w.module("combat")
+	var t: Array = combat.creature_state["bandido_1"].tile
+	WorldHelpers.put(w, int(t[0]) + 1, int(t[1]))
+	var payload := {"spell": "voz_divina", "target": "bandido_1", "aprimoramentos": [0]}
+	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "vivo não responde")
+	combat.creature_state["bandido_1"].alive = false
+	check(WorldHelpers.cmd(w, "CastSpell", payload).accepted, "o cadáver responde")
+	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "um corpo só uma vez")
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "voz_divina"}).accepted, "versão básica fora de combate")
+	eq(sh.efeito_bonus("voz_divina"), 1, "fala com criaturas pela cena")
