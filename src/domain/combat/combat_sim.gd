@@ -494,6 +494,8 @@ func remove_combatant(id: String) -> void:
 ## Passagem de rodada: conta as rodadas de zonas e marcas; invocações que acabam saem do combate.
 func _passar_rodada() -> void:
 	expiradas.clear()
+	for id in combatants:   # Orientação: a vantagem dura até o fim da rodada em que foi dada
+		combatants[id].sheet.limpar_efeitos("rodada_orientacao")
 	for k in conjurando.keys():   # execução longa: cada rodada conta um passo até a magia ficar pronta
 		if int(conjurando[k].rodadas) > 0:
 			conjurando[k].rodadas = int(conjurando[k].rodadas) - 1

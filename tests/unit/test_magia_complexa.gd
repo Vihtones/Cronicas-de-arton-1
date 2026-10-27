@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1158,3 +1158,82 @@ func test_lagrimas_de_wynna_ritual_se_perde_se_o_alvo_se_afastou() -> void:
 	c.world.player_sheet = sim.c("player").sheet   # no fim do combate, a ficha da simulação volta para o mundo
 	c.processar_rituais_do_dia()
 	check(not CharacterSheet.from_dict(st.sheet).arcana_perdida, "sem o alvo no lugar, o ritual se perde sem efeito")
+
+
+# --- Orientação (1º círculo): vantagem no próximo teste de perícia ------------------------------
+func _orientar(m: Array, alvos: Array, apr: Array = [], extra: Dictionary = {}) -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "orientacao", "target": alvos[0], "targets": alvos, "aprimoramentos": apr}
+	for k in extra:
+		a[k] = extra[k]
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+
+
+func test_orientacao_da_vantagem_no_proximo_teste_de_pericia() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1"])
+	check(sim.c("bandido_1").sheet.efeito_bonus("vantagem_pericia") > 0, "o alvo ganha a vantagem")
+
+
+func test_orientacao_e_gasta_no_proximo_teste_de_pericia() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1"])
+	var sh: CharacterSheet = sim.c("bandido_1").sheet
+	Checks.skill(sh, "percepcao", 5, m[3], sim.rng, "combat")
+	eq(sh.efeito_bonus("vantagem_pericia"), 0, "um teste de perícia gasta a vantagem")
+
+
+func test_orientacao_nao_e_gasta_por_teste_de_resistencia() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1"])
+	var sh: CharacterSheet = sim.c("bandido_1").sheet
+	Checks.skill(sh, "vontade", 5, m[3], sim.rng, "combat")
+	check(sh.efeito_bonus("vantagem_pericia") > 0, "teste de resistência não gasta a vantagem de perícia")
+
+
+func test_orientacao_expira_na_passagem_da_rodada() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1"])
+	sim._passar_rodada()
+	eq(sim.c("bandido_1").sheet.efeito_bonus("vantagem_pericia"), 0, "sem teste, a vantagem acaba com a rodada")
+
+
+func test_orientacao_de_atributo_dura_a_cena() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1"], [0], {"atributo": "int"})
+	var sh: CharacterSheet = sim.c("bandido_1").sheet
+	check(sh.efeito_tipo_existe("vantagem_atributo", "int"), "o aprimoramento vale para o atributo escolhido")
+	sim._passar_rodada()
+	check(sh.efeito_tipo_existe("vantagem_atributo", "int"), "o aprimoramento de atributo sobrevive à rodada")
+	Checks.skill(sh, "percepcao", 5, m[3], sim.rng, "combat")
+	check(sh.efeito_tipo_existe("vantagem_atributo", "int"), "o aprimoramento de atributo não é gasto por teste")
+
+
+func test_orientacao_de_grupo_cobre_tres_atributos() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1"], [1], {"grupo": "mentais"})
+	var sh: CharacterSheet = sim.c("bandido_1").sheet
+	check(sh.efeito_tipo_existe("vantagem_atributo", "int") and sh.efeito_tipo_existe("vantagem_atributo", "sab") and sh.efeito_tipo_existe("vantagem_atributo", "car"), "o grupo mental vale para int, sab e car")
+	check(not sh.efeito_tipo_existe("vantagem_atributo", "for"), "e não para força")
+
+
+func test_orientacao_alvos_escolhidos_recebem_a_vantagem() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	_orientar(m, ["bandido_1", "bandido_2"], [2])
+	check(sim.c("bandido_1").sheet.efeito_bonus("vantagem_pericia") > 0 and sim.c("bandido_2").sheet.efeito_bonus("vantagem_pericia") > 0, "cada criatura escolhida ganha a vantagem")
+
+
+func test_orientacao_valida_os_aprimoramentos() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "orientacao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]}).ok, "aprimoramento de atributo exige um atributo")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "orientacao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [1]}).ok, "aprimoramento de grupo exige o grupo")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "orientacao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0, 1], "atributo": "int", "grupo": "mentais"}).ok, "os dois aprimoramentos de atributo não se combinam")

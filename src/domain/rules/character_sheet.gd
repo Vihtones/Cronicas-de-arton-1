@@ -226,6 +226,11 @@ func remove_efeito(id_efeito: String) -> void:
 	efeitos = efeitos.filter(func(e): return e.id != id_efeito)
 
 
+## Há um efeito deste tipo de bônus com este tipo (ex.: vantagem em testes de um atributo).
+func efeito_tipo_existe(stat: String, tipo: String) -> bool:
+	return efeitos.any(func(e): return e.stat == stat and str(e.tipo) == tipo)
+
+
 func has_efeito(id_efeito: String) -> bool:
 	return efeitos.any(func(e): return e.id == id_efeito)
 

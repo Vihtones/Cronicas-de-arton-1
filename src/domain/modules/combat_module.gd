@@ -1479,6 +1479,28 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.c(guardiao).flags.append("incorporeo")
 			sim.c(guardiao).sheet.add_efeito("magia.guardiao_divino", "luz", LUZ_GUARDIAO, "cena")
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": guardiao, "buff": "guardiao_divino", "luz": LUZ_GUARDIAO, "tags": ["magia"]}, [id, guardiao]))
+		"orientacao":
+			# Orientação (1º círculo): próximo teste de perícia com dois dados (melhor). Aprimoramento 0 (2 PM): dura a
+			# cena e vale para as perícias de um atributo. Aprimoramento 1 (5 PM): o mesmo para um grupo de atributos
+			# (físicos ou mentais). Aprimoramento 2 (5 PM): alvos escolhidos.
+			var apr_o: Array = a.get("aprimoramentos", [])
+			var alvos_o: Array = [str(a.get("target", id))]
+			if apr_o.has(2):
+				alvos_o = []
+				for tg in a.get("targets", []):
+					if sim.combatants.has(tg):
+						alvos_o.append(str(tg))
+			var grupo_o: Array = ["for", "des", "con"] if str(a.get("grupo", "")) == "fisicos" else ["int", "sab", "car"]
+			for tg in alvos_o:
+				var sh_o: CharacterSheet = sim.c(tg).sheet
+				if apr_o.has(0):
+					sh_o.add_efeito("magia.orientacao", "vantagem_atributo", 1, "cena", str(a.get("atributo", "")))
+				elif apr_o.has(1):
+					for attr in grupo_o:
+						sh_o.add_efeito("magia.orientacao", "vantagem_atributo", 1, "cena", attr)
+				else:
+					sh_o.add_efeito("magia.orientacao", "vantagem_pericia", 1, "rodada_orientacao")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "orientacao", "tags": ["magia"]}, [id, tg]))
 		"lagrimas_de_wynna":
 			# Lágrimas de Wynna (5º círculo): alvo faz Vontade; falha, perde magias arcanas até o fim da cena; passou,
 			# perde por uma rodada. Aprimoramento 1 (2 PM): esfera de 6m com as criaturas escolhidas. Aprimoramento 2
@@ -2189,6 +2211,7 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
 	world.player_sheet.limpar_efeitos("cena")
 	world.player_sheet.limpar_efeitos("rodada")
+	world.player_sheet.limpar_efeitos("rodada_orientacao")
 	world.player_sheet.limpar_efeitos("turno")
 	world.player_sheet.allihanna_ativa = false
 	for m in sim.marcas:   # condições impostas pela Aura Divina duram só a cena

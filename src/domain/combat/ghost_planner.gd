@@ -125,6 +125,13 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):
 						return {"ok": false, "reason": "Perdição só afeta inimigos"}
+			if sp_id == "orientacao":
+				if apr.has(0) and apr.has(1):
+					return {"ok": false, "reason": "a Orientação de atributo e a de grupo de atributos não se combinam"}
+				if apr.has(0) and not ["for", "des", "con", "int", "sab", "car"].has(str(a.get("atributo", ""))):
+					return {"ok": false, "reason": "escolha um atributo para a Orientação"}
+				if apr.has(1) and not ["fisicos", "mentais"].has(str(a.get("grupo", ""))):
+					return {"ok": false, "reason": "escolha o grupo de atributos (fisicos ou mentais)"}
 			if sp_id == "lagrimas_de_wynna":
 				if apr.has(0) and apr.has(1):
 					return {"ok": false, "reason": "o ritual de um dia não combina com a esfera"}

@@ -21,6 +21,16 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 	# indefeso falha automaticamente em Reflexos (LB p.394)
 	var falha_auto := skill_name == "reflexos" and sheet.has_condition_flag(rules, "falha_reflexos")
 	var d20: int = rng.roll(stream, 1, 20)[0]
+	# Orientação (LB p.193): em teste de perícia, rola dois dados e fica com o melhor. A vantagem geral é gasta
+	# no próximo teste; a de atributo (aprimoramento) vale até o fim da cena para as perícias daquele atributo.
+	if not eh_resistencia and not falha_auto:
+		var attr_pericia := str(rules.value("pericia.tabela", {}).get(skill_name, {}).get("atributo", "")).to_lower()
+		var vant_geral := sheet.efeito_bonus("vantagem_pericia") > 0
+		var vant_attr := sheet.efeito_tipo_existe("vantagem_atributo", attr_pericia)
+		if vant_geral or vant_attr:
+			d20 = maxi(d20, rng.roll(stream, 1, 20)[0])
+			if vant_geral:
+				sheet.remove_efeito_stat("vantagem_pericia")
 	var total := d20 + mod
 	if eh_resistencia:
 		sheet.limpar_efeitos("proxima_resistencia")   # "próximo teste de resistência" é gasto ao rolar
