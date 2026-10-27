@@ -12,12 +12,15 @@ func handled_commands() -> PackedStringArray: return PackedStringArray(["Rest"])
 
 
 ## Descanso (LB p.106): recupera PV e PM conforme a condição do local.
+const POUSADAS := ["taverna", "estalagem"]   # lugares onde se paga o pernoite (1 T$)
+
+
 func rest_quality() -> String:
 	var tr = world.module("travel")
 	if tr != null and tr.current_region != "vila":
 		return "normal" if int(world.player.gold) >= 1 else "ruim"  # estalagem comum (LB p.163) ou relento
 	var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
-	if loc == "taverna" and int(world.player.gold) >= 1:
+	if POUSADAS.has(loc) and int(world.player.gold) >= 1:
 		return "normal"  # salão comunal / quarto simples
 	if bool(world.db.location(loc).get("indoor", false)):
 		return "ruim" if world.db.zone_at(world.db.world_to_tile(world.player.position)) == "cripta" else "normal"
@@ -45,7 +48,7 @@ func execute(cmd: GameCommand) -> Array:
 	var out: Array = []
 	var tr2 = world.module("travel")
 	var in_town: bool = tr2 != null and tr2.current_region != "vila"
-	if quality == "normal" and (in_town or world.db.location_at(world.db.world_to_tile(world.player.position)) == "taverna"):
+	if quality == "normal" and (in_town or POUSADAS.has(world.db.location_at(world.db.world_to_tile(world.player.position)))):
 		out.append(fact("GOLD_CHANGED", {"delta": -1, "reason": "pernoite na taverna"}))
 	out.append_array(world.advance_ticks(hours * 60 / world.clock.tick_minutes))
 	var s := world.player_sheet

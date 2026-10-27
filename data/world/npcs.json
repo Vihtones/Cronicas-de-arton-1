@@ -1473,6 +1473,37 @@
     6
    ],
    "start_present": false
+  },
+  {
+   "id": "hiena_5",
+   "name": "Hiena da Serra",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    116,
+    31
+   ],
+   "zone": "serra",
+   "active_hours": [
+    19,
+    5
+   ],
+   "signal": "Um riso agudo desce das cristas da serra."
+  },
+  {
+   "id": "hiena_6",
+   "name": "Hiena da Serra",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    118,
+    33
+   ],
+   "zone": "serra",
+   "active_hours": [
+    19,
+    5
+   ]
   }
  ]
 }

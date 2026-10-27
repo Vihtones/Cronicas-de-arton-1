@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Pedra Branca: a Estalagem da Ponte Velha cobra o pernoite (1 T$) como a taverna; Berta vende pão e cerveja, Marta (entreposto) vende corda, tocha, pão, saco de dormir e poção de cura; duas hienas rondam a serra à noite.
+
 - Pedra Branca ganha gente: Berta e Caio (estalagem), Tuco (barqueiro), Gunther (lavrador), Marta (entreposto), Sargento Hesk e Lia (torre), com rotinas próprias, família Pontes e vozes por profissão. `tools/build_content.py` não sobrescreve mais map.json e items.json (mantidos à mão); `--forcar` regera.
 
 - Mapa: a Estrada Leste deixa de acabar na borda. O mundo cresce de 96 para 160 colunas com a Serra do Leste (cristas, lago com cais, Riacho Frio com ponte) e o povoado de Pedra Branca (praça com poço, estalagem, entreposto, casa do barqueiro, torre de vigia, campos). Gerado por `tools/gen_mapa_leste.py` (bolsões fechados pela mata viram árvore). Novos tiles de ponte/cais e barranco (antes saíam pretos). Ferramenta `tools/mapa_tour.gd` para capturar pontos do mapa.

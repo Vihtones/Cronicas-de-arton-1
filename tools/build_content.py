@@ -331,6 +331,10 @@ creatures = [
  {"id": "salteador_2", "name": "Salteador Caolho", "rule": "criatura.bandido_comum", "faction": "salteadores", "spawn": [64, 27], "zone": "estrada", "start_present": False},
  {"id": "hiena_3", "name": "Hiena Jovem", "rule": "criatura.hiena", "faction": "fauna", "spawn": [82, 35], "zone": "floresta", "active_hours": [18, 6], "start_present": False},
  {"id": "hiena_4", "name": "Hiena Jovem", "rule": "criatura.hiena", "faction": "fauna", "spawn": [79, 38], "zone": "floresta", "active_hours": [18, 6], "start_present": False},
+ # Serra do Leste: matilha que desce das cristas à noite
+ {"id": "hiena_5", "name": "Hiena da Serra", "rule": "criatura.hiena", "faction": "fauna", "spawn": [116, 31], "zone": "serra", "active_hours": [19, 5],
+  "signal": "Um riso agudo desce das cristas da serra."},
+ {"id": "hiena_6", "name": "Hiena da Serra", "rule": "criatura.hiena", "faction": "fauna", "spawn": [118, 33], "zone": "serra", "active_hours": [19, 5]},
 ]
 items = {
  "chave_cela": {"name": "Chave de ferro", "price": 0},
@@ -362,6 +366,7 @@ economy = {
  },
  "price_limits": [0.5, 3.0], "status": "ORIGINAL_DO_JOGO",
  "shops": {"rosana": ["pao", "cerveja"], "mara": ["corda", "tocha", "pao", "saco_de_dormir"], "ysolde": ["pocao_cura"],
+           "berta": ["pao", "cerveja"], "marta": ["corda", "tocha", "pao", "saco_de_dormir", "pocao_cura"],
            "valkaria_mercado": ["pocao_cura", "saco_de_dormir", "arco_curto", "cota_malha", "espada_longa", "tocha", "corda"],
            "garrick": ["adaga", "espada_curta", "espada_longa", "machado_batalha", "arco_curto", "couro_batido", "cota_malha"]},
 }
