@@ -9698,6 +9698,484 @@
    "pagina": 15,
    "pdf_page": 17,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.amigo_divino",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Seu melhor amigo vive em um mundo divino, mas você pode gastar uma ação de movimento e 2 PM para invocá-lo a Arton. Ele surge em espaço desocupado em alcance curto e permanece até o fim da cena ou até você enviá-lo de volta (ação livre). Enquanto estiver no mundo divino e com menos da metade dos PV, tem Cura Acelerada 10.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.asas_aliadas",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Uma vez por rodada, se estiver em alcance curto do seu melhor amigo e ele usar deslocamento de voo, pode pagar 1 PM para ser alçado aos céus, deslocando-se para um quadrado desocupado no trajeto do amigo. Seu próximo ataque nesse turno conta como investida.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aumento_de_atributo",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Você recebe +1 em um atributo. Pode escolher este poder várias vezes, mas apenas uma vez por patamar para um mesmo atributo.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bom_garoto",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Uma vez por rodada, quando seu melhor amigo faz um acerto crítico em combate ou reduz um inimigo a 0 PV em seu turno, você recebe uma ação padrão que só pode usar consigo mesmo.",
+    "implementado": false,
+    "prereq": {
+     "texto": "nível de treinador 11"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.comando_defensivo",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Quando seu melhor amigo sofre dano, você pode gastar 2 PM para fazer um teste de Adestramento e reduzir o dano por esse resultado. Pode usar uma vez por rodada para cada melhor amigo.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.comandos_distantes",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "O alcance de suas habilidades de treinador aumenta em uma categoria (de curto para médio, de médio para longo).",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.convocar_enxame",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Você aprende e pode lançar Enxame de Pestes (atributo-chave Carisma) e pode usar seus aprimoramentos como se tivesse acesso aos mesmos círculos de magia que um clérigo de seu nível. Não é habilidade mágica: provém de sua capacidade de atrair criaturas (veja Magias Simuladas, p. 44).",
+    "implementado": false,
+    "prereq": {
+     "texto": "nível de treinador 5"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.coracao_grande",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Seu limite de parceiros aumenta em +1. No 11º nível, esse limite aumenta em +1 adicional.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 18,
+   "pdf_page": 20,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.direcionamento_marcial",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Quando usa Direcionar em um teste de ataque, você também soma seu Carisma na rolagem de dano desse ataque.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.domador_cativante",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Você soma seu Carisma no dano de Domar Criatura, e os dados de dano dessa habilidade aumentam para d10.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.domador_lendario",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Quando usa Domar Criatura, pode gastar +2 PM para mudar os dados de dano para d12 e atingir todos os alvos dentro do alcance.",
+    "implementado": false,
+    "prereq": {
+     "texto": "Domador Cativante; nível de treinador 17"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ensinar_truque",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Um de seus melhores amigos aprende um truque adicional. Pode escolher este poder uma vez por patamar, por amigo.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.investida_conjunta",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Uma vez por rodada, quando um melhor amigo no qual você está montado faz uma investida, pode gastar 2 PM para fazer um ataque corpo a corpo (que também conta como investida).",
+    "implementado": false,
+    "prereq": {
+     "texto": "melhor amigo montaria"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lider_da_matilha",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Quando usa Direcionar, pode aplicar o bônus ao próximo teste de perícia de outros melhores amigos com a mesma ação, ao custo de +1 PM por amigo adicional. O bônus só afeta o teste se ele for feito até o fim do seu turno.",
+    "implementado": false,
+    "prereq": {
+     "texto": "Conquistar pelos Números"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lingua_das_criaturas",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Você pode se comunicar com criaturas não inteligentes (Int –4 ou –5) por linguagem corporal e vocalizações, e pode usar Adestramento com elas para mudar atitude e persuasão.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mascote",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Você tem um mascote: um parceiro especial que não conta em seu limite de parceiros e com o qual você se comunica por gestos em alcance médio. Obedece a seus comandos, dentro do que a espécie pode fazer. Pode ser escolhido várias vezes, para mascotes diferentes. Se perder um, treina outro com uma semana de trabalho e T$ 100.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.petisco_merecido",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Você pode gastar 2 PM para conceder +2 em Força e Destreza a um melhor amigo em alcance curto até o fim da cena.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.protecao_fraterna",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Quando você e/ou seu melhor amigo sofrem um efeito que permite teste de resistência, se ele estiver em alcance curto, você pode gastar 2 PM para coordenar os esforços: os dois fazem o teste e usam o melhor resultado. Se um tiver habilidade que modifica o efeito ao passar (como Evasão), ambos são afetados.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.trabalho_em_equipe",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Uma vez por rodada, quando faz uma ação de movimento, seus melhores amigos recebem uma ação de movimento.",
+    "implementado": false,
+    "prereq": {
+     "texto": "nível de treinador 5"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.treinador_eclectico",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Seus melhores amigos usam seu nível de personagem, em vez do nível de treinador, para calcular seus PV, modificadores de perícias e Defesa.",
+    "implementado": false,
+    "prereq": {
+     "texto": "nível de treinador 6"
+    }
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.veterinario_de_campo",
+   "valor": {
+    "classe": "treinador",
+    "grupo": "classe",
+    "efeito": "Gasta uma ação completa para fazer um teste de Adestramento em um melhor amigo adjacente; ele recupera PV igual ao resultado. Só pode usar uma vez por dia no mesmo alvo.",
+    "implementado": false
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 19,
+   "pdf_page": 21,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.treinador",
+   "valor": {
+    "pv_inicial": 12,
+    "soma_con": true,
+    "pv_nivel": 3,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "adestramento",
+     "vontade"
+    ],
+    "pericias_escolha": 4,
+    "lista": [
+     "acrobacia",
+     "atletismo",
+     "cavalgar",
+     "diplomacia",
+     "guerra",
+     "iniciativa",
+     "intimidacao",
+     "intuicao",
+     "luta",
+     "oficio",
+     "percepcao",
+     "pontaria",
+     "reflexos",
+     "religiao",
+     "sobrevivencia"
+    ],
+    "proficiencias": [],
+    "habilidades": [
+     "Direcionar (2 PM: soma Carisma no teste de perícia do melhor amigo em alcance curto)",
+     "Melhor amigo (1º nível; 2 truques, +1 truque a cada 3 níveis)",
+     "Domar criatura (2º nível: teste oposto de Adestramento x Vontade, 2d8 de dano psíquico não letal; 5º nível rende criaturas com controle por PM; 8º nível mantém a criatura até o fim do dia)",
+     "Poder de treinador (2º nível e a cada nível seguinte)",
+     "Treino especializado (5º nível: Conquistar pelos Números ou Treino Intensivo)",
+     "Sincronia de combate (6º nível)",
+     "Sincronia perfeita (20º nível)"
+    ],
+    "melhor_amigo": {
+     "tipos": [
+      "animal",
+      "construto",
+      "espirito",
+      "monstro",
+      "morto-vivo"
+     ],
+     "atributos_base": "For 1, Des 1, Con 1, Int –4, Sab 1, Car 0",
+     "pv": "16 + Con e 4 PV + Con por nível",
+     "pericias_treinadas": "3 entre Acrobacia, Atletismo, Fortitude, Furtividade, Luta, Percepção, Pontaria, Reflexos, Sobrevivência e Vontade",
+     "defesa": "10 + Des + Car do treinador + metade do nível do treinador",
+     "deslocamento_m": 12,
+     "arma_natural": "1d8, crítico x2, corte, impacto ou perfuração",
+     "truques_iniciais": 2
+    },
+    "mascotes": {
+     "aguia_real": "Uma vez por rodada, fornece +1d6 em uma rolagem de dano com arma.",
+     "bicho_preguica": "Agarrado às costas, ocupa o espaço de um item vestido e fornece ataque natural de garra (1d6, crítico x2, corte). Uma vez por rodada, ao usar agredir, pode gastar 1 PM para ataque extra com a garra.",
+     "camundongo_espiritual": "Aumenta a CD para resistir a habilidades mágicas em +1.",
+     "fada_borboleta": "Diminui o custo de habilidades mágicas em –1 PM.",
+     "gekko_malhado": "Fornece +2 na Defesa e em Reflexos.",
+     "mico_leao_dourado": "Permite usar Ladinagem para punga em alcance curto.",
+     "minivaca": "Fornece +1 em testes de ataque; esse bônus dobra em investidas.",
+     "ossinhos": "Esqueleto de um animal reanimado. Fornece redução de corte, frio e perfuração 2."
+    },
+    "truques": {
+     "alado": {
+      "texto": "Seu melhor amigo ganha deslocamento de voo 15m.",
+      "pre": "Asas; nível de treinador 5"
+     },
+     "amigao": {
+      "texto": "Seu melhor amigo recebe +1 em Força e seu tamanho muda para Enorme. Aumenta o dano de suas armas naturais em um passo e afeta Furtividade e manobras.",
+      "pre": "melhor amigo Grande; nível de treinador 7"
+     },
+     "amigo_feroz": {
+      "texto": "Seu melhor amigo recebe +2 em testes de ataque e na margem de ameaça com suas armas naturais, e o dano delas aumenta em um passo.",
+      "pre": null
+     },
+     "amigo_protetor": {
+      "texto": "Quando você sofre dano, se seu melhor amigo estiver em alcance curto, pode gastar 2 PM para que ele salte em sua defesa: você sofre apenas metade do dano e o melhor amigo sofre o restante.",
+      "pre": null
+     },
+     "amigo_veterano": {
+      "texto": "Seu amigo vira um parceiro veterano de seu tipo.",
+      "pre": "nível de treinador 5"
+     },
+     "amigo_mestre": {
+      "texto": "Seu amigo veterano vira um parceiro mestre de seu tipo.",
+      "pre": "Amigo Veterano; nível de treinador 11"
+     },
+     "anatomia_humanoide": {
+      "texto": "Seu melhor amigo tem forma humanoide e Int –2 (em vez de –4). Não recebe arma natural inicial, mas tem proficiência com armas simples e armaduras leves, pode empunhar dois itens e vestir um adicional, e tem limite de carga de 10 espaços. Só pode ser escolhido na criação do melhor amigo.",
+      "pre": "construto ou morto-vivo"
+     },
+     "arma_natural_adicional": {
+      "texto": "Seu melhor amigo recebe uma arma natural adicional. Quando faz a ação agredir com outra arma, você pode gastar 1 PM para que ele faça um ataque corpo a corpo extra com essa arma.",
+      "pre": "animal ou monstro"
+     },
+     "asas": {
+      "texto": "Seu melhor amigo possui asas que permitem pairar a 1,5m do chão com deslocamento 12m, ignorar terreno difícil e ser imune a dano por queda (a menos que esteja inconsciente). Pode voar com deslocamento 12m gastando 1 PM por rodada.",
+      "pre": null
+     },
+     "bote": {
+      "texto": "Quando faz uma investida, seu melhor amigo pode atacar com todas as suas armas naturais. Todos os ataques recebem o bônus de +2 da investida, mas devem ser feitos contra o mesmo alvo.",
+      "pre": "duas armas naturais"
+     },
+     "condicionamento_especial": {
+      "texto": "Seu melhor amigo recebe +2 em um atributo e +1 em outro, exceto Inteligência. Pode escolher este truque uma vez por patamar.",
+      "pre": null
+     },
+     "deslocamento_especial": {
+      "texto": "Seu melhor amigo recebe deslocamento de escalada ou de natação igual ao seu deslocamento base. Pode escolher este truque uma segunda vez para ter ambos.",
+      "pre": null
+     },
+     "magia_inata": {
+      "texto": "Escolha uma magia de 1º círculo, arcana ou divina. Seu melhor amigo aprende e pode lançar essa magia (atributo-chave Carisma do treinador). Pode escolher este truque outras vezes para magias diferentes.",
+      "pre": "espírito"
+     },
+     "manobra_ensaiada": {
+      "texto": "Escolha uma manobra de combate. Seu melhor amigo recebe +2 em testes de ataque para executá-la e, uma vez por rodada, quando acerta um ataque com arma natural, você pode gastar 1 PM para que ele faça essa manobra contra o alvo como ação livre.",
+      "pre": null
+     },
+     "reanimacao_sombria": {
+      "texto": "Uma vez por cena, se seu melhor amigo estiver com 0 PV ou menos, você pode gastar 3 PM por patamar para reanimá-lo com PV iguais à metade do seu máximo.",
+      "pre": "morto-vivo"
+     },
+     "reducao_de_dano": {
+      "texto": "Seu melhor amigo recebe redução de dano 5.",
+      "pre": "nível de treinador 5"
+     },
+     "sopro": {
+      "texto": "Seu melhor amigo recebe um sopro de ácido, fogo, frio ou eletricidade. Gasta uma ação padrão e PM limitados pelo Carisma do treinador para soprar um cone de 6m: para cada PM gasto, criaturas na área sofrem 2d8 de dano do tipo escolhido (Reflexos CD Car reduz à metade).",
+      "pre": "construto, espírito ou monstro"
+     },
+     "taticas_de_matilha": {
+      "texto": "Se seu melhor amigo estiver flanqueando um inimigo, recebe +2 nos testes de ataque (total +4) e nas rolagens de dano contra ele. Se você estiver flanqueando com ele, recebe os mesmos bônus.",
+      "pre": null
+     },
+     "treinamento_de_companhia": {
+      "texto": "Seu melhor amigo recebe uma ação de movimento adicional nos turnos dele (apenas para se deslocar).",
+      "pre": "animal"
+     },
+     "treinamento_defensivo": {
+      "texto": "Seu melhor amigo passa a receber bônus na Defesa igual ao seu nível (em vez de metade do nível).",
+      "pre": null
+     },
+     "treinamento_marcial": {
+      "texto": "Seu melhor amigo recebe +2 em testes de ataque e rolagens de dano; esse bônus aumenta em +1 para cada patamar acima de iniciante. Se tiver Anatomia Humanoide, também recebe proficiência com armas marciais, armaduras pesadas e escudos.",
+      "pre": null
+     },
+     "veloz": {
+      "texto": "Seu melhor amigo recebe +2 na Defesa, +3m em seus deslocamentos e se torna treinado em Atletismo (se já for, recebe +2 nessa perícia).",
+      "pre": null
+     }
+    },
+    "poderes": [
+     "amigo_divino",
+     "asas_aliadas",
+     "aumento_de_atributo",
+     "bom_garoto",
+     "comando_defensivo",
+     "comandos_distantes",
+     "convocar_enxame",
+     "coracao_grande",
+     "direcionamento_marcial",
+     "domador_cativante",
+     "domador_lendario",
+     "ensinar_truque",
+     "investida_conjunta",
+     "lider_da_matilha",
+     "lingua_das_criaturas",
+     "mascote",
+     "petisco_merecido",
+     "protecao_fraterna",
+     "trabalho_em_equipe",
+     "treinador_eclectico",
+     "veterinario_de_campo"
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 16,
+   "pdf_page": 18,
+   "status": "VERIFICADA"
   }
  ]
 }
