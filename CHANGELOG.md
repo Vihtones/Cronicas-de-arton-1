@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Rogar Maldição (divina, 2º círculo) completa: debilidade (esmorecido, sem falar nem lançar magias), doença (contrai e já sofre o primeiro efeito), fraqueza (debilitado e lento), isolamento de um sentido (cego, surdo, sem faro, ou caído sem se levantar); +1 efeito; permanente com Fortitude parcial. Novo sistema de doenças (LB p.318): as oito doenças do livro, contaminação, teste de Fortitude no início de cada dia, efeitos progressivos que avançam e regridem, cura após dois sucessos seguidos (três na Maldição Pegajosa), perda permanente de atributo e morte.
+
 - Enxame de Pestes (divina, 2º círculo) completa: enxame sustentado num quadrado em alcance médio que não ocupa espaço; no fim dos turnos do conjurador, 2d12 de corte em quem está nele (Fortitude metade); ação de movimento para levá-lo 12m; +1d12, criaturas maiores (Reflexos, 3d12 de corte, impacto ou perfuração), +1 enxame, elementais (Reflexos, 5d12 de ácido, eletricidade, fogo ou frio).
 
 - Miasma Mefítico (divina, 2º círculo) completa: nuvem de 6m em alcance médio, 5d6 de ácido e enjoado (Fortitude: metade, sem enjoo), +1d6, dano de trevas; truque com pó de ônix (T$ 10) que mata quem está com 0 PV ou menos (Fortitude anula; falhou: +2 na CD das magias por um dia; passou: imune por um dia).

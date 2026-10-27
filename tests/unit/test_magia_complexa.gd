@@ -1,5 +1,6 @@
 extends TestCase
 ## Sistemas para magias complexas (docs/MAGIA_COMPLEXA.md): áreas, zonas, marcas, invocações e PV temporários.
+const Doencas := preload("res://src/domain/rules/doencas.gd")
 const Area := preload("res://src/domain/combat/area.gd")
 const Atitudes := preload("res://src/domain/rules/atitudes.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
@@ -229,7 +230,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3155,3 +3156,59 @@ func test_enxame_de_pestes_fere_no_fim_do_turno_e_se_move() -> void:
 	check(_lanca(m2, {"type": "cast", "spell": "enxame_de_pestes", "tiles": [Vector2i(32, 57), Vector2i(27, 57)], "aprimoramentos": [1, 2], "tipo_dano": "impacto"}).ok, "dois enxames maiores")
 	eq(m2[2].zonas.filter(func(z): return str(z.fonte) == "enxame_de_pestes").size(), 2, "dois enxames")
 	eq(str(m2[2].zonas.filter(func(z): return str(z.fonte) == "enxame_de_pestes")[0].dados.resistencia), "reflexos", "maiores: Reflexos")
+
+
+func test_rogar_maldicao_efeitos_sustentada_e_permanente() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	check(not _lanca(m, {"type": "cast", "spell": "rogar_maldicao", "target": "bandido_1", "efeitos": ["debilidade", "fraqueza"]}).ok, "um efeito só, sem aprimoramento")
+	check(_lanca(m, {"type": "cast", "spell": "rogar_maldicao", "target": "bandido_1", "efeitos": ["debilidade", "fraqueza"], "aprimoramentos": [0]}).ok, "dois efeitos (3º)")
+	check(b1.conditions.has("esmorecido") and b1.conditions.has("debilitado") and b1.conditions.has("lento"), "condições da maldição")
+	sim.budget.std = 1
+	sim.c("bandido_1").sheet.spells = PackedStringArray(["bencao"])
+	sim.c("bandido_1").sheet.pm = 10
+	var vb := GhostPlanner.validate_action(sim, "bandido_1", {"type": "cast", "spell": "bencao", "targets": ["bandido_1"]})
+	eq(str(vb.get("reason", "")), "amaldiçoado: não consegue lançar magias", "debilidade: não lança magias")
+	eq(str(sim.sustentadas.get("player", "")), "rogar_maldicao", "sustentada")
+	m[1]._encerrar_sustentada("player", [])
+	check(not b1.conditions.has("lento") and b1.efeito_bonus("bloqueio_magias") == 0, "fim da sustentação: some")
+	var m2 := _cena_grupo(9)
+	var b2 := _bandido(m2, "bandido_1", -50)
+	b2.pv_max = 999
+	_lanca(m2, {"type": "cast", "spell": "rogar_maldicao", "target": "bandido_1", "efeitos": ["isolamento"], "sentido": "tato"})
+	check(b2.conditions.has("caido"), "sem tato: caído")
+	m2[2].budget.move = 1
+	check(not GhostPlanner.validate_action(m2[2], "bandido_1", {"type": "stand"}).ok, "não se levanta")
+	var m3 := _cena_grupo(9)
+	var b3 := _bandido(m3, "bandido_1", -50)
+	_lanca(m3, {"type": "cast", "spell": "rogar_maldicao", "target": "bandido_1", "efeitos": ["doenca"], "doenca": "infeccao_do_esgoto"})
+	check(b3.doencas.has("infeccao_do_esgoto") and b3.conditions.has("fraco"), "doença: contrai e já sofre o primeiro efeito")
+	var m4 := _cena_grupo(9)
+	var b4 := _bandido(m4, "bandido_1", 99)
+	_lanca(m4, {"type": "cast", "spell": "rogar_maldicao", "target": "bandido_1", "efeitos": ["fraqueza"]})
+	check(not b4.conditions.has("lento"), "Fortitude anula")
+
+
+func test_doencas_progressao_e_cura() -> void:
+	var r := RuleRegistry.load_default()
+	var rng := RngStreams.new(7)
+	var sh := CharacterBuilder.build(r, "humano", "guerreiro", CharacterBuilder.presets("guerreiro")[0], ["for", "des", "con"], "guerreiro")
+	Doencas.contrair(sh, "maldicao_pegajosa", false, r, rng, "world", 0)
+	check(sh.doencas.has("maldicao_pegajosa"), "contaminado")
+	eq(int(sh.doencas.maldicao_pegajosa.estagio), -1, "sem efeito ainda")
+	sh.add_efeito("teste", "resistencia", -99, "dia", "", 99)
+	var pv0 := sh.pv
+	Doencas.teste_diario(sh, r, rng, "world", 1)
+	eq(int(sh.doencas.maldicao_pegajosa.estagio), 0, "falhou: primeiro efeito")
+	check(sh.pv < pv0, "perde 1d12 PV")
+	Doencas.teste_diario(sh, r, rng, "world", 2)
+	eq(int(sh.doencas.maldicao_pegajosa.estagio), 1, "falhou de novo: segundo efeito")
+	sh.remove_efeito("teste")
+	sh.add_efeito("teste", "resistencia", 99, "dia", "", 99)
+	Doencas.teste_diario(sh, r, rng, "world", 3)
+	eq(int(sh.doencas.maldicao_pegajosa.estagio), 0, "passou: efeito anterior")
+	Doencas.teste_diario(sh, r, rng, "world", 4)
+	check(sh.doencas.has("maldicao_pegajosa"), "Maldição Pegajosa pede três sucessos")
+	Doencas.teste_diario(sh, r, rng, "world", 5)
+	check(not sh.doencas.has("maldicao_pegajosa"), "curado")

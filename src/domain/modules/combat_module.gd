@@ -1,5 +1,6 @@
 class_name CombatModule
 extends WorldModule
+const Doencas := preload("res://src/domain/rules/doencas.gd")
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const Area := preload("res://src/domain/combat/area.gd")
@@ -998,7 +999,7 @@ func _sente_cheiro(id: String, z: Dictionary) -> bool:
 	var t: Vector2i = sim.c(id).tile
 	if (z.tiles as Array).has(t):
 		return true
-	if not sim.c(id).sheet.senses.has("faro"):
+	if not sim.c(id).sheet.senses.has("faro") or sim.c(id).sheet.efeito_bonus("sem_faro") > 0:
 		return false
 	for zt in z.tiles:
 		if CombatSim.cheb(t, zt) <= ALCANCE_CURTO_QUADRADOS:
@@ -1709,6 +1710,58 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Rogar Maldição (divina 2): 1 criatura em alcance curto, sustentada; Fortitude anula. Efeitos à escolha (+1 por
+## aprimoramento de 3 PM): debilidade (esmorecido; não se comunica nem lança magias), doença (instantânea: contrai e já
+## sofre o primeiro efeito, ver doencas.gd), fraqueza (debilitado e lento), isolamento (perde um sentido: visão, cego;
+## audição, surdo; olfato ou paladar, sem faro; tato, caído e sem se levantar). Aprimoramento de 7 PM (4º): permanente,
+## Fortitude parcial (passou: sofre a maldição por 1 rodada).
+func _rogar_maldicao(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var tg: String = a.get("target", "")
+	var T: CharacterSheet = sim.c(tg).sheet
+	var passou := _resiste(tg, "fortitude", spell_dc(sh, a), out)
+	if passou and not apr.has(1):
+		out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": "rogar_maldicao", "saved": true}, [id, tg]))
+		return out
+	var efeito := "magia.rogar_maldicao_" + id
+	var fim := "permanente" if apr.has(1) and not passou else "cena"
+	var conds: Array = []
+	var extras: Array = []
+	for ef in a.get("efeitos", []):
+		match str(ef):
+			"debilidade":
+				conds.append("esmorecido")
+				extras.append_array(["bloqueio_magias", "bloqueio_fala"])
+			"fraqueza":
+				conds.append_array(["debilitado", "lento"])
+			"isolamento":
+				match str(a.get("sentido", "")):
+					"visao": conds.append("cego")
+					"audicao": conds.append("surdo")
+					"olfato", "paladar": extras.append("sem_faro")
+					"tato":
+						conds.append("caido")
+						extras.append("nao_levanta")
+			"doenca":
+				for r in Doencas.contrair(T, str(a.get("doenca", "")), true, world.rules, world.rng, "combat", world.day_index()):
+					out.append(fact("DISEASE_CONTRACTED", {"actor": id, "target": tg, "doenca": str(a.get("doenca", "")), "efeito": r, "pv_after": T.pv}, [id, tg]))
+	for c in conds:
+		if T.efeito_bonus("imune", c) <= 0:
+			T.add_condition(c, world.rules)
+			T.add_efeito(efeito, "condicao", 1, fim, c)
+	for x in extras:
+		T.add_efeito(efeito, x, 1, fim)
+	if passou:
+		sim.add_marca("maldicao_%s" % id, tg, "rogar_maldicao", "efeito", 1, {"efeito": efeito})
+	elif fim != "permanente" and not (conds.is_empty() and extras.is_empty()):
+		_iniciar_sustentada(id, "rogar_maldicao", out)
+	out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "rogar_maldicao", "efeitos": a.get("efeitos", []), "permanente": fim == "permanente",
+		"tags": ["magia", "maldicao"]}, [id, tg]))
+	return out
+
+
 ## Enxame de Pestes (divina 2): enxame Médio num quadrado em alcance médio, sustentado; não ocupa espaço. No fim dos
 ## turnos do conjurador, 2d12 de corte em quem está no quadrado (Fortitude reduz à metade). Ação de movimento
 ## ("mover_enxame") leva o enxame 12m. Aprimoramentos: +1d12 (repetível); criaturas maiores (Reflexos, 3d12 de corte,
@@ -2330,6 +2383,9 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			s.remove_efeito("magia.arma_espiritual")
 		"oracao":
 			sim.c(id).erase("oracao")
+		"rogar_maldicao":
+			for cid in sim.combatants:
+				sim.c(cid).sheet.anular_magia("magia.rogar_maldicao_" + id)
 		"enxame_de_pestes":
 			for z in sim.zonas.duplicate(true):
 				if str(z.fonte) == "enxame_de_pestes" and str(z.dados.conjurador) == id:
@@ -2930,6 +2986,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_miasma(id, a))
 		"enxame_de_pestes":
 			out.append_array(_enxame(id, a))
+		"rogar_maldicao":
+			out.append_array(_rogar_maldicao(id, a))
 		"augurio":
 			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
 			var magia_au = world.module("magia")

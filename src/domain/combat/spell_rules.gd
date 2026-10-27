@@ -46,6 +46,7 @@ const COMPLETAS := {
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
 	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
 	"circulo_da_justica": {"aprimoramentos": [0, 1, 2]},   # pessoal: ver o invisível em alcance curto; –10/–20; permanente
+	"rogar_maldicao": {"aprimoramentos": [0, 1]},   # +1 efeito (repetível); permanente, Fortitude parcial
 	"enxame_de_pestes": {"aprimoramentos": [0, 1, 2, 3]},   # +1d12; criaturas maiores; +1 enxame; elementais
 	"miasma_mefitico": {"aprimoramentos": [0, 1]},   # +1d6 (repetível); trevas; truque: mata quem está com 0 PV ou menos
 	"controlar_fogo": {"aprimoramentos": [0, 1, 2]},   # labaredas (sustentada); +1d6 (repetível, exceto chamejar); criatura de fogo
@@ -303,6 +304,8 @@ const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]
 
 ## Acalmar Animal: animal; monstro ou espírito com Int –5 ou –4 (1 PM); qualquer monstro ou espírito (5 PM).
 ## Tranquilidade: animal ou humanoide; qualquer criatura (1 PM, ou criaturas escolhidas com o de 5 PM).
+const MALDICOES := ["debilidade", "doenca", "fraqueza", "isolamento"]
+const SENTIDOS := ["visao", "audicao", "olfato", "paladar", "tato"]
 const PO_DE_ONIX := 10   # T$ do truque do Miasma Mefítico
 const EFEITOS_FOGO := ["chamejar", "esquentar", "extinguir", "modelar"]
 

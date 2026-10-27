@@ -276,7 +276,7 @@ func falha_nevoa(attacker: String, target: String) -> int:
 	var dist := cheb(a_tile, t_tile)
 	if dist <= 1:
 		return leve
-	if c(attacker).sheet.senses.has("faro") and dist <= int(rules.value("alcance.quadrados", {}).get("curto", 6)):
+	if c(attacker).sheet.senses.has("faro") and c(attacker).sheet.efeito_bonus("sem_faro") <= 0 and dist <= int(rules.value("alcance.quadrados", {}).get("curto", 6)):
 		return leve
 	return int(rules.value("situacao.camuflagem_total").falha_pct)
 
@@ -765,6 +765,8 @@ func _passar_rodada() -> void:
 			expiradas.append(m.id)
 			if m.tipo == "condicao" and combatants.has(m.alvo):
 				c(m.alvo).sheet.remove_condition(str(m.dados.condicao))   # condição de rodadas (ex.: cego da Cólera de Azgher)
+			if m.tipo == "efeito" and combatants.has(m.alvo):
+				c(m.alvo).sheet.anular_magia(str(m.dados.efeito))   # efeito de magia de rodadas (Rogar Maldição resistida)
 			if m.tipo == "invocacao" and combatants.has(m.alvo):
 				remove_combatant(m.alvo)
 		else:

@@ -1116,6 +1116,199 @@
    "pagina": 318,
    "pdf_page": 324,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.calafrio_diabolico",
+   "valor": {
+    "nome": "Calafrio Diabólico",
+    "transmissao": "contato",
+    "cd": 25,
+    "estagios": [
+     {
+      "condicao": "fraco"
+     },
+     {
+      "condicao": "debilitado"
+     },
+     {
+      "condicao": "inconsciente"
+     },
+     {
+      "morte": true
+     }
+    ],
+    "cura_sucessos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.febre_do_riso",
+   "valor": {
+    "nome": "Febre do Riso",
+    "transmissao": "inalacao",
+    "cd": 20,
+    "estagios": [
+     {
+      "condicao": "frustrado"
+     },
+     {
+      "condicao": "esmorecido"
+     },
+     {
+      "condicao": "confuso"
+     }
+    ],
+    "cura_sucessos": 2,
+    "obs": "a condição se ativa no início de cada cena (no jogo: vale pelo dia)"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.febre_mental",
+   "valor": {
+    "nome": "Febre Mental",
+    "transmissao": "inalacao",
+    "cd": 20,
+    "estagios": [
+     {
+      "condicao": "frustrado"
+     },
+     {
+      "condicao": "esmorecido"
+     },
+     {
+      "condicao": "alquebrado"
+     }
+    ],
+    "cura_sucessos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.infeccao_do_esgoto",
+   "valor": {
+    "nome": "Infecção do Esgoto",
+    "transmissao": "contato",
+    "cd": 15,
+    "estagios": [
+     {
+      "condicao": "fraco"
+     },
+     {
+      "condicao": "debilitado"
+     }
+    ],
+    "cura_sucessos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.maldicao_pegajosa",
+   "valor": {
+    "nome": "Maldição Pegajosa",
+    "transmissao": "contato",
+    "cd": 20,
+    "estagios": [
+     {
+      "perde_pv": "1d12"
+     },
+     {
+      "perde_pv": "2d12"
+     },
+     {
+      "perde_pv": "4d12"
+     }
+    ],
+    "cura_sucessos": 3
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.molestia_demoniaca",
+   "valor": {
+    "nome": "Moléstia Demoníaca",
+    "transmissao": "contato",
+    "cd": 20,
+    "estagios": [
+     {
+      "perde_pv": "1d12"
+     },
+     {
+      "perde_pv": "2d12"
+     },
+     {
+      "perde_atributo": "con"
+     },
+     {
+      "morte": true
+     }
+    ],
+    "cura_sucessos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.tremores",
+   "valor": {
+    "nome": "Tremores",
+    "transmissao": "contato",
+    "cd": 15,
+    "estagios": [
+     {
+      "condicao": "vulneravel"
+     }
+    ],
+    "cura_sucessos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "doenca.variola",
+   "valor": {
+    "nome": "Varíola",
+    "transmissao": "inalacao",
+    "cd": 20,
+    "estagios": [
+     {
+      "condicao": "enjoado"
+     },
+     {
+      "condicao": "debilitado"
+     },
+     {
+      "perde_atributo": "car"
+     },
+     {
+      "morte": true
+     }
+    ],
+    "cura_sucessos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
   }
  ]
 }

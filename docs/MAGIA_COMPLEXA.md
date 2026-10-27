@@ -98,10 +98,10 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
 - Divinas de 1º círculo: todas feitas.
-- Divinas de 2º círculo feitas: Enxame de Pestes (zonas "enxame" de 1 quadrado; dano no fim do turno do conjurador), Miasma Mefítico (efeito cd_magias soma na CD), Controlar Fogo (CombatSim.chama_em: zonas de fogo, tochas, criaturas em chamas; bestiário "composicao" para criaturas de fogo), Augúrio (assunto = um lugar do mapa; miséria = criatura hostil ou armadilha, felicidade = baú ou pista), Círculo da Justiça (SpellsModule.justicas; NPCs no lugar não distorcem boatos), Condição (status_conhecidos), Físico Divino, Mente Divina (atributo muda de verdade e reverte), Oração,
+- Divinas de 2º círculo feitas: Rogar Maldição (sistema de doenças em src/domain/rules/doencas.gd, dados doenca.* em core.json; teste no início do dia pelo PartyModule), Enxame de Pestes (zonas "enxame" de 1 quadrado; dano no fim do turno do conjurador), Miasma Mefítico (efeito cd_magias soma na CD), Controlar Fogo (CombatSim.chama_em: zonas de fogo, tochas, criaturas em chamas; bestiário "composicao" para criaturas de fogo), Augúrio (assunto = um lugar do mapa; miséria = criatura hostil ou armadilha, felicidade = baú ou pista), Círculo da Justiça (SpellsModule.justicas; NPCs no lugar não distorcem boatos), Condição (status_conhecidos), Físico Divino, Mente Divina (atributo muda de verdade e reverte), Oração,
   Purificação, Raio Solar, Soco de Arsenal (empurrão e alcance natural), Voz Divina (Mudar Atitude com não humanoides exige comunicação), Silêncio (alcance "médio" do catálogo normalizado para "medio").
-- Divinas de 2º círculo restantes (4): aliado_animal,
-  controlar_madeira, rogar_maldicao, tempestade_divina.
+- Divinas de 2º círculo restantes (3): aliado_animal,
+  controlar_madeira, tempestade_divina.
 - Divinas de 3º círculo (12): anular_a_luz, comunhao_com_a_natureza, controlar_agua, controlar_terra,
   despertar_consciencia, dispersar_as_trevas, heroismo, missao_divina, potencia_divina, protecao_contra_magia,
   servo_divino, viagem_arborea.

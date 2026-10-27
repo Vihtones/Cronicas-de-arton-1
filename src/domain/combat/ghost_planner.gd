@@ -84,6 +84,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 		"stand":
 			if not A.sheet.conditions.has("caido"): return {"ok": false, "reason": "não está caído"}
 			if (A.flags as Array).has("comando_senta_%d" % sim.turn_counter): return {"ok": false, "reason": "Comando (Senta): não se levanta neste turno"}
+			if A.sheet.efeito_bonus("nao_levanta") > 0: return {"ok": false, "reason": "sem o tato, não consegue se levantar"}
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
 			return {"ok": true, "kind": "movimento"}
 		"coup":
@@ -164,6 +165,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]
+			if sp_id == "rogar_maldicao":
+				var efs: Array = a.get("efeitos", [])
+				if efs.is_empty() or efs.size() > 1 + apr.count(0): return {"ok": false, "reason": "escolha %d efeito(s) da maldição" % (1 + apr.count(0))}
+				for ef_m in efs:
+					if not SpellRules.MALDICOES.has(str(ef_m)) or efs.count(ef_m) > 1: return {"ok": false, "reason": "efeito de maldição inválido"}
+				if efs.has("doenca") and sim.rules.value("doenca." + str(a.get("doenca", "")), {}).is_empty(): return {"ok": false, "reason": "escolha a doença"}
+				if efs.has("isolamento") and not SpellRules.SENTIDOS.has(str(a.get("sentido", ""))): return {"ok": false, "reason": "escolha o sentido: " + ", ".join(SpellRules.SENTIDOS)}
+				if a.get("target", "") == actor: return {"ok": false, "reason": "escolha a vítima"}
 			if sp_id == "enxame_de_pestes":
 				if apr.has(1) and apr.has(3): return {"ok": false, "reason": "escolha um tipo de enxame"}
 				if apr.has(1) and not ["corte", "impacto", "perfuracao"].has(str(a.get("tipo_dano", "corte"))): return {"ok": false, "reason": "dano de corte, impacto ou perfuração"}
@@ -342,6 +351,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if apr.has(1):
 					if A.sheet.arcana_perdida:
 						return {"ok": false, "reason": "você já perdeu as magias arcanas"}
+			if A.sheet.efeito_bonus("bloqueio_magias") > 0:
+				return {"ok": false, "reason": "amaldiçoado: não consegue lançar magias"}
 			if str(sp.get("tipo", "")) == "arcana" and (A.sheet.efeito_bonus("bloqueio_arcana") > 0 or A.sheet.arcana_perdida):
 				return {"ok": false, "reason": "você não consegue lançar magias arcanas"}
 			if sp_id == "banimento":
@@ -410,6 +421,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if TD.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, TD.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "longe demais para conversar"}
 			if int(TD.get("diplomacia_dia", -1)) == sim.dia: return {"ok": false, "reason": "já tentou mudar a atitude dele hoje"}
+			if A.sheet.efeito_bonus("bloqueio_fala") > 0: return {"ok": false, "reason": "amaldiçoado: não consegue se comunicar"}
 			if not SpellRules.pode_conversar(A.sheet, str(a.target), TD.sheet): return {"ok": false, "reason": "não há como conversar com essa criatura (Voz Divina)"}
 			return {"ok": true, "kind": "completa"}
 		"adestrar":

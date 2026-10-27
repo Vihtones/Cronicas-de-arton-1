@@ -17,6 +17,8 @@ const ORDERS := ["seguir", "proteger", "manter_posicao", "recuar"]
 const CONTRACT_LOYALTY_GAIN := 5.0   # lealdade de quem cumpre um contrato
 const SHARE_LOYALTY_GAIN := 3.0      # lealdade de quem recebe parte do caixa da guilda
 
+const Doencas := preload("res://src/domain/rules/doencas.gd")
+
 var members: Dictionary = {}   # npc_id -> {loyalty: float, order: String}
 var guild: Dictionary = {}     # {} ou {name, members}
 var last_day := -1
@@ -176,9 +178,17 @@ func on_event(e: GameEvent) -> Array:
 		return []
 	if e.event_type == "TIME_ADVANCED" and world.day_index() != last_day:
 		last_day = world.day_index()
+		var doentes: Array = []
 		if world.player_sheet != null:
 			world.player_sheet.limpar_dia(world.day_index())   # efeitos de magia "por um dia" acabam
-		var rituais: Array = []
+			doentes.append_array(_teste_de_doencas("player", world.player_sheet))
+		for id_d in members:
+			var f_d := CharacterSheet.from_dict(members[id_d].sheet) if members[id_d].has("sheet") else ficha_de(id_d)
+			f_d.limpar_dia(world.day_index())
+			doentes.append_array(_teste_de_doencas(id_d, f_d))
+			if members[id_d].has("sheet") or not f_d.doencas.is_empty():
+				members[id_d].sheet = f_d.to_dict()
+		var rituais: Array = doentes
 		var combat = world.module("combat")
 		if combat != null:
 			rituais = combat.processar_rituais_do_dia()   # Lágrimas de Wynna: o ritual de um dia termina aqui
@@ -187,6 +197,15 @@ func on_event(e: GameEvent) -> Array:
 			_descansa(id)
 		return rituais + _resolve_contracts()
 	return []
+
+
+## Doenças (LB p.318): o teste de Fortitude do início do dia de quem está contaminado.
+func _teste_de_doencas(quem: String, f: CharacterSheet) -> Array:
+	var out: Array = []
+	for r in Doencas.teste_diario(f, world.rules, world.rng, "world", world.day_index()):
+		r["who"] = quem
+		out.append(fact("DISEASE_CHECK", r, [quem]))
+	return out
 
 
 ## Muda a ficha guardada de um companheiro (magias lançadas nele fora de combate). `fn` recebe a CharacterSheet.
