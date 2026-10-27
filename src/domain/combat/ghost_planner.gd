@@ -99,6 +99,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}
 			if sp_id == "resistencia_a_energia" and not SpellRules.tipo_energia_valido(str(a.get("tipo_energia", "fogo"))):
 				return {"ok": false, "reason": "tipo de energia inválido"}
+			if sp_id == "protecao_divina":
+				for tg in targets:
+					if sim.is_enemy(actor, tg):
+						return {"ok": false, "reason": "Proteção Divina só protege aliados"}
 			if sp_id == "perdicao":
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):

@@ -225,3 +225,19 @@ func test_condicao_de_magia_acaba_com_a_cena() -> void:
 	sh.add_condition("fraco")
 	sh.limpar_efeitos("cena")
 	check(not sh.conditions.has("fraco"), "fraco some ao fim da cena")
+
+
+func test_protecao_divina_base_esfera_e_medo() -> void:
+	var m := _cena_com("protecao_divina", 5, Vector2i(27, 57))
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "protecao_divina", "target": "bandido_1", "targets": ["bandido_1"]}
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "não protege inimigo")
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]   # o alvo é aliado nesta cena de teste
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "base válida em aliado adjacente: %s" % str(v))
+	c._cast("player", a, v)
+	check(sim.c("bandido_1").sheet.efeito_bonus("resistencia") == 2, "base: +2 em resistências")
+	sim.c("bandido_1").sheet.add_efeito("magia.protecao_divina", "imune", 1, "cena", "apavorado")
+	sim.c("bandido_1").sheet.add_condition("apavorado")
+	check(not sim.c("bandido_1").sheet.conditions.has("apavorado"), "imunidade bloqueia medo")

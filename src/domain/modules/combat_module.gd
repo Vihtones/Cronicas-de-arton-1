@@ -708,6 +708,27 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					ts.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
 					ts.add_condition("fraco")
 					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": "fraco", "tags": ["magia"]}, [id, tg]))
+		"protecao_divina":
+			# Proteção Divina (divina 1): +2 em testes de resistência; aprimoramentos: +1, reação com +5 no próximo teste,
+			# esfera de 3m e imunidade a efeitos de medo.
+			var apr3: Array = a.get("aprimoramentos", [])
+			var alvos3: Array = a.get("targets", [a.get("target", id)])
+			if apr3.has(2):
+				var centro: Vector2i = sim.c(alvos3[0]).tile
+				alvos3 = []
+				for other in sim.combatants:
+					if not sim.is_enemy(id, other) and not sim.c(other).sheet.is_dead() and CombatSim.cheb(sim.c(other).tile, centro) <= 2:
+						alvos3.append(other)
+			for tg in alvos3:
+				var ts3: CharacterSheet = sim.c(tg).sheet
+				if apr3.has(1):
+					ts3.add_efeito("magia.protecao_divina", "proxima_resistencia", 5, "proxima_resistencia")
+				else:
+					ts3.add_efeito("magia.protecao_divina", "resistencia", 2 + (1 if apr3.has(0) else 0), "cena")
+				if apr3.has(3):
+					for cond in ["abalado", "apavorado"]:
+						ts3.add_efeito("magia.protecao_divina", "imune", 1, "cena", cond)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "protecao_divina", "tags": ["magia"]}, [id, tg]))
 		"resistencia_a_energia":
 			# Resistência a Energia (universal 1): redução de dano 10 contra um tipo de energia (aprimoramentos ajustam).
 			var apr2: Array = a.get("aprimoramentos", [])
