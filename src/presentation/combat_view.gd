@@ -249,6 +249,7 @@ func candidate_actions(t: Vector2i) -> Array:
 			if str(sp.get("alcance", "")) == "pessoal" or (target == "" and SpellRules.ALVO_QUADRADO.has(spell)):
 				base["targets"] = ["player"]
 				base["target"] = "player"
+				base["no_chao"] = target == "" and t != me   # Luz e Escuridão num ponto, não num objeto carregado
 				return [base]
 			if target == "":
 				return []

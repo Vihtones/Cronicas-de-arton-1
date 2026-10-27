@@ -31,6 +31,8 @@ const COMPLETAS := {
 	"suporte_ambiental": {"aprimoramentos": [0]},   # alcance curto e criaturas escolhidas
 	"abencoar_alimentos": {"aprimoramentos": [0, 1]},   # +1 alvo (repetível); água benta; truque: só purifica
 	"criar_elementos": {"aprimoramentos": [0, 1, 2]},   # +1 passo de quantidade; arremesso 2d4 (água/terra); +1d6 de fogo
+	"luz": {"aprimoramentos": [0, 1, 2, 3, 4, 5, 6]},   # +3m; dia; permanente; olhos (arcano); globos (arcano); luz solar (divino); halo (divino)
+	"escuridao": {"aprimoramentos": [0, 1, 2, 3, 4]},   # +1,5m; escuridão total; olhos (cego); dia; sombras pessoais
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -60,10 +62,10 @@ const REACAO_APR := {"protecao_divina": [1], "premonicao": [0]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
-const ALVO_QUADRADO := ["criar_elementos", "nevoa", "controlar_plantas"]
+const ALVO_QUADRADO := ["criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
@@ -138,8 +140,14 @@ static func aprimoramentos_validos(sp_id: String, idx: Array, sheet: CharacterSh
 		return idx.is_empty()
 	var permitidos: Array = COMPLETAS[sp_id].aprimoramentos
 	var cmax := circulo_maximo(sheet, rules)
+	var lista: Array = rules.value("magia." + sp_id, {}).get("aprimoramentos", [])
+	var tradicao := str(rules.value("classe." + sheet.class_id, {}).get("magia", {}).get("tipo", "arcana"))
 	for i in idx:
 		if not permitidos.has(int(i)) or circulo_exigido(sp_id, int(i), rules) > cmax:
+			return false
+		# "Apenas Arcanos" / "Apenas Divinos" (magias universais): só para quem lança pela tradição indicada
+		var apenas := str(lista[int(i)].get("apenas", "")) if int(i) < lista.size() else ""
+		if (apenas == "arcanos" and tradicao != "arcana") or (apenas == "divinos" and tradicao != "divina"):
 			return false
 	for par in EXCLUSIVOS.get(sp_id, []):
 		if idx.has(par[0]) and idx.has(par[1]):

@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2581,3 +2581,86 @@ func test_criar_elementos_arremesso_e_agua() -> void:
 	var w := _mundo_explorador(["criar_elementos"])
 	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "criar_elementos", "elemento": "agua"}).accepted, "água fora de combate")
 	eq(w.module("state").item_count("frasco_agua"), 1, "recipiente cheio de água potável")
+
+
+# --- Luz e Escuridão (universais, 1º círculo) ------------------------------------------------------
+func _noite(sim: CombatSim) -> void:
+	sim.env_fn = func(_t: Vector2i) -> Dictionary: return {"darkness": true, "fog": false}
+
+
+func test_luz_em_objeto_carregado_tira_a_camuflagem_da_noite() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_noite(sim)
+	sim.c("bandido_2").tile = Vector2i(30, 57)
+	eq(int(sim.attack_profile("player", "bandido_2", 0, false, false).get("miss_chance", 0)), 0, "corpo a corpo fora de alcance: perfil vazio")
+	check(not sim.iluminado(Vector2i(30, 57)), "noite sem luz")
+	check(_lanca(m, {"type": "cast", "spell": "luz", "target": "player", "targets": ["player"]}).ok, "Luz no próprio objeto")
+	check(sim.iluminado(Vector2i(30, 57)), "6m de raio iluminados")
+	check(not sim.iluminado(Vector2i(31, 57)), "além dos 6m, escuro")
+
+
+func test_escuridao_leve_total_e_luz_natural_nao_ilumina() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("tocha", "fonte_luz", 6, "cena")
+	_lanca(m, {"type": "cast", "spell": "escuridao", "target": "player", "targets": ["player"], "tile": Vector2i(32, 57), "no_chao": true})
+	check(not sim.iluminado(Vector2i(32, 57)), "a tocha não ilumina as sombras")
+	sim.c("bandido_1").tile = Vector2i(32, 58)
+	eq(sim.falha_escuridao("player", "bandido_1"), 20, "escuridão leve: camuflagem leve")
+	var m2 := _cena_grupo(1)
+	var sim2: CombatSim = m2[2]
+	_lanca(m2, {"type": "cast", "spell": "escuridao", "target": "player", "targets": ["player"], "tile": Vector2i(29, 57), "no_chao": true, "aprimoramentos": [1]})
+	eq(sim2.falha_escuridao("player", "bandido_2"), 50, "escuridão total bloqueia a visão através dela")
+
+
+func test_luz_anula_escuridao() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_lanca(m, {"type": "cast", "spell": "escuridao", "target": "player", "targets": ["player"], "tile": Vector2i(32, 57), "no_chao": true})
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "luz", "target": "player", "targets": ["player"], "tile": Vector2i(31, 57), "no_chao": true})
+	eq(sim.escuridao_em(Vector2i(32, 57)), "", "a Luz dissipou a Escuridão")
+
+
+func test_luz_aprimoramentos_por_tradicao_halo_e_permanente() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "luz", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [3]}).ok, "olhos é só para arcanos")
+	check(_lanca(m, {"type": "cast", "spell": "luz", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [6]}).ok, "halo é divino")
+	eq(sim.c("bandido_1").sheet.efeito_bonus("pericia_diplomacia"), 10, "+10 em Diplomacia")
+	eq(sim.c("bandido_1").sheet.efeito_rd("trevas"), 10, "redução de trevas 10")
+	var w := _mundo_explorador(["luz"])
+	w.player.gold = 60
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "luz", "aprimoramentos": [2]}).accepted, "luz permanente")
+	eq(int(w.player.gold), 10, "pó de rubi")
+	WorldHelpers.advance_hours(w, 72)
+	eq(w.module("magia").luz_ativa(), 4, "dura para sempre")
+
+
+func test_luz_solar_estabiliza_aliados_e_ofusca_inimigos() -> void:
+	var m := _cena_grupo(5)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b2 := _bandido(m, "bandido_2", -50)
+	sim.c("bandido_2").tile = Vector2i(28, 57)
+	_lanca(m, {"type": "cast", "spell": "luz", "target": "player", "targets": ["player"], "aprimoramentos": [5]})
+	c._begin_turn_base("bandido_2")
+	check(b2.conditions.has("ofuscado"), "inimigo na luz cálida: ofuscado")
+	var p: CharacterSheet = sim.c("player").sheet
+	p.add_condition("sangrando", m[3])
+	c._luz_solar("player", [])
+	check(not p.conditions.has("sangrando"), "aliado: imune a sangrando")
+
+
+func test_escuridao_nos_olhos_e_sombras_pessoais() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_2", -50)
+	_lanca(m, {"type": "cast", "spell": "escuridao", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [2]})
+	check(b.conditions.has("cego"), "falhou: cego")
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "escuridao", "target": "player", "targets": ["player"], "aprimoramentos": [4]})
+	eq(sim.c("player").sheet.efeito_bonus("pericia_furtividade"), 10, "+10 em Furtividade")
+	eq(int(sim.attack_profile("bandido_1", "player", 0, false, false).get("miss_chance", 0)), 20, "camuflagem leve das sombras")

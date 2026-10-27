@@ -143,6 +143,21 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "luz" or sp_id == "escuridao":
+				var luz_v: bool = sp_id == "luz"
+				var tg_l: String = a.get("target", "")
+				var precisa_criatura: bool = (luz_v and (apr.has(3) or apr.has(6))) or (not luz_v and apr.has(2))
+				if precisa_criatura and not sim.combatants.has(tg_l): return {"ok": false, "reason": "escolha uma criatura"}
+				if luz_v and apr.has(2) and apr.size() > 1: return {"ok": false, "reason": "a luz permanente não se combina com outros aprimoramentos"}
+				if luz_v and apr.has(3) and sim.c(tg_l).sheet.has_effective_condition(sim.rules, "cego"): return {"ok": false, "reason": "não afeta criaturas cegas"}
+				if luz_v and apr.has(4):
+					for q in a.get("tiles", []):
+						if CombatSim.cheb(A.tile, Vector2i(int(q[0]), int(q[1]))) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "globo fora do alcance longo"}
+					targets = [actor]
+				if not precisa_criatura and not sim.combatants.has(tg_l):
+					targets = [actor]
+				if not luz_v and apr.has(4):
+					targets = [actor]
 			if sp_id == "criar_elementos":
 				var el := str(a.get("elemento", ""))
 				if not SpellRules.ELEMENTOS.has(el): return {"ok": false, "reason": "escolha o elemento: água, ar, fogo ou terra"}
@@ -330,6 +345,17 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				return {"ok": false, "reason": "só no próximo turno"}
 			var tc := Vector2i(int(chao.tile[0]), int(chao.tile[1]))
 			if CombatSim.cheb(A.tile, tc) > 1: return {"ok": false, "reason": "longe da arma"}
+			return {"ok": true, "kind": "movimento"}
+		"mover_globos":
+			# Luz (globos): ação livre, uma vez por rodada, dentro do alcance longo.
+			if (A.flags as Array).has("globos_%d" % sim.round_no): return {"ok": false, "reason": "os globos já se moveram nesta rodada"}
+			if not sim.zonas.any(func(z): return z.tipo == "globo_luz" and str(z.get("dados", {}).get("conjurador", "")) == actor): return {"ok": false, "reason": "sem globos de luz"}
+			for q in a.get("tiles", []):
+				if CombatSim.cheb(A.tile, Vector2i(int(q[0]), int(q[1]))) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance longo"}
+			return {"ok": true, "kind": "livre"}
+		"guardar_fonte":
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			if A.sheet.efeito_bonus("fonte_luz") <= 0 and not A.sheet.efeitos.any(func(e): return e.stat == "fonte_escuridao"): return {"ok": false, "reason": "nada emitindo luz ou sombras"}
 			return {"ok": true, "kind": "movimento"}
 		"escapar":
 			# Libertar-se de efeito que prende (Controlar Plantas): ação padrão e Acrobacia ou Atletismo.

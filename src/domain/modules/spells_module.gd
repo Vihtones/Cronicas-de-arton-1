@@ -21,7 +21,9 @@ const FORA_DE_COMBATE := {
 	"detectar_ameacas": [],
 	"suporte_ambiental": [],   # você (e, com o aprimoramento, os companheiros presentes)
 	"abencoar_alimentos": [],
-	"criar_elementos": [],   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
+	"criar_elementos": [],
+	"luz": [],   # num objeto que você carrega (ou permanente, com pó de rubi)
+	"escuridao": [],   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
 const RAIO_DETECTAR := 12   # esfera de 18m
@@ -34,6 +36,7 @@ const MINUTOS_DIA := 24 * 60
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
 var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
+var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
 var luz_carregada: Dictionary = {}   # luz que o jogador carrega fora de combate: {raio: quadrados, ate: tick}
 var abencoados: Dictionary = {}  # item -> {n: porções abençoadas, ate: tick do fim da cena}
 var podas: Dictionary = {}       # "x,y" -> true: vegetação podada por Controlar Plantas (instantânea, fica)
@@ -98,6 +101,13 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 				return PackedStringArray(["objeto fora do alcance"])
 		"abencoar_alimentos":
 			return _valida_abencoar(cmd.payload, apr)
+		"luz", "escuridao":
+			if sp_id == "luz" and apr.has(2) and int(world.player.gold) < 50:
+				return PackedStringArray(["faltam T$ 50 de pó de rubi"])
+			if sp_id == "luz" and apr.has(2) and apr.size() > 1:
+				return PackedStringArray(["a luz permanente não se combina com outros aprimoramentos"])
+			if (sp_id == "luz" and (apr.has(3) or apr.has(4) or apr.has(6))) or (sp_id == "escuridao" and apr.has(2)):
+				return PackedStringArray(["essa versão mira criaturas ou pontos de uma cena de combate"])
 		"criar_elementos":
 			if not SpellRules.ELEMENTOS.has(str(cmd.payload.get("elemento", ""))):
 				return PackedStringArray(["escolha o elemento: água, ar, fogo ou terra"])
@@ -155,6 +165,26 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"luz", "escuridao":
+			var apr_l: Array = cmd.payload.get("aprimoramentos", [])
+			var combat_l = world.module("combat")
+			var cena: int = combat_l.TICKS_CENA if combat_l != null else 6
+			var ate_l := world.clock.tick + cena
+			if (sp_id == "luz" and apr_l.has(1)) or (sp_id == "escuridao" and apr_l.has(3)):
+				ate_l = world.clock.tick + 24 * 60 / world.clock.tick_minutes
+			if sp_id == "luz":
+				if apr_l.has(2):
+					ate_l = -1
+					out.append(fact("GOLD_CHANGED", {"delta": -50, "reason": "pó de rubi"}))
+				escuridao_carregada = {}   # Luz anula Escuridão
+				luz_carregada = {"raio": Area.quadrados(6.0 + 3.0 * apr_l.count(0)), "ate": ate_l}
+			elif apr_l.has(4):
+				sh.add_efeito("magia.escuridao", "pericia_furtividade", 10, "cena")
+				sh.add_efeito("magia.escuridao", "camuflagem_sombras", 1, "cena")
+			else:
+				luz_carregada = {}   # Escuridão anula Luz
+				escuridao_carregada = {"raio": Area.quadrados(6.0 + 1.5 * apr_l.count(0)), "total": apr_l.has(1), "ate": ate_l}
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": sp_id, "tags": ["magia"]}, ["player"]))
 		"criar_elementos":
 			match str(cmd.payload.elemento):
 				"agua":
@@ -375,9 +405,15 @@ func carregar_luz(raio_q: int) -> void:
 
 
 func luz_ativa() -> int:
-	if luz_carregada.is_empty() or int(luz_carregada.ate) <= world.clock.tick:
+	if luz_carregada.is_empty() or (int(luz_carregada.ate) >= 0 and int(luz_carregada.ate) <= world.clock.tick):
 		return 0
 	return int(luz_carregada.raio)
+
+
+func escuridao_ativa() -> Dictionary:
+	if escuridao_carregada.is_empty() or int(escuridao_carregada.ate) <= world.clock.tick:
+		return {}
+	return escuridao_carregada
 
 
 ## Consome uma porção abençoada do item, se houver uma valendo. Chamado ao comer.
@@ -443,7 +479,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate()}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -454,3 +490,4 @@ func from_dict(d: Dictionary) -> void:
 	protecao_detectar = (d.get("protecao_detectar", {}) as Dictionary).duplicate()
 	abencoados = (d.get("abencoados", {}) as Dictionary).duplicate(true)
 	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()
+	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()

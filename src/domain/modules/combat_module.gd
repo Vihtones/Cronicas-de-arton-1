@@ -158,6 +158,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["você não tem " + str(act.get("item", ""))])
 				if act.get("type", "") == "agua_benta" and (st == null or not st.has_item("agua_benta")):
 					return PackedStringArray(["você não tem água benta"])
+				if act.get("type", "") == "cast" and act.get("spell", "") == "luz" and (act.get("aprimoramentos", []) as Array).has(2) and int(world.player.gold) < 50:
+					return PackedStringArray(["faltam T$ 50 de pó de rubi"])
 			var g := GhostPlanner.simulate(sim, "player", actions)
 			if not g.valid:
 				return PackedStringArray(["plano inválido: " + str(g.steps[-1].reason)])
@@ -410,6 +412,9 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	var magia_p = world.module("magia")
 	if magia_p != null and magia_p.luz_ativa() > 0:
 		world.player_sheet.add_efeito("luz_carregada", "fonte_luz", magia_p.luz_ativa(), "cena")   # tocha acesa ou chama
+	if magia_p != null and not magia_p.escuridao_ativa().is_empty():
+		var esc_c: Dictionary = magia_p.escuridao_ativa()
+		world.player_sheet.add_efeito("magia.escuridao", "fonte_escuridao", int(esc_c.raio), "cena", "total" if bool(esc_c.total) else "leve")
 	if magia_p != null and not magia_p.podas.is_empty():
 		sim.add_zona("poda_mundo", magia_p.tiles_podados(), "poda", -1, "controlar_plantas")   # vegetação podada antes
 	active = true
@@ -1452,6 +1457,128 @@ func _reacao_arma_espiritual(atacante: String, alvo: String, ranged: bool, out: 
 	_golpe_arma_espiritual(alvo, atacante, out)
 
 
+## Luz e Escuridão (universais 1). Ver o cabeçalho de cada ramo; Luz anula Escuridão e Escuridão anula Luz.
+func _luz_ou_escuridao(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var luz: bool = str(a.spell) == "luz"
+	var cd := spell_dc(sh, a)
+	var alvo: String = a.get("target", "")
+	var alvo_c: bool = sim.combatants.has(alvo) and not a.get("no_chao", false)
+	var dur := "permanente" if luz and apr.has(2) else ("dia" if (luz and apr.has(1)) or (not luz and apr.has(3)) else "cena")
+	var ate := world.day_index() + 1 if dur == "dia" else -1
+	if dur == "permanente" and id == "player":
+		out.append(fact("GOLD_CHANGED", {"delta": -50, "reason": "pó de rubi"}))
+	# versões em criatura
+	if luz and apr.has(3):
+		# arcana: nos olhos do alvo; ofuscado pela cena (não afeta cegos). Vontade anula.
+		var ts3: CharacterSheet = sim.c(alvo).sheet
+		if not ts3.has_effective_condition(world.rules, "cego") and not _resiste(alvo, "vontade", cd, out):
+			sim.add_condicao(alvo, "ofuscado", 0, "luz")
+		return out
+	if luz and apr.has(6):
+		# divina: halo de luz no alvo tocado: +10 em Diplomacia e redução de trevas 10.
+		var ts6: CharacterSheet = sim.c(alvo).sheet
+		ts6.add_efeito("magia.luz", "pericia_diplomacia", 10, "cena")
+		ts6.add_efeito("magia.luz", "rd", 10, "cena", "trevas")
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo, "buff": "halo_de_luz", "tags": ["magia"]}, [id, alvo]))
+		return out
+	if not luz and apr.has(2):
+		# nos olhos do alvo: Fortitude parcial; cego pela cena ou, se passar, por 1 rodada.
+		var passou := _resiste(alvo, "fortitude", cd, out)
+		sim.add_condicao(alvo, "cego", 1 if passou else 0, "escuridao")
+		return out
+	if not luz and apr.has(4):
+		# pessoal: coberto de sombras, +10 em Furtividade e camuflagem leve.
+		sh.add_efeito("magia.escuridao", "pericia_furtividade", 10, "cena")
+		sh.add_efeito("magia.escuridao", "camuflagem_sombras", 1, "cena")
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "sombras", "tags": ["magia"]}, [id]))
+		return out
+	if luz and apr.has(4):
+		# arcana: 4 globos (alcance longo), cada um ilumina como tocha; quem divide o espaço com um fica ofuscado e visível.
+		var i := 0
+		for q in a.get("tiles", []).slice(0, 4):
+			var tq := Vector2i(int(q[0]), int(q[1])) if q is Array else q as Vector2i
+			sim.add_zona("globo_%s_%d" % [id, i], [tq], "globo_luz", -1, "luz", {"conjurador": id})
+			sim.add_zona("globo_%s_%d_luz" % [id, i], Area.esfera(tq, Area.quadrados(9.0)), "luz", -1, "luz", {"conjurador": id, "magica": true})
+			i += 1
+		_anular_oposta(true, Area.esfera(sim.c(id).tile, 0), out)
+		return out
+	var raio := Area.quadrados(6.0 + (3.0 * apr.count(0) if luz else 1.5 * apr.count(0)))
+	if alvo_c:
+		# objeto carregado por uma criatura (involuntária: Vontade anula)
+		if sim.is_enemy(id, alvo) and _resiste(alvo, "vontade", cd, out):
+			return out
+		var ts: CharacterSheet = sim.c(alvo).sheet
+		if luz:
+			ts.add_efeito("magia.luz", "fonte_luz", raio, dur, "magica", ate)
+			if apr.has(5):
+				ts.add_efeito("magia.luz", "fonte_luz_solar", raio, dur, id, ate)
+		else:
+			ts.add_efeito("magia.escuridao", "fonte_escuridao", raio, dur, "total" if apr.has(1) else "leve", ate)
+		_anular_oposta(luz, Area.esfera(sim.c(alvo).tile, raio), out)
+	else:
+		var centro: Vector2i = a.get("tile", sim.c(id).tile)
+		var tiles := Area.esfera(centro, raio)
+		if luz:
+			sim.add_zona("luz_%d" % sim.zonas.size(), tiles, "luz", -1, "luz", {"conjurador": id, "magica": true, "solar": apr.has(5)})
+		else:
+			sim.add_zona("escuridao_%d" % sim.zonas.size(), tiles, "escuridao", -1, "escuridao", {"conjurador": id, "total": apr.has(1)})
+		_anular_oposta(luz, tiles, out)
+	out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo, "buff": str(a.spell), "tags": ["magia"]}, [id]))
+	return out
+
+
+## Teste de resistência com a reação de Premonição; devolve se passou.
+func _resiste(alvo: String, pericia: String, cd: int, out: Array) -> bool:
+	var sv := Checks.skill(sim.c(alvo).sheet, pericia, cd, world.rules, world.rng, "combat")
+	sv = _pos_teste(alvo, sv, cd, out)
+	return sv.get("success", false)
+
+
+## Luz anula Escuridão (e vice-versa): a magia oposta que se sobrepõe à área nova se dissipa.
+func _anular_oposta(luz: bool, area: Array, out: Array) -> void:
+	var tipo_z := "escuridao" if luz else "luz"
+	for z in sim.zonas.duplicate(true):
+		if str(z.tipo) == tipo_z and str(z.fonte) == tipo_z and _alguma_em(z.tiles, area):
+			sim.remove_zona(str(z.id))
+			out.append(fact("SPELL_ENDED", {"spell": tipo_z, "reason": "anulada"}, []))
+	var stat := "fonte_escuridao" if luz else "fonte_luz"
+	for cid in sim.combatants:
+		var s: CharacterSheet = sim.c(cid).sheet
+		for e in s.efeitos.duplicate():
+			if e.stat == stat and str(e.id) == "magia." + tipo_z and _alguma_em(Area.esfera(sim.c(cid).tile, int(e.bonus)), area):
+				s.remove_efeito("magia." + tipo_z)
+				out.append(fact("SPELL_ENDED", {"spell": tipo_z, "target": cid, "reason": "anulada"}, [cid]))
+				break
+
+
+## Luz cálida (aprimoramento divino) no início do turno: aliados do conjurador na luz estabilizam e ficam imunes a
+## sangrando; inimigos ficam ofuscados (e quem tem sensibilidade a luz sofre como sob o sol).
+func _luz_solar(id: String, facts: Array) -> void:
+	var x: Dictionary = sim.c(id)
+	var conj := ""
+	for z in sim.zonas:
+		if str(z.tipo) == "luz" and bool(z.get("dados", {}).get("solar", false)) and (z.tiles as Array).has(x.tile):
+			conj = str(z.dados.conjurador)
+	for cid in sim.combatants:
+		for e in sim.c(cid).sheet.efeitos:
+			if e.stat == "fonte_luz_solar" and CombatSim.cheb(sim.c(cid).tile, x.tile) <= int(e.bonus) and sim.c(cid).sheet.efeito_bonus("fonte_oculta") <= 0:
+				conj = str(e.tipo)
+	if conj == "" or not sim.combatants.has(conj):
+		return
+	var s: CharacterSheet = x.sheet
+	if not sim.is_enemy(conj, id):
+		s.add_efeito("magia.luz", "imune", 1, "rodada", "sangrando")
+		s.remove_condition("sangrando")
+		if s.is_down():
+			s.stable = true
+	else:
+		sim.add_condicao(id, "ofuscado", 1, "luz")
+		facts.append(fact("BUFF_APPLIED", {"actor": conj, "target": id, "buff": "ofuscado", "tags": ["magia", "luz"]}, [conj, id]))
+
+
 func _criar_elementos(id: String, a: Dictionary) -> Array:
 	var out: Array = []
 	var sh: CharacterSheet = sim.c(id).sheet
@@ -1829,6 +1956,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
 	_perigos_inicio_de_turno(id, facts)
+	_luz_solar(id, facts)
 	_resolver_conjuracao(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
@@ -2001,6 +2129,26 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			if r_x.get("success", false):
 				_soltar(id, marca_x)
 			out.append(fact("ESCAPE_ATTEMPT", {"actor": id, "skill": pericia_x, "check": r_x, "success": r_x.get("success", false)}, [id]))
+		"mover_globos":
+			# Luz (globos, aprimoramento arcano): uma vez por rodada, ação livre, os globos vão a outros quadrados.
+			(sim.c(id).flags as Array).append("globos_%d" % sim.round_no)
+			var novos: Array = a.get("tiles", [])
+			var i_g := 0
+			for z in sim.zonas.duplicate(true):
+				if str(z.tipo) == "globo_luz" and str(z.get("dados", {}).get("conjurador", "")) == id and i_g < novos.size():
+					var tg_g := Vector2i(int(novos[i_g][0]), int(novos[i_g][1]))
+					sim.add_zona(str(z.id), [tg_g], "globo_luz", -1, "luz", z.dados)
+					sim.add_zona(str(z.id) + "_luz", Area.esfera(tg_g, Area.quadrados(9.0)), "luz", -1, "luz", {"conjurador": id, "magica": true})
+					i_g += 1
+			out.append(fact("GLOBES_MOVED", {"actor": id, "count": i_g}, [id]))
+		"guardar_fonte":
+			# Guardar (ou revelar) o objeto que emite Luz ou Escuridão: ação de movimento.
+			var sh_g: CharacterSheet = sim.c(id).sheet
+			if sh_g.efeito_bonus("fonte_oculta") > 0:
+				sh_g.remove_efeito_stat("fonte_oculta")
+			else:
+				sh_g.add_efeito("fonte_oculta", "fonte_oculta", 1, "cena")
+			out.append(fact("LIGHT_TOGGLED", {"actor": id, "oculta": sh_g.efeito_bonus("fonte_oculta") > 0}, [id]))
 		"arma_espiritual":
 			var i_ae := sim.arma_espiritual_livre(id)
 			(sim.c(id).flags as Array).append("ae_atk_%d" % i_ae)
@@ -2159,6 +2307,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"luz", "escuridao":
+			out.append_array(_luz_ou_escuridao(id, a))
 		"criar_elementos":
 			# Criar Elementos (divina 1): porção real de um elemento (LB p.187). Água: enche um recipiente (item frasco com
 			# água). Ar: vento num quadrado: tira fumaça e afasta a névoa por uma rodada. Fogo: chama que ilumina como uma

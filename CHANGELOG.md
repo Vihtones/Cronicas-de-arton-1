@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Luz e Escuridão (universais, 1º círculo) completas: luz de 6m num objeto carregado ou num ponto (Vontade anula em objeto de involuntário), +3m, um dia, permanente com pó de rubi, olhos (ofuscado) e globos para arcanos, luz solar (aliados estabilizam e não sangram, inimigos ofuscados) e halo (+10 Diplomacia, RD trevas 10) para divinos; escuridão leve de 6m (+1,5m), total que bloqueia a visão, olhos (cego), um dia e sombras pessoais (+10 Furtividade, camuflagem leve). Luz natural não ilumina as sombras; uma anula a outra. O catálogo da Luz tinha quatro aprimoramentos colados num só; foram separados, com a marca "apenas" de tradição.
+
 - Criar Elementos (divina, 1º círculo) completa: água enche um recipiente, ar tira fumaça e afasta a névoa por uma rodada, fogo ilumina como tocha (na palma ou num quadrado, onde queima com 1d6 e pode deixar em chamas), terra cria um cubo; aprimoramentos de quantidade, arremesso de água ou terra (2d4 +1 passo por tamanho) e +1d6 de fogo. Com ela, todas as divinas de 1º círculo estão completas.
 - Luz (LB p.158): tochas acendem pelo diário (9m, uma cena) e quem carrega luz ou está numa área iluminada não tem a camuflagem da noite. No combate, magias de quadrado aceitam clique em quadrado vazio, e as magias pessoais passam a levar aprimoramentos e truque; T escolhe o elemento.
 

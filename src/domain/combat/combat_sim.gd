@@ -168,13 +168,50 @@ static func ataque_efetivo(rules: RuleRegistry, sheet: CharacterSheet, atk: Dict
 ## Luz (LB p.158 e p.318): quadrado iluminado por zona de luz ou por quem carrega luz (efeito "fonte_luz", raio em
 ## quadrados: tocha, chama de Criar Elementos). Na luz, a escuridão da noite não dá camuflagem.
 func iluminado(t: Vector2i) -> bool:
+	if escuridao_em(t) != "":
+		return false   # as sombras mágicas não são iluminadas por luz natural (e a Luz que as anularia já as dissipou)
 	if zona_em(t, "luz"):
 		return true
 	for id in combatants:
 		var raio := int(c(id).sheet.efeito_bonus("fonte_luz"))
-		if raio > 0 and cheb(c(id).tile, t) <= raio:
+		if raio > 0 and cheb(c(id).tile, t) <= raio and c(id).sheet.efeito_bonus("fonte_oculta") <= 0:
 			return true
 	return false
+
+
+## Escuridão (magia): "" sem escuridão mágica, "leve" ou "total". Zona "escuridao" ou quem carrega o objeto que a emana
+## (efeito "fonte_escuridao": raio; tipo "total" ou "leve"). O objeto guardado (efeito "fonte_oculta") não emana.
+func escuridao_em(t: Vector2i) -> String:
+	var nivel := ""
+	for z in zonas:
+		if z.tipo == "escuridao" and (z.tiles as Array).has(t):
+			nivel = "total" if bool(z.get("dados", {}).get("total", false)) else maxs_nivel(nivel, "leve")
+	for id in combatants:
+		var sh: CharacterSheet = c(id).sheet
+		if sh.efeito_bonus("fonte_oculta") > 0:
+			continue
+		for e in sh.efeitos:
+			if e.stat == "fonte_escuridao" and cheb(c(id).tile, t) <= int(e.bonus):
+				nivel = "total" if str(e.tipo) == "total" else maxs_nivel(nivel, "leve")
+	return nivel
+
+
+static func maxs_nivel(a: String, b: String) -> String:
+	return "total" if a == "total" or b == "total" else (b if b != "" else a)
+
+
+## Falha por escuridão mágica entre atacante e alvo: total bloqueia a visão na área e através dela; leve, só no alvo.
+## Quem está num globo de Luz (aprimoramento arcano) tem a silhueta visível: sem camuflagem por escuridão.
+func falha_escuridao(attacker: String, target: String) -> int:
+	var t_tile: Vector2i = c(target).tile
+	if zona_em(t_tile, "globo_luz"):
+		return 0
+	for t in tiles_entre(c(attacker).tile, t_tile):
+		if escuridao_em(t) == "total":
+			return int(rules.value("situacao.camuflagem_total").falha_pct)
+	if escuridao_em(t_tile) == "leve":
+		return int(rules.value("situacao.camuflagem_leve").falha_pct)
+	return 0
 
 
 ## Arma Espiritual: índice de uma arma livre para contra-atacar ou atacar nesta rodada, ou -1. Cada arma age uma vez
@@ -434,10 +471,13 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)   # Escudo da Fé (camuflagem leve)
 	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
 	var sees_dark: bool = sheet.senses.has("visao_penumbra")
-	if (env.get("darkness", false) and not sees_dark and not iluminado(T.tile)) or env.get("fog", false):
+	if (env.get("darkness", false) and not sees_dark and not iluminado(T.tile) and not zona_em(T.tile, "globo_luz")) or env.get("fog", false):
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
 	miss_chance = maxi(miss_chance, falha_nevoa(attacker, target))
+	miss_chance = maxi(miss_chance, falha_escuridao(attacker, target))
+	if T.sheet.efeito_bonus("camuflagem_sombras") > 0 and not zona_em(T.tile, "globo_luz"):
+		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # Escuridão (pessoal)
 	if zona_em(T.tile, "fumaca"):
 		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # fumaça densa (LB p.318)
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)

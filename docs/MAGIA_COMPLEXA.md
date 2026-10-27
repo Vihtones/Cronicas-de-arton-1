@@ -48,6 +48,9 @@ versões de magia que agem no mundo (`FORA_DE_COMBATE`); guarda os cadáveres pr
 
 Terreno: o mapa marca `natural` e `solo` por tipo de quadrado. Rastrear (LB p.123) é `Checks.cd_rastrear`; ao fugir de
 um combate, inimigos treinados em Sobrevivência tentam seguir os rastros e alcançam o jogador (`_tentar_rastrear`).
+Escuridão mágica: `CombatSim.escuridao_em` (zona `escuridao` ou efeito `fonte_escuridao`), `falha_escuridao`; luz natural não
+ilumina sombras; Luz e Escuridão se anulam (`_anular_oposta`). Aprimoramentos "Apenas Arcanos/Divinos" usam `apenas` no
+catálogo e a tradição da classe. Pendente de interface: guardar o objeto (ação `guardar_fonte`) e mover globos (`mover_globos`).
 Luz (LB p.158, p.318): `CombatSim.iluminado` (zona `luz` ou efeito `fonte_luz` de quem carrega); tocha acesa e chama
 na palma ficam em `SpellsModule.luz_carregada` pela cena. A escuridão da noite não vale em quadrado iluminado.
 Comida (LB p.161): itens com `alimento`; `UseItem` come (bônus de alimentação, um por dia); água benta é item e ação
@@ -100,7 +103,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
   servo_divino, viagem_arborea.
 - Divinas de 4º círculo (4): conceder_milagre, controlar_o_clima, cupula_de_repulsao, terremoto.
 - Divinas de 5º círculo (4): furia_do_panteao, intervencao_divina, reanimacao_impura, segunda_chance.
-- Universais de 1º círculo (5): aviso, compreensao, escuridao, luz, visao_mistica. (Névoa feita, com terreno de água.)
+- Universais de 1º círculo (3): aviso, compreensao, visao_mistica. (Névoa, Luz e Escuridão feitas.)
 - Universais de 2º círculo (4): conjurar_mortos_vivos, dissipar_magia, marca_da_obediencia, runa_de_protecao.
 - Universais de 3º círculo (7): imobilizar, lendas_e_historias, manto_de_sombras, pele_de_pedra, selo_de_mana,
   servo_morto_vivo, videncia.
