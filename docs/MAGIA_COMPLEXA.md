@@ -45,6 +45,10 @@ Resolvido nesta fase: execução longa (`CombatSim.conjurando`, Banimento), conc
 execução, ritual de um dia (`CombatModule.processar_rituais_do_dia`, Lágrimas de Wynna), registro de magias
 ativas por escola (dissipar), reação após teste (Premonição) e condições com efeito no combate.
 
+## Escopo decidido
+
+O objetivo é implementar todas as magias do catálogo (divinas e universais de 1º ao 5º círculo, e as arcanas). A água entra no escopo: aprimoramentos 'sob a água' e similares devem ser implementados sobre o terreno aquático do combate, e nenhuma magia entra em `SpellRules.COMPLETAS` sem todos os aprimoramentos.
+
 ## Restante do catálogo (triagem)
 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
