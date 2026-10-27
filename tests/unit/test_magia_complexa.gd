@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -964,3 +964,86 @@ func test_banimento_itens_opostos_somam_2_na_cd() -> void:
 	var a := {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"], "itens_opostos": 2}
 	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
 	eq(sim.conjurando["player"].cd, base + 4, "cada item que se opõe soma +2 na CD")
+
+
+# --- Guardião Divino (4º círculo): elemental de luz com ação própria -------------------------
+func _invocar_guardiao(m: Array) -> String:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "guardiao_divino", "target": "player", "targets": ["player"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	for id in sim.combatants:
+		if sim.c(id).flags.has("guardiao"):
+			return id
+	return ""
+
+
+func test_guardiao_divino_exige_circulo_4() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(12)[2], "player", {"type": "cast", "spell": "guardiao_divino", "target": "player", "targets": ["player"]}).ok, "nível 12 não lança magia de 4º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(13)[2], "player", {"type": "cast", "spell": "guardiao_divino", "target": "player", "targets": ["player"]}).ok, "nível 13 lança o Guardião Divino")
+
+
+func test_guardiao_divino_invoca_elemental_com_100_de_luz_e_incorporeo() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	var gid := _invocar_guardiao(m)
+	check(gid != "", "o elemental entra na cena")
+	eq(sim.c(gid).sheet.efeito_bonus("luz"), 100, "o elemental começa com 100 pontos de luz")
+	check(sim.c(gid).flags.has("incorporeo"), "o elemental é incorpóreo")
+
+
+func test_guardiao_divino_e_imune_a_dano() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	var gid := _invocar_guardiao(m)
+	var pv_antes: int = sim.c(gid).sheet.pv
+	sim.apply_damage(gid, 50)
+	eq(sim.c(gid).sheet.pv, pv_antes, "dano não afeta o elemental incorpóreo")
+
+
+func test_guardiao_divino_cura_o_aliado_mais_ferido_gastando_luz() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var gid := _invocar_guardiao(m)
+	sim.c("player").sheet.pv = 900   # faltam 99 PV (pv_max 999)
+	c._turno_guardiao(gid)
+	eq(sim.c("player").sheet.pv, 999, "o elemental cura 1 PV por ponto de luz")
+	eq(sim.c(gid).sheet.efeito_bonus("luz"), 1, "a luz gasta é descontada: restam 1 ponto")
+
+
+func test_guardiao_divino_remove_condicao_por_3_pontos() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var gid := _invocar_guardiao(m)
+	sim.c("bandido_1").side = "player"   # aliado, sem PV faltando
+	sim.c("bandido_1").sheet.add_condition("cego", m[3])
+	c._turno_guardiao(gid)
+	check(not sim.c("bandido_1").sheet.conditions.has("cego"), "o elemental remove a condição da lista")
+	eq(sim.c(gid).sheet.efeito_bonus("luz"), 97, "remover uma condição custa 3 pontos de luz")
+
+
+func test_guardiao_divino_voa_ate_o_aliado_distante() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var gid := _invocar_guardiao(m)
+	sim.c("bandido_1").side = "player"
+	sim.c("bandido_1").tile = Vector2i(40, 57)   # bem fora do alcance curto do elemental
+	sim.c("bandido_1").sheet.pv = 500
+	c._turno_guardiao(gid)
+	check(CombatSim.cheb(sim.c(gid).tile, Vector2i(40, 57)) <= 6, "o elemental voa até alcance curto do aliado")
+	eq(sim.c("bandido_1").sheet.pv, 600, "o aliado distante recebe 100 PV, o que a luz permite")
+	check(sim.c("bandido_1").sheet.pv > 500, "o aliado distante recebe a cura")
+
+
+func test_guardiao_divino_se_desfaz_sem_luz() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var gid := _invocar_guardiao(m)
+	sim.c("player").sheet.pv = 899   # faltam 100: gasta toda a luz
+	c._turno_guardiao(gid)
+	eq(sim.c(gid).sheet.efeito_bonus("luz"), 0, "a luz zera")
+	check(sim.c(gid).flags.has("fora") and not sim.conscious(gid), "sem luz, o elemental sai da cena")

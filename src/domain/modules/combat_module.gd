@@ -435,7 +435,10 @@ func _run_until_player() -> Array:
 		if not start.skip:
 			if id == "player":
 				return out
-			out.append_array(_ai_turn(id))
+			if sim.c(id).flags.has("guardiao"):
+				out.append_array(_turno_guardiao(id))
+			else:
+				out.append_array(_ai_turn(id))
 			end = _check_end()
 			if not end.is_empty():
 				out.append_array(end)
@@ -454,6 +457,9 @@ const RAIO_AURA_QUADRADOS := 6
 ## Raio da Aura Divina: 9m (LB p.182), com 1 quadrado = 1,5m. Condições que a aura pode impor (a escolha do conjurador).
 const RAIO_AURA_DIVINA_QUADRADOS := 6
 const ALCANCE_CURTO_QUADRADOS := 6   # alcance curto: 9m
+const LUZ_GUARDIAO := 100            # pontos de luz do Guardião Divino (LB p.194)
+const CONDICOES_GUARDIAO := ["abalado", "apavorado", "alquebrado", "atordoado", "cego", "confuso", "debilitado", "enjoado",
+	"esmorecido", "exausto", "fascinado", "fatigado", "fraco", "frustrado", "ofuscado", "pasmo", "sangrando", "surdo", "vulneravel"]
 const CONDICOES_AURA_DIVINA := ["esmorecido", "debilitado", "lento"]
 
 
@@ -553,6 +559,94 @@ func _condicao_aura(hs: CharacterSheet) -> String:
 		if e.id == "magia.aura_divina" and e.stat == "condicao":
 			return str(e.tipo)
 	return "esmorecido"
+
+
+## Guardião Divino: no próprio turno, o elemental voa (18m) até o aliado mais ferido, se preciso, e gasta luz:
+## 1 ponto por PV curado, 3 pontos por condição da lista removida. Quando a luz acaba, sai da cena.
+func _turno_guardiao(id: String) -> Array:
+	var out: Array = []
+	var me: Dictionary = sim.c(id)
+	var luz := _luz_guardiao(id)
+	var aliados: Array = []
+	for a in sim.combatants:
+		if a != id and sim.c(a).side == me.side and sim.conscious(a):
+			aliados.append(a)
+	var alvo := ""
+	var pior := 0
+	for a in aliados:
+		var falta := int(sim.c(a).sheet.pv_max) - int(sim.c(a).sheet.pv)
+		if falta > pior:
+			pior = falta
+			alvo = a
+	if alvo == "":
+		for a in aliados:
+			if not _condicoes_do_guardiao(sim.c(a).sheet).is_empty() and luz >= 3:
+				alvo = a
+				break
+	if alvo == "":
+		return out
+	if CombatSim.cheb(me.tile, sim.c(alvo).tile) > ALCANCE_CURTO_QUADRADOS:
+		var de: Vector2i = me.tile
+		var para := _tile_voo(de, sim.c(alvo).tile)
+		if para != de:
+			me.tile = para
+			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [de.x, de.y], "path": [[para.x, para.y]], "flying": true}, [id]))
+	for a in aliados:
+		if CombatSim.cheb(me.tile, sim.c(a).tile) > ALCANCE_CURTO_QUADRADOS:
+			continue
+		var sh: CharacterSheet = sim.c(a).sheet
+		var falta_a := int(sh.pv_max) - int(sh.pv)
+		if falta_a > 0 and luz > 0:
+			var gasto := mini(falta_a, luz)
+			var curado := sh.curar(gasto)
+			luz -= gasto
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": a, "buff": "guardiao_divino", "cura": curado, "luz_restante": luz, "tags": ["magia"]}, [id, a]))
+		for cond in _condicoes_do_guardiao(sh):
+			if luz < 3:
+				break
+			sh.remove_condition(cond)
+			luz -= 3
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": a, "buff": "guardiao_divino", "condicao_removida": cond, "luz_restante": luz, "tags": ["magia"]}, [id, a]))
+	me.sheet.add_efeito("magia.guardiao_divino", "luz", luz, "cena")
+	if luz <= 0:
+		me.flags.append("fora")   # sem luz, o elemental se desfaz
+		out.append(fact("BUFF_APPLIED", {"actor": id, "buff": "guardiao_divino", "efeito": "encerrado", "tags": ["magia"]}, [id]))
+	return out
+
+
+func _luz_guardiao(id: String) -> int:
+	return sim.c(id).sheet.efeito_bonus("luz")
+
+
+func _condicoes_do_guardiao(sh: CharacterSheet) -> Array:
+	var r: Array = []
+	for cond in CONDICOES_GUARDIAO:
+		if sh.conditions.has(cond):
+			r.append(cond)
+	return r
+
+
+## Quadrado livre a até 12 quadrados (18m de voo) de `origem` e a alcance curto de `alvo`, o mais perto possível de `origem`.
+func _tile_voo(origem: Vector2i, alvo: Vector2i) -> Vector2i:
+	var melhor := origem
+	var melhor_d := 999
+	for dx in range(-12, 13):
+		for dy in range(-12, 13):
+			var t := origem + Vector2i(dx, dy)
+			if CombatSim.cheb(t, alvo) > ALCANCE_CURTO_QUADRADOS or not sim.walk_fn.call(t):
+				continue
+			var ocupado := false
+			for oid in sim.combatants:
+				if sim.c(oid).tile == t and sim.conscious(oid):
+					ocupado = true
+					break
+			if ocupado:
+				continue
+			var d := CombatSim.cheb(t, origem)
+			if d < melhor_d:
+				melhor_d = d
+				melhor = t
+	return melhor
 
 
 ## Fim da execução do Banimento (no início do turno do conjurador): alvo fora de alcance ou já fora da cena não é afetado.
@@ -1342,6 +1436,14 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					"pv_after": ts_cz.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": passou_cz, "tags": tags_cz}, [id, tg_cz]))
 			if apr_cz.has(2):
 				_dissipar_na_area(tiles_cz, "Necromancia", out)
+		"guardiao_divino":
+			# Guardião Divino (4º círculo): invoca um elemental de luz (Pequeno, incorpóreo, 100 pontos de luz). Ele age
+			# uma vez por rodada no próprio turno (`_turno_guardiao`) e termina quando a luz acaba.
+			var guardiao := invocar(id, "criatura.elemental_de_luz", -1, "guardiao_divino")
+			sim.c(guardiao).flags.append("guardiao")
+			sim.c(guardiao).flags.append("incorporeo")
+			sim.c(guardiao).sheet.add_efeito("magia.guardiao_divino", "luz", LUZ_GUARDIAO, "cena")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": guardiao, "buff": "guardiao_divino", "luz": LUZ_GUARDIAO, "tags": ["magia"]}, [id, guardiao]))
 		"banimento":
 			# Banimento (3º círculo): execução de 1d3+1 rodadas (`_resolver_conjuracao`). Concentração: ser ferido enquanto
 			# conjura exige Vontade com CD igual ao dano. Itens que se opõem ao alvo somam +2 na CD (`itens_opostos`).

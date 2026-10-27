@@ -374,6 +374,8 @@ func ligacao_de(conj: String) -> Dictionary:
 func _dano_bruto(target: String, amount: int) -> Array:
 	var T := c(target)
 	var s: CharacterSheet = T.sheet
+	if T.flags.has("incorporeo"):
+		return []   # elemental incorpóreo (Guardião Divino): imune a dano
 	if s.has_effective_condition(rules, "petrificado"):
 		amount = maxi(0, amount - 8)   # petrificado: redução de dano 8 (LB p.394)
 	var link := _link_de(target)

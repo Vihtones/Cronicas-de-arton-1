@@ -145,6 +145,38 @@
    "pdf_page": 122,
    "status": "VERIFICADA",
    "nota": "Reconferido com layout preservado (pdftotext -layout). ND pressupõe grupo de 4."
+  },
+  {
+   "id": "criatura.elemental_de_luz",
+   "valor": {
+    "nome": "Elemental de Luz (Guardião Divino)",
+    "nd": "—",
+    "tipo": "elemental",
+    "tamanho": "pequeno",
+    "iniciativa": 0,
+    "percepcao": 0,
+    "defesa": 10,
+    "fort": 0,
+    "ref": 0,
+    "von": 0,
+    "pv": 1,
+    "deslocamento_m": 18,
+    "ataques": [],
+    "atributos": {
+     "for": 0,
+     "des": 0,
+     "con": 0,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {}
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano), Guardião Divino (pág. 194)",
+   "pagina": 194,
+   "pdf_page": 200,
+   "status": "ADAPTADA",
+   "nota": "O livro traz só o tamanho (Pequeno) e as capacidades; os valores de combate são adaptados. Incorpórea: imune a dano."
   }
  ]
 }
