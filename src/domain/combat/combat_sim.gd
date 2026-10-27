@@ -396,6 +396,41 @@ func trim_path(mover: String, path: Array, budget_sq: int) -> Array:
 
 
 ## --- Ataque (LB p.230-239) ----------------------------------------------------
+## Chamas (Controlar Fogo): fontes de fogo mundanas ou criadas — fogo de Criar Elementos ou modelado (zona com
+## dados.chama), tocha ou chama na palma carregada (efeito fonte_luz não mágico) e criatura em chamas.
+## Devolve "zona:<id>", "portador:<id>", "em_chamas:<id>" ou "" para o quadrado.
+const CHAMAS_CARREGADAS := ["luz_carregada", "magia.criar_elementos"]
+
+
+func chama_em(t: Vector2i) -> String:
+	for z in zonas:
+		var cz: Array = z.get("dados", {}).get("centro", [])
+		if bool(z.get("dados", {}).get("chama", false)) and cz.size() == 2 and Vector2i(int(cz[0]), int(cz[1])) == t:
+			return "zona:" + str(z.id)
+	var occ := occupant(t)
+	if occ == "":
+		return ""
+	if c(occ).sheet.efeitos.any(func(e): return e.stat == "fonte_luz" and CHAMAS_CARREGADAS.has(str(e.id))):
+		return "portador:" + occ
+	if c(occ).sheet.conditions.has("em_chamas"):
+		return "em_chamas:" + occ
+	return ""
+
+
+## Quadrado atual de uma chama ("" se ela se apagou).
+func tile_da_chama(ref: String) -> Variant:
+	var id := ref.get_slice(":", 1)
+	if ref.begins_with("zona:"):
+		for z in zonas:
+			if str(z.id) == id:
+				var cz: Array = z.dados.centro
+				return Vector2i(int(cz[0]), int(cz[1]))
+		return null
+	if combatants.has(id) and chama_em(c(id).tile) == ref:
+		return c(id).tile
+	return null
+
+
 ## Alcance natural corpo a corpo em quadrados (1 = adjacente); efeitos "alcance_corpo" somam (Soco de Arsenal).
 func alcance_corpo(id: String) -> int:
 	return 1 + int(c(id).sheet.efeito_bonus("alcance_corpo"))
@@ -515,7 +550,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	miss_chance = maxi(miss_chance, falha_escuridao(attacker, target))
 	if T.sheet.efeito_bonus("camuflagem_sombras") > 0 and not zona_em(T.tile, "globo_luz"):
 		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # Escuridão (pessoal)
-	if zona_em(T.tile, "fumaca"):
+	if zona_em(T.tile, "fumaca") or zona_em(T.tile, "fumaca_leve"):
 		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # fumaça densa (LB p.318)
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
 	if mods.any(func(m): return m[0] == "ataque poderoso"): avg += 5

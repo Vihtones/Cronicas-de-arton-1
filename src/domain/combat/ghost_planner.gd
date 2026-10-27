@@ -164,6 +164,29 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]
+			if sp_id == "controlar_fogo":
+				var curto_f := int(sim.rules.value("alcance.quadrados", {}).get("curto", 6))
+				if apr.has(2):
+					var TF := sim.c(a.get("target", ""))
+					if TF.is_empty() or not SpellRules.criatura_de_fogo(sim.rules, TF.sheet): return {"ok": false, "reason": "o alvo precisa ser uma criatura de fogo"}
+				else:
+					var ef := "labaredas" if apr.has(0) else str(a.get("efeito", ""))
+					if not apr.has(0) and not SpellRules.EFEITOS_FOGO.has(ef): return {"ok": false, "reason": "escolha: chamejar, esquentar, extinguir ou modelar"}
+					if ef == "chamejar":
+						if apr.has(1): return {"ok": false, "reason": "o aumento de dano não vale para chamejar"}
+						for tg_f in a.get("targets", [a.get("target", "")]):
+							if not sim.combatants.has(tg_f) or CombatSim.cheb(A.tile, sim.c(tg_f).tile) > curto_f: return {"ok": false, "reason": "arma fora do alcance"}
+						targets = []
+					elif ef == "esquentar":
+						var TE := sim.c(a.get("target", ""))
+						if TE.is_empty(): return {"ok": false, "reason": "escolha quem segura ou veste o objeto"}
+						var obj_e := str(a.get("objeto", "arma"))
+						if not ["arma", "armadura"].has(obj_e) or str(TE.sheet.equipment.get("weapon" if obj_e == "arma" else "armor", "")) == "": return {"ok": false, "reason": "ele não segura nem veste esse objeto"}
+					else:
+						var tc_f: Vector2i = a.get("tile", Vector2i(-1, -1))
+						if sim.chama_em(tc_f) == "": return {"ok": false, "reason": "escolha uma chama"}
+						if CombatSim.cheb(A.tile, tc_f) > curto_f: return {"ok": false, "reason": "chama fora do alcance"}
+						targets = [actor]
 			if sp_id == "augurio" and (apr.has(0) or apr.has(1)): return {"ok": false, "reason": "a consulta à divindade leva minutos: fora de combate"}
 			if sp_id == "condicao" and targets.size() > 5 + apr.count(0): return {"ok": false, "reason": "alvos demais"}
 			if sp_id == "voz_divina":
@@ -403,6 +426,30 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "detectar magia exige ação completa"}
 			if not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Misticismo é somente treinada"}
 			return {"ok": true, "kind": "completa"}
+		"resfriar":
+			# Controlar Fogo (Esquentar): ação completa para resfriar o objeto e cancelar o efeito.
+			if not sim.can_spend("completa"): return {"ok": false, "reason": "resfriar exige ação completa"}
+			if not sim.marcas.any(func(m): return m.alvo == actor and m.tipo == "esquentar"): return {"ok": false, "reason": "nada esquentando"}
+			return {"ok": true, "kind": "completa"}
+		"mover_chama":
+			# Controlar Fogo (Modelar): ação livre, uma vez por rodada, até 9m em qualquer direção.
+			if (A.flags as Array).has("chama_%d" % sim.round_no): return {"ok": false, "reason": "a chama já se moveu nesta rodada"}
+			var zc: Array = sim.zonas.filter(func(z): return str(z.id) == "chama_modelada_" + actor)
+			if zc.is_empty(): return {"ok": false, "reason": "sem chama modelada"}
+			var de_c := Vector2i(int(zc[0].dados.centro[0]), int(zc[0].dados.centro[1]))
+			var para_c: Vector2i = a.get("tile", de_c)
+			if CombatSim.cheb(de_c, para_c) > Area.quadrados(9.0) or CombatSim.cheb(de_c, para_c) == 0: return {"ok": false, "reason": "a chama se move até 9m"}
+			return {"ok": true, "kind": "livre"}
+		"labareda":
+			# Controlar Fogo (Labaredas, sustentada): ação de movimento; alvo em alcance curto a partir da chama.
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			var ml: Array = sim.marcas.filter(func(m): return m.alvo == actor and m.tipo == "labaredas")
+			if ml.is_empty(): return {"ok": false, "reason": "sem labaredas"}
+			var tl = sim.tile_da_chama(str(ml[0].dados.chama))
+			if tl == null: return {"ok": false, "reason": "a chama se apagou"}
+			var TL := sim.c(a.get("target", ""))
+			if TL.is_empty() or TL.sheet.is_dead() or CombatSim.cheb(tl, TL.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "alvo fora do alcance da chama"}
+			return {"ok": true, "kind": "movimento"}
 		"mover_facho":
 			if (A.flags as Array).has("facho_%d" % sim.round_no): return {"ok": false, "reason": "o facho já mudou nesta rodada"}
 			if not sim.zonas.any(func(z): return str(z.id) == "facho_" + actor): return {"ok": false, "reason": "sem facho de luz"}

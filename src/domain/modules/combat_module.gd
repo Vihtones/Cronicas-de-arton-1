@@ -977,8 +977,11 @@ func _zonas_e_marcas_inicio_de_turno(id: String, facts: Array) -> void:
 			continue
 		var dados_m: Dictionary = m.get("dados", {})
 		var conj: String = str(dados_m.get("conjurador", id))
+		if m.tipo == "esquentar" and str(x.sheet.equipment.get("weapon" if str(dados_m.get("objeto", "")) == "arma" else "armor", "")) == "":
+			sim.remove_marca(str(m.id), id)   # largou o objeto que esquentava
+			continue
 		if dados_m.has("dano_inicio_turno"):
-			_efeito_magico_no_turno(id, str(dados_m.dano_inicio_turno), conj, str(m.fonte), facts)
+			_efeito_magico_no_turno(id, str(dados_m.dano_inicio_turno), conj, str(m.fonte), facts, str(dados_m.get("tipo_dano", "")))
 		if dados_m.has("cura_inicio_turno") and sim.conscious(id):
 			var s: CharacterSheet = x.sheet
 			var cura := int(Dice.roll(str(dados_m.cura_inicio_turno), world.rng, "combat").total)
@@ -1702,6 +1705,113 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Controlar Fogo (divina 2, LB p.186): alcance curto, pela cena. Chamejar: armas escolhidas causam +1d6 de fogo
+## (também armas naturais e ataques desarmados). Esquentar: um objeto que alguém segura ou veste causa 1d6 de fogo por
+## rodada a ele (ação completa "resfriar" cancela). Extinguir: apaga uma chama e deixa uma nuvem de fumaça de 3m
+## (camuflagem leve). Modelar: a chama se move 9m por rodada (ação livre "mover_chama"), 2d6 de fogo em quem ela
+## atravessa (uma vez por rodada cada). Aprimoramentos: labaredas (sustentada; ação de movimento "labareda", 4d6,
+## Reflexos reduz à metade); +1d6 (exceto chamejar); criatura de fogo (Fortitude parcial: 0 PV ou 5d6).
+func _controlar_fogo(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var mais := apr.count(1)
+	var cd := spell_dc(sh, a)
+	if apr.has(2):
+		var tg: String = a.get("target", "")
+		if _resiste(tg, "fortitude", cd, out):
+			out.append_array(_dano_de_fogo(id, tg, "%dd6" % (5 + mais), 0, "", "Controlar Fogo"))
+		else:
+			var T: CharacterSheet = sim.c(tg).sheet
+			var tags: Array = ["magia", "fogo"]
+			tags.append_array(sim.apply_damage(tg, maxi(0, T.pv)))
+			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Controlar Fogo", "d20": 0, "mod": 0, "mods": [], "total": 0,
+				"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": 0, "rolls": [], "pv_after": T.pv, "special": false,
+				"ranged": true, "spell": true, "save": "fortitude", "saved": false, "tags": tags}, [id, tg]))
+		return out
+	var ef := "labaredas" if apr.has(0) else str(a.get("efeito", ""))
+	match ef:
+		"chamejar":
+			for tg in a.get("targets", [a.get("target", "")]):
+				var ts: CharacterSheet = sim.c(tg).sheet
+				ts.add_efeito("magia.controlar_fogo", "dano_elemental", 1, "cena", str(ts.equipment.get("weapon", "")) + "|fogo")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "chamejar", "tags": ["magia", "fogo"]}, [id, tg]))
+		"esquentar":
+			var tg_e: String = a.get("target", "")
+			sim.add_marca("esquentar_%s" % id, tg_e, "controlar_fogo", "esquentar", -1, {"dano_inicio_turno": "%dd6" % (1 + mais), "tipo_dano": "fogo",
+				"conjurador": id, "objeto": str(a.get("objeto", "arma"))})
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_e, "buff": "esquentar", "tags": ["magia", "fogo"]}, [id, tg_e]))
+		"extinguir":
+			var t: Vector2i = a.tile
+			_apagar_chama(sim.chama_em(t))
+			sim.add_zona("fumaca_leve_%d" % sim.zonas.size(), Area.esfera(t, Area.quadrados(3.0)), "fumaca_leve", -1, "controlar_fogo")
+			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "controlar_fogo", "efeito": "extinguir", "tile": [t.x, t.y]}, [id]))
+		"modelar":
+			var t2: Vector2i = a.tile
+			_apagar_chama(sim.chama_em(t2))
+			sim.add_zona("chama_modelada_%s" % id, Area.esfera(t2, Area.quadrados(9.0)), "luz", -1, "controlar_fogo",
+				{"chama": true, "centro": [t2.x, t2.y], "conjurador": id, "dados": "%dd6" % (2 + mais)})
+			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "controlar_fogo", "efeito": "modelar", "tile": [t2.x, t2.y]}, [id]))
+		"labaredas":
+			var ref := sim.chama_em(a.tile)
+			sim.add_marca("labaredas_%s" % id, id, "controlar_fogo", "labaredas", -1, {"chama": ref, "dados": 4 + mais, "cd": cd})
+			_iniciar_sustentada(id, "controlar_fogo", out)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "labaredas", "tags": ["magia", "fogo"]}, [id]))
+	return out
+
+
+## Tira a chama de onde está (zona de fogo, tocha ou chama na palma, criatura em chamas).
+func _apagar_chama(ref: String) -> void:
+	var cid := ref.get_slice(":", 1)
+	if ref.begins_with("zona:"):
+		sim.remove_zona(cid)
+	elif ref.begins_with("portador:"):
+		for e in sim.c(cid).sheet.efeitos.duplicate(true):
+			if e.stat == "fonte_luz" and CombatSim.CHAMAS_CARREGADAS.has(str(e.id)):
+				sim.c(cid).sheet.remove_efeito(str(e.id))
+	elif ref.begins_with("em_chamas:"):
+		sim.c(cid).sheet.remove_condition("em_chamas")
+
+
+## Modelar: a chama vai até `para`; quem está no caminho (ou no destino) sofre o dano, uma vez por rodada.
+func _mover_chama(id: String, para: Vector2i) -> Array:
+	var out: Array = []
+	var z: Dictionary = sim.zonas.filter(func(zz): return str(zz.id) == "chama_modelada_" + id)[0]
+	var de := Vector2i(int(z.dados.centro[0]), int(z.dados.centro[1]))
+	var caminho: Array = CombatSim.tiles_entre(de, para)
+	caminho.append(para)
+	var dados := str(z.dados.dados)
+	sim.add_zona(str(z.id), Area.esfera(para, Area.quadrados(9.0)), "luz", -1, "controlar_fogo",
+		{"chama": true, "centro": [para.x, para.y], "conjurador": id, "dados": dados})
+	for t in caminho:
+		var tg := sim.occupant(t)
+		if tg == "" or tg == id or (sim.c(tg).flags as Array).has("chama_queimou_%d" % sim.round_no):
+			continue
+		(sim.c(tg).flags as Array).append("chama_queimou_%d" % sim.round_no)
+		out.append_array(_dano_de_fogo(id, tg, dados, 0, "", "Controlar Fogo"))
+	return out
+
+
+## Dano de fogo de magia num alvo; com `pericia`, o teste reduz à metade.
+func _dano_de_fogo(id: String, tg: String, dados: String, cd: int, pericia: String, nome: String) -> Array:
+	var out: Array = []
+	var T: CharacterSheet = sim.c(tg).sheet
+	var dano := int(Dice.roll(dados, world.rng, "combat").total)
+	var passou := false
+	if pericia != "":
+		passou = _resiste(tg, pericia, cd, out)
+		if passou:
+			dano = dano / 2
+	dano = _dano_por_tipo(T, "fogo", dano)
+	var tags: Array = ["magia", "fogo"]
+	if passou: tags.append("resistiu")
+	tags.append_array(sim.apply_damage(tg, dano))
+	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": nome, "d20": 0, "mod": 0, "mods": [], "total": 0,
+		"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [], "pv_after": T.pv, "special": false,
+		"ranged": true, "spell": true, "save": pericia, "saved": passou, "tags": tags}, [id, tg]))
+	return out
+
+
 ## Condição: posição e status de cada alvo da magia que o conjurador acompanha (morto ou fora do plano: some).
 func status_conhecidos(id: String) -> Array:
 	var out: Array = []
@@ -1851,7 +1961,7 @@ func _criar_elementos(id: String, a: Dictionary) -> Array:
 				return out
 			var dados := "%dd6" % (1 + apr.count(2))
 			for t in tiles:
-				sim.add_zona("chama_%d" % sim.zonas.size(), Area.esfera(t, Area.quadrados(9.0)), "luz", -1, "criar_elementos")
+				sim.add_zona("chama_%d" % sim.zonas.size(), Area.esfera(t, Area.quadrados(9.0)), "luz", -1, "criar_elementos", {"chama": true, "centro": [t.x, t.y]})
 				var tg := sim.occupant(t)
 				if tg != "":
 					var ts: CharacterSheet = sim.c(tg).sheet
@@ -2114,6 +2224,10 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			s.remove_efeito("magia.arma_espiritual")
 		"oracao":
 			sim.c(id).erase("oracao")
+		"controlar_fogo":
+			for m in sim.marcas.duplicate(true):
+				if m.alvo == id and m.tipo == "labaredas":
+					sim.remove_marca(str(m.id), id)
 		"silencio":
 			sim.remove_zona("silencio_%s" % id)
 			for cid in sim.combatants:
@@ -2433,6 +2547,17 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var r_dm := Checks.skill(sim.c(id).sheet, "misticismo", 15, world.rules, world.rng, "combat")
 			var auras_dm: Array = auras_na_cena(sim.c(id).tile, ALCANCE_CURTO_QUADRADOS, false) if r_dm.get("success", false) else []
 			out.append(fact("MAGIC_DETECTED", {"actor": id, "check": r_dm, "auras": auras_dm}, [id]))
+		"resfriar":
+			for m in sim.marcas.duplicate(true):
+				if m.alvo == id and m.tipo == "esquentar":
+					sim.remove_marca(str(m.id), id)
+			out.append(fact("SPELL_ENDED", {"spell": "controlar_fogo", "target": id, "reason": "resfriado"}, [id]))
+		"mover_chama":
+			(sim.c(id).flags as Array).append("chama_%d" % sim.round_no)
+			out.append_array(_mover_chama(id, a.get("tile", sim.c(id).tile)))
+		"labareda":
+			var ml: Dictionary = sim.marcas.filter(func(m): return m.alvo == id and m.tipo == "labaredas")[0]
+			out.append_array(_dano_de_fogo(id, str(a.target), "%dd6" % int(ml.dados.dados), int(ml.dados.cd), "reflexos", "Labareda"))
 		"mover_facho":
 			# Raio Solar (truque): uma vez por rodada, ação livre, o facho muda de direção.
 			(sim.c(id).flags as Array).append("facho_%d" % sim.round_no)
@@ -2682,6 +2807,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_raio_solar(id, a))
 		"soco_de_arsenal":
 			out.append_array(_soco_de_arsenal(id, a))
+		"controlar_fogo":
+			out.append_array(_controlar_fogo(id, a))
 		"augurio":
 			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
 			var magia_au = world.module("magia")
@@ -3141,9 +3268,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var sh_am: CharacterSheet = sim.c(alvo_am).sheet
 			var arma_am := str(sh_am.equipment.get("weapon", ""))
 			var apr_am: Array = a.get("aprimoramentos", [])
-			sh_am.remove_efeito_stat("encanto_arma")
-			sh_am.remove_efeito_stat("atributo_arma")
-			sh_am.remove_efeito_stat("dano_elemental")
+			sh_am.remove_efeito("magia.arma_magica")   # não empilha consigo; outras magias de dano (Chamejar) ficam
 			var bonus_am := mini(2 if apr_am.has(0) else 1, SpellRules.circulo_maximo(sh, world.rules))
 			sh_am.add_efeito("magia.arma_magica", "encanto_arma", bonus_am, "cena", arma_am)
 			if alvo_am == id:
@@ -3550,12 +3675,14 @@ func _reacao_protecao(atacante: String, alvo: String, out: Array) -> void:
 
 
 ## Dano elemental da Arma Mágica (aprimoramento): dados de 1d6 (2d6 com o 2º aprimoramento) do tipo escolhido.
-func _dano_elemental_arma(sh: CharacterSheet) -> Dictionary:
+## Dados de dano de energia na arma empunhada (Arma Mágica, Controlar Fogo: Chamejar); efeitos de magias diferentes somam.
+func _dano_elemental_arma(sh: CharacterSheet) -> Array:
 	var arma := str(sh.equipment.get("weapon", ""))
+	var out: Array = []
 	for e in sh.efeitos:
 		if e.stat == "dano_elemental" and str(e.tipo).begins_with(arma + "|"):
-			return {"tipo": str(e.tipo).get_slice("|", 1), "dados": int(e.bonus)}
-	return {}
+			out.append({"tipo": str(e.tipo).get_slice("|", 1), "dados": int(e.bonus)})
+	return out
 
 
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
@@ -3595,8 +3722,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			extra += 2
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
 		dmg = maxi(1, int(r.total))
-		var elem := _dano_elemental_arma(A.sheet)
-		if not elem.is_empty():
+		for elem in _dano_elemental_arma(A.sheet):
 			var rd := Dice.roll("%dd6" % int(elem.dados), world.rng, "combat", int(atk.mult) if crit else 1)
 			var dano_el: int = T.sheet.dano_por_tipo(str(elem.tipo), int(rd.total))
 			dmg += dano_el

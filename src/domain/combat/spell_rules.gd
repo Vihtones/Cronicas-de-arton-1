@@ -46,6 +46,7 @@ const COMPLETAS := {
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
 	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
 	"circulo_da_justica": {"aprimoramentos": [0, 1, 2]},   # pessoal: ver o invisível em alcance curto; –10/–20; permanente
+	"controlar_fogo": {"aprimoramentos": [0, 1, 2]},   # labaredas (sustentada); +1d6 (repetível, exceto chamejar); criatura de fogo
 	"augurio": {"aprimoramentos": [0, 1, 2, 3]},   # consultar a divindade (pista); perguntas de sim ou não; falha só em 1 no 1d12 / 1d20
 	"condicao": {"aprimoramentos": [0, 1]},   # +1 alvo (repetível); um dia
 	"voz_divina": {"aprimoramentos": [0, 1]},   # interrogar um cadáver (uma vez por corpo); falar com plantas e rochas
@@ -300,6 +301,14 @@ const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]
 
 ## Acalmar Animal: animal; monstro ou espírito com Int –5 ou –4 (1 PM); qualquer monstro ou espírito (5 PM).
 ## Tranquilidade: animal ou humanoide; qualquer criatura (1 PM, ou criaturas escolhidas com o de 5 PM).
+const EFEITOS_FOGO := ["chamejar", "esquentar", "extinguir", "modelar"]
+
+
+## Criatura composta principalmente por fogo, lava ou magma (bestiário: "composicao").
+static func criatura_de_fogo(rules: RuleRegistry, sh: CharacterSheet) -> bool:
+	return ["fogo", "lava", "magma"].has(str(rules.value(sh.source_rule, {}).get("composicao", "")))
+
+
 ## Condição (divina 2): o que o conjurador sabe de um alvo — posição, PV, condições e magias ativas sobre ele.
 static func status_de(id: String, sh: CharacterSheet, tile: Vector2i) -> Dictionary:
 	var magias: Array = []

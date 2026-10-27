@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1285,14 +1285,14 @@ func test_arma_magica_dano_elemental_com_aprimoramento() -> void:
 	var m := _cena_grupo(9)
 	_arma_magica(m, [0, 1], {"elemento": "fogo"})
 	var sh: CharacterSheet = m[2].c("bandido_1").sheet
-	eq(m[1]._dano_elemental_arma(sh).get("tipo", ""), "fogo", "o dano elemental é do tipo escolhido")
-	eq(m[1]._dano_elemental_arma(sh).get("dados", 0), 1, "1d6 no 1º aprimoramento")
+	eq(m[1]._dano_elemental_arma(sh)[0].get("tipo", ""), "fogo", "o dano elemental é do tipo escolhido")
+	eq(m[1]._dano_elemental_arma(sh)[0].get("dados", 0), 1, "1d6 no 1º aprimoramento")
 
 
 func test_arma_magica_segundo_aprimoramento_faz_2d6() -> void:
 	var m := _cena_grupo(9)
 	_arma_magica(m, [0, 1, 2], {"elemento": "frio"})
-	eq(m[1]._dano_elemental_arma(m[2].c("bandido_1").sheet).get("dados", 0), 2, "2d6 com o 2º aprimoramento")
+	eq(m[1]._dano_elemental_arma(m[2].c("bandido_1").sheet)[0].get("dados", 0), 2, "2d6 com o 2º aprimoramento")
 
 
 func test_arma_magica_valida_elemento_e_ordem_dos_aprimoramentos() -> void:
@@ -3040,3 +3040,61 @@ func test_augurio_presagio_do_lugar_e_consultas() -> void:
 	var q := WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "aprimoramentos": [1], "perguntas": [{"tipo": "ameaca", "local": loc}]})
 	check(q.accepted, "perguntas de sim ou não (4º círculo)")
 	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "aprimoramentos": [1], "perguntas": []}).accepted, "precisa de pergunta")
+
+
+func test_controlar_fogo_chamejar_esquentar_extinguir() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	check(not _lanca(m, {"type": "cast", "spell": "controlar_fogo", "efeito": "chamejar", "targets": ["player"], "aprimoramentos": [1]}).ok, "+1d6 não vale para chamejar")
+	check(_lanca(m, {"type": "cast", "spell": "controlar_fogo", "efeito": "chamejar", "targets": ["player"]}).ok, "Chamejar")
+	eq(m[1]._dano_elemental_arma(sim.c("player").sheet).size(), 1, "+1d6 de fogo na arma")
+	var b1 := _bandido(m, "bandido_1", -50)
+	b1.equipment["weapon"] = "espada_curta"
+	sim.budget.std = 1
+	check(_lanca(m, {"type": "cast", "spell": "controlar_fogo", "efeito": "esquentar", "target": "bandido_1", "objeto": "arma"}).ok, "Esquentar")
+	var antes := b1.pv
+	m[1]._zonas_e_marcas_inicio_de_turno("bandido_1", [])
+	check(b1.pv < antes, "1d6 de fogo por rodada em quem segura")
+	var vr := GhostPlanner.validate_action(sim, "bandido_1", {"type": "resfriar"})
+	check(vr.ok and vr.kind == "completa", "resfriar: ação completa")
+	m[1]._execute_action("bandido_1", {"type": "resfriar"}, vr)
+	check(not sim.marcas.any(func(mk): return mk.tipo == "esquentar"), "resfriado: cancela")
+	var m2 := _cena_grupo(5)
+	var s2: CombatSim = m2[2]
+	check(not _lanca(m2, {"type": "cast", "spell": "controlar_fogo", "efeito": "extinguir", "tile": Vector2i(28, 57)}).ok, "precisa de uma chama")
+	s2.add_zona("chama_x", [Vector2i(28, 57)], "luz", -1, "criar_elementos", {"chama": true, "centro": [28, 57]})
+	check(_lanca(m2, {"type": "cast", "spell": "controlar_fogo", "efeito": "extinguir", "tile": Vector2i(28, 57)}).ok, "Extinguir")
+	eq(s2.chama_em(Vector2i(28, 57)), "", "chama apagada")
+	check(s2.zona_em(Vector2i(29, 57), "fumaca_leve"), "nuvem de fumaça de 3m")
+	check(int(s2.attack_profile("player", "bandido_1", 0, false, false).get("miss_chance", 0)) > 0, "camuflagem leve na fumaça")
+
+
+func test_controlar_fogo_modelar_labaredas_e_criatura_de_fogo() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b2 := _bandido(m, "bandido_2", -50)
+	sim.add_zona("chama_x", [Vector2i(28, 56)], "luz", -1, "criar_elementos", {"chama": true, "centro": [28, 56]})
+	check(_lanca(m, {"type": "cast", "spell": "controlar_fogo", "efeito": "modelar", "tile": Vector2i(28, 56), "aprimoramentos": [1]}).ok, "Modelar")
+	check(GhostPlanner.validate_action(sim, "player", {"type": "mover_chama", "tile": Vector2i(32, 57)}).ok, "mover a chama")
+	var antes := b2.pv
+	m[1]._mover_chama("player", Vector2i(32, 57))
+	check(b2.pv < antes, "a chama queima quem atravessa")
+	var depois := b2.pv
+	m[1]._mover_chama("player", Vector2i(33, 57))
+	m[1]._mover_chama("player", Vector2i(32, 57))
+	eq(b2.pv, depois, "uma vez por rodada")
+	var m2 := _cena_grupo(5)
+	var s2: CombatSim = m2[2]
+	var b1 := _bandido(m2, "bandido_1", -50)
+	s2.add_zona("chama_y", [Vector2i(27, 58)], "luz", -1, "criar_elementos", {"chama": true, "centro": [27, 58]})
+	check(_lanca(m2, {"type": "cast", "spell": "controlar_fogo", "tile": Vector2i(27, 58), "aprimoramentos": [0]}).ok, "Labaredas")
+	eq(str(s2.sustentadas.get("player", "")), "controlar_fogo", "sustentada")
+	s2.budget.move = 1
+	var antes_l := b1.pv
+	var lab := {"type": "labareda", "target": "bandido_1"}
+	var vl := GhostPlanner.validate_action(s2, "player", lab)
+	check(vl.ok and vl.kind == "movimento", "labareda: ação de movimento")
+	m2[1]._execute_action("player", lab, vl)
+	check(b1.pv < antes_l, "4d6 de fogo")
+	var m3 := _cena_grupo(5)
+	check(not _lanca(m3, {"type": "cast", "spell": "controlar_fogo", "target": "bandido_1", "aprimoramentos": [2]}).ok, "só criatura de fogo")

@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Controlar Fogo (divina, 2º círculo) completa: chamejar (+1d6 de fogo nas armas, também naturais), esquentar (1d6 por rodada em quem segura ou veste o objeto; ação completa resfriar, ou largar), extinguir (fumaça de 3m com camuflagem leve), modelar (a chama anda 9m por rodada e queima quem atravessa); labaredas sustentadas (4d6, Reflexos metade), +1d6 e criatura de fogo (Fortitude: 0 PV ou 5d6). Danos de energia de armas de magias diferentes agora somam (Arma Mágica + Chamejar).
+
 - Augúrio (divina, 2º círculo) completa: sobre entrar e explorar um lugar do mapa, responde felicidade (baú com algo ou pista não descoberta), miséria (criatura hostil ou armadilha armada), ambos ou nada; falha secreta em 1 no 1d6 (1d12, 1d20); o mesmo assunto repete a primeira resposta. Consulta à divindade (uma pista e um fato do lugar) e perguntas de sim, não ou não sei, fora de combate.
 
 - Círculo da Justiça (divina, 2º círculo) completa: esfera de 9m por um dia; quem está dentro sofre –10 em Acrobacia, Enganação, Furtividade e Ladinagem e não mente (Vontade, uma vez por círculo: –5 e pode mentir); –10/–20; permanente com balança de prata (T$ 5.000); versão pessoal que vê o invisível. Fora de combate, NPCs mentirosos no lugar do círculo não distorcem os boatos.
