@@ -8,6 +8,7 @@ extends WorldModule
 ## Subida de nível: PV/PM pela classe e escolha de poder (ChoosePower).
 
 const MYSTERY_ND := 1.0
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const MULT_MIN := 0.5
 const MULT_MAX := 2.0
 const NOVELTY_DECAY := 0.25       # cada vitória anterior sobre o mesmo tipo reduz 25%...
@@ -272,8 +273,13 @@ func _level_up() -> Dictionary:
 	if s.class_id == "guerreiro" and s.level == 3:
 		s.powers["durao"] = true  # habilidade de classe no 3º nível (LB p.66)
 	s.pending_powers += 1
+	var aprendida := ""
+	if bool(c.get("magia", {}).get("aprende_a_cada_nivel", false)):
+		aprendida = SpellRules.magia_aprendida_no_nivel(s, world.rules)   # o clérigo aprende uma magia a cada nível
+		if aprendida != "":
+			s.spells.append(aprendida)
 	return fact("LEVEL_UP", {"level": s.level, "pv_gain": pv_gain, "pm_gain": pm_gain, "pending_powers": s.pending_powers,
-		"options": available_powers(), "opcoes": _opcoes_info()}, ["player"])
+		"options": available_powers(), "opcoes": _opcoes_info(), "magia_aprendida": aprendida}, ["player"])
 
 
 func _opcoes_info() -> Array:

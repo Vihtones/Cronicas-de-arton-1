@@ -49,6 +49,26 @@ const TIPOS_ENERGIA := ["acido", "eletricidade", "fogo", "frio", "luz", "trevas"
 
 
 ## Círculo máximo que o conjurador pode lançar. Usa a tabela de conjuração da classe (ex.: clérigo: 2º no 5º nível).
+## Magia que o conjurador aprende ao subir de nível (catálogo: "aprende_a_cada_nivel"): a de maior círculo que ele já
+## pode lançar, divina ou universal, completa e ainda não conhecida. Empate: ordem alfabética. "" se não há nenhuma.
+static func magia_aprendida_no_nivel(sheet: CharacterSheet, rules: RuleRegistry) -> String:
+	var max_c := circulo_maximo(sheet, rules)
+	var ids: Array = COMPLETAS.keys()
+	ids.sort()
+	var best := ""
+	var best_c := -1
+	for sp_id in ids:
+		var sp: Dictionary = rules.value("magia." + str(sp_id), {})
+		if sp.is_empty() or not ["divina", "universal"].has(str(sp.get("tipo", ""))):
+			continue
+		var circ := int(sp.get("circulo", 0))
+		if circ > max_c or circ <= best_c or sheet.spells.has(sp_id):
+			continue
+		best = str(sp_id)
+		best_c = circ
+	return best
+
+
 static func circulo_maximo(sheet: CharacterSheet, rules: RuleRegistry) -> int:
 	var magia: Dictionary = rules.value("classe." + sheet.class_id, {}).get("magia", {})
 	var circulos: Dictionary = magia.get("circulos", {})

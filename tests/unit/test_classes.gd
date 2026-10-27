@@ -675,3 +675,27 @@ func test_manto_do_cruzado_salva_a_versao_e_a_cena() -> void:
 	var volta := CharacterSheet.from_dict(P.to_dict())
 	eq(volta.manto_versao, "trevas", "versão escolhida sobrevive ao save")
 	eq(volta.manto_cruzado, "trevas", "versão ativa sobrevive ao save")
+
+
+func test_clerigo_aprende_magia_do_maior_circulo_que_pode_lancar_ao_subir_de_nivel() -> void:
+	var w := WorldHelpers.world(5)
+	var s := CharacterBuilder.build(RuleRegistry.load_default(), "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	w.player_sheet = s
+	s.level = 8   # sobe para 9: passa a lançar magias de 3º círculo
+	var antes := s.spells.size()
+	var lv: Dictionary = w.modules.progression._level_up().payload
+	eq(s.spells.size(), antes + 1, "aprende uma magia ao subir de nível")
+	var aprendida: String = str(lv.get("magia_aprendida", ""))
+	check(aprendida != "", "a magia aprendida aparece no evento de subida")
+	eq(int(w.rules.value("magia." + aprendida, {}).get("circulo", 0)), 3, "é de 3º círculo, o maior que ele já lança")
+
+
+func test_clerigo_nao_aprende_magia_de_circulo_acima_do_que_lanca() -> void:
+	var w := WorldHelpers.world(5)
+	var s := CharacterBuilder.build(RuleRegistry.load_default(), "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	w.player_sheet = s
+	s.level = 1   # sobe para 2: ainda só lança magias de 1º círculo (2º abre no 5º nível)
+	var lv: Dictionary = w.modules.progression._level_up().payload
+	var aprendida: String = str(lv.get("magia_aprendida", ""))
+	check(aprendida != "", "aprende a magia de 1º círculo")
+	eq(int(w.rules.value("magia." + aprendida, {}).get("circulo", 0)), 1, "só de 1º círculo antes do 5º nível")
