@@ -1,5 +1,6 @@
 class_name CombatView
 extends Node2D
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 ## Combate na tela: grade, planejamento com projeção fantasma, confirmação e
 ## reprodução cinematográfica dos eventos. A animação NUNCA decide resultados.
 
@@ -17,6 +18,8 @@ var mode := "mover"          # mover | atacar | investida | misericordia
 var special := false
 var spell := "seta_infalivel"   # magia selecionada no modo magia (tecla 4 alterna)
 var pungente := false   # Magia Pungente no próximo lançamento
+var spell_alvos: Array = []   # magias de alvos escolhidos: inimigos marcados antes de confirmar
+var spell_apr: Array = []     # aprimoramentos ligados na próxima magia (tecla B)
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var hover := Vector2i(-1, -1)
 var preview: Dictionary = {}
@@ -213,7 +216,7 @@ func candidate_actions(t: Vector2i) -> Array:
 				return [{"type": "cast", "spell": spell, "targets": ["player"], "pungente": pungente}]
 			if target == "" or not gs.is_enemy("player", target):
 				return []
-			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente}]
+			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate()}]
 	return []
 
 
@@ -224,6 +227,9 @@ func _update_preview() -> void:
 
 
 func add_hover_to_plan() -> void:
+	if mode == "magia" and SpellRules.multi_alvo(GhostPlanner.spell_rule(Game.world.rules, spell)):
+		_toggle_alvo(hover)
+		return
 	var cand := candidate_actions(hover)
 	if cand.is_empty():
 		return
@@ -241,7 +247,33 @@ func undo() -> void:
 	_update_preview()
 
 
+func _toggle_alvo(t: Vector2i) -> void:
+	var gs := _ghost_sim()
+	var id: String = gs.occupant(t, "player")
+	if id == "" or not gs.is_enemy("player", id):
+		message.emit("Marque um inimigo para a magia.")
+		return
+	if spell_alvos.has(id):
+		spell_alvos.erase(id)
+	else:
+		spell_alvos.append(id)
+	message.emit("Alvos de %s: %d (Enter confirma, clique marca ou desmarca)." % [spell.replace("_", " "), spell_alvos.size()])
+
+
+func toggle_aprimoramento() -> void:
+	var disp: Array = SpellRules.aprimoramentos_disponiveis(spell)
+	if disp.is_empty():
+		message.emit("Esta magia não tem aprimoramentos disponíveis.")
+		return
+	spell_apr = [] if not spell_apr.is_empty() else [disp[0]]
+	message.emit("Aprimoramento %s." % ("ligado (+%d PM)" % Game.world.rules.value("magia." + spell).aprimoramentos[disp[0]].pm if not spell_apr.is_empty() else "desligado"))
+
+
 func confirm() -> void:
+	if not spell_alvos.is_empty() and my_turn():
+		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente})
+		spell_alvos.clear()
+		mode = "mover"
 	if plan.is_empty() or not my_turn():
 		return
 	# guarda o que o fantasma previa, para os momentos "contra as probabilidades" e "deu errado"
@@ -342,6 +374,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_2: mode = "investida"; _update_preview()
 			KEY_3: mode = "misericordia"; _update_preview()
 			KEY_4: cycle_spell()
+			KEY_B: toggle_aprimoramento()
 			KEY_5: drink_potion()
 			KEY_6: mode = "atirar"; message.emit("Modo tiro: clique no alvo (sem se mover)."); _update_preview()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()

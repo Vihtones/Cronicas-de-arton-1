@@ -81,6 +81,7 @@ func test_furia_entra_no_ataque_corpo_a_corpo_do_barbaro() -> void:
 func test_clerigo_conjura_com_sabedoria_e_cura() -> void:
 	var sh := _build("clerigo")
 	check(sh.spells.has("curar_ferimentos"), "clérigo começa com Curar Ferimentos")
+	check(sh.spells.has("perdicao"), "clérigo começa com Perdição (magia completa)")
 	check(sh.caster_attr == "sab", "atributo de conjuração é a Sabedoria")
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -137,3 +138,26 @@ func test_efeito_de_cena_acaba_com_o_combate() -> void:
 	check(sh.efeito_bonus("ataque") == -1 and not sh.has_efeito("magia.teste"), "cena limpa só o efeito de cena")
 	var copia := CharacterSheet.from_dict(sh.to_dict())
 	check(copia.efeito_bonus("ataque") == -1, "efeitos sobrevivem à gravação")
+
+
+func test_perdicao_em_varios_inimigos_com_aprimoramento_e_sem_aliados() -> void:
+	var sh := _build("clerigo")
+	sh.spells = PackedStringArray(["perdicao"])
+	sh.equipment["armor"] = ""
+	sh.level = 5
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1", "bandido_2"], true, false)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(28, 57)
+	sim.c("bandido_2").tile = Vector2i(28, 58)
+	var a := {"type": "cast", "spell": "perdicao", "targets": ["bandido_1", "bandido_2"], "aprimoramentos": [0]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok and int(v.cost) == 3, "dois alvos com aprimoramento: 3 PM (%s)" % str(v))
+	c._cast("player", a, v)
+	check(sim.c("bandido_1").sheet.efeito_bonus("ataque") == -2, "primeiro inimigo recebe –2 (círculo 2 permite)")
+	check(sim.c("bandido_2").sheet.efeito_bonus("dano") == -2, "segundo inimigo recebe –2 no dano")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "perdicao", "targets": ["player"]}).ok, "não aceita a si mesmo")

@@ -21,6 +21,15 @@ static func circulo_maximo(sheet: CharacterSheet, rules: RuleRegistry) -> int:
 	return best
 
 
+## Magia de alvos escolhidos (ex.: Perdição): o jogador marca vários inimigos antes de confirmar.
+static func multi_alvo(sp: Dictionary) -> bool:
+	return str(sp.get("alvo_tipo", "")) == "Alvos"
+
+
+static func aprimoramentos_disponiveis(sp_id: String) -> Array:
+	return COMPLETAS.get(sp_id, {}).get("aprimoramentos", [])
+
+
 static func aprimoramentos_validos(sp_id: String, idx: Array) -> bool:
 	if not COMPLETAS.has(sp_id):
 		return idx.is_empty()
