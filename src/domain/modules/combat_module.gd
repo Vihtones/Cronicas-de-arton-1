@@ -989,6 +989,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
 		if not bool(v.get("ranged", false)):
 			extra += ClassFeatures.furia_bonus(A.sheet)   # Fúria do bárbaro: +dano corpo a corpo
+		extra += ClassFeatures.instinto_bonus(A.sheet)   # Instinto Selvagem: +dano em qualquer ataque
 		if T.damaged_round == sim.round_no and Array(A.sheet.habilidades).any(func(h): return str(h).begins_with("oportunista")):
 			extra += 2
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
@@ -1013,8 +1014,9 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			tags.append("reducao")
 		if T.sheet.efeito_bonus("imune", dtype) > 0:
 			dmg = 0   # imunidade a tipo de energia (Resistência a Energia, 4º aprimoramento)
-		if T.sheet.efeito_rd(dtype) > 0:
-			dmg = maxi(0, dmg - T.sheet.efeito_rd(dtype))   # Resistência a Energia (magia)
+		var rd_total: int = T.sheet.efeito_rd(dtype) + ClassFeatures.reducao_dano(T.sheet)   # magia + Redução de Dano do bárbaro (cumulativas, LB)
+		if rd_total > 0:
+			dmg = maxi(0, dmg - rd_total)
 			tags.append("reducao")
 		tags.append("impacto")
 		if crit: tags.append("critico")

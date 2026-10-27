@@ -407,3 +407,25 @@ func test_vestimenta_da_fe_defesa_resistencia_e_reducao() -> void:
 	eq(alvo.efeito_rd("fogo"), 5, "redução de dano 5 contra todos os tipos")
 	alvo.limpar_dia(999)
 	eq(alvo.efeito_bonus("defesa"), 0, "o efeito acaba no dia seguinte")
+
+
+func test_habilidades_do_barbaro_escalam_com_o_nivel() -> void:
+	var sh := _build("barbaro")
+	sh.level = 2
+	eq(ClassFeatures.instinto_bonus(sh), 0, "instinto só a partir do 3º nível")
+	sh.level = 3
+	eq(ClassFeatures.instinto_bonus(sh), 1, "instinto +1 no 3º nível")
+	sh.level = 9
+	eq(ClassFeatures.instinto_bonus(sh), 2, "instinto +2 no 9º nível")
+	sh.level = 15
+	eq(ClassFeatures.instinto_bonus(sh), 3, "instinto +3 no 15º nível")
+	var rd := {4: 0, 5: 2, 8: 4, 11: 6, 14: 8, 17: 10, 20: 10}
+	for nivel in rd:
+		sh.level = nivel
+		eq(ClassFeatures.reducao_dano(sh), rd[nivel], "redução de dano no %dº nível" % nivel)
+	sh.level = 19
+	eq(ClassFeatures.furia_bonus(sh), 5, "fúria +5 antes do 20º nível")
+	sh.level = 20
+	eq(ClassFeatures.furia_bonus(sh), 10, "fúria titânica dobra o bônus")
+	eq(ClassFeatures.instinto_pericia(sh, "reflexos"), ClassFeatures.instinto_bonus(sh), "instinto vale em Reflexos")
+	eq(ClassFeatures.instinto_pericia(sh, "atletismo"), 0, "instinto não vale em outras perícias")

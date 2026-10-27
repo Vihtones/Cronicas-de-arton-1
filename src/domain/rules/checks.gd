@@ -1,6 +1,7 @@
 class_name Checks
 extends RefCounted
 ## Testes T20: 1d20 + modificador >= CD (LB p.220).
+const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 const RESISTANCIAS := ["fortitude", "reflexos", "vontade"]
 
 
@@ -8,7 +9,7 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 		stream: String = "world", extra_mod: int = 0) -> Dictionary:
 	if not sheet.can_use_skill(skill_name, rules):
 		return {"allowed": false, "reason": "perícia somente treinada: " + skill_name}
-	var mod := sheet.skill_value(skill_name, rules) + extra_mod + sheet.condition_skill_mod(rules, skill_name)
+	var mod := sheet.skill_value(skill_name, rules) + extra_mod + sheet.condition_skill_mod(rules, skill_name) + ClassFeatures.instinto_pericia(sheet, skill_name)
 	var eh_resistencia := skill_name in RESISTANCIAS
 	if eh_resistencia:
 		mod += sheet.efeito_bonus("resistencia") + sheet.efeito_bonus("proxima_resistencia")   # efeitos de magia
