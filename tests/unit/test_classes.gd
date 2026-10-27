@@ -75,3 +75,26 @@ func test_furia_entra_no_ataque_corpo_a_corpo_do_barbaro() -> void:
 		if m[0] == "fúria":
 			achou = true
 	check(achou, "Fúria aparece como modificador de ataque")
+
+
+func test_clerigo_conjura_com_sabedoria_e_cura() -> void:
+	var sh := _build("clerigo")
+	check(sh.spells.has("curar_ferimentos"), "clérigo começa com Curar Ferimentos")
+	check(sh.caster_attr == "sab", "atributo de conjuração é a Sabedoria")
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1"], true, false)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_1").sheet.pv = 1
+	var a := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "cura em alvo adjacente é válida: %s" % str(v.get("reason", "")))
+	var curou := false
+	for f in c._cast("player", a, v):
+		if f.type == "HEALED":
+			curou = int(f.payload.amount) > 0
+	check(curou, "Curar Ferimentos cura o alvo")

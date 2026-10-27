@@ -15,17 +15,18 @@ const FREE_ATTR_RACES := ["humano", "lefou", "osteon", "sereia"]
 ## Deformidade do lefou: +2 em duas perícias à escolha. Padrão provisório até haver tela de escolha.
 const LEFOU_DEFAULT := ["intimidacao", "sobrevivencia"]
 ## Classes jogáveis na criação. Primeira leva: classes sem magia própria (bárbaro, paladino, nobre, bucaneiro,
-## cavaleiro, caçador, inventor) — o kit de equipamento é provisório, escolhido entre armas/armaduras já no catálogo.
-## Bardo, clérigo, druida e treinador ficam para a leva seguinte (exigem sistema de magia divina/bardo e mascotes).
-const CLASSES := ["guerreiro", "ladino", "arcanista", "barbaro", "paladino", "nobre", "bucaneiro", "cavaleiro", "cacador", "inventor"]
+## cavaleiro, caçador, inventor). Segunda leva: clérigo, com Curar Ferimentos (única magia divina implementada).
+## O kit de equipamento é provisório, escolhido entre armas/armaduras já no catálogo.
+## Bardo, druida e treinador ficam para depois (exigem magias de bardo/druida e mascotes, que ainda não existem).
+const CLASSES := ["guerreiro", "ladino", "arcanista", "barbaro", "paladino", "nobre", "bucaneiro", "cavaleiro", "cacador", "inventor", "clerigo"]
 const CLASS_NAMES := {"guerreiro": "Guerreiro", "ladino": "Ladino", "arcanista": "Arcanista", "barbaro": "Bárbaro",
-	"paladino": "Paladino", "nobre": "Nobre", "bucaneiro": "Bucaneiro", "cavaleiro": "Cavaleiro", "cacador": "Caçador", "inventor": "Inventor"}
+	"paladino": "Paladino", "nobre": "Nobre", "bucaneiro": "Bucaneiro", "cavaleiro": "Cavaleiro", "cacador": "Caçador", "inventor": "Inventor", "clerigo": "Clérigo"}
 const WEAPON_BY_CLASS := {"guerreiro": "espada_longa", "ladino": "espada_curta", "arcanista": "adaga",
 	"barbaro": "machado_batalha", "paladino": "espada_longa", "nobre": "espada_curta", "bucaneiro": "espada_curta",
-	"cavaleiro": "espada_longa", "cacador": "arco_curto", "inventor": "funda"}
+	"cavaleiro": "espada_longa", "cacador": "arco_curto", "inventor": "funda", "clerigo": "clava"}
 const ARMOR_BY_CLASS := {"guerreiro": "couro_batido", "ladino": "couro_batido", "arcanista": "",
 	"barbaro": "gibao_peles", "paladino": "cota_malha", "nobre": "couro_batido", "bucaneiro": "couro_batido",
-	"cavaleiro": "cota_malha", "cacador": "couro_batido", "inventor": "couro_batido"}
+	"cavaleiro": "cota_malha", "cacador": "couro_batido", "inventor": "couro_batido", "clerigo": "cota_malha"}
 ## Perícias escolhidas por padrão (protótipo: sem tela de escolha individual ainda)
 const DEFAULT_CHOICES := {
 	"guerreiro": ["atletismo", "percepcao"],
@@ -162,6 +163,10 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 		for sp in chosen:
 			if ARCANE_SPELLS.has(sp) and not s.spells.has(sp) and s.spells.size() < want:
 				s.spells.append(sp)
+	if p_class == "clerigo":
+		# Clérigo: conjura com Sabedoria. Só Curar Ferimentos está implementada (ver ROADMAP).
+		s.caster_attr = "sab"
+		s.spells.append("curar_ferimentos")
 	s.pm = s.pm_max
 	for f in c.pericias_fixas:
 		s.trained.append(str(f).get_slice("|", 0))
@@ -264,5 +269,6 @@ static func presets(p_class: String) -> Array:
 		"bucaneiro": return [{"for": 2, "des": 3, "con": 2, "int": 1, "sab": 1, "car": 0}, {"for": 2, "des": 3, "con": 1, "int": 1, "sab": 1, "car": 1}]
 		"cavaleiro": return [{"for": 3, "des": 1, "con": 2, "int": 1, "sab": 1, "car": 1}, {"for": 3, "des": 0, "con": 2, "int": 1, "sab": 1, "car": 1}]
 		"cacador": return [{"for": 1, "des": 3, "con": 2, "int": 0, "sab": 2, "car": 0}, {"for": 1, "des": 3, "con": 1, "int": 1, "sab": 2, "car": 0}]
+		"clerigo": return [{"for": 0, "des": 0, "con": 2, "int": 1, "sab": 4, "car": 0}, {"for": 1, "des": 0, "con": 3, "int": 0, "sab": 3, "car": 0}]
 		"inventor": return [{"for": 1, "des": 1, "con": 2, "int": 3, "sab": 1, "car": 0}, {"for": 0, "des": 1, "con": 2, "int": 3, "sab": 1, "car": 1}]
 	return []
