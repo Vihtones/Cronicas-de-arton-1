@@ -117,6 +117,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not SpellRules.pode_lancar_no_turno(sp_id, apr):
 				if sp_id == "protecao_divina":
 					return {"ok": false, "reason": "com o aprimoramento de reação, Proteção Divina age quando um aliado vai fazer teste de resistência"}
+				if sp_id == "armadura_arcana":
+					return {"ok": false, "reason": "com o aprimoramento de reação, a Armadura Arcana age quando você sofre um ataque"}
 				return {"ok": false, "reason": "Escudo da Fé é reação: age quando um aliado é atacado (ou escolha execução padrão)"}
 			if int(sp.get("circulo", 0)) > SpellRules.circulo_maximo(A.sheet, sim.rules):
 				return {"ok": false, "reason": "magia de %dº círculo acima do que você conjura" % int(sp.get("circulo", 0))}

@@ -112,7 +112,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
   servo_morto_vivo, videncia.
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
-- Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
+- Arcanas de 1º círculo do catálogo: feitas (Armadura Arcana, Toque Chocante, Seta Infalível).
 - Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas, Santuário, Comando, Acalmar Animal, Tranquilidade, Detectar Ameaças, Suporte Ambiental, Abençoar Alimentos e Criar Elementos (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem

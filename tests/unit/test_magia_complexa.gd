@@ -1675,11 +1675,11 @@ func test_despedacar_dobra_e_ignora_rd_em_construto() -> void:
 	check(perdeu >= 6 and perdeu <= 20 and perdeu % 2 == 0, "o dobro, sem RD (%d)" % perdeu)
 
 
-func test_despedacar_area_atinge_todos_incluindo_o_conjurador() -> void:
+func test_despedacar_area_atinge_todos_menos_o_conjurador() -> void:
 	var m := _cena_grupo(1)
 	var sim: CombatSim = m[2]
 	check(_lanca(m, {"type": "cast", "spell": "despedacar", "target": "player", "aprimoramentos": [5]}).ok, "versão em área")
-	check(sim.c("player").sheet.pv < 999, "o conjurador está na área")
+	eq(sim.c("player").sheet.pv, 999, "área de alcance pessoal não afeta o conjurador (LB p.225)")
 	check(sim.c("bandido_1").sheet.pv < 999, "adjacente atingido")
 	eq(sim.c("bandido_2").sheet.pv, 999, "a 9m (6 quadrados), fora da esfera de 6m")
 
@@ -2735,3 +2735,67 @@ func test_visao_mistica_auras_e_analise_e_detectar_magia() -> void:
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "detectar_magia"}).ok, "Misticismo é somente treinada")
 	sim.c("player").sheet.trained.append("misticismo")
 	check(GhostPlanner.validate_action(sim, "player", {"type": "detectar_magia"}).ok, "treinado: ação completa")
+
+
+# --- Arcanas de 1º círculo: Armadura Arcana, Toque Chocante, Seta Infalível ---------------------
+func _arcanista(nivel: int) -> Array:
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "arcanista", CharacterBuilder.presets("arcanista")[0], ["for", "des", "con"], "arcanista")
+	sh.level = nivel
+	sh.spells = PackedStringArray(["armadura_arcana", "toque_chocante", "seta_infalivel", "luz"])
+	sh.equipment["armor"] = ""
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1", "bandido_2"], true, false)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_2").tile = Vector2i(32, 57)
+	sim.walk_fn = func(_t: Vector2i) -> bool: return true
+	for id in ["player", "bandido_1", "bandido_2"]:
+		sim.c(id).sheet.pv_max = 999
+		sim.c(id).sheet.pv = 999
+	sim.c("player").sheet.pm = 99
+	return [w, c, sim, r]
+
+
+func test_armadura_arcana_bonus_aprimorado_dia_e_reacao() -> void:
+	var m := _arcanista(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	var d0 := sh.defense(m[3], true)
+	_lanca(m, {"type": "cast", "spell": "armadura_arcana", "target": "player", "aprimoramentos": [1, 1, 2]})
+	eq(sh.defense(m[3], true), d0 + 7, "+5 +1 +1, por um dia")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "armadura_arcana", "target": "player", "aprimoramentos": [0]}).ok, "a versão de reação não se lança no turno")
+	var b := _bandido(m, "bandido_1", 0)
+	var pm := sh.pm
+	var out: Array = c._resolve_attack("bandido_1", "player", sim.attack_profile("bandido_1", "player", 0, false, false), false)
+	check(out.any(func(f): return f.type == "REACTION" and f.payload.power == "armadura_arcana"), "reação: +5 contra o ataque")
+	eq(sh.pm, pm - 2, "1 PM do círculo + 1 PM do aprimoramento")
+
+
+func test_toque_chocante_dano_ataque_e_area() -> void:
+	var m := _arcanista(1)
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_1", -50)
+	_lanca(m, {"type": "cast", "spell": "toque_chocante", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]})
+	check(999 - b.pv >= 6 and 999 - b.pv <= 30, "3d8+3 de eletricidade (%d)" % (999 - b.pv))
+	var m2 := _arcanista(1)
+	var sim2: CombatSim = m2[2]
+	sim2.c("bandido_2").tile = Vector2i(28, 58)
+	_lanca(m2, {"type": "cast", "spell": "toque_chocante", "target": "player", "aprimoramentos": [2]})
+	check(sim2.c("bandido_1").sheet.pv < 999 and sim2.c("bandido_2").sheet.pv < 999, "esfera de 6m atinge todos")
+	eq(sim2.c("player").sheet.pv, 999, "menos você")
+
+
+func test_seta_infalivel_quantidade_e_lancas() -> void:
+	var m := _arcanista(13)
+	var sim: CombatSim = m[2]
+	var out: Array = m[1]._cast("player", {"type": "cast", "spell": "seta_infalivel", "targets": ["bandido_1", "bandido_2"], "target": "bandido_1", "aprimoramentos": [0, 3]}, {"cost": 0})
+	var hits: Array = out.filter(func(f): return f.type == "ATTACK_RESOLVED")
+	eq(hits.size(), 10, "dez lanças")
+	check(hits.all(func(f): return "essencia" in f.payload.tags and int(f.payload.damage) >= 2 and int(f.payload.damage) <= 9), "1d8+1 de essência cada")
+	check(not GhostPlanner.validate_action(_arcanista(1)[2], "player", {"type": "cast", "spell": "seta_infalivel", "targets": ["bandido_1"], "target": "bandido_1", "aprimoramentos": [2]}).ok, "cinco setas exigem 2º círculo")

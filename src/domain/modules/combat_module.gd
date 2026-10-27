@@ -21,10 +21,10 @@ var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict),
 const POWER_POLICIES := {"premonicao_reacao": ["auto", "nunca"], "escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"],
-	"golpe_divino": ["auto", "nunca"], "golpe_divino_extra": ["nunca", "auto"], "arma_espiritual": ["auto", "nunca"], "sustentar": ["auto", "nunca"]}
+	"golpe_divino": ["auto", "nunca"], "golpe_divino_extra": ["nunca", "auto"], "arma_espiritual": ["auto", "nunca"], "sustentar": ["auto", "nunca"], "armadura_arcana": ["auto", "nunca"]}
 const DEFAULT_POLICY := {"premonicao_reacao": "auto", "escudo_da_fe": "auto", "protecao_divina": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
 	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto", "golpe_divino": "auto", "golpe_divino_extra": "nunca",
-	"arma_espiritual": "auto", "sustentar": "auto"}
+	"arma_espiritual": "auto", "sustentar": "auto", "armadura_arcana": "auto"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
 var stance_sneak := false
@@ -1710,6 +1710,65 @@ func _criar_elementos(id: String, a: Dictionary) -> Array:
 	return out
 
 
+func _toque_chocante(id: String, tgt: String, expr: String, bonus: int, com_ataque: bool, cd: int, sp: Dictionary) -> Array:
+	var out: Array = []
+	var T: CharacterSheet = sim.c(tgt).sheet
+	var sh: CharacterSheet = sim.c(id).sheet
+	var passou := false
+	var dano_ataque := 0
+	var sv := {}
+	if com_ataque:
+		# ataque corpo a corpo como parte da execução, contra a Defesa do alvo
+		var corpo := {}
+		for at in sh.attacks:
+			if not bool(at.get("distancia", false)):
+				corpo = at
+				break
+		var d20: int = world.rng.roll("combat", 1, 20)[0]
+		if d20 + sh.skill_value("luta", world.rules) < T.defense(world.rules, true):
+			out.append(fact("SPELL_MISSED", {"caster": id, "target": tgt, "spell": "toque_chocante"}, [id, tgt]))
+			return out
+		if not corpo.is_empty():
+			dano_ataque = _dano_por_tipo(T, str(corpo.get("tipo", "impacto")), int(Dice.roll(str(corpo.dano), world.rng, "combat", 1, int(sh.attrs["for"]) if corpo.get("for_no_dano", false) else 0).total))
+	else:
+		var metal := bool(world.rules.value("armadura." + str(T.equipment.get("armor", "")), {}).get("metal", false))
+		_reacao_protecao(id, tgt, out)
+		sv = Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat", int(sp.penalidade_metal) if metal else 0)
+		sv = _pos_teste(tgt, sv, cd, out)
+		passou = sv.get("success", false)
+	var r := Dice.roll(expr, world.rng, "combat", 1, bonus)
+	var dmg := int(r.total)
+	if passou:
+		dmg = maxi(1, dmg / 2)
+	dmg = _dano_por_tipo(T, "eletricidade", dmg) + dano_ataque
+	var tags: Array = ["magia", "eletricidade"]
+	if passou: tags.append("resistiu")
+	tags.append_array(sim.apply_damage(tgt, dmg))
+	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Toque Chocante", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
+		"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
+		"pv_after": T.pv, "special": false, "ranged": false, "spell": true, "save": "" if com_ataque else "fortitude", "saved": passou, "tags": tags}, [id, tgt]))
+	return out
+
+
+## Armadura Arcana em reação (aprimoramento de 1 PM): quem conhece a magia, ao sofrer um ataque, gasta o custo
+## (2 PM) e ganha +5 na Defesa contra esse ataque. Política "armadura_arcana"; uma vez por rodada.
+func _reacao_armadura_arcana(attacker: String, target: String, out: Array) -> int:
+	var T: Dictionary = sim.c(target)
+	if T.is_empty() or not T.sheet.spells.has("armadura_arcana") or not sim.is_enemy(attacker, target):
+		return 0
+	if not CondicoesCombate.pode_reagir(T.sheet, world.rules) or (target == "player" and str(power_policy.get("armadura_arcana", "auto")) == "nunca"):
+		return 0
+	var flag := "armadura_reacao_%d" % sim.round_no
+	var sp := GhostPlanner.spell_rule(world.rules, "armadura_arcana")
+	var custo := GhostPlanner.spell_cost(world.rules, sp, {"spell": "armadura_arcana", "aprimoramentos": [0]})
+	if T.flags.has(flag) or T.sheet.pm < custo:
+		return 0
+	T.sheet.pm -= custo
+	T.flags.append(flag)
+	out.append(fact("REACTION", {"actor": target, "power": "armadura_arcana", "defense": 5, "pm_after": T.sheet.pm}, [target]))
+	return 5
+
+
 ## Despedaçar numa criatura (ver _cast).
 func _despedacar_criatura(id: String, tg: String, expr: String, cd: int, out: Array) -> void:
 	var T: Dictionary = sim.c(tg)
@@ -2332,28 +2391,29 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 		return out
 	match str(a.spell):
 		"armadura_arcana":
-			# +5 na Defesa pela cena; não acumula com o bônus de armadura (LB p.183)
+			# Armadura Arcana (arcana 1, LB p.183): +5 na Defesa pela cena; acumula com magias, não com armadura.
+			# Aprimoramentos: reação (_reacao_armadura_arcana); +1 (2 PM, repetível); um dia (2 PM, 3º círculo).
+			var apr_aa: Array = a.get("aprimoramentos", [])
 			var arm: Dictionary = world.rules.value("armadura." + str(sh.equipment.get("armor", "")), {})
-			sh.scene_defense = maxi(0, int(sp.defesa) - int(arm.get("defesa", 0)))
-			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "armadura_arcana", "defense": sh.scene_defense, "tags": ["magia"]}, [id]))
+			var bonus_aa := maxi(0, int(sp.defesa) + apr_aa.count(1) - int(arm.get("defesa", 0)))
+			if apr_aa.has(2):
+				sh.add_efeito("magia.armadura_arcana", "defesa", bonus_aa, "dia", "", world.day_index() + 1)
+			else:
+				sh.scene_defense = bonus_aa
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "armadura_arcana", "defense": bonus_aa, "tags": ["magia"]}, [id]))
 		"toque_chocante":
-			var tgt: String = a.get("target", "")
-			var T: CharacterSheet = sim.c(tgt).sheet
-			var cd := spell_dc(sh, a)
-			var metal := bool(world.rules.value("armadura." + str(T.equipment.get("armor", "")), {}).get("metal", false))
-			_reacao_protecao(id, tgt, out)
-			var sv := Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat", int(sp.penalidade_metal) if metal else 0)
-			sv = _pos_teste(tgt, sv, cd, out)
-			var r := Dice.roll(sp.dano, world.rng, "combat", 1, battle_bonus(sh))
-			var dmg := int(r.total)
-			if sv.get("success", false):
-				dmg = maxi(1, dmg / 2)
-			var tags: Array = ["magia", "impacto", "eletricidade"]
-			if sv.get("success", false): tags.append("resistiu")
-			tags.append_array(sim.apply_damage(tgt, dmg))
-			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Toque Chocante", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
-				"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
-				"pv_after": T.pv, "special": false, "ranged": false, "spell": true, "save": "fortitude", "saved": sv.get("success", false), "tags": tags}, [id, tgt]))
+			# Toque Chocante (arcana 1, LB p.209): 2d8+2 de eletricidade; Fortitude reduz à metade (–5 com armadura de metal).
+			# Aprimoramentos: +1d8+1 (1 PM, repetível); sem resistência, com ataque corpo a corpo como parte da execução
+			# (acertou: dano do ataque e da magia) (2 PM); esfera de 6m a partir de você (2 PM; não o afeta).
+			var apr_tc: Array = a.get("aprimoramentos", [])
+			var expr_tc := "%dd8+%d" % [2 + apr_tc.count(0), 2 + apr_tc.count(0)]
+			var alvos_tc: Array = [a.get("target", "")]
+			if apr_tc.has(2):
+				alvos_tc = _criaturas_vivas_em(Area.esfera(sim.c(id).tile, Area.quadrados(6.0))).filter(func(x): return x != id)
+			var bonus_tc := battle_bonus(sh)   # Arcano de Batalha: uma vez por magia
+			for tgt in alvos_tc:
+				out.append_array(_toque_chocante(id, str(tgt), expr_tc, bonus_tc, apr_tc.has(1), spell_dc(sh, a), sp))
+				bonus_tc = 0
 		"raio_arcano":
 			# Raio Arcano (LB p.39): 1d8 (+1d8 por círculo acima do 1º), alcance curto, Reflexos reduz à metade
 			var tgt: String = a.get("target", (a.get("targets", [""]) as Array)[0])
@@ -2372,16 +2432,24 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
 				"pv_after": T.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": sv.get("success", false), "tags": tags}, [id, tgt]))
 		"seta_infalivel":
-			var targets: Array = a.get("targets", [a.get("target", "")])
-			for i in int(sp.setas):
-				var tgt: String = targets[i % targets.size()]
-				if not sim.c(tgt).is_empty() and not sim.c(tgt).sheet.is_dead():
-					var r := Dice.roll(sp.dano_por_seta, world.rng, "combat", 1, battle_bonus(sh) if i == 0 else 0)
-					var tags: Array = ["magia", "impacto"]
-					tags.append_array(sim.apply_damage(tgt, int(r.total)))
-					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
-						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
-						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+			# Seta Infalível de Talude (arcana 1, LB p.205): duas setas de 1d4+1 de essência, sem teste, divididas entre os
+			# alvos escolhidos. Aprimoramentos: lanças de 1d8+1 (2º); três, cinco (2º) ou dez (4º) setas; vale o maior.
+			# Arcano de Batalha soma uma vez.
+			var apr_si: Array = a.get("aprimoramentos", [])
+			var n_si := 10 if apr_si.has(3) else (5 if apr_si.has(2) else (3 if apr_si.has(1) else int(sp.setas)))
+			var dado_si := "1d8+1" if apr_si.has(0) else str(sp.dano_por_seta)
+			var alvos_si: Array = a.get("targets", [a.get("target", "")])
+			for i_si in n_si:
+				var tgt: String = alvos_si[i_si % alvos_si.size()]
+				if sim.c(tgt).is_empty() or sim.c(tgt).sheet.is_dead():
+					continue
+				var r := Dice.roll(dado_si, world.rng, "combat", 1, battle_bonus(sh) if i_si == 0 else 0)
+				var dano_si := _dano_por_tipo(sim.c(tgt).sheet, "essencia", int(r.total))
+				var tags: Array = ["magia", "essencia"]
+				tags.append_array(sim.apply_damage(tgt, dano_si))
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
+					"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_si, "rolls": r.rolls,
+					"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
 		"luz", "escuridao":
 			out.append_array(_luz_ou_escuridao(id, a))
 		"aviso":
@@ -2575,7 +2643,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var objetos_d: Array = []
 			if apr_d.has(5):
 				var area_d := Area.esfera(sim.c(id).tile, Area.quadrados(6.0))
-				criaturas_d = _criaturas_vivas_em(area_d)
+				criaturas_d = _criaturas_vivas_em(area_d).filter(func(x): return x != id)   # área de alcance pessoal só afeta você se disser (LB p.225)
 				objetos_d = _objetos_quebraveis_em(area_d, SpellRules.despedacar_tamanho_max(apr_d))
 			else:
 				criaturas_d = a.get("targets", []) if a.has("objeto") else a.get("targets", [a.get("target", id)])
@@ -3209,6 +3277,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	var atk: Dictionary = v.atk
 	var pre: Array = []
 	v.defense = int(v.defense) + _reacao_escudo(attacker, target, pre)   # reação de magia antes da rolagem
+	v.defense = int(v.defense) + _reacao_armadura_arcana(attacker, target, pre)
 	var d20: int = world.rng.roll("combat", 1, 20)[0]
 	var camo_roll := 0
 	var camo_miss := false

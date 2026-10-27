@@ -1288,7 +1288,26 @@
     "alcance": "pessoal",
     "duracao": "cena",
     "defesa": 5,
-    "cumulativo_com_armadura": false
+    "cumulativo_com_armadura": false,
+    "nome": "Armadura Arcana",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia cria uma película protetora invisível, mas tangível, fornecendo +5 na Defesa. Esse bônus é cumulativo com outras magias, mas não com bônus fornecido por armaduras.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda a execução para reação. Em vez do normal, quando sofre um ataque, você cria um escudo mágico que fornece +5 na Defesa contra esse ataque (cumulativo com o bônus do efeito básico desta magia e de armaduras)."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta o bônus na Defesa em +1."
+     },
+     {
+      "pm": 2,
+      "texto": "muda a duração para um dia. Requer 3º círculo."
+     }
+    ]
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 183,
@@ -1306,7 +1325,26 @@
     "dano": "2d8+2",
     "dano_tipo": "eletricidade",
     "resistencia": "fortitude_metade",
-    "penalidade_metal": -5
+    "penalidade_metal": -5,
+    "nome": "Toque Chocante",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "texto": "Arcos elétricos envolvem sua mão, causando 2d8+2 pontos de dano de eletricidade. Se o alvo usa armadura de metal (ou carrega muito metal, a critério do mestre), sofre uma penalidade de –5 no teste de resistência.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta o dano em +1d8+1."
+     },
+     {
+      "pm": 2,
+      "texto": "muda a resistência para nenhum. Como parte da execução da magia, você faz um ataque corpo a corpo contra o alvo. Se acertar, causa o dano do ataque e da magia."
+     },
+     {
+      "pm": 2,
+      "texto": "muda o alcance para pessoal e o alvo para área: esfera com 6m de raio. Você dispara raios pelas pontas dos dedos que afetam todas as criaturas na área."
+     }
+    ]
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 209,
@@ -1324,7 +1362,31 @@
     "setas": 2,
     "dano_por_seta": "1d4+1",
     "dano_tipo": "essencia",
-    "acerta_automaticamente": true
+    "acerta_automaticamente": true,
+    "nome": "Seta Infalível de Talude",
+    "alvo_tipo": "Alvos",
+    "alvo": "criaturas escolhidas",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Favorita entre arcanistas iniciantes, esta magia lança duas setas de energia que causam 1d4+1 pontos de dano de essência cada. Você pode lançar as setas em alvos diferentes ou concentrá-las num mesmo alvo. Caso você possua um bônus no dano de magias, como pelo poder Arcano de Batalha, ele é aplicado em apenas uma seta (o bônus vale para a magia, não cada alvo).",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "muda as setas para lanças de energia que surgem e caem do céu. Cada lança causa 1d8+1 pontos de dano de essência. Requer 2º círculo."
+     },
+     {
+      "pm": 2,
+      "texto": "muda o número de setas/lanças para três."
+     },
+     {
+      "pm": 4,
+      "texto": "muda o número de setas/lanças para cinco. Requer 2º círculo."
+     },
+     {
+      "pm": 9,
+      "texto": "muda o número de setas/lanças para dez. Requer 4º círculo."
+     }
+    ]
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 206,
