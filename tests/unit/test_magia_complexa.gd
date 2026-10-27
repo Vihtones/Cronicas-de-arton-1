@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -358,3 +358,74 @@ func test_sopro_com_aprimoramento_2_leva_pv_negativos_a_zero_antes_da_cura() -> 
 	var a := {"type": "cast", "spell": "sopro_da_salvacao", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [1]}
 	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
 	check(sim.c("bandido_2").sheet.pv >= 6, "PV negativos vão a 0 e só então recebem a cura (mínimo 6)")
+
+
+# --- Círculo da Restauração (4º círculo) ---------------------------------------------------
+func test_circulo_da_restauracao_exige_circulo_4_e_nivel_13() -> void:
+	var m12 := _cena_grupo(12)
+	check(not GhostPlanner.validate_action(m12[2], "player", {"type": "cast", "spell": "circulo_da_restauracao", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "clérigo de nível 12 não lança magia de 4º círculo")
+	var m13 := _cena_grupo(13)
+	check(GhostPlanner.validate_action(m13[2], "player", {"type": "cast", "spell": "circulo_da_restauracao", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "clérigo de nível 13 lança o Círculo da Restauração")
+
+
+func test_circulo_da_restauracao_cria_esfera_de_3m_por_5_rodadas() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "circulo_da_restauracao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	eq(sim.zonas.size(), 1, "uma zona criada")
+	eq(sim.zonas[0].rodadas, 5, "dura 5 rodadas")
+	eq((sim.zonas[0].tiles as Array).size(), Area.esfera(Vector2i(27, 57), Area.quadrados(3.0)).size(), "área é a esfera de 3m em volta do alvo")
+
+
+func test_circulo_da_restauracao_cura_e_da_1_pm_no_fim_do_turno_de_quem_esta_dentro() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "circulo_da_restauracao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	var ts: CharacterSheet = sim.c("bandido_1").sheet
+	ts.pv = 10
+	ts.pm_max = 99
+	ts.pm = 0
+	var facts: Array = []
+	c._zonas_fim_de_turno("bandido_1", facts)
+	check(ts.pv >= 16, "criatura dentro recupera no mínimo 3d8+3 (6 PV)")
+	eq(ts.pm, 1, "recebe 1 PM")
+	sim.c("player").tile = Vector2i(10, 57)   # fora da esfera (raio 2 em volta de 27,57)
+	var fora: CharacterSheet = sim.c("player").sheet
+	fora.pv = 10
+	c._zonas_fim_de_turno("player", facts)
+	eq(fora.pv, 10, "criatura fora da esfera não é curada")
+
+
+func test_circulo_da_restauracao_limita_pm_a_5_por_dia() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "circulo_da_restauracao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	var ts: CharacterSheet = sim.c("bandido_1").sheet
+	ts.pm_max = 99
+	ts.pm = 0
+	var facts: Array = []
+	for i in 7:
+		c._zonas_fim_de_turno("bandido_1", facts)
+	eq(ts.pm, 5, "máximo de 5 PM por dia com a magia")
+
+
+func test_circulo_da_restauracao_faz_mortos_vivos_perderem_pv_e_pm_na_mesma_quantidade() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "circulo_da_restauracao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	var ts: CharacterSheet = sim.c("bandido_1").sheet
+	ts.creature_type = "morto-vivo"
+	ts.pm_max = 99
+	ts.pm = 99
+	var pv_antes := ts.pv
+	c._zonas_fim_de_turno("bandido_1", [])
+	eq(pv_antes - ts.pv, 99 - ts.pm, "mortos-vivos perdem a mesma quantidade de PV e de PM")
+	check(ts.pv < pv_antes, "perdem PV")

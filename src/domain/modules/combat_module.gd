@@ -181,7 +181,9 @@ func execute(cmd: GameCommand) -> Array:
 					return out
 			return out
 		"EndTurn":
-			var out: Array = [fact("TURN_ENDED", {"actor": "player"}, ["player"])]
+			var out: Array = []
+			_zonas_fim_de_turno("player", out)
+			out.append(fact("TURN_ENDED", {"actor": "player"}, ["player"]))
 			sim.next_turn()
 			out.append_array(_run_until_player())
 			return out
@@ -436,6 +438,7 @@ func _run_until_player() -> Array:
 			if not end.is_empty():
 				out.append_array(end)
 				return out
+		_zonas_fim_de_turno(id, out)
 		out.append(fact("TURN_ENDED", {"actor": id}))
 		sim.next_turn()
 	push_warning("Combate: limite de iterações atingido")
@@ -537,6 +540,40 @@ func _zona_afeta(z: Dictionary, id: String) -> bool:
 	if afeta == "inimigos":
 		return sim.c(id).side != lado
 	return sim.c(id).side == lado
+
+
+## Fim de turno: zonas com efeito "fim_turno" (Círculo da Restauração). Criaturas vivas recuperam PV e até 1 PM
+## (máximo 5 PM por dia com a magia); mortos-vivos e criaturas vulneráveis à luz perdem a mesma quantidade.
+func _zonas_fim_de_turno(id: String, facts: Array) -> void:
+	var x: Dictionary = sim.c(id)
+	var s: CharacterSheet = x.sheet
+	if s.is_dead():
+		return
+	for z in sim.zonas.duplicate(true):
+		var dados: Dictionary = z.get("dados", {})
+		if not dados.has("fim_turno") or not (z.tiles as Array).has(x.tile) or not _zona_afeta(z, id):
+			continue
+		var conj := str(dados.get("conjurador", id))
+		var n := int(Dice.roll(str(dados.fim_turno), world.rng, "combat").total)
+		if _sofre_luz(s):
+			s.pm -= mini(s.pm, n)
+			var tags_f: Array = ["magia", "luz"]
+			tags_f.append_array(sim.apply_damage(id, n))
+			facts.append(fact("ATTACK_RESOLVED", {"attacker": conj, "target": id, "weapon": str(z.fonte), "d20": 0, "mod": 0,
+				"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": n, "rolls": [],
+				"pv_after": s.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags_f}, [conj, id]))
+		else:
+			s.pv = mini(s.pv_max, s.pv + n)
+			facts.append(fact("HEALED", {"actor": conj, "target": id, "amount": n, "pv_after": s.pv, "source": str(z.fonte), "tags": ["magia", "cura"]}, [conj, id]))
+			var usados := s.efeito_bonus("usos_circulo_restauracao")
+			if usados < 5:
+				s.pm = mini(s.pm_max, s.pm + 1)
+				s.add_efeito("circulo_restauracao", "usos_circulo_restauracao", usados + 1, "dia")
+
+
+## Criatura que sofre dano por luz: mortos-vivos e criaturas com vulnerabilidade à luz (tabela da raça).
+func _sofre_luz(s: CharacterSheet) -> bool:
+	return s.creature_type == "morto-vivo" or int(s.vuln.get("luz", 0)) > 0
 
 
 ## Dano mágico por dados (zona ou marca): aplica e registra no mesmo formato de um ataque de magia.
@@ -1008,6 +1045,16 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if apr_v.has(2):
 					tsv.add_efeito("magia.vestimenta_da_fe", "rd", 5, "dia", "*", ate_v)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "vestimenta_da_fe", "tags": ["magia"]}, [id, tg]))
+		"circulo_da_restauracao":
+			# Círculo da Restauração (4º círculo): esfera de 3m no alvo por 5 rodadas. Ao fim do turno de cada criatura
+			# dentro dele: 3d8+3 PV e 1 PM (4d8+4 PV com o aprimoramento). Mortos-vivos e criaturas vulneráveis à luz
+			# perdem a mesma quantidade. Cada criatura recebe no máximo 5 PM por dia com esta magia.
+			var apr_r: Array = a.get("aprimoramentos", [])
+			var regen_r := "4d8+4" if apr_r.has(0) else "3d8+3"
+			var alvo_r: String = a.get("target", id)
+			sim.add_zona("circulo_restauracao_%d" % sim.zonas.size(), Area.esfera(sim.c(alvo_r).tile, Area.quadrados(3.0)), "circulo_restauracao", 5, "circulo_da_restauracao",
+				{"fim_turno": regen_r, "conjurador": id, "afeta": "todos"})
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_r, "buff": "circulo_da_restauracao", "tags": ["magia"]}, [id, alvo_r]))
 		"coluna_de_chamas":
 			# Coluna de Chamas (3º círculo): cilindro de 3m de raio em volta do alvo; 6d6 de fogo e 6d6 de luz,
 			# Reflexos reduz à metade. Aprimoramentos: +1d6 de fogo e +1d6 de luz (1 PM cada).
