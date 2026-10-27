@@ -125,6 +125,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):
 						return {"ok": false, "reason": "Perdição só afeta inimigos"}
+			if sp_id == "banimento":
+				var tg_b: String = a.get("target", "")
+				if tg_b == actor or not sim.combatants.has(tg_b):
+					return {"ok": false, "reason": "Banimento precisa de outra criatura como alvo"}
+				if sim.conjurando.has(actor):
+					return {"ok": false, "reason": "você já está conjurando uma magia de execução longa"}
+				if apr.has(0) and not tg_b.begins_with("inv_"):
+					return {"ok": false, "reason": "o aprimoramento só devolve criatura conjurada"}
 			if sp_id == "sopro_da_salvacao":
 				return _validar_sopro(sim, actor, A, a, cost)
 			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.alcance), apr)

@@ -24,6 +24,7 @@ var marcas: Array = []
 ## Ids que expiraram na última passagem de rodada (a apresentação pode mostrar o fim do efeito).
 var expiradas: Array = []
 var rng: RngStreams                 # null em simulações do fantasma: sem rolagens
+var conjurando: Dictionary = {}     # conjurador -> {alvo, cd, apr, rodadas}: magia de execução longa (Banimento); 0 rodadas = pronta
 var pendencias: Array = []          # efeitos de ligação ocorridos, drenados pelo módulo para o registro
 
 
@@ -42,6 +43,7 @@ func clone() -> CombatSim:
 	c.zonas = zonas.duplicate(true)
 	c.marcas = marcas.duplicate(true)
 	c.expiradas = expiradas.duplicate()
+	c.conjurando = conjurando.duplicate(true)
 	return c
 
 
@@ -337,6 +339,13 @@ static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
 ## quando falha. A ligação acaba se o alvo cair a 0 PV (exceto com o aprimoramento de 5 PM).
 func apply_damage(target: String, amount: int) -> Array:
 	var tags := _dano_bruto(target, amount)
+	# Concentração na execução (LB p.170): ser ferido exige Vontade com CD igual ao dano; falha perde a magia.
+	if amount > 0 and rng != null and conjurando.has(target) and int(conjurando[target].rodadas) > 0:
+		var sv_c := Checks.skill(c(target).sheet, "vontade", amount, rules, rng, "combat")
+		var passou_c: bool = sv_c.get("success", false)
+		pendencias.append({"tipo": "concentracao", "conj": target, "alvo": target, "valor": amount, "passou": passou_c})
+		if not passou_c:
+			conjurando.erase(target)
 	var lig := ligacao_de(target)
 	if not lig.is_empty() and amount > 0 and rng != null:
 		var alvo := str(lig.alvo)
@@ -483,6 +492,9 @@ func remove_combatant(id: String) -> void:
 ## Passagem de rodada: conta as rodadas de zonas e marcas; invocações que acabam saem do combate.
 func _passar_rodada() -> void:
 	expiradas.clear()
+	for k in conjurando.keys():   # execução longa: cada rodada conta um passo até a magia ficar pronta
+		if int(conjurando[k].rodadas) > 0:
+			conjurando[k].rodadas = int(conjurando[k].rodadas) - 1
 	for z in zonas:
 		if z.rodadas > 0:
 			z.rodadas -= 1

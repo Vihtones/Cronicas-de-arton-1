@@ -453,6 +453,7 @@ const RAIO_AURA_QUADRADOS := 6
 
 ## Raio da Aura Divina: 9m (LB p.182), com 1 quadrado = 1,5m. Condições que a aura pode impor (a escolha do conjurador).
 const RAIO_AURA_DIVINA_QUADRADOS := 6
+const ALCANCE_CURTO_QUADRADOS := 6   # alcance curto: 9m
 const CONDICOES_AURA_DIVINA := ["esmorecido", "debilitado", "lento"]
 
 
@@ -552,6 +553,51 @@ func _condicao_aura(hs: CharacterSheet) -> String:
 		if e.id == "magia.aura_divina" and e.stat == "condicao":
 			return str(e.tipo)
 	return "esmorecido"
+
+
+## Fim da execução do Banimento (no início do turno do conjurador): alvo fora de alcance ou já fora da cena não é afetado.
+## Criatura de outro mundo (espírito) faz Vontade ou é banida; morto-vivo faz Vontade ou cai a 0 PV; quem passa fica
+## enjoado por 1d4 rodadas. Nativo de Arton não é afetado. Com o aprimoramento, a criatura conjurada volta ao plano.
+func _resolver_conjuracao(id: String, facts: Array) -> void:
+	if not sim.conjurando.has(id) or int(sim.conjurando[id].rodadas) > 0:
+		return
+	var cj: Dictionary = sim.conjurando[id]
+	sim.conjurando.erase(id)
+	if not sim.conscious(id):
+		return
+	var alvo := str(cj.alvo)
+	if not sim.combatants.has(alvo) or not sim.conscious(alvo):
+		facts.append(fact("SPELL_MISSED", {"caster": id, "target": alvo, "spell": "banimento", "reason": "fora da cena"}, [id, alvo]))
+		return
+	if CombatSim.cheb(sim.c(id).tile, sim.c(alvo).tile) > ALCANCE_CURTO_QUADRADOS:
+		facts.append(fact("SPELL_MISSED", {"caster": id, "target": alvo, "spell": "banimento", "reason": "fora de alcance"}, [id, alvo]))
+		return
+	var alv: CharacterSheet = sim.c(alvo).sheet
+	var cd := int(cj.cd)
+	if bool(cj.apr):
+		if alvo.begins_with("inv_"):
+			sim.remove_combatant(alvo)
+			facts.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo, "buff": "banimento", "efeito": "devolvida_ao_plano", "tags": ["magia"]}, [id, alvo]))
+		else:
+			facts.append(fact("SPELL_MISSED", {"caster": id, "target": alvo, "spell": "banimento", "reason": "não é criatura conjurada"}, [id, alvo]))
+		return
+	var planar := alv.creature_type == "espirito"
+	var morta := alv.creature_type == "morto-vivo"
+	if not planar and not morta:
+		facts.append(fact("SPELL_MISSED", {"caster": id, "target": alvo, "spell": "banimento", "reason": "nativo de Arton"}, [id, alvo]))
+		return
+	var sv := Checks.skill(alv, "vontade", cd, world.rules, world.rng, "combat")
+	sv = _pos_teste(alvo, sv, cd, facts)
+	if sv.get("success", false):
+		sim.add_condicao(alvo, "enjoado", int(Dice.roll("1d4", world.rng, "combat").total), "banimento")
+		facts.append(fact("SPELL_MISSED", {"caster": id, "target": alvo, "spell": "banimento", "reason": "resistiu"}, [id, alvo]))
+		return
+	if morta:
+		sim.apply_damage(alvo, alv.pv + alv.pv_temp)   # conexão com as energias negativas rompida: 0 PV
+		facts.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo, "buff": "banimento", "efeito": "destruido", "tags": ["magia"]}, [id, alvo]))
+	else:
+		sim.c(alvo).flags.append("fora")   # de volta ao mundo de origem: fica fora da cena (não age nem é alvo)
+		facts.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo, "buff": "banimento", "efeito": "banido", "tags": ["magia"]}, [id, alvo]))
 
 
 ## Quadrado livre e transitável mais perto de `centro`, pela própria simulação (vale no planejamento também).
@@ -856,6 +902,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
+	_resolver_conjuracao(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
 	CondicoesCombate.inicio_de_turno(sim, id, world.rng, facts)   # em chamas e sangramento
@@ -897,6 +944,8 @@ func _begin_turn_base(id: String) -> Dictionary:
 	if s.has_effective_condition(world.rules, "enjoado"):
 		sim.budget["enjoado"] = true
 	x.flags.erase("defensivo")   # Combate Defensivo vale "até seu próximo turno" (LB p.125)
+	if sim.conjurando.has(id) and int(sim.conjurando[id].rodadas) > 0:
+		sim.budget["std"] = 0   # conjurando: a ação padrão vai para a execução da magia
 	var extra_move := false
 	if not x.flags.has("agiu"):
 		x.flags.append("agiu")
@@ -1293,6 +1342,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					"pv_after": ts_cz.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": passou_cz, "tags": tags_cz}, [id, tg_cz]))
 			if apr_cz.has(2):
 				_dissipar_na_area(tiles_cz, "Necromancia", out)
+		"banimento":
+			# Banimento (3º círculo): execução de 1d3+1 rodadas (`_resolver_conjuracao`). Concentração: ser ferido enquanto
+			# conjura exige Vontade com CD igual ao dano. Itens que se opõem ao alvo somam +2 na CD (`itens_opostos`).
+			var cd_b := spell_dc(sh, a) + 2 * int(a.get("itens_opostos", 0))
+			var rodadas_b := int(Dice.roll("1d3+1", world.rng, "combat").total)
+			sim.conjurando[id] = {"alvo": a.get("target", ""), "cd": cd_b, "apr": a.get("aprimoramentos", []).has(0), "rodadas": rodadas_b}
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": a.get("target", ""), "buff": "banimento_conjurando", "rodadas": rodadas_b, "tags": ["magia"]}, [id]))
 		"aura_divina":
 			# Aura Divina (5º círculo): esfera de 9m que segue você pela cena (ver `_refresh_aura_divina`). A CD guarda
 			# a da magia; a condição (esmorecido, debilitado ou lento) é a escolha do conjurador, aplicada a quem entra.
@@ -1924,6 +1980,10 @@ func _propagar_ligacoes() -> Array:
 				sim.c(lig.alvo).sheet.add_condition(str(cond), world.rules)
 			out.append(fact("BUFF_APPLIED", {"actor": conj, "target": lig.alvo, "buff": "ligacao_sombria", "condicao": str(cond), "passou": passou, "tags": ["magia"]}, [conj, lig.alvo]))
 	for p in sim.pendencias:
+		if p.tipo == "concentracao":
+			if not p.passou:
+				out.append(fact("SPELL_FAILED", {"caster": p.conj, "check": "vontade", "cd": p.valor, "reason": "ferido_na_execucao", "d20": 0, "total": 0}, [p.conj]))
+			continue
 		out.append(fact("BUFF_APPLIED", {"actor": p.conj, "target": p.alvo, "buff": "ligacao_sombria", "dano": p.valor, "passou": p.passou, "tags": ["magia"]}, [p.conj, p.alvo]))
 	sim.pendencias.clear()
 	return out
@@ -1990,6 +2050,10 @@ func _end_combat(outcome: String) -> Array:
 		if id == "player" or str(id).begins_with("inv_"):   # invocações não são criaturas do mundo nem companheiros
 			continue
 		var x := sim.c(id)
+		if x.flags.has("fora"):   # banido por Banimento: volta ao mundo de origem, sem contar como derrota
+			creature_state[id].sheet = x.sheet.to_dict()
+			creature_state[id].present = false
+			continue
 		if x.side == "player":
 			# companheiro: não é criatura; se morreu, sai como NPC_DIED (a party reage)
 			if x.sheet.is_dead():
@@ -2057,7 +2121,7 @@ func to_dict() -> Dictionary:
 				"damaged_round": x.damaged_round, "surprised": x.surprised, "flags": x.flags.duplicate()}
 		d["sim"] = {"combatants": cs, "order": sim.order.duplicate(), "initiative": sim.initiative.duplicate(), "turn_idx": sim.turn_idx,
 			"round_no": sim.round_no, "turn_counter": sim.turn_counter, "budget": sim.budget.duplicate(),
-			"zonas": sim.zonas.duplicate(true), "marcas": sim.marcas.duplicate(true)}
+			"zonas": sim.zonas.duplicate(true), "marcas": sim.marcas.duplicate(true), "conjurando": sim.conjurando.duplicate(true)}
 	return d
 
 
@@ -2086,5 +2150,6 @@ func from_dict(d: Dictionary) -> void:
 		sim.budget = {"std": int(s.budget.std), "move": int(s.budget.move)}
 		sim.zonas = (s.get("zonas", []) as Array).duplicate(true)
 		sim.marcas = (s.get("marcas", []) as Array).duplicate(true)
+		sim.conjurando = (s.get("conjurando", {}) as Dictionary).duplicate(true)
 	else:
 		active = false

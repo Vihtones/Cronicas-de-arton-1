@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -846,3 +846,121 @@ func test_aura_divina_acaba_quando_o_conjurador_cai() -> void:
 	sim.c("player").sheet.pv = 0
 	c._refresh_bencaos()
 	eq(sim.c("bandido_1").sheet.efeito_bonus("defesa"), 0, "com o conjurador caído, o bônus some")
+
+
+# --- Banimento (3º círculo, execução de 1d3+1 rodadas) ---------------------------------------
+func _banir(m: Array, alvo: String, apr: Array = []) -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "banimento", "target": alvo, "targets": [alvo], "aprimoramentos": apr}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	sim.conjurando["player"].rodadas = 0   # a execução termina: a magia fica pronta para o próximo turno do conjurador
+	c._begin_turn_base("player")
+
+
+func test_banimento_exige_circulo_3() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(8)[2], "player", {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 8 não lança magia de 3º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(9)[2], "player", {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 9 lança o Banimento")
+
+
+func test_banimento_espirito_que_falha_e_banido_da_cena() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.creature_type = "espirito"
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_banir(m, "bandido_1")
+	check(sim.c("bandido_1").flags.has("fora") and not sim.conscious("bandido_1"), "espírito que falha na Vontade sai da cena")
+
+
+func test_banimento_morto_vivo_que_falha_cai_a_0_pv() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.creature_type = "morto-vivo"
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_banir(m, "bandido_1")
+	eq(sim.c("bandido_1").sheet.pv, 0, "morto-vivo que falha é reduzido a 0 PV")
+
+
+func test_banimento_nativo_de_arton_nao_e_afetado() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.creature_type = "humanoide"
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_banir(m, "bandido_1")
+	check(sim.combatants.has("bandido_1"), "nativo de Arton continua na cena")
+	check(not sim.c("bandido_1").sheet.conditions.has("enjoado"), "nativo não recebe o enjoo do Banimento")
+
+
+func test_banimento_quem_passa_na_vontade_fica_enjoado() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.creature_type = "espirito"
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	_banir(m, "bandido_1")
+	check(sim.combatants.has("bandido_1"), "quem passa não é banido")
+	check(sim.c("bandido_1").sheet.conditions.has("enjoado"), "quem passa fica enjoado")
+
+
+func test_banimento_ser_ferido_enquanto_conjura_quebra_a_magia() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.creature_type = "espirito"
+	sim.c("player").sheet.add_efeito("teste", "resistencia", -50, "cena")   # falha na concentração (CD = dano)
+	var a := {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	sim.apply_damage("player", 10)
+	check(not sim.conjurando.has("player"), "ferido na execução e sem concentração, a magia é perdida")
+	var facts: Array = c._propagar_ligacoes()
+	var falhou := false
+	for f in facts:
+		if f.type == "SPELL_FAILED" and str(f.payload.get("reason", "")) == "ferido_na_execucao":
+			falhou = true
+	check(falhou, "a perda da magia por dano é registrada")
+
+
+func test_banimento_ser_ferido_com_concentracao_mantem_a_magia() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	var a := {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	sim.apply_damage("player", 10)
+	check(sim.conjurando.has("player"), "com concentração, a magia continua")
+
+
+func test_banimento_ocupa_a_acao_padrao_enquanto_conjura() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.conjurando["player"] = {"alvo": "bandido_1", "cd": 15, "apr": false, "rodadas": 2}
+	sim.budget = {"std": 1, "move": 1}
+	c._begin_turn_base("player")
+	eq(sim.budget["std"], 0, "enquanto conjura, a ação padrão do turno vai para a magia")
+
+
+func test_banimento_com_aprimoramento_devolve_criatura_conjurada() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var inv: String = c.invocar("player", "criatura.bandido_comum", 5, "teste")
+	_banir(m, inv, [0])
+	check(not sim.combatants.has(inv), "a criatura conjurada volta ao plano")
+
+
+func test_banimento_aprimoramento_so_aceita_criatura_conjurada() -> void:
+	var m := _cena_grupo(9)
+	var a := {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]}
+	check(not GhostPlanner.validate_action(m[2], "player", a).ok, "o aprimoramento não vale contra criatura que não foi conjurada")
+
+
+func test_banimento_itens_opostos_somam_2_na_cd() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	var base: int = c.spell_dc(sh, {})
+	var a := {"type": "cast", "spell": "banimento", "target": "bandido_1", "targets": ["bandido_1"], "itens_opostos": 2}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	eq(sim.conjurando["player"].cd, base + 4, "cada item que se opõe soma +2 na CD")
