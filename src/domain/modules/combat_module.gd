@@ -663,21 +663,21 @@ func processar_rituais_do_dia() -> Array:
 			continue
 		var npc := str(e.tipo)
 		ps.remove_efeito_de("magia.lagrimas_de_wynna", "ritual")
-		var st: Dictionary = creature_state.get(npc, {})
-		if st.is_empty() or not bool(st.get("present", false)) or not _mesmo_lugar_do_jogador(st):
+		var estado_npc: Dictionary = creature_state.get(npc, {})
+		if estado_npc.is_empty() or not bool(estado_npc.get("present", false)) or not _mesmo_lugar_do_jogador(estado_npc):
 			out.append(fact("SPELL_MISSED", {"caster": "player", "target": npc, "spell": "lagrimas_de_wynna", "reason": "alvo se afastou"}, ["player", npc]))
 			continue
-		var nsh := CharacterSheet.from_dict(st.sheet)
+		var nsh := CharacterSheet.from_dict(estado_npc.sheet)
 		var sv := Checks.skill(nsh, "vontade", int(e.bonus), world.rules, world.rng, "world")
 		if not sv.get("success", false):
 			nsh.arcana_perdida = true
-		st.sheet = nsh.to_dict()
+		estado_npc.sheet = nsh.to_dict()
 		out.append(fact("BUFF_APPLIED", {"actor": "player", "target": npc, "buff": "lagrimas_de_wynna", "passou": sv.get("success", false), "arcana_perdida": not sv.get("success", false), "tags": ["magia"]}, ["player", npc]))
 	return out
 
 
-func _mesmo_lugar_do_jogador(st: Dictionary) -> bool:
-	var t: Array = st.get("tile", [])
+func _mesmo_lugar_do_jogador(estado_npc: Dictionary) -> bool:
+	var t: Array = estado_npc.get("tile", [])
 	if t.size() < 2:
 		return false
 	var onde := world.db.location_at(world.db.world_to_tile(world.player.position))
