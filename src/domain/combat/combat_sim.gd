@@ -396,6 +396,29 @@ func trim_path(mover: String, path: Array, budget_sq: int) -> Array:
 
 
 ## --- Ataque (LB p.230-239) ----------------------------------------------------
+## Alcance natural corpo a corpo em quadrados (1 = adjacente); efeitos "alcance_corpo" somam (Soco de Arsenal).
+func alcance_corpo(id: String) -> int:
+	return 1 + int(c(id).sheet.efeito_bonus("alcance_corpo"))
+
+
+## Empurrão: afasta `id` de `origem` até `quadrados`, quadrado a quadrado, parando antes de obstáculo ou criatura.
+## Devolve o caminho percorrido (vazio se não se moveu).
+func empurrar(id: String, origem: Vector2i, quadrados: int) -> Array:
+	var pos: Vector2i = c(id).tile
+	var d := Vector2i(signi(pos.x - origem.x), signi(pos.y - origem.y))
+	if d == Vector2i.ZERO:
+		d = Vector2i(1, 0)
+	var caminho: Array = []
+	for _i in quadrados:
+		var nx := pos + d
+		if not walk_fn.call(nx) or occupant(nx, id) != "":
+			break
+		pos = nx
+		caminho.append(pos)
+	c(id).tile = pos
+	return caminho
+
+
 func flanking(attacker: String, target: String) -> bool:
 	var a: Vector2i = c(attacker).tile
 	var t: Vector2i = c(target).tile
@@ -424,7 +447,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	var ranged: bool = atk.get("distancia", false)
 	var reach := int(atk.get("alcance_q", 1))
 	var mods: Array = []
-	if not ranged and dist > 1:
+	if not ranged and dist > alcance_corpo(attacker):
 		return {"ok": false, "reason": "alvo fora do alcance corpo a corpo"}
 	if ranged and dist > reach * 2:
 		return {"ok": false, "reason": "alvo além do dobro do alcance"}

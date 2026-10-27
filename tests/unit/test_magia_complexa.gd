@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2912,3 +2912,25 @@ func test_silencio_fora_de_combate_abafa_o_barulho() -> void:
 	check(w.module("magia").silencio_ativo(), "ativo")
 	var out: Array = w.module("combat").on_event(GameEvent.create("e", "OBJECT_DAMAGED", w.clock.tick, {"object": "porta_cela"}))
 	check(out.any(func(f): return f.type == "NOISE_UNHEARD"), "ninguém ouve")
+
+
+func test_soco_de_arsenal_dano_empurrao_e_alcance_natural() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b2 := _bandido(m, "bandido_2", -50)
+	var fr := int(sim.c("player").sheet.attrs["for"])
+	check(_lanca(m, {"type": "cast", "spell": "soco_de_arsenal", "target": "bandido_2", "aprimoramentos": [1, 2]}).ok, "Soco válido em alcance médio")
+	var d := 999 - b2.pv
+	check(d >= 5 + fr and d <= 30 + fr, "5d6 + Força (%d)" % d)
+	eq(sim.c("bandido_2").tile, Vector2i(36, 57), "empurrado 6m para longe")
+	var m2 := _cena_grupo(5)
+	var b3 := _bandido(m2, "bandido_2", 99)
+	_lanca(m2, {"type": "cast", "spell": "soco_de_arsenal", "target": "bandido_2"})
+	eq(m2[2].c("bandido_2").tile, Vector2i(32, 57), "passou: sem empurrão")
+	check(999 - b3.pv <= (24 + fr) / 2 + 1, "metade do dano")
+	var m3 := _cena_grupo(5)
+	var s3: CombatSim = m3[2]
+	s3.c("bandido_1").tile = Vector2i(29, 57)
+	check(not s3.attack_profile("player", "bandido_1", 0, false, false).ok, "3 quadrados: fora do corpo a corpo")
+	check(_lanca(m3, {"type": "cast", "spell": "soco_de_arsenal", "target": "player", "aprimoramentos": [0]}).ok, "versão pessoal")
+	check(s3.attack_profile("player", "bandido_1", 0, false, false).ok, "alcance natural +3m")

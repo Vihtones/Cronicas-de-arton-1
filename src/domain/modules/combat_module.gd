@@ -1692,6 +1692,43 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Soco de Arsenal (divina 2, LB p.206): 4d6 + Força de impacto em alcance médio e empurrão de 3m para longe do
+## conjurador; Fortitude reduz à metade e evita o empurrão. Aprimoramentos: pessoal, pela cena o alcance natural
+## corpo a corpo aumenta 3m (1 PM); +1d6 (2 PM, repetível); +3m de empurrão (4 PM, repetível); dano de essência (5 PM).
+func _soco_de_arsenal(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	if apr.has(0):
+		sh.add_efeito("magia.soco_de_arsenal", "alcance_corpo", Area.quadrados(3.0), "cena")
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "soco_de_arsenal", "tags": ["magia"]}, [id]))
+		return out
+	var tgt: String = a.get("target", "")
+	var T: CharacterSheet = sim.c(tgt).sheet
+	var cd := spell_dc(sh, a)
+	var sv := Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat")
+	sv = _pos_teste(tgt, sv, cd, out)
+	var passou: bool = sv.get("success", false)
+	var r := Dice.roll("%dd6" % (4 + apr.count(1)), world.rng, "combat", 1, int(sh.attrs["for"]) + battle_bonus(sh))
+	var tipo := "essencia" if apr.has(3) else "impacto"
+	var dmg := maxi(0, int(r.total))
+	if passou:
+		dmg = maxi(1, dmg / 2)
+	dmg = _dano_por_tipo(T, tipo, dmg)
+	var tags: Array = ["magia", tipo]
+	if passou: tags.append("resistiu")
+	tags.append_array(sim.apply_damage(tgt, dmg))
+	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Soco de Arsenal", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
+		"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dmg, "rolls": r.rolls,
+		"pv_after": T.pv, "special": false, "ranged": true, "spell": true, "save": "fortitude", "saved": passou, "tags": tags}, [id, tgt]))
+	if not passou and not T.is_dead():
+		var from: Vector2i = sim.c(tgt).tile
+		var caminho := sim.empurrar(tgt, sim.c(id).tile, Area.quadrados(3.0) * (1 + apr.count(2)))
+		if not caminho.is_empty():
+			out.append(fact("COMBAT_MOVED", {"actor": tgt, "from": [from.x, from.y], "path": caminho.map(func(t): return [t.x, t.y]), "forced": true}, [tgt]))
+	return out
+
+
 func _resiste(alvo: String, pericia: String, cd: int, out: Array) -> bool:
 	var sv := Checks.skill(sim.c(alvo).sheet, pericia, cd, world.rules, world.rng, "combat")
 	sv = _pos_teste(alvo, sv, cd, out)
@@ -2620,6 +2657,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append(fact("CONDITIONS_REMOVED", {"actor": id, "target": tg_pu, "conditions": removidas}, [id, tg_pu]))
 		"raio_solar":
 			out.append_array(_raio_solar(id, a))
+		"soco_de_arsenal":
+			out.append_array(_soco_de_arsenal(id, a))
 		"silencio":
 			# Silêncio (divina 2): esfera de 6m em alcance médio, sustentada; quem está dentro fica surdo e não lança magias.
 			# Aprimoramentos: objeto que emana 3m (Vontade de involuntário); cena, e o som só não sai da área.

@@ -99,9 +99,9 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 
 - Divinas de 1º círculo: todas feitas.
 - Divinas de 2º círculo feitas: Físico Divino, Mente Divina (atributo muda de verdade e reverte), Oração,
-  Purificação, Raio Solar, Silêncio (alcance "médio" do catálogo normalizado para "medio").
-- Divinas de 2º círculo restantes (12): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
-  controlar_madeira, enxame_de_pestes, miasma_mefitico, rogar_maldicao, soco_de_arsenal, tempestade_divina,
+  Purificação, Raio Solar, Soco de Arsenal (empurrão e alcance natural), Silêncio (alcance "médio" do catálogo normalizado para "medio").
+- Divinas de 2º círculo restantes (11): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
+  controlar_madeira, enxame_de_pestes, miasma_mefitico, rogar_maldicao, tempestade_divina,
   voz_divina.
 - Divinas de 3º círculo (12): anular_a_luz, comunhao_com_a_natureza, controlar_agua, controlar_terra,
   despertar_consciencia, dispersar_as_trevas, heroismo, missao_divina, potencia_divina, protecao_contra_magia,

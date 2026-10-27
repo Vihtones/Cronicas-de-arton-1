@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Soco de Arsenal (divina, 2º círculo) completa: 4d6 + Força de impacto em alcance médio e empurrão de 3m (Fortitude reduz à metade e evita), +1d6, +3m de empurrão, dano de essência, e a versão pessoal que aumenta o alcance natural corpo a corpo em 3m pela cena. Novos sistemas: empurrão (CombatSim.empurrar) e alcance natural (efeito alcance_corpo).
+
 - Físico Divino, Mente Divina, Oração, Purificação, Raio Solar e Silêncio (divinas, 2º círculo) completas: atributos que mudam de verdade e revertem, bênção de oração, purificação de condições, raio solar e área de silêncio que deixa surdo e impede magias. Correção: alcance "médio" do catálogo (com acento) agora é reconhecido.
 
 - Armadura Arcana, Toque Chocante e Seta Infalível de Talude (arcanas, 1º círculo) completas, com texto e aprimoramentos do livro no catálogo: Armadura em reação (+5 contra um ataque), +1 e um dia; Toque com +1d8+1, ataque corpo a corpo sem resistência e esfera de 6m; Seta com lanças de 1d8+1 e três, cinco ou dez setas. Os danos agora são de eletricidade e essência de verdade (antes contavam como impacto). Correção: área de alcance pessoal não afeta o conjurador (LB p.225), também no Despedaçar.
