@@ -10176,6 +10176,517 @@
    "pagina": 16,
    "pdf_page": 18,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.alquimista",
+   "valor": {
+    "variante_de": "classe.inventor",
+    "substitui": "Ofício inicial passa a ser alquimista; Laboratório pessoal no lugar de habilidades de inventor (ver tabela)",
+    "pericias": "Como o inventor básico, mas o Ofício inicial é alquimista",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Engenhosidade",
+      "texto": "Como o inventor básico"
+     },
+     {
+      "nivel": 1,
+      "nome": "Laboratório pessoal",
+      "texto": "Começa com instrumentos de alquimista aprimorados e 10 itens alquímicos com preço total de até T$ 300"
+     },
+     {
+      "nivel": 2,
+      "nome": "Alquimista iniciado",
+      "texto": "Recebe o poder Alquimista Iniciado (Tormenta20, p. 68)"
+     },
+     {
+      "nivel": 3,
+      "nome": "Mistura básica",
+      "texto": "Pode usar catalisadores em itens alquímicos como se fossem magias"
+     },
+     {
+      "nivel": 5,
+      "nome": "Aplicação rápida",
+      "texto": "Gasta ação completa e 2 PM para usar dois preparados alquímicos ao mesmo tempo (ambos em mãos ou sacáveis como ação livre)"
+     },
+     {
+      "nivel": 7,
+      "nome": "Magia engarrafada",
+      "texto": "Pode usar Mistura básica e Aplicação rápida em poções"
+     },
+     {
+      "nivel": 8,
+      "nome": "Odores alquímicos",
+      "texto": "Ação completa para detectar itens alquímicos e poções em alcance médio; identifica tipo e uso dos itens e, nas poções, a magia emulada e os PM usados na fabricação"
+     },
+     {
+      "nivel": 9,
+      "nome": "Fabricar emulsão (1 encanto)",
+      "texto": "Aprende a fabricar emulsões com um encanto (T$ 250, CD 25). Nos níveis 13 e 17, emulsões com dois (T$ 750, CD 30) e três encantos (T$ 1.500, CD 35)"
+     },
+     {
+      "nivel": 10,
+      "nome": "Mestre alquimista",
+      "texto": "Recebe o poder Mestre Alquimista (Tormenta20, p. 69)"
+     },
+     {
+      "nivel": 11,
+      "nome": "Bombardeio eficiente",
+      "texto": "Ao usar preparado ou poção que causa dano, gasta 1 PM para ignorar 10 pontos da redução de dano dos alvos"
+     },
+     {
+      "nivel": 20,
+      "nome": "Pedra filosofal",
+      "texto": "Cura Acelerada 10; rola dois dados em Fortitude e usa o melhor; pode sacrificar a pedra para salvar a si ou a um aliado em alcance curto (efeito básico de Segunda Chance). Refazer custa uma semana de trabalho e T$ 18.000"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 23,
+   "pdf_page": 25,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.atleta",
+   "valor": {
+    "variante_de": "classe.lutador",
+    "substitui": "Briga e habilidades próprias do atleta; demais habilidades de lutador (poderes de lutador, casca grossa) são as do lutador básico",
+    "pericias": "Atletismo (For) e Luta (For), mais 4 a escolha entre Acrobacia, Adestramento, Cavalgar, Cura, Fortitude, Iniciativa, Intimidação, Ofício, Percepção, Pilotagem, Pontaria e Reflexos. Sem proficiências",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Briga",
+      "texto": "Dano desarmado 1d6; 1d8 no 5º, 1d10 no 10º, 2d6 no 13º, 2d8 no 17º e 2d10 no 20º nível"
+     },
+     {
+      "nivel": 1,
+      "nome": "Façanha atlética",
+      "texto": "Gasta PM (limitado pela Força) em testes de perícia: +2 no teste por PM gasto"
+     },
+     {
+      "nivel": 2,
+      "nome": "Arremesso atlético",
+      "texto": "Alcance de armas de arremesso aumenta um passo; ao atacar com elas pode usar o dano de Briga. A partir do 10º nível, esses ataques contam como desarmados para habilidades de lutador"
+     },
+     {
+      "nivel": 2,
+      "nome": "Poderio muscular",
+      "texto": "Aprende e pode lançar Primor Atlético, apenas em si mesmo (habilidade simulada, p. 44)"
+     },
+     {
+      "nivel": 3,
+      "nome": "Casca grossa",
+      "texto": "Como o lutador básico (Con +1 no 7º, +2 no 11º, +3 no 15º e +4 no 19º nível)"
+     },
+     {
+      "nivel": 5,
+      "nome": "Mais alto e mais rápido",
+      "texto": "Deslocamento +3m; recebe deslocamento de escalada e natação igual à metade do normal (ou +3m, se já os possuir). A natação não permite respirar debaixo d’água, mas soma o nível de atleta à duração da prenda de respiração"
+     },
+     {
+      "nivel": 9,
+      "nome": "Disciplina atlética",
+      "texto": "Ao falhar em teste de resistência, gasta 2 PM para rolar de novo usando Atletismo no lugar da perícia original"
+     },
+     {
+      "nivel": 20,
+      "nome": "Corpo ideal",
+      "texto": "Imunidade a cansaço, metabolismo e veneno; redução de dano 10; dano desarmado e com armas de arremesso 2d10 (criaturas Médias)"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 25,
+   "pdf_page": 27,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.burgues",
+   "valor": {
+    "variante_de": "classe.nobre",
+    "substitui": "Habilidades de nobre substituídas pelas de burguês; demais poderes de nobre são os do nobre básico",
+    "pericias": "Diplomacia (Car) e Vontade (Sab), mais 6 a escolha entre Adestramento, Atuação, Cavalgar, Conhecimento, Diplomacia, Enganação, Fortitude, Guerra, Iniciativa, Intimidação, Intuição, Investigação, Jogatina, Luta, Nobreza, Ofício, Percepção e Pontaria. Sem proficiências",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Meios de produção",
+      "texto": "No início de cada aventura recebe T$ 100 em dinheiro, itens mundanos ou poções a escolha; T$ 300 no veterano, T$ 600 no campeão e T$ 1.000 no lenda"
+     },
+     {
+      "nivel": 1,
+      "nome": "Orgulho",
+      "texto": "Como o nobre básico"
+     },
+     {
+      "nivel": 1,
+      "nome": "Poder monetário",
+      "texto": "Ao usar habilidade com custo em PM, pode consumir tibares de ouro (limitados pelo Car): cada TO paga 1 PM. Até um número por dia igual ao nível (dobro do nível a partir do 5º)"
+     },
+     {
+      "nivel": 2,
+      "nome": "Desmoralizar",
+      "texto": "Aprende Perdição (apenas criaturas Int –3 ou maior), como magia simulada (p. 44), com aprimoramentos como clérigo do mesmo nível. Penalidade de Desmoralizar –1, –2, –3, –4 e –5 nos níveis 2, 6, 10, 14 e 18"
+     },
+     {
+      "nivel": 3,
+      "nome": "Negociante nato",
+      "texto": "Ao chegar em comunidade nova, gasta 1 dia e faz Diplomacia (CD 20): vende itens por 60% do preço (em vez de 50%); a cada 10 pontos acima da CD, +10% no preço (máximo 100%). Não se acumula com barganha"
+     },
+     {
+      "nivel": 4,
+      "nome": "Suborno",
+      "texto": "Aprende Enfeitiçar (Car), como magia simulada. A CD para resistir aumenta em +2 se consumiu pelo menos 1 tibar para pagar o custo"
+     },
+     {
+      "nivel": 5,
+      "nome": "Ostentação",
+      "texto": "Pode usar um item vestido adicional. CD das habilidades de burguês +1 por item banhado a ouro, cravejado de gemas ou de mitral (cumulativo; três tipos dão +3)"
+     },
+     {
+      "nivel": 9,
+      "nome": "Novo rico",
+      "texto": "Para cada item mágico vestido, +1 PM por nível de poder do item (após 1 dia de uso)"
+     },
+     {
+      "nivel": 20,
+      "nome": "Magnata",
+      "texto": "A penalidade de Desmoralizar também se aplica à CD das habilidades das criaturas afetadas. Cada tibar consumido para pagar PM concede 10 PV temporários cumulativos até o fim da cena"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 26,
+   "pdf_page": 28,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.duelista",
+   "valor": {
+    "variante_de": "classe.bucaneiro",
+    "substitui": "Duelo (no lugar de Insolência/Esquiva sagaz conforme a tabela) e Escola de duelo; demais poderes de bucaneiro são os do básico",
+    "pericias": "Luta (For) ou Pontaria (Des) e Reflexos (Des), mais 2 a escolha entre Acrobacia, Atletismo, Atuação, Diplomacia, Fortitude, Iniciativa, Intimidação, Luta, Ofício, Percepção, Pilotagem e Pontaria. Proficiências como o bucaneiro básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Duelo +2",
+      "texto": "Gasta 2 PM para escolher um oponente em alcance curto e receber +2 em testes de ataque e rolagens de dano contra ele até o fim da cena. Se atacar outro, o bônus termina. A cada cinco níveis, +1 PM aumenta o bônus em +1"
+     },
+     {
+      "nivel": 1,
+      "nome": "Insolência",
+      "texto": "Como o bucaneiro básico"
+     },
+     {
+      "nivel": 2,
+      "nome": "Escola de duelo",
+      "texto": "Escolhe uma escola, sem possibilidade de troca: Ambidestra (+2 na Defesa e Reflexos com duas armas, uma leve; uma vez por rodada, ao ser atacado e errar, pode gastar 1 PM para atacar de volta), Clássica (+2 em dano com arma de uma mão, sem nada na outra; dano da escola +5; uma vez por rodada, ao agredir, pode gastar 1 PM e, se um ataque for crítico, faz ataque adicional) ou de Tiro (proficiência com armas de fogo leves e de uma mão; dano +1 passo e alcance +1 categoria com elas)"
+     },
+     {
+      "nivel": 2,
+      "nome": "Poder de bucaneiro",
+      "texto": "Como o bucaneiro básico"
+     },
+     {
+      "nivel": 3,
+      "nome": "Esquiva sagaz +1",
+      "texto": "Como o bucaneiro básico (+2 no 7º, +3 no 11º, +4 no 15º e +5 no 19º nível)"
+     },
+     {
+      "nivel": 4,
+      "nome": "Truques de capa",
+      "texto": "Com capa esvoaçante, gasta 2 PM e a ação indicada: Capa Inoportuna (livre; reduz em um passo a ação de fintar), Distração Oportuna (reação; +5 em Reflexos ou Vontade), Efeito Dramático (livre; +5 em perícia de Carisma), Impulso (livre; +9m de deslocamento e +5 em Acrobacia e Atletismo por 1 rodada), Paraquedas (reação; reduz a queda em 6d6) ou Rasgar a Capa (reação; reduz o dano sofrido à metade e destrói a capa)"
+     },
+     {
+      "nivel": 6,
+      "nome": "Duelo +3",
+      "texto": "Como Duelo, com bônus de +3"
+     },
+     {
+      "nivel": 10,
+      "nome": "Técnica avançada",
+      "texto": "Aprende uma técnica de combate conforme sua escola de duelo; só pode usá-la usando a escola"
+     },
+     {
+      "nivel": 11,
+      "nome": "Duelo +4",
+      "texto": "Como Duelo, com bônus de +4"
+     },
+     {
+      "nivel": 16,
+      "nome": "Duelo +5",
+      "texto": "Como Duelo, com bônus de +5"
+     },
+     {
+      "nivel": 20,
+      "nome": "Duelista lendário",
+      "texto": "Ao atacar com a escola, gasta 1 PM para rolar de novo; quando um oponente ataca você com a escola ativa, gasta 1 PM para forçá-lo a rolar de novo (uma vez por ataque)"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 27,
+   "pdf_page": 29,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.ermitao",
+   "valor": {
+    "variante_de": "classe.druida",
+    "substitui": "Habilidades de druida substituídas pelas do ermitão; poder Forma Selvagem e poderes com ele como pré-requisito não podem ser escolhidos",
+    "pericias": "Sobrevivência (Sab) e Vontade (Sab), mais 2 a escolha entre Adestramento, Atletismo, Cavalgar, Conhecimento, Cura, Fortitude, Iniciativa, Intuição, Luta, Misticismo, Ofício, Percepção e Religião. Sem proficiências. Pontos de mana como o druida básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Devoto fiel",
+      "texto": "Como o druida básico"
+     },
+     {
+      "nivel": 1,
+      "nome": "Empatia selvagem",
+      "texto": "Como o druida básico, mas também se comunica com criaturas vegetais não inteligentes (Int –4 ou –5) e espíritos"
+     },
+     {
+      "nivel": 1,
+      "nome": "Magias",
+      "texto": "Como o druida básico (1º círculo no 1º nível; 2º no 6º; 3º no 10º; 4º no 14º)"
+     },
+     {
+      "nivel": 2,
+      "nome": "Poder de druida",
+      "texto": "Como o druida básico, sem Forma Selvagem"
+     },
+     {
+      "nivel": 3,
+      "nome": "Sítio sagrado",
+      "texto": "Área erma de 5 km de raio, refúgio e base básica (paga metade do custo de porte e de cômodos). Ao criar o sítio escolhe um terreno (aquático, ártico, colina, deserto, floresta, montanha, pântano, planície ou subterrâneo): nesse terreno soma Sab (mín. +1) em Furtividade, Percepção, Misticismo, Religião e Sobrevivência. No 7º nível e a cada quatro níveis, novo terreno ou +2 em um já escolhido. Criaturas não inteligentes têm atitude melhor (animais amistosos no 7º; no 15º, um passo melhor). Caminhos sagrados: sem redução de deslocamento por terreno difícil natural no terreno do sítio e CD de rastreio +10. Se o sítio for destruído, perde todos os PM"
+     },
+     {
+      "nivel": 5,
+      "nome": "Vínculo com a terra",
+      "texto": "Em terreno do sítio, magias custam –1 PM (cumulativo). Dentro do sítio, o redutor muda para –2"
+     },
+     {
+      "nivel": 11,
+      "nome": "Temperado pelo clima",
+      "texto": "RD 5 contra o dano do tipo associado ao terreno do sítio: aquático (eletricidade), ártico (frio), colina (impacto), deserto (fogo), floresta (corte), montanha (perfuração), pântano (ácido), planície (luz) e subterrâneo (trevas)"
+     },
+     {
+      "nivel": 20,
+      "nome": "Eixo de pedras",
+      "texto": "Uma vez por aventura, lança magias no eixo cujo custo total de PM seja igual ao nível + Sab (execução de movimento, padrão ou completa). Em terreno do sítio, uma vez por rodada pode descarregar uma delas como ação livre sem custo"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 29,
+   "pdf_page": 31,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.inovador",
+   "valor": {
+    "variante_de": "classe.guerreiro",
+    "substitui": "Sequência especial e habilidades de guerreiro do inovador (ver tabela); demais poderes de guerreiro são os do básico",
+    "pericias": "Luta (For) ou Pontaria (Des) e Acrobacia (Des), mais 2 a escolha entre Adestramento, Atletismo, Conhecimento, Fortitude, Guerra, Iniciativa, Intimidação, Investigação, Luta, Ofício, Pontaria e Reflexos. Pontos de vida e mana e proficiências como o guerreiro básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Do bom e do melhor",
+      "texto": "Começa com arma, armadura ou escudo superior de até T$ 500; é considerado não proficiente em qualquer arma, armadura ou escudo que não seja superior ou mágico"
+     },
+     {
+      "nivel": 1,
+      "nome": "Sequência especial (+2)",
+      "texto": "Gasta 2 PM para iniciar uma sequência: cada arma ainda não usada na sequência dá +1 em testes de ataque e rolagens de dano (cumulativo até +2). A cada 4 níveis, +1 PM aumenta o limite em +2 (+4 no 5º, +6 no 9º, +8 no 13º, +10 no 17º). Termina ao fim da cena ou após 1 rodada sem trocar de arma"
+     },
+     {
+      "nivel": 2,
+      "nome": "Bombardeio sequencial",
+      "texto": "Pode usar a sequência ao usar itens alquímicos ou poções (o bônus acumulado soma na CD para resistir ao item)"
+     },
+     {
+      "nivel": 2,
+      "nome": "Poder de guerreiro",
+      "texto": "Como o guerreiro básico"
+     },
+     {
+      "nivel": 3,
+      "nome": "Acrobacia defensiva",
+      "texto": "Ao sofrer dano, gasta 2 PM para executar uma pirueta: faz teste de Acrobacia e subtrai o resultado do dano"
+     },
+     {
+      "nivel": 4,
+      "nome": "Domínio excêntrico",
+      "texto": "Após uma semana carregando arma exótica, de fogo superior ou mágica, recebe proficiência nela"
+     },
+     {
+      "nivel": 7,
+      "nome": "Técnica revolucionária",
+      "texto": "Gasta 2 PM para usar as armas empunhadas, até o fim do combate, com uma destas habilidades (escolha): adaptável, ágil, alongada, dupla ou versátil (para uma manobra escolhida). Ativar de novo encerra o efeito"
+     },
+     {
+      "nivel": 20,
+      "nome": "Estilo único",
+      "texto": "Escolhe dois poderes de guerreiro ou de combate que possua e ignora os requisitos e restrições de armas deles; o mestre decide a interação"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 30,
+   "pdf_page": 32,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.machado_de_pedra",
+   "valor": {
+    "variante_de": "classe.barbaro",
+    "substitui": "Grunhidos, Machado de Pedra, Tanga de Peles, Fúria Primitiva, Instinto Selvagem e Resiliência Primal conforme a tabela; demais poderes de bárbaro são os do básico",
+    "pericias": "Fortitude (Con) e Luta (For), mais 2 a escolha entre Adestramento, Atletismo, Cavalgar, Iniciativa, Intimidação, Ofício, Percepção, Pontaria, Sobrevivência e Vontade. Proficiência: escudos",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Fúria +2",
+      "texto": "Como o bárbaro básico (+3 no 7º, +4 no 10º, +5 no 16º)"
+     },
+     {
+      "nivel": 1,
+      "nome": "Grunhidos",
+      "texto": "Conhece só o idioma rústico da sua comunidade e comunica-se por grunhidos; conhece uma palavra em valkar por nível de machado de pedra"
+     },
+     {
+      "nivel": 1,
+      "nome": "Machado de pedra",
+      "texto": "Sem proficiência com armas simples; sabe usar adaga, azagaia, clava, funda, lança, machadinha e tacape. No 9º nível aprende uma arma simples ou marcial. Ao atacar com arma natural, desarmado ou uma dessas armas, +1 no teste de ataque e na rolagem de dano"
+     },
+     {
+      "nivel": 1,
+      "nome": "Tanga de peles (Con)",
+      "texto": "Sem proficiência com armadura leve; sem armadura, soma Constituição à Defesa; no 3º nível e a cada quatro níveis, +1 na Defesa (+2 no 7º, +3 no 11º, +4 no 15º e +5 no 19º)"
+     },
+     {
+      "nivel": 2,
+      "nome": "Fúria primitiva",
+      "texto": "Sem armadura e empunhando arma do machado de pedra, o custo da Fúria cai em –1 PM. Uma vez por cena, ao entrar em fúria, recebe PV temporários iguais ao nível + Constituição"
+     },
+     {
+      "nivel": 3,
+      "nome": "Instinto selvagem +1",
+      "texto": "Como o bárbaro básico (+2 no 9º nível e +3 no 15º)"
+     },
+     {
+      "nivel": 5,
+      "nome": "Resiliência primal 3",
+      "texto": "RD 3; +3 a cada três níveis, até RD 15 no 17º nível (RD 6 no 8º, 9 no 11º, 12 no 14º)"
+     },
+     {
+      "nivel": 20,
+      "nome": "Fúria rústica",
+      "texto": "Ao entrar em fúria, pode gastar 5 PM para ter Cura Acelerada 10 (cumulativa) e fazer um ataque desarmado adicional ao agredir"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 32,
+   "pdf_page": 34,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.magimarcialista",
+   "valor": {
+    "variante_de": "classe.bardo",
+    "substitui": "Cadência magimarcial, magificação, bravado magimarcial, dança defensiva, arte sublime e crescendo vitorioso conforme a tabela; magias e poderes de bardo são os do básico",
+    "pericias": "Atuação (Car) e Luta (For), mais 6 a escolha entre Acrobacia, Atletismo, Cavalgar, Conhecimento, Diplomacia, Enganação, Fortitude, Guerra, Iniciativa, Jogatina, Misticismo e Reflexos. Pontos de vida: 16 + Con e 4 PV + Con por nível. Proficiências como o bardo básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Cadência magimarcial",
+      "texto": "Ao lançar magia de bardo, recebe uma carga arcana; ao fazer a ação agredir, recebe uma carga marcial. Acumula até o Carisma em cada tipo, duram até o fim da cena"
+     },
+     {
+      "nivel": 1,
+      "nome": "Magificação",
+      "texto": "Com pelo menos 1 carga arcana e 1 marcial: +2 em testes de ataque e rolagens de dano e conta como sob Inspiração; +1 a cada cinco níveis"
+     },
+     {
+      "nivel": 2,
+      "nome": "Bravado magimarcial",
+      "texto": "Ao lançar magia, gasta 1 carga marcial para reduzir o custo em –1 PM (cumulativo). Ao atacar, gasta 1 carga arcana para +1d6 na rolagem de dano"
+     },
+     {
+      "nivel": 3,
+      "nome": "Dança defensiva",
+      "texto": "Em teste de resistência, gasta 1 carga marcial para +5. Ao sofrer dano, gasta 1 carga arcana para RD 10 contra esse dano"
+     },
+     {
+      "nivel": 7,
+      "nome": "Arte sublime",
+      "texto": "Ao usar Bravado ou Dança, pode gastar uma carga adicional do tipo exigido para dobrar o efeito"
+     },
+     {
+      "nivel": 20,
+      "nome": "Crescendo vitorioso",
+      "texto": "No início de cada combate recebe 1 carga arcana e 1 marcial. Soma o total de cargas marciais na CD das habilidades de bardo e o de arcanas nos testes de ataque e rolagens de dano"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 33,
+   "pdf_page": 35,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.necromante",
+   "valor": {
+    "variante_de": "classe.arcanista",
+    "substitui": "Caminho do necromante, falar com mortos, animar cadáver, necrologia, distorção necrótica, necropotência e domínio sobre a morte conforme a tabela; magias de arcanista e poderes de arcanista são os do básico",
+    "pericias": "Misticismo (Int) e Vontade (Sab), mais 2 a escolha entre Conhecimento, Cura, Diplomacia, Enganação, Fortitude, Iniciativa, Intimidação, Intuição, Investigação, Nobreza, Ofício e Percepção. Pontos de vida e mana e proficiências como o arcanista básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Caminho do necromante",
+      "texto": "Aprende magias de necromancia divinas como arcanas (não de encantamento; pelo menos metade de necromancia). Para lançar, gasta PV igual ao círculo máximo da magia (até o círculo a que tem acesso); a conexão dura até o fim da cena. Atributo-chave: Inteligência"
+     },
+     {
+      "nivel": 1,
+      "nome": "Falar com mortos",
+      "texto": "Comunica-se com mortos-vivos pelos poderes arcanos; usa Misticismo com eles para mudar atitude e persuasão. A partir do 3º nível, ação padrão e 1 PM para conversar com cadáver em alcance curto, como Voz Divina, com o aprimoramento de dar um pouco de vida"
+     },
+     {
+      "nivel": 2,
+      "nome": "Animar cadáver",
+      "texto": "Ação completa e 3 PM para animar cadáver Pequeno, Médio ou Grande em alcance curto: vira parceiro iniciante do tipo escolhido, que não conta no limite de parceiros (apenas um cadáver por vez). Sacrificável para reduzir o dano à metade. A partir do 7º nível, 6 PM criam parceiro veterano; no 11º, 9 PM criam parceiro mestre"
+     },
+     {
+      "nivel": 3,
+      "nome": "Necrologia +2",
+      "texto": "+2 em Cura, Fortitude e na CD das magias de necromancia; +1 a cada cinco níveis (+3 no 8º, +4 no 13º, +5 no 18º)"
+     },
+     {
+      "nivel": 4,
+      "nome": "Distorção necrótica",
+      "texto": "Escolhe uma magia de 1º círculo conhecida que não seja de necromancia: a escola passa a ser necromancia, sem efeito mecânico além disso"
+     },
+     {
+      "nivel": 5,
+      "nome": "Necropotência",
+      "texto": "Ao estabelecer a conexão, pode gastar o dobro de PV. Sempre que reduz inimigos vivos a 0 PV ou menos com magia de necromancia, recebe 2 PM temporários (máximo por cena igual ao nível)"
+     },
+     {
+      "nivel": 20,
+      "nome": "Domínio sobre a morte",
+      "texto": "O custo em PM das magias de necromancia cai à metade (após aprimoramentos e reduções). Ao matar criatura viva com necromancia, gasta 2 PM para erguê-la como morto-vivo sob controle (como Servo Morto-Vivo, sem componente material)"
+     },
+     {
+      "nivel": 0,
+      "nome": "Ritual do Lich (poder de classe exclusivo)",
+      "texto": "Passos descritos no quadro da página 36 do Heróis de Arton. Pré-requisitos: Celebrar Ritual, Escrever Pergaminho, Preparar Poção e 17º nível de necromante"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 34,
+   "pdf_page": 36,
+   "status": "VERIFICADA"
   }
  ]
 }
