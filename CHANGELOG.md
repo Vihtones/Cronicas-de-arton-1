@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Perigos (LB p.318): calor e frio extremos (Fortitude por dia, ou por minuto no extremo; o dano só cura fora do clima), fumaça densa (Fortitude ou perde o turno; duas falhas, –1d6 PV; camuflagem leve) e sufocamento (prender a respiração por 1 + Con rodadas, depois Fortitude ou desmaia perdendo 1d6 PV por rodada).
+- Suporte Ambiental (divina, 1º círculo) completa: por 1 dia, imune a calor e frio extremos, respira na água e não sufoca em fumaça; aprimoramento de alcance curto e criaturas escolhidas (fora de combate, os companheiros presentes). Correção: o solo lamacento agora conta como macio para rastrear.
+
 - Armadilhas (LB p.316): as doze armadilhas do livro entram como regras; a laje do corredor da cripta é um virote de verdade (Reflexos CD 20 evita, 1d10+2), que dispara uma vez em quem não a conhece e pode ser desarmada com Ladinagem (falhar por 5 a ativa).
 - Detectar Ameaças (divina, 1º círculo) completa: pela cena, até descarregar; armadilha ou criatura hostil a até 18m pede Percepção (sabe origem, direção e distância, ou só que há perigo). Aprimoramentos: espécie e aura da criatura; não ser surpreendido pelo que detectou e +5 contra armadilhas.
 

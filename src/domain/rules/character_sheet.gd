@@ -206,7 +206,11 @@ func curar(n: int) -> int:
 	if n <= 0 or efeito_bonus("bloqueio_cura") > 0:
 		return 0
 	var antes := pv
-	pv = mini(pv_max, pv + n)
+	# Calor e frio (LB p.318): o dano do clima só é curado depois de sair dele.
+	var teto := pv_max - efeito_bonus("dano_clima")
+	if pv >= teto:
+		return 0
+	pv = mini(teto, pv + n)
 	return pv - antes
 
 

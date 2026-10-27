@@ -1493,6 +1493,48 @@ func _objetos_quebraveis_em(tiles: Array, tam_max: int) -> Array:
 	return out
 
 
+## Perigos no início do turno (LB p.318). Fumaça densa (zona "fumaca"): Fortitude (CD 10 +1 por teste anterior) ou perde
+## o turno tossindo; duas falhas seguidas, –1d6 PV. Sufocamento (flag "submerso", sem respirar água): prende a
+## respiração por 1 + Con rodadas; depois Fortitude (CD 15 +1 por teste anterior) ou cai inconsciente e perde 1d6 PV
+## por rodada até respirar. Suporte Ambiental protege dos dois.
+func _perigos_inicio_de_turno(id: String, facts: Array) -> void:
+	var x: Dictionary = sim.c(id)
+	var s: CharacterSheet = x.sheet
+	if s.is_dead():
+		return
+	if sim.zona_em(x.tile, "fumaca") and s.efeito_bonus("imune_fumaca") <= 0 and s.creature_type != "morto-vivo":
+		var n := int(x.get("testes_fumaca", 0))
+		var r := Checks.skill(s, "fortitude", 10 + n, world.rules, world.rng, "combat")
+		x["testes_fumaca"] = n + 1
+		if r.get("success", false):
+			x["falhas_fumaca"] = 0
+		else:
+			x["falhas_fumaca"] = int(x.get("falhas_fumaca", 0)) + 1
+			sim.add_condicao(id, "pasmo", 1, "fumaca")   # perde o turno engasgando
+			if int(x.falhas_fumaca) >= 2:
+				s.pv -= int(Dice.roll("1d6", world.rng, "combat").total)
+			facts.append(fact("HAZARD", {"actor": id, "hazard": "fumaca", "check": r, "pv_after": s.pv}, [id]))
+	elif x.has("testes_fumaca") and not sim.zona_em(x.tile, "fumaca"):
+		x.erase("testes_fumaca")
+		x.erase("falhas_fumaca")
+	if x.flags.has("submerso") and s.efeito_bonus("respira_agua") <= 0 and s.creature_type != "morto-vivo":
+		var rodadas := int(x.get("folego", 0)) + 1
+		x["folego"] = rodadas
+		if rodadas > 1 + int(s.attrs.get("con", 0)):
+			var nf := int(x.get("testes_sufoco", 0))
+			var rs := Checks.skill(s, "fortitude", 15 + nf, world.rules, world.rng, "combat")
+			x["testes_sufoco"] = nf + 1
+			if not rs.get("success", false) or s.conditions.has("inconsciente"):
+				s.add_condition("inconsciente", world.rules)
+				s.pv -= int(Dice.roll("1d6", world.rng, "combat").total)
+				facts.append(fact("HAZARD", {"actor": id, "hazard": "sufocamento", "check": rs, "pv_after": s.pv}, [id]))
+	elif not x.flags.has("submerso") and x.has("folego"):
+		x.erase("folego")
+		x.erase("testes_sufoco")
+		if s.conditions.has("inconsciente") and s.pv > 0:
+			s.remove_condition("inconsciente")   # voltou a respirar
+
+
 ## Fuga: os inimigos que restam tentam seguir os rastros do jogador (Rastrear, Sobrevivência apenas treinado,
 ## LB p.123). Se algum conseguir, o grupo o alcança pouco depois (perseguição, ORIGINAL_DO_JOGO).
 const TICKS_PERSEGUICAO := 3
@@ -1504,7 +1546,7 @@ func _tentar_rastrear() -> Array:
 	var clima: bool = w != null and w.enabled
 	var ruim: bool = clima and (w.is_night() or ["chuva", "tempestade", "neblina"].has(str(w.region.condition)))
 	var solo := world.db.solo(tile)
-	if clima and natural and ["lama", "neve"].has(str(w.region.get("surface", ""))):
+	if clima and natural and ["lamacento", "neve"].has(str(w.region.get("surface", ""))):
 		solo = "macio"
 	var grupo := 0
 	var perseguidores: Array = []
@@ -1708,6 +1750,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
+	_perigos_inicio_de_turno(id, facts)
 	_resolver_conjuracao(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
@@ -2021,6 +2064,12 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"suporte_ambiental":
+			# Suporte Ambiental (divina 1): toque (curto e criaturas escolhidas com o aprimoramento), 1 dia. Imune a calor
+			# e frio extremos, respira na água (e o que respira água, no ar) e não sufoca em fumaça densa.
+			for tg_sa in a.get("targets", [a.get("target", id)]):
+				SpellRules.aplicar_suporte(sim.c(tg_sa).sheet, world.day_index() + 1)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_sa, "buff": "suporte_ambiental", "tags": ["magia"]}, [id, tg_sa]))
 		"detectar_ameacas":
 			# Detectar Ameaças (divina 1): pessoal, pela cena ou até descarregar (SpellsModule; vale ao explorar).
 			var magia_d = world.module("magia")

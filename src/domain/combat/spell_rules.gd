@@ -28,6 +28,7 @@ const COMPLETAS := {
 	"acalmar_animal": {"aprimoramentos": [0, 1, 2, 3]},   # médio; monstro/espírito Int –5/–4; +1 alvo; qualquer monstro/espírito
 	"tranquilidade": {"aprimoramentos": [0, 1, 2]},   # qualquer criatura; +1 alvo; médio e criaturas escolhidas
 	"detectar_ameacas": {"aprimoramentos": [0, 1]},   # raça e aura; não surpreendido e +5 contra armadilhas
+	"suporte_ambiental": {"aprimoramentos": [0]},   # alcance curto e criaturas escolhidas
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -55,9 +56,9 @@ const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
 ## Aprimoramentos que trocam a execução para reação mesmo sem a magia ser reação no base (Proteção Divina +2 PM).
 const REACAO_APR := {"protecao_divina": [1], "premonicao": [0]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
-const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2]}
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
@@ -291,3 +292,10 @@ static func aura_por_nd(nd: String) -> String:
 	if v >= 7.0:
 		return "moderada"
 	return "tenue"
+
+
+## Suporte Ambiental: por 1 dia, imune ao clima extremo, respira na água e não sufoca em fumaça.
+static func aplicar_suporte(sh: CharacterSheet, ate_dia: int) -> void:
+	sh.add_efeito("magia.suporte_ambiental", "imune_clima", 1, "dia", "", ate_dia)
+	sh.add_efeito("magia.suporte_ambiental", "respira_agua", 1, "dia", "", ate_dia)
+	sh.add_efeito("magia.suporte_ambiental", "imune_fumaca", 1, "dia", "", ate_dia)

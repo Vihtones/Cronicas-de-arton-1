@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2410,3 +2410,66 @@ func test_detectar_ameacas_percebe_criatura_hostil() -> void:
 	if not det.is_empty():
 		check(det[0].payload.has("aura"), "com aura e espécie")
 		check(int(combat.creature_state[str(det[0].payload.creature)].get("detectado_ate", -1)) > w.clock.tick, "não vai surpreender")
+
+
+# --- Perigos (LB p.318) e Suporte Ambiental (divina, 1º círculo) ---------------------------------
+func test_fumaca_densa_faz_perder_o_turno_e_dano_na_segunda_falha() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_1", -50)
+	sim.add_zona("fumaca_teste", [Vector2i(27, 57)], "fumaca", -1, "teste")
+	eq(int(sim.attack_profile("player", "bandido_1", 0, false, false).get("miss_chance", 0)), 20, "camuflagem leve dentro da fumaça")
+	check(c._begin_turn_base("bandido_1").skip, "tossindo: perde o turno")
+	b.remove_condition("pasmo")
+	var pv0 := b.pv
+	c._begin_turn_base("bandido_1")
+	check(b.pv < pv0, "duas falhas seguidas: perde PV")
+
+
+func test_sufocamento_prende_a_respiracao_e_depois_desmaia() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_1", -50)
+	b.attrs["con"] = 1
+	sim.c("bandido_1").flags.append("submerso")
+	c._begin_turn_base("bandido_1")
+	c._begin_turn_base("bandido_1")
+	check(not b.conditions.has("inconsciente"), "1 + Con = 2 rodadas sem problema")
+	c._begin_turn_base("bandido_1")
+	check(b.conditions.has("inconsciente") and b.pv < 999, "depois, falha e desmaia perdendo PV")
+	sim.c("bandido_1").flags.erase("submerso")
+	c._begin_turn_base("bandido_1")
+	check(not b.conditions.has("inconsciente"), "voltou a respirar")
+
+
+func test_suporte_ambiental_protege_de_fumaca_e_sufocamento() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_1", -50)
+	b.attrs["con"] = 0
+	check(_lanca(m, {"type": "cast", "spell": "suporte_ambiental", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "toque")
+	sim.add_zona("fumaca_teste", [Vector2i(27, 57)], "fumaca", -1, "teste")
+	sim.c("bandido_1").flags.append("submerso")
+	for i in 4:
+		check(not c._begin_turn_base("bandido_1").skip, "não tosse nem se afoga")
+	check(not b.conditions.has("inconsciente"), "respira na água")
+
+
+func test_calor_extremo_fere_e_suporte_ambiental_imuniza() -> void:
+	var w := _mundo_explorador(["suporte_ambiental"])
+	var wm = w.module("weather")
+	w.player_sheet.add_efeito("teste", "resistencia", -50, "cena")
+	wm.region.temp_c = 65
+	var out: Array = wm.perigo_clima(w.clock.tick)
+	check(out.any(func(f): return f.type == "CLIMATE_DAMAGE"), "calor extremo: testes por minuto")
+	var pv := w.player_sheet.pv
+	eq(w.player_sheet.curar(50), 0, "o dano do clima não cura no clima")
+	wm.region.temp_c = 20
+	wm.perigo_clima(w.clock.tick)
+	check(w.player_sheet.curar(5) > 0, "fora do clima, cura")
+	wm.region.temp_c = 65
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "suporte_ambiental"}).accepted, "Suporte Ambiental")
+	eq(wm.perigo_clima(w.clock.tick).size(), 0, "imune ao clima")

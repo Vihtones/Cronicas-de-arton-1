@@ -43,11 +43,48 @@ func season() -> String:
 	return ["verao", "outono", "inverno", "primavera"][((m - 1) / 3) % 4]
 
 
+## Calor e Frio (LB p.318): acima de 50 °C ou abaixo de –10 °C, Fortitude por dia (CD 15 +1 por teste anterior);
+## acima de 60 °C ou abaixo de –20 °C, por minuto. Falhou: 1d6 de fogo ou frio, que só cura fora do clima.
+## Suporte Ambiental (imune ao clima) e imunidade ao tipo de dano protegem.
+var testes_clima := 0
+var ultimo_dia_clima := -1
+
+
+func perigo_clima(tick: int) -> Array:
+	var s: CharacterSheet = world.player_sheet
+	if s == null:
+		return []
+	var t := int(region.temp_c)
+	var tipo := "fogo" if t > 50 else ("frio" if t < -10 else "")
+	if tipo == "":
+		testes_clima = 0
+		s.remove_efeito("clima")   # fora do clima, o dano volta a ser curável
+		return []
+	if s.efeito_bonus("imune_clima") > 0:
+		return []
+	var extremo := t > 60 or t < -20
+	var n := world.clock.tick_minutes if extremo else 0
+	if not extremo and world.day_index() != ultimo_dia_clima:
+		n = 1
+		ultimo_dia_clima = world.day_index()
+	var out: Array = []
+	for i in n:
+		var r := Checks.skill(s, "fortitude", 15 + testes_clima, world.rules, world.rng, "world")
+		testes_clima += 1
+		if not r.get("success", false):
+			var dano := s.dano_por_tipo(tipo, int(Dice.roll("1d6", world.rng, "world").total))
+			s.pv -= dano
+			s.add_efeito("clima", "dano_clima", s.efeito_bonus("dano_clima") + dano, "clima")
+			out.append(fact("CLIMATE_DAMAGE", {"tipo": tipo, "damage": dano, "pv_after": s.pv, "temp_c": t}, ["player"]))
+	return out
+
+
 func on_tick(tick: int) -> Array:
 	var tgt: float = TARGET_INTENSITY.get(region.condition, 0.0)
 	region.intensity = move_toward(float(region.get("intensity", tgt)), tgt, RAMP_PER_TICK)
+	var clima_out := perigo_clima(tick)
 	if tick % (60 / world.clock.tick_minutes) != 0:
-		return []
+		return clima_out
 	var row: Dictionary = TRANSITIONS[region.condition]
 	var r := world.rng.stream("weather").randf()
 	if season() == "inverno" and region.condition == "nublado":
@@ -72,8 +109,8 @@ func on_tick(tick: int) -> Array:
 	if next != region.condition:
 		var prev: String = region.condition
 		region.condition = next
-		return [fact("WEATHER_CHANGED", {"from": prev, "to": next, "temp_c": region.temp_c, "surface": region.surface})]
-	return []
+		return clima_out + [fact("WEATHER_CHANGED", {"from": prev, "to": next, "temp_c": region.temp_c, "surface": region.surface})]
+	return clima_out
 
 
 ## Ambiente mecânico para combate num tile.
@@ -94,10 +131,12 @@ func perception_cd_mod() -> int:
 	return 5 if region.condition in ["neblina", "tempestade"] else 0
 
 
-func to_dict() -> Dictionary: return {"region": region.duplicate(), "wet_hours": wet_hours}
+func to_dict() -> Dictionary: return {"region": region.duplicate(), "wet_hours": wet_hours, "testes_clima": testes_clima, "ultimo_dia_clima": ultimo_dia_clima}
 func from_dict(d: Dictionary) -> void:
 	var base := region.duplicate()
 	region = d.get("region", region).duplicate()
 	for k in base:
 		if not region.has(k): region[k] = base[k]   # saves antigos
 	wet_hours = int(d.get("wet_hours", 0))
+	testes_clima = int(d.get("testes_clima", 0))
+	ultimo_dia_clima = int(d.get("ultimo_dia_clima", -1))

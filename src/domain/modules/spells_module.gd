@@ -19,6 +19,7 @@ const FORA_DE_COMBATE := {
 	"acalmar_animal": [],   # criaturas por perto, antes da luta
 	"tranquilidade": [],
 	"detectar_ameacas": [],
+	"suporte_ambiental": [],   # você (e, com o aprimoramento, os companheiros presentes)
 }
 const RAIO_DETECTAR := 12   # esfera de 18m
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
@@ -142,6 +143,16 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"suporte_ambiental":
+			SpellRules.aplicar_suporte(sh, world.day_index() + 1)
+			var alvos_s: Array = ["player"]
+			var party_s = world.module("party")
+			if (cmd.payload.get("aprimoramentos", []) as Array).has(0) and party_s != null:
+				for npc in party_s.members:
+					if party_s.destino_de(npc) == "":
+						party_s.aplicar_na_ficha(npc, func(f: CharacterSheet): SpellRules.aplicar_suporte(f, world.day_index() + 1))
+						alvos_s.append(npc)
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "targets": alvos_s, "buff": "suporte_ambiental", "tags": ["magia"]}, ["player"]))
 		"detectar_ameacas":
 			ativar_detectar(cmd.payload.get("aprimoramentos", []))
 			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "detectar_ameacas", "tags": ["magia"]}, ["player"]))

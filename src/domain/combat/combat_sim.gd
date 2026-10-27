@@ -426,6 +426,8 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
 	miss_chance = maxi(miss_chance, falha_nevoa(attacker, target))
+	if zona_em(T.tile, "fumaca"):
+		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # fumaça densa (LB p.318)
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
 	if mods.any(func(m): return m[0] == "ataque poderoso"): avg += 5
 	if mods.any(func(m): return m[0] == "névoa espessa"): avg -= 2
