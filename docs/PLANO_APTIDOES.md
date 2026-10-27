@@ -53,8 +53,14 @@ Números decididos (ajustáveis em `aptitudes.gd`):
 - Bônus de teste: +1 a cada 10%.
 - Custo para aprender uma aptidão nova: 5 XP × (distância do domínio principal + 1).
 
+Fase 2 (testes de perícia): cada perícia do Livro Básico tem um domínio
+(`DOMINIO_DE_PERICIA`). Quando a ficha tem afinidade definida, o teste soma o bônus da
+aptidão "dominio.pericia" e cada sucesso gera progresso nela. Fichas sem afinidade seguem
+iguais. Testes em `tests/unit/test_aptitudes.gd`.
+
 Ainda não feito (próximas fases):
-- Testes de perícia usando a % em vez de bônus fixos.
-- Ganhar aptidões pela prática no jogo (hoje a função existe, mas nada a chama).
+- Definir a afinidade na criação (origem/raça) ou em NPCs. Hoje nenhuma ficha a recebe no
+  jogo, então o efeito só aparece quando a afinidade é definida (decisão de design pendente).
+- Mais de uma aptidão por perícia (subdomínios, como cozinhar e forjar).
 - Interface para ver e escolher aptidões; NPCs com afinidade.
 - Integração com a árvore de poderes do Livro Básico (fonte de aptidões de combate).

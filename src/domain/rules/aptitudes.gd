@@ -22,6 +22,24 @@ const TETO := 100.0
 const CUSTO_XP_BASE := 5         # XP para aprender uma aptidão nova, multiplicado por (distância + 1)
 
 
+## Domínio de cada perícia do Livro Básico: a aptidão de uma perícia é "dominio.pericia".
+const DOMINIO_DE_PERICIA := {
+	"acrobacia": "sobreviver", "adestramento": "cuidar", "atletismo": "lutar", "atuacao": "criar",
+	"cavalgar": "sobreviver", "conhecimento": "conhecer", "cura": "cuidar", "diplomacia": "comunicar",
+	"enganacao": "comunicar", "fortitude": "cuidar", "furtividade": "sobreviver", "guerra": "lutar",
+	"iniciativa": "sobreviver", "intimidacao": "comunicar", "intuicao": "comunicar", "investigacao": "conhecer",
+	"jogatina": "comunicar", "ladinagem": "fazer", "luta": "lutar", "misticismo": "conhecer", "nobreza": "comunicar",
+	"oficio": "fazer", "percepcao": "conhecer", "pilotagem": "sobreviver", "pontaria": "lutar", "reflexos": "sobreviver",
+	"religiao": "cuidar", "sobrevivencia": "sobreviver", "vontade": "cuidar",
+}
+
+
+## Chave da aptidão ligada a uma perícia ("dominio.pericia"), ou "" se a perícia não tem domínio.
+static func chave_de_pericia(pericia: String) -> String:
+	var dom: String = DOMINIO_DE_PERICIA.get(pericia, "")
+	return dom + "." + pericia if dom != "" else ""
+
+
 ## Passos entre dois domínios (busca em largura). -1 se algum não existir.
 static func distancia(a: String, b: String) -> int:
 	if not VIZINHOS.has(a) or not VIZINHOS.has(b):

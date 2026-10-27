@@ -2,6 +2,7 @@ class_name Checks
 extends RefCounted
 ## Testes T20: 1d20 + modificador >= CD (LB p.220).
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
+const Apt := preload("res://src/domain/rules/aptitudes.gd")
 const RESISTANCIAS := ["fortitude", "reflexos", "vontade"]
 
 
@@ -9,7 +10,11 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 		stream: String = "world", extra_mod: int = 0) -> Dictionary:
 	if not sheet.can_use_skill(skill_name, rules):
 		return {"allowed": false, "reason": "perícia somente treinada: " + skill_name}
+	# Aptidões (Nen, fase 2): só fichas com afinidade definida usam a porcentagem da aptidão da perícia
+	var chave_apt := Apt.chave_de_pericia(skill_name) if not sheet.afinidade.is_empty() else ""
 	var mod := sheet.skill_value(skill_name, rules) + extra_mod + sheet.condition_skill_mod(rules, skill_name) + ClassFeatures.instinto_pericia(sheet, skill_name)
+	if chave_apt != "":
+		mod += sheet.bonus_aptidao(chave_apt)
 	var eh_resistencia := skill_name in RESISTANCIAS
 	if eh_resistencia:
 		mod += sheet.efeito_bonus("resistencia") + sheet.efeito_bonus("proxima_resistencia")   # efeitos de magia
@@ -28,6 +33,8 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 		d20 = rng.roll(stream, 1, 20)[0]
 		total = d20 + mod
 	var sucesso := total >= cd and not falha_auto
+	if chave_apt != "":
+		sheet.praticar_aptidao(chave_apt, sucesso)   # só o sucesso gera progresso
 	return {"allowed": true, "skill": skill_name, "d20": d20, "mod": mod, "total": total, "cd": cd,
 		"success": sucesso, "margin": total - cd, "sorte": sorte, "falha_automatica": falha_auto}
 

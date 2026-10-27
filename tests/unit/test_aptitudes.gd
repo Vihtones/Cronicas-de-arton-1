@@ -80,3 +80,29 @@ func test_afinidade_e_aptidoes_sobrevivem_ao_save() -> void:
 	eq(float(volta.aptidoes["fazer.cozinhar"].pct), antes, "progresso volta igual")
 	eq(volta.bonus_aptidao("fazer.cozinhar"), Apt.bonus(antes), "bônus de teste volta igual")
 	eq(s.bonus_aptidao("nao.existe"), 0, "aptidão ausente dá +0")
+
+
+func test_pericia_com_afinidade_usa_e_treina_a_aptidao() -> void:
+	var r := RuleRegistry.load_default()
+	var s := CharacterSheet.premade_warrior(r)
+	s.afinidade = {"lutar": 100}
+	var rng := RngStreams.new(4)
+	var base := s.skill_value("luta", r)
+	var primeiro := Checks.skill(s, "luta", 1, r, rng)
+	eq(primeiro.mod, base, "sem progresso ainda: só o valor da perícia")
+	check(s.aptidoes.has("lutar.luta"), "o sucesso cria a aptidão da perícia")
+	for i in 300:
+		Checks.skill(s, "luta", 1, r, rng)
+	var b := s.bonus_aptidao("lutar.luta")
+	check(b > 0, "depois de treinar, o bônus da aptidão é positivo (%d)" % b)
+	eq(Checks.skill(s, "luta", 1, r, rng).mod, base + b, "o bônus entra no teste")
+
+
+func test_pericia_sem_afinidade_nao_muda() -> void:
+	var r := RuleRegistry.load_default()
+	var s := CharacterSheet.premade_warrior(r)
+	var rng := RngStreams.new(4)
+	var base := s.skill_value("luta", r)
+	for i in 50:
+		eq(Checks.skill(s, "luta", 1, r, rng).mod, base, "sem afinidade o teste é o de antes")
+	eq(s.aptidoes.size(), 0, "nenhuma aptidão criada")
