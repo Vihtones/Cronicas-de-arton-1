@@ -2,6 +2,7 @@ class_name CharacterSheet
 extends RefCounted
 ## Ficha mínima T20. Valores derivados vêm de regras do RuleRegistry.
 
+const Apt := preload("res://src/domain/rules/aptitudes.gd")
 var id: String
 var name: String
 var level: int = 1
@@ -44,6 +45,8 @@ var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37
 var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
 var sorte_usada: bool = false        # Sorte Salvadora (hynne): uma vez por rodada; zera ao começar a rodada
 var olhar_usado: bool = false          # Olhar Atordoante (medusa): uma vez por cena; zera no fim do combate
+var afinidade: Dictionary = {}   # aptidões no estilo Nen: domínio -> % (soma 100), ver aptitudes.gd
+var aptidoes: Dictionary = {}    # "dominio.nome" -> {"pct": float, "pratica": int, "marco": bool}
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
 ## Efeitos temporários de magias e habilidades: {id, stat, bonus, fim, tipo}. stat: ataque | dano | defesa |
@@ -304,6 +307,18 @@ func condition_mod(rules: RuleRegistry, field: String) -> int:
 	return worst
 
 
+## Pratica uma aptidão (chave "dominio.nome"); só o sucesso gera progresso.
+func praticar_aptidao(chave: String, sucesso: bool) -> void:
+	var estado: Dictionary = aptidoes.get(chave, {})
+	aptidoes[chave] = Apt.praticar(estado, afinidade, chave, sucesso)
+
+
+## Bônus de teste da aptidão (+1 a cada 10%); 0 se a ficha não tem a aptidão.
+func bonus_aptidao(chave: String) -> int:
+	var estado: Dictionary = aptidoes.get(chave, {})
+	return Apt.bonus(float(estado.get("pct", 0.0)))
+
+
 ## Penalidade de condições em um teste de perícia ou resistência: soma os campos
 ## "pericias" (todas), "pericias_atrib" (pelo atributo da perícia) e "pericias_nomes" (a perícia),
 ## usando o pior valor de cada campo (LB p.394).
@@ -351,7 +366,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"efeitos": efeitos.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
+		"efeitos": efeitos.duplicate(true), "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -378,6 +393,8 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
 	s.powers = d.get("powers", {}).duplicate(true)
 	s.efeitos = Array(d.get("efeitos", [])).duplicate(true)
+	s.afinidade = (d.get("afinidade", {}) as Dictionary).duplicate()
+	s.aptidoes = (d.get("aptidoes", {}) as Dictionary).duplicate(true)
 	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()

@@ -37,3 +37,24 @@ mais difícil e mais lento é aprender.
 - Muito aberto pode diluir o jogo. Por isso cada domínio tem limites de dificuldade
   e a progressão precisa ter custo visível.
 - Testes existentes (343) devem continuar passando; mudanças em progressão exigem novos testes.
+
+## Status: fase 1 (modelo e prática) implementada
+
+Código: `src/domain/rules/aptitudes.gd` (funções puras) e `CharacterSheet.afinidade` /
+`CharacterSheet.aptidoes`, salvos com a ficha. Testes: `tests/unit/test_aptitudes.gd`.
+
+Números decididos (ajustáveis em `aptitudes.gd`):
+- Domínios: fazer, lutar, criar, cuidar, conhecer, comunicar, sobreviver.
+- Grafo de vizinhança: fazer–criar, fazer–lutar, fazer–sobreviver, criar–conhecer,
+  conhecer–comunicar, comunicar–cuidar, cuidar–sobreviver, sobreviver–lutar. Distância = passos.
+- Ganho por uso bem-sucedido: 2 pontos × 0,75^distância × (0,5 + afinidade no domínio / 100)
+  × (1 − progresso/100), com piso de 5% do ganho. Falha não gera progresso.
+- Nome na ficha a partir de 25%. Teto de 80% sem marco narrativo; 100% com `marco`.
+- Bônus de teste: +1 a cada 10%.
+- Custo para aprender uma aptidão nova: 5 XP × (distância do domínio principal + 1).
+
+Ainda não feito (próximas fases):
+- Testes de perícia usando a % em vez de bônus fixos.
+- Ganhar aptidões pela prática no jogo (hoje a função existe, mas nada a chama).
+- Interface para ver e escolher aptidões; NPCs com afinidade.
+- Integração com a árvore de poderes do Livro Básico (fonte de aptidões de combate).
