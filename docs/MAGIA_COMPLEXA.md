@@ -48,6 +48,10 @@ versões de magia que agem no mundo (`FORA_DE_COMBATE`); guarda os cadáveres pr
 
 Terreno: o mapa marca `natural` e `solo` por tipo de quadrado. Rastrear (LB p.123) é `Checks.cd_rastrear`; ao fugir de
 um combate, inimigos treinados em Sobrevivência tentam seguir os rastros e alcançam o jogador (`_tentar_rastrear`).
+Atitudes (LB p.259): `src/domain/rules/atitudes.gd`; na cena, `CombatModule.atitude_de` (marca `atitude` de magia vale
+sobre a natural); só hostil ataca; sem hostis a luta acaba como `pacificado`; fora de combate, `atitude_fora` e
+`atitude_temp` (dura `TICKS_CENA`). Mudar Atitude (Diplomacia) e Acalmar Animal (Adestramento): ações `diplomacia`
+e `adestrar` (tecla K / Shift+K) e o comando `ChangeAttitude` fora de combate.
 Ações hostis: `CombatModule._alvos_hostis` e `_area_hostil` (magias de área ofensivas; as novas entram ali); o Santuário
 usa os dois em `_execute_action`. Toque inclui o próprio conjurador (LB p.225).
 Presos: marca de tipo `preso` (Controlar Plantas) com a CD; ação `escapar` (Acrobacia ou Atletismo); a IA imóvel tenta.
@@ -77,9 +81,9 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (6): abencoar_alimentos, acalmar_animal,
+- Divinas de 1º círculo (4): abencoar_alimentos,
   criar_elementos,
-  detectar_ameacas, suporte_ambiental, tranquilidade.
+  detectar_ameacas, suporte_ambiental.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
   controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
   raio_solar, rogar_maldicao, silencio, soco_de_arsenal, tempestade_divina, voz_divina.
@@ -95,7 +99,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas, Santuário e Comando (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas, Santuário, Comando, Acalmar Animal e Tranquilidade (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

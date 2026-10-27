@@ -1,6 +1,8 @@
 extends TestCase
 ## Sistemas para magias complexas (docs/MAGIA_COMPLEXA.md): áreas, zonas, marcas, invocações e PV temporários.
 const Area := preload("res://src/domain/combat/area.gd")
+const Atitudes := preload("res://src/domain/rules/atitudes.gd")
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 
 
 func _cena() -> Array:
@@ -227,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2223,3 +2225,108 @@ func test_comando_resistido_ou_surdo_nao_obedece() -> void:
 	sim.budget.std = 1
 	_lanca(m, {"type": "cast", "spell": "comando", "target": "bandido_2", "targets": ["bandido_2"], "ordem": "pare"})
 	check(not sim.tem_marca("bandido_2", "comando"), "surdo não ouve a ordem")
+
+
+# --- Atitudes, Acalmar Animal e Tranquilidade (divinas, 1º círculo) ----------------------------
+func _bandido(m: Array, id: String, vontade: int) -> CharacterSheet:
+	var sh: CharacterSheet = m[2].c(id).sheet
+	sh.remove_condition("surpreendido")
+	m[2].c(id).surprised = false
+	sh.add_efeito("teste", "resistencia", vontade, "cena")
+	return sh
+
+
+func test_atitudes_passo_e_diplomacia() -> void:
+	eq(Atitudes.passo("hostil", 1), "inamistoso", "um passo acima")
+	eq(Atitudes.passo("prestativo", 3), "prestativo", "não passa do topo")
+	eq(Atitudes.resultado_diplomacia("hostil", 25, 10), "indiferente", "passou por 10: duas categorias")
+	eq(Atitudes.resultado_diplomacia("indiferente", 8, 10), "indiferente", "falhou por menos de 5: nada")
+	eq(Atitudes.resultado_diplomacia("indiferente", 4, 10), "inamistoso", "falhou por 5: piora")
+
+
+func test_tranquilidade_falha_deixa_indiferente_e_encerra_a_luta() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_bandido(m, "bandido_1", -50)
+	_bandido(m, "bandido_2", -50)
+	check(_lanca(m, {"type": "cast", "spell": "tranquilidade", "targets": ["bandido_1", "bandido_2"], "target": "bandido_1", "aprimoramentos": [1]}).ok, "dois alvos")
+	eq(c.atitude_de("bandido_1"), "indiferente", "indiferente")
+	var fim: Array = c._check_end()
+	check(fim.any(func(f): return f.type == "COMBAT_ENDED" and f.payload.outcome == "pacificado"), "sem hostis, a luta acaba")
+	eq(c.atitude_fora("bandido_1"), "indiferente", "segue calmo pela cena")
+	c._check_encounter()
+	check(not c.active or not c.sim.combatants.has("bandido_1") or c.atitude_de("bandido_1") == "indiferente", "não volta a atacar (se outro bandido começar a luta, ele segue calmo)")
+
+
+func test_tranquilidade_resistida_da_menos_2_e_hostilidade_desfaz() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b2 := _bandido(m, "bandido_2", 99)
+	_bandido(m, "bandido_1", -50)
+	sim.c("bandido_2").tile = Vector2i(27, 58)
+	_lanca(m, {"type": "cast", "spell": "tranquilidade", "targets": ["bandido_1"], "target": "bandido_1"})
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "tranquilidade", "targets": ["bandido_2"], "target": "bandido_2"})
+	eq(b2.efeito_bonus("ataque"), -2, "resistiu: –2 nos ataques")
+	_ataque_planejado(m, "player", "bandido_2")
+	eq(c.atitude_de("bandido_1"), "hostil", "atacar um aliado do alvo desfaz a Tranquilidade")
+
+
+func test_acalmar_animal_prestativo_bonus_e_tipos() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_1", -50)
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "acalmar_animal", "targets": ["bandido_1"], "target": "bandido_1"}).ok, "humanoide não é animal")
+	b.creature_type = "animal"
+	check(_lanca(m, {"type": "cast", "spell": "acalmar_animal", "targets": ["bandido_1"], "target": "bandido_1"}).ok, "animal")
+	eq(c.atitude_de("bandido_1"), "prestativo", "prestativo")
+	eq(sim.c("player").sheet.efeito_bonus_tipo("diplomacia_vs", "bandido_1"), 10, "+10 em Diplomacia contra ele")
+	b.creature_type = "monstro"
+	b.attrs["int"] = -4
+	check(SpellRules.alvo_social_valido("acalmar_animal", [1], b), "monstro de Int –4 com o aprimoramento")
+	b.attrs["int"] = 2
+	check(not SpellRules.alvo_social_valido("acalmar_animal", [1], b), "monstro inteligente, não")
+	check(SpellRules.alvo_social_valido("acalmar_animal", [3], b), "qualquer monstro com o de 5 PM")
+	_ataque_planejado(m, "player", "bandido_1")
+	eq(c.atitude_de("bandido_1"), "hostil", "atacar o animal desfaz")
+
+
+func test_diplomacia_e_adestramento_em_combate() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_bandido(m, "bandido_1", -50)
+	var a := {"type": "diplomacia", "target": "bandido_1"}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok and v.kind == "completa", "mudar atitude é ação completa")
+	sim.c("player").sheet.flat_skills["diplomacia"] = 60
+	c._execute_action("player", a, v)
+	check(c.atitude_de("bandido_1") != "hostil", "convencido (%s)" % c.atitude_de("bandido_1"))
+	sim.budget = {"std": 1, "move": 1}
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "uma vez por dia")
+	sim.c("bandido_2").sheet.creature_type = "animal"
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "adestrar", "target": "bandido_2"}).ok, "Adestramento é apenas treinada")
+
+
+func test_acalmar_e_mudar_atitude_fora_de_combate() -> void:
+	var w := WorldHelpers.world(5)
+	var sh := CharacterBuilder.build(w.rules, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.spells = PackedStringArray(["tranquilidade"])
+	sh.pm = 10
+	w.player_sheet = sh
+	var combat = w.module("combat")
+	var t: Array = combat.creature_state["bandido_1"].tile
+	WorldHelpers.put(w, int(t[0]) + 3, int(t[1]))
+	var csh := CharacterSheet.from_dict(combat.creature_state["bandido_1"].sheet)
+	csh.add_efeito("teste", "resistencia", -50, "cena")
+	combat.creature_state["bandido_1"].sheet = csh.to_dict()
+	var r := WorldHelpers.cmd(w, "CastSpell", {"spell": "tranquilidade", "targets": ["bandido_1"]})
+	check(r.accepted, "Tranquilidade fora de combate: %s" % str(r.errors))
+	eq(combat.atitude_fora("bandido_1"), "indiferente", "calmo pela cena")
+	WorldHelpers.advance_hours(w, 2)
+	eq(combat.atitude_fora("bandido_1"), "hostil", "a cena acaba e ele volta a ser hostil")
+	check(WorldHelpers.cmd(w, "ChangeAttitude", {"target": "bandido_1"}).accepted, "Diplomacia fora de combate")
+	check(not WorldHelpers.cmd(w, "ChangeAttitude", {"target": "bandido_1"}).accepted, "uma vez por dia")

@@ -16,6 +16,8 @@ const FORA_DE_COMBATE := {
 	"despedacar": [],   # contra um objeto mundano
 	"caminhos_da_natureza": [],   # você e os companheiros presentes
 	"controlar_plantas": [],   # poda, falar com plantas e truque (enredar só tem efeito numa cena de combate)
+	"acalmar_animal": [],   # criaturas por perto, antes da luta
+	"tranquilidade": [],
 }
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
@@ -84,6 +86,25 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var p := _tile_jogador()
 			if maxi(absi(p.x - int(od.tile[0])), absi(p.y - int(od.tile[1]))) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
 				return PackedStringArray(["objeto fora do alcance"])
+		"acalmar_animal", "tranquilidade":
+			var combat_v = world.module("combat")
+			var alvos_v: Array = cmd.payload.get("targets", [])
+			var lim := 1 + apr.count(2 if sp_id == "acalmar_animal" else 1)
+			if sp_id == "tranquilidade" and apr.has(2):
+				lim = 999
+			if alvos_v.is_empty() or alvos_v.size() > lim:
+				return PackedStringArray(["escolha os alvos"])
+			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.get("alcance", "curto")), apr)
+			var reach := int(world.rules.value("alcance.quadrados", {}).get(alc, 6))
+			for tg in alvos_v:
+				if combat_v == null or not combat_v.creature_state.has(tg) or not combat_v.is_active_creature(tg):
+					return PackedStringArray(["alvo inválido"])
+				var tc: Vector2i = combat_v.creature_tile(tg)
+				var p_v := _tile_jogador()
+				if maxi(absi(p_v.x - tc.x), absi(p_v.y - tc.y)) > reach:
+					return PackedStringArray(["fora do alcance"])
+				if not SpellRules.alvo_social_valido(sp_id, apr, CharacterSheet.from_dict(combat_v.creature_state[tg].sheet)):
+					return PackedStringArray(["tipo de criatura que a magia não afeta"])
 		"controlar_plantas":
 			if not cmd.payload.get("truque", false) and not apr.has(0) and not apr.has(2):
 				return PackedStringArray(["fora de combate, só a poda, falar com plantas ou o truque"])
@@ -117,6 +138,24 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"acalmar_animal", "tranquilidade":
+			var combat_e = world.module("combat")
+			var acalmar: bool = sp_id == "acalmar_animal"
+			var cd: int = combat_e.spell_dc(sh, cmd.payload)
+			for tg in cmd.payload.get("targets", []):
+				var ts := CharacterSheet.from_dict(combat_e.creature_state[tg].sheet)
+				var hostil: bool = combat_e.atitude_fora(tg) == "hostil"
+				var sv := Checks.skill(ts, "vontade", cd, world.rules, world.rng, "world", 5 if acalmar and hostil else 0)
+				if sv.get("success", false):
+					if not acalmar:
+						combat_e.penalizar_fora(tg, -2, combat_e.TICKS_CENA)
+					out.append(fact("SPELL_MISSED", {"caster": "player", "target": tg, "spell": sp_id, "saved": true}, ["player", tg]))
+					continue
+				combat_e.acalmar_fora(tg, "prestativo" if acalmar else "indiferente", combat_e.TICKS_CENA)
+				if acalmar:
+					sh.add_efeito("magia.acalmar_animal", "diplomacia_vs", 10, "cena", tg)
+					sh.add_efeito("magia.acalmar_animal", "adestramento_vs", 10, "cena", tg)
+				out.append(fact("BUFF_APPLIED", {"actor": "player", "target": tg, "buff": sp_id, "tags": ["magia"]}, ["player", tg]))
 		"controlar_plantas":
 			var apr_p: Array = cmd.payload.get("aprimoramentos", [])
 			var p_cp := _tile_jogador()

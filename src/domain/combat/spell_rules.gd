@@ -25,6 +25,8 @@ const COMPLETAS := {
 	"controlar_plantas": {"aprimoramentos": [0, 1, 2]},   # poda (instantânea); também imóvel; falar com plantas; truque: anima 1 planta
 	"santuario": {"aprimoramentos": [0, 1]},   # não inteligentes do tipo escolhido não percebem; também contra área
 	"comando": {"aprimoramentos": [0, 1]},   # qualquer criatura; +1 alvo (repetível); ordens fuja, largue, pare, senta, venha
+	"acalmar_animal": {"aprimoramentos": [0, 1, 2, 3]},   # médio; monstro/espírito Int –5/–4; +1 alvo; qualquer monstro/espírito
+	"tranquilidade": {"aprimoramentos": [0, 1, 2]},   # qualquer criatura; +1 alvo; médio e criaturas escolhidas
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -52,9 +54,9 @@ const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
 ## Aprimoramentos que trocam a execução para reação mesmo sem a magia ser reação no base (Proteção Divina +2 PM).
 const REACAO_APR := {"protecao_divina": [1], "premonicao": [0]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
-const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1]}
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
@@ -261,3 +263,18 @@ static func aplicar_caminhos(sh: CharacterSheet, apr: Array, truque: bool, ate_d
 
 
 const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]
+
+
+## Acalmar Animal: animal; monstro ou espírito com Int –5 ou –4 (1 PM); qualquer monstro ou espírito (5 PM).
+## Tranquilidade: animal ou humanoide; qualquer criatura (1 PM, ou criaturas escolhidas com o de 5 PM).
+static func alvo_social_valido(sp_id: String, apr: Array, alvo: CharacterSheet) -> bool:
+	var tipo := alvo.creature_type
+	if sp_id == "acalmar_animal":
+		if tipo == "animal":
+			return true
+		if ["monstro", "espirito"].has(tipo):
+			return apr.has(3) or (apr.has(1) and int(alvo.attrs.get("int", 0)) <= -4)
+		return false
+	if apr.has(0) or apr.has(2):
+		return true
+	return tipo == "animal" or tipo == "humanoide"

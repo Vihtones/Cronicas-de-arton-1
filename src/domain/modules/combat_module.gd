@@ -4,6 +4,7 @@ const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const Area := preload("res://src/domain/combat/area.gd")
 const CondicoesCombate := preload("res://src/domain/combat/condicoes_combate.gd")
+const Atitudes := preload("res://src/domain/rules/atitudes.gd")
 ## Combate tático híbrido (§9). Planejamento congelado no turno, fantasma sem
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
@@ -36,7 +37,7 @@ var log: Array = []
 
 func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
-	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy"])
+	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy", "ChangeAttitude"])
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH", "ORDER_SET", "SCHEDULED_PURSUIT"])
 
@@ -119,6 +120,21 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	match cmd.type:
 		"SetStance":
 			if active: return PackedStringArray(["não durante o combate"])
+		"ChangeAttitude":
+			# Fora de combate: Diplomacia (Mudar Atitude, um minuto) ou Adestramento (Acalmar Animal, CD 25).
+			if active: return PackedStringArray(["em combate: use as ações de combate"])
+			var alvo_ca := str(cmd.payload.get("target", ""))
+			if not creature_state.has(alvo_ca) or not is_active_creature(alvo_ca): return PackedStringArray(["ninguém para convencer"])
+			if CombatSim.cheb(world.db.world_to_tile(world.player.position), creature_tile(alvo_ca)) > ALCANCE_CURTO_QUADRADOS:
+				return PackedStringArray(["longe demais"])
+			var pericia_ca := str(cmd.payload.get("skill", "diplomacia"))
+			if pericia_ca == "diplomacia" and int(creature_state[alvo_ca].get("diplomacia_dia", -1)) == world.day_index():
+				return PackedStringArray(["já tentou mudar a atitude dele hoje"])
+			if pericia_ca == "adestramento":
+				if not world.player_sheet.can_use_skill("adestramento", world.rules): return PackedStringArray(["Adestramento é apenas treinada"])
+				if CharacterSheet.from_dict(creature_state[alvo_ca].sheet).creature_type != "animal": return PackedStringArray(["escolha um animal"])
+			elif pericia_ca != "diplomacia":
+				return PackedStringArray(["perícia inválida"])
 		"SetPowerPolicy":
 			var pw := str(cmd.payload.get("power", ""))
 			if not POWER_POLICIES.has(pw): return PackedStringArray(["poder sem política: " + pw])
@@ -155,6 +171,25 @@ func execute(cmd: GameCommand) -> Array:
 			power_policy[str(cmd.payload.power)] = str(cmd.payload.policy)
 			if sim != null: sim.toggles = power_policy.duplicate()
 			return [fact("POWER_POLICY_SET", {"power": cmd.payload.power, "policy": cmd.payload.policy}, ["player"])]
+		"ChangeAttitude":
+			var alvo_e := str(cmd.payload.target)
+			var st_e: Dictionary = creature_state[alvo_e]
+			var csh := CharacterSheet.from_dict(st_e.sheet)
+			var antes := atitude_fora(alvo_e)
+			var novo := antes
+			var res := {}
+			if str(cmd.payload.get("skill", "diplomacia")) == "adestramento":
+				res = Checks.skill(world.player_sheet, "adestramento", 25, world.rules, world.rng, "world", world.player_sheet.efeito_bonus_tipo("adestramento_vs", alvo_e))
+				if res.get("success", false) and not Atitudes.ORDEM.slice(2).has(antes):
+					novo = "indiferente"
+			else:
+				res = Checks.skill(world.player_sheet, "diplomacia", 0, world.rules, world.rng, "world", world.player_sheet.efeito_bonus_tipo("diplomacia_vs", alvo_e))
+				var von := Checks.skill(csh, "vontade", 0, world.rules, world.rng, "world")
+				novo = Atitudes.resultado_diplomacia(antes, int(res.total), int(von.total))
+				st_e.diplomacia_dia = world.day_index()
+			st_e.atitude = novo
+			st_e.erase("atitude_temp")
+			return [fact("ATTITUDE_CHANGED", {"actor": "player", "target": alvo_e, "from": antes, "to": novo, "check": res}, ["player", alvo_e])]
 		"SetStance":
 			stance_sneak = bool(cmd.payload.get("sneak", false))
 			undetected_by.clear(); approach_rolled.clear()
@@ -162,6 +197,9 @@ func execute(cmd: GameCommand) -> Array:
 		"StartCombat":
 			var ids: Array = cmd.payload.enemies
 			var surprised := ids.all(func(id): return undetected_by.has(id))
+			for id in ids:   # atacar quem foi acalmado por magia desfaz a magia (Acalmar Animal, Tranquilidade)
+				if creature_state.has(id):
+					creature_state[id].erase("atitude_temp")
 			return _start(_group_with(ids), surprised, false)
 		"ExecutePlan":
 			var out: Array = []
@@ -297,6 +335,8 @@ func _check_encounter() -> Array:
 		if not is_active_creature(id) or world.db.zone_at(creature_tile(id)) != zone:
 			approach_rolled.erase(id); undetected_by.erase(id)
 			continue
+		if not Atitudes.agressiva(atitude_fora(id)):
+			continue   # acalmado ou não hostil: não ataca
 		var d := CombatSim.cheb(p, creature_tile(id))
 		var asleep := is_asleep(id)
 		var radius := DETECT_ASLEEP if asleep else DETECT_AWAKE
@@ -362,6 +402,7 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	if dlg != null and not dlg.session.is_empty():
 		pre.append(fact("DIALOGUE_ENDED", {"npc": dlg.session.npc, "reason": "combate"}))
 	sim = _new_sim()
+	sim.dia = world.day_index()
 	var magia_p = world.module("magia")
 	if magia_p != null and not magia_p.podas.is_empty():
 		sim.add_zona("poda_mundo", magia_p.tiles_podados(), "poda", -1, "controlar_plantas")   # vegetação podada antes
@@ -378,7 +419,14 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	for id in enemy_ids:
 		creature_state[id].woken_until = world.clock.tick + 36
 		sim.combatants[id] = {"id": id, "side": "enemy", "tile": creature_tile(id), "sheet": CharacterSheet.from_dict(creature_state[id].sheet),
-			"charge_turn": -99, "damaged_round": -1, "surprised": enemies_surprised, "flags": []}
+			"charge_turn": -99, "damaged_round": -1, "surprised": enemies_surprised, "flags": [], "atitude": str(creature_state[id].get("atitude", "hostil")),
+			"diplomacia_dia": int(creature_state[id].get("diplomacia_dia", -1))}
+		var temp: Dictionary = creature_state[id].get("atitude_temp", {})
+		if not temp.is_empty() and int(temp.ate) > world.clock.tick:
+			_pacificar("player", id, str(temp.valor), "acalmado")   # ainda acalmado por magia nesta cena
+		var pen_t: Dictionary = creature_state[id].get("penalidade_temp", {})
+		if not pen_t.is_empty() and int(pen_t.ate) > world.clock.tick:
+			sim.c(id).sheet.add_efeito("magia.tranquilidade", "ataque", int(pen_t.ataque), "cena")   # Tranquilidade resistida
 	# Iniciativa (LB p.231): jogador rola; inimigos fazem um teste único com o menor valor.
 	var p_mod := world.player_sheet.skill_value("iniciativa", world.rules)
 	var e_mod := 999
@@ -447,6 +495,8 @@ func _run_until_player() -> Array:
 				return out
 			if sim.c(id).flags.has("guardiao"):
 				out.append_array(_turno_guardiao(id))
+			elif sim.c(id).side == "enemy" and not Atitudes.agressiva(atitude_de(id)):
+				out.append(fact("TURN_SKIPPED", {"actor": id, "reason": "atitude", "atitude": atitude_de(id)}))
 			else:
 				out.append_array(_ai_turn(id))
 			end = _check_end()
@@ -1082,6 +1132,94 @@ func _turno_comando(id: String, ordem: String, conj: String) -> Array:
 	return out
 
 
+## --- Atitudes (LB p.259) --------------------------------------------------------------------------
+const TICKS_CENA := 6   # uma cena fora de combate dura cerca de uma hora (ORIGINAL_DO_JOGO)
+
+
+func _marca_atitude(id: String) -> Dictionary:
+	for m in sim.marcas:
+		if m.alvo == id and m.tipo == "atitude":
+			return m
+	return {}
+
+
+## Atitude da criatura em relação ao grupo do jogador: a de magia (marca) vale sobre a natural.
+func atitude_de(id: String) -> String:
+	var m := _marca_atitude(id)
+	if not m.is_empty():
+		return str(m.dados.valor)
+	return str(sim.c(id).get("atitude", "hostil")) if sim.c(id).side == "enemy" else "prestativo"
+
+
+## Atitude fora de combate (para começar encontros): a de magia ainda na cena, ou a natural.
+func atitude_fora(id: String) -> String:
+	var st_a: Dictionary = creature_state.get(id, {})
+	var t: Dictionary = st_a.get("atitude_temp", {})
+	if not t.is_empty() and int(t.ate) > world.clock.tick:
+		return str(t.valor)
+	return str(st_a.get("atitude", "hostil"))
+
+
+## Acalmar Animal: ação hostil do conjurador ou de aliados dele contra o alvo dissipa. Tranquilidade: ação hostil de
+## qualquer um contra o alvo ou os aliados dele dissipa. O alvo volta à atitude de antes.
+func _atitude_quebra(id: String, a: Dictionary, out: Array) -> void:
+	var alvos := _alvos_hostis(id, a)
+	alvos.append_array(_criaturas_vivas_em(_area_hostil(id, a)))
+	if alvos.is_empty():
+		return
+	for m in sim.marcas.duplicate(true):
+		if m.tipo != "atitude" or not sim.combatants.has(m.alvo):
+			continue
+		var quebra := false
+		for tg in alvos:
+			if str(m.fonte) == "tranquilidade":
+				quebra = quebra or tg == m.alvo or (sim.c(tg).side == sim.c(m.alvo).side)
+			else:
+				quebra = quebra or (tg == m.alvo and not sim.is_enemy(id, str(m.dados.conjurador)))
+		if quebra:
+			sim.remove_marca(str(m.id), m.alvo)
+			out.append(fact("SPELL_ENDED", {"caster": str(m.dados.conjurador), "spell": str(m.fonte), "target": m.alvo, "reason": "acao_hostil"}, [m.alvo]))
+
+
+## Mudar Atitude (Diplomacia, LB p.118): oposto pela Vontade do alvo; uma vez por dia por alvo. `mod`: –10 em combate.
+func _mudar_atitude(id: String, alvo: String, mod: int) -> Array:
+	var A: Dictionary = sim.c(id)
+	var T: Dictionary = sim.c(alvo)
+	var r := Checks.skill(A.sheet, "diplomacia", 0, world.rules, world.rng, "combat", mod + A.sheet.efeito_bonus_tipo("diplomacia_vs", alvo))
+	var von := Checks.skill(T.sheet, "vontade", 0, world.rules, world.rng, "combat")
+	T["diplomacia_dia"] = sim.dia
+	var antes := str(T.get("atitude", "hostil"))
+	T["atitude"] = Atitudes.resultado_diplomacia(antes, int(r.total), int(von.total))
+	return [fact("ATTITUDE_CHANGED", {"actor": id, "target": alvo, "from": antes, "to": T.atitude, "total": r.total, "vontade": von.total}, [id, alvo])]
+
+
+## Adestramento, Acalmar Animal (LB p.115): CD 25; o animal deixa de ser agressivo (indiferente).
+func _acalmar_pela_pericia(id: String, alvo: String) -> Array:
+	var A: Dictionary = sim.c(id)
+	var r := Checks.skill(A.sheet, "adestramento", 25, world.rules, world.rng, "combat", A.sheet.efeito_bonus_tipo("adestramento_vs", alvo))
+	var antes := str(sim.c(alvo).get("atitude", "hostil"))
+	if r.get("success", false) and not Atitudes.ORDEM.slice(2).has(antes):
+		sim.c(alvo)["atitude"] = "indiferente"
+	return [fact("ATTITUDE_CHANGED", {"actor": id, "target": alvo, "from": antes, "to": str(sim.c(alvo).get("atitude", antes)), "check": r, "skill": "adestramento"}, [id, alvo])]
+
+
+## Fora de combate (SpellsModule): a criatura fica com a atitude `valor` por `ticks` (a cena).
+func acalmar_fora(id: String, valor: String, ticks: int) -> void:
+	if creature_state.has(id):
+		creature_state[id].atitude_temp = {"valor": valor, "ate": world.clock.tick + ticks}
+
+
+## Fora de combate: Tranquilidade resistida deixa –2 nos ataques pela cena.
+func penalizar_fora(id: String, ataque: int, ticks: int) -> void:
+	if creature_state.has(id):
+		creature_state[id].penalidade_temp = {"ataque": ataque, "ate": world.clock.tick + ticks}
+
+
+## Acalmar Animal e Tranquilidade: a atitude muda por magia pela cena.
+func _pacificar(conj: String, alvo: String, valor: String, fonte: String) -> void:
+	sim.add_marca(fonte + "_atitude", alvo, fonte, "atitude", -1, {"valor": valor, "conjurador": conj})
+
+
 ## Santuário: marca do alvo protegido ({} se não tem).
 func _santuario_de(alvo: String) -> Dictionary:
 	for m in sim.marcas:
@@ -1597,6 +1735,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 	if _santuario_impede(id, a, out):
 		return out   # Santuário: não consegue e perde a ação
 	_santuario_quebra(id, a, out)
+	_atitude_quebra(id, a, out)
 	match a.type:
 		"move":
 			var path := GhostPlanner._tiles(a.path)
@@ -1690,6 +1829,10 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 							break
 				out.append(fact("HEALED", {"actor": id, "target": alvo_m, "amount": cura_m, "pv_after": ts_m.pv, "source": "cura_pelas_maos", "tags": ["classe", "cura"]}, [id, alvo_m]))
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id]))
+		"diplomacia":
+			out.append_array(_mudar_atitude(id, str(a.target), -10))
+		"adestrar":
+			out.append_array(_acalmar_pela_pericia(id, str(a.target)))
 		"pegar_arma":
 			var X: Dictionary = sim.c(id)
 			var chao_p: Dictionary = X.arma_no_chao
@@ -1845,6 +1988,26 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"acalmar_animal", "tranquilidade":
+			# Acalmar Animal (divina 1): Vontade anula (+5 se hostil ou em combate); o alvo fica prestativo pela cena e o
+			# conjurador recebe +10 em Adestramento e Diplomacia contra ele. Tranquilidade (divina 1): Vontade parcial;
+			# falhou, fica indiferente e não ataca; passou, –2 nos ataques. Ação hostil desfaz (_atitude_quebra).
+			var cd_t := spell_dc(sh, a)
+			var acalmar: bool = a.spell == "acalmar_animal"
+			for tg_t in a.get("targets", [a.get("target", "")]):
+				var ts_t: CharacterSheet = sim.c(tg_t).sheet
+				var sv_t := Checks.skill(ts_t, "vontade", cd_t, world.rules, world.rng, "combat", 5 if acalmar else 0)
+				sv_t = _pos_teste(tg_t, sv_t, cd_t, out)
+				if sv_t.get("success", false):
+					if not acalmar:
+						ts_t.add_efeito("magia.tranquilidade", "ataque", -2, "cena")
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg_t, "spell": a.spell, "saved": true}, [id, tg_t]))
+					continue
+				_pacificar(id, tg_t, "prestativo" if acalmar else "indiferente", str(a.spell))
+				if acalmar:
+					sh.add_efeito("magia.acalmar_animal", "diplomacia_vs", 10, "cena", tg_t)
+					sh.add_efeito("magia.acalmar_animal", "adestramento_vs", 10, "cena", tg_t)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_t, "buff": str(a.spell), "atitude": atitude_de(tg_t), "tags": ["magia"]}, [id, tg_t]))
 		"comando":
 			# Comando (divina 1): ordem irresistível a humanoides (qualquer criatura com o aprimoramento de 1 PM) que ouçam;
 			# +1 alvo por aprimoramento de 2 PM. Vontade anula; quem falha obedece no próprio turno (_obedecer_comando).
@@ -2951,14 +3114,18 @@ func _check_end() -> Array:
 		return _end_combat("morte")
 	var enemies_up := false
 	var animals_up := false
+	var pacificos := false
 	for id in sim.combatants:
 		var x := sim.c(id)
 		if x.side == "enemy" and sim.conscious(id):
+			if not Atitudes.agressiva(atitude_de(id)):
+				pacificos = true   # acalmado (Acalmar Animal, Tranquilidade, Diplomacia): não luta
+				continue
 			enemies_up = true
 			if world.rules.value(x.sheet.source_rule, {}).get("tipo", "") == "animal":
 				animals_up = true
 	if not enemies_up:
-		return _end_combat("vitoria")
+		return _end_combat("pacificado" if pacificos else "vitoria")
 	if P.sheet.is_down() and not animals_up:
 		return _end_combat("captura")
 	return []
@@ -3016,6 +3183,11 @@ func _end_combat(outcome: String) -> Array:
 			continue
 		creature_state[id].sheet = x.sheet.to_dict()
 		creature_state[id].tile = [x.tile.x, x.tile.y]
+		creature_state[id].atitude = str(x.get("atitude", "hostil"))   # Diplomacia muda de verdade
+		creature_state[id].diplomacia_dia = int(x.get("diplomacia_dia", -1))
+		var magica := _marca_atitude(id)
+		if not magica.is_empty() and not x.sheet.is_dead():   # acalmado por magia: dura a cena
+			creature_state[id].atitude_temp = {"valor": str(magica.dados.valor), "ate": world.clock.tick + TICKS_CENA}
 		if outcome == "vitoria" or x.sheet.is_dead():
 			creature_state[id].alive = not x.sheet.is_dead()
 			creature_state[id].present = false

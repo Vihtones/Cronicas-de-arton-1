@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Atitudes (LB p.259): criaturas têm atitude (hostil a prestativo); só as hostis atacam; quando não restam hostis a luta termina pacificada. Mudar Atitude com Diplomacia (ação completa com –10 em combate, um minuto fora; oposto pela Vontade; uma vez por dia) e Acalmar Animal com Adestramento (CD 25). Teclas K e Shift+K.
+- Acalmar Animal e Tranquilidade (divinas, 1º círculo) completas, em combate e fora dele: Acalmar deixa o animal prestativo (+5 na resistência se hostil ou em combate) e dá +10 em Adestramento e Diplomacia contra ele; Tranquilidade deixa indiferente (quem resiste sofre –2 nos ataques). Ação hostil desfaz. Todos os aprimoramentos (alcance médio, outros tipos de alvo, mais alvos).
+
 - Correção: criaturas do bestiário recebem o tipo da ficha (animal, humanoide...), antes todas eram humanoides; o elemental de luz é do tipo espírito, como os elementais de T20.
 
 - Comando (divina, 1º círculo) completa: humanoide (qualquer criatura com aprimoramento; +1 alvo por aprimoramento) que ouça faz Vontade ou obedece no próprio turno: Fuja e Venha tomam o turno inteiro, Largue solta a arma (só a pega de novo no turno seguinte; a IA vai buscá-la; recolhida ao fim da luta), Pare deixa pasmo (uma vez por cena), Senta deixa caído sem poder levantar naquele turno. Tecla T escolhe a ordem.

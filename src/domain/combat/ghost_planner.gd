@@ -143,6 +143,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "acalmar_animal" or sp_id == "tranquilidade":
+				var lim := 1 + apr.count(2 if sp_id == "acalmar_animal" else 1)
+				if sp_id == "tranquilidade" and apr.has(2):
+					lim = 999   # criaturas escolhidas
+				if targets.size() > lim: return {"ok": false, "reason": "alvos demais"}
+				for tg in targets:
+					if not sim.combatants.has(tg) or tg == actor: return {"ok": false, "reason": "alvo inválido"}
+					if not SpellRules.alvo_social_valido(sp_id, apr, sim.c(tg).sheet): return {"ok": false, "reason": "tipo de criatura que a magia não afeta"}
 			if sp_id == "comando":
 				if not SpellRules.ORDENS_COMANDO.has(str(a.get("ordem", ""))):
 					return {"ok": false, "reason": "escolha a ordem: fuja, largue, pare, senta ou venha"}
@@ -277,6 +285,22 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if T.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, T.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
 			return {"ok": true, "kind": "movimento", "cost": 1}
+		"diplomacia":
+			# Mudar Atitude em combate (LB p.118): ação completa, –10, Diplomacia oposta pela Vontade; uma vez por dia por alvo.
+			if not sim.can_spend("completa"): return {"ok": false, "reason": "mudar atitude em combate exige ação completa"}
+			var TD := sim.c(a.get("target", ""))
+			if TD.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
+			if CombatSim.cheb(A.tile, TD.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "longe demais para conversar"}
+			if int(TD.get("diplomacia_dia", -1)) == sim.dia: return {"ok": false, "reason": "já tentou mudar a atitude dele hoje"}
+			return {"ok": true, "kind": "completa"}
+		"adestrar":
+			# Adestramento, Acalmar Animal (LB p.115): ação completa, apenas treinado, CD 25.
+			if not sim.can_spend("completa"): return {"ok": false, "reason": "acalmar animal exige ação completa"}
+			if not A.sheet.can_use_skill("adestramento", sim.rules): return {"ok": false, "reason": "Adestramento é apenas treinada"}
+			var TN := sim.c(a.get("target", ""))
+			if TN.is_empty() or TN.sheet.creature_type != "animal" or not sim.conscious(a.target): return {"ok": false, "reason": "escolha um animal"}
+			if CombatSim.cheb(A.tile, TN.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "longe demais"}
+			return {"ok": true, "kind": "completa"}
 		"pegar_arma":
 			# Pegar a arma largada (Comando, "Largue"): ação de movimento, no mesmo quadrado ou adjacente; só a partir do
 			# turno seguinte ao que largou.

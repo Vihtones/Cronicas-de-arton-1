@@ -25,6 +25,7 @@ var marcas: Array = []
 var expiradas: Array = []
 var rng: RngStreams                 # null em simulações do fantasma: sem rolagens
 var conjurando: Dictionary = {}     # conjurador -> {alvo, cd, apr, rodadas}: magia de execução longa (Banimento); 0 rodadas = pronta
+var dia := 0                        # dia do mundo (Mudar Atitude: uma vez por dia por alvo)
 var sustentadas: Dictionary = {}    # conjurador -> id da magia sustentada (uma por vez, LB p.227)
 var pendencias: Array = []          # efeitos de ligação ocorridos, drenados pelo módulo para o registro
 
@@ -46,6 +47,7 @@ func clone() -> CombatSim:
 	c.expiradas = expiradas.duplicate()
 	c.conjurando = conjurando.duplicate(true)
 	c.sustentadas = sustentadas.duplicate(true)
+	c.dia = dia
 	return c
 
 

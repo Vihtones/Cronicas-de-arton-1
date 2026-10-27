@@ -233,6 +233,10 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "" or not gs.is_enemy("player", target):
 				return []
 			return [{"type": "arma_espiritual", "target": target}]
+		"conversar", "adestrar":
+			if target == "" or not gs.is_enemy("player", target):
+				return []
+			return [{"type": "diplomacia" if mode == "conversar" else "adestrar", "target": target}]
 		"magia":
 			var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 			if str(sp.get("alcance", "")) == "pessoal":
@@ -394,7 +398,9 @@ func set_mode(m: String) -> void:
 	mode = m
 	var dicas := {"cura": "Cura pelas Mãos: clique em você ou num aliado adjacente (N: passo extra, H: remover condição).",
 		"olhar": "Olhar atordoante: clique num inimigo em alcance curto.",
-		"arma": "Arma Espiritual (ação livre): clique num inimigo adjacente. Shift+W: sustentar ou soltar a magia sustentada."}
+		"arma": "Arma Espiritual (ação livre): clique num inimigo adjacente. Shift+W: sustentar ou soltar a magia sustentada.",
+		"conversar": "Mudar atitude (Diplomacia, ação completa, –10): clique num inimigo em alcance curto.",
+		"adestrar": "Acalmar animal (Adestramento, ação completa, CD 25): clique num animal em alcance curto."}
 	message.emit(dicas.get(m, "Modo: " + m))
 	_update_preview()
 
@@ -516,6 +522,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_S: use_aura()
 			KEY_E: use_egide()
 			KEY_C: escape()
+			KEY_K: set_mode("adestrar" if event.shift_pressed else "conversar")
 			KEY_F: cycle_policy("golpe_divino")
 			KEY_Z: cycle_policy("golpe_divino_extra")
 			KEY_X: extra_attack()
