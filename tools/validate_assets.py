@@ -38,7 +38,8 @@ def main():
         if img.mode != "RGBA": errors.append(f"{aid}: sem canal alpha")
         if a["tipo"] == "spritesheet_personagem":
             px, py = a["pivot"]
-            if not (0 <= px < tile and 0 <= py < tile): errors.append(f"{aid}: pivô fora do quadro")
+            quadro = img.size[0] // 3   # largura do quadro (32 px nos sprites antigos, 64 px nos de LPC)
+            if not (0 <= px < quadro and 0 <= py < quadro): errors.append(f"{aid}: pivô fora do quadro")
             # cada quadro precisa ter conteúdo e transparência (checagem quadro a quadro)
             for fy in range(img.size[1] // tile):
                 for fx in range(img.size[0] // tile):

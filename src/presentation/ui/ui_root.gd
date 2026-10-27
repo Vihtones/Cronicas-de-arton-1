@@ -1047,6 +1047,10 @@ func _build_credits(root: Control) -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = 520
 		v.add_child(l)
+	if FileAccess.file_exists("res://assets/CREDITOS_PERSONAGENS.txt"):   # personagens (camadas LPC, atribuição)
+		var lp := _label(FileAccess.get_file_as_string("res://assets/CREDITOS_PERSONAGENS.txt"), 7)
+		lp.custom_minimum_size.x = 520
+		v.add_child(lp)
 	panel_credits.visible = false
 
 
@@ -1150,8 +1154,9 @@ func _refresh_creation() -> void:
 	pv.add_child(ptr)
 	var fig := TextureRect.new()
 	var at := AtlasTexture.new()
-	at.atlas = load("res://assets/chars/player.png")
-	at.region = Rect2(0, 0, 32, 32)
+	var folha: Texture2D = load("res://assets/chars/player.png")
+	at.atlas = folha
+	at.region = Rect2(0, 0, folha.get_width() / 3, folha.get_height() / 4)   # primeiro quadro (parado, de frente)
 	fig.texture = at
 	fig.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	fig.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

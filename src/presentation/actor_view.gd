@@ -23,6 +23,7 @@ var direction := 0
 var walking := false
 var down := false
 var base_scale := 1.0
+var quadro_k := 1.0                # tamanho do quadro em relação a 32 px (sprites antigos 1, LPC de 64 px: 2)
 var _anim_t := 0.0
 var _tween: Tween
 var _was_walking := false
@@ -47,18 +48,24 @@ func setup(id: String, sheet_path: String, display_name: String = "") -> void:
 	shadow_contact.position = Vector2(0, 3)
 	shadow_contact.modulate = Color(0, 0, 0, 0.38)
 	add_child(shadow_contact)
+	var tex: Texture2D = load(sheet_path)
+	quadro_k = float(tex.get_height() / 4) / 32.0
+	var pe_y := 28.0 * quadro_k                       # pés dentro do quadro (Art Bible: pivô 16,28 em 32 px)
+	var deslocamento := Vector2(0, -(pe_y - 16.0 * quadro_k))
+	var alto := 60.0 if quadro_k > 1.5 else 32.0      # altura da figura acima dos pés (barras e nome)
+	shadow_contact.scale = Vector2.ONE * (1.0 + 0.3 * (quadro_k - 1.0))
 	shadow_cast = Sprite2D.new()
-	shadow_cast.texture = load(sheet_path)
+	shadow_cast.texture = tex
 	shadow_cast.hframes = 3
 	shadow_cast.vframes = 4
-	shadow_cast.offset = Vector2(0, -12)
+	shadow_cast.offset = deslocamento
 	shadow_cast.modulate = Color(0, 0, 0, 0.0)
 	add_child(shadow_cast)
 	sprite = Sprite2D.new()
-	sprite.texture = load(sheet_path)
+	sprite.texture = tex
 	sprite.hframes = 3
 	sprite.vframes = 4
-	sprite.offset = Vector2(0, -12)  # pivô nos pés (Art Bible: 16,28)
+	sprite.offset = deslocamento  # pivô nos pés (Art Bible: 16,28 em 32 px)
 	add_child(sprite)
 	if display_name != "":
 		label = Label.new()
@@ -66,13 +73,13 @@ func setup(id: String, sheet_path: String, display_name: String = "") -> void:
 		label.add_theme_font_size_override("font_size", 8)
 		label.add_theme_color_override("font_outline_color", Color.BLACK)
 		label.add_theme_constant_override("outline_size", 3)
-		label.position = Vector2(-40, -42)
+		label.position = Vector2(-40, -(alto + 10.0))
 		label.size = Vector2(80, 10)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.visible = false
 		add_child(label)
-	hp_back = ColorRect.new(); hp_back.color = Color(0, 0, 0, 0.7); hp_back.size = Vector2(22, 3); hp_back.position = Vector2(-11, -32); hp_back.visible = false
-	hp_bar = ColorRect.new(); hp_bar.color = Color(0.85, 0.2, 0.2); hp_bar.size = Vector2(20, 1); hp_bar.position = Vector2(-10, -31); hp_bar.visible = false
+	hp_back = ColorRect.new(); hp_back.color = Color(0, 0, 0, 0.7); hp_back.size = Vector2(22, 3); hp_back.position = Vector2(-11, -alto); hp_back.visible = false
+	hp_bar = ColorRect.new(); hp_bar.color = Color(0.85, 0.2, 0.2); hp_bar.size = Vector2(20, 1); hp_bar.position = Vector2(-10, -alto + 1.0); hp_bar.visible = false
 	add_child(hp_back); add_child(hp_bar)
 
 
@@ -91,7 +98,7 @@ func apply_race(race: String) -> void:
 	var l := RaceLook.of(race)
 	sprite.self_modulate = l.tint
 	base_scale = float(l.scale)
-	shadow_contact.scale = Vector2.ONE * base_scale
+	shadow_contact.scale = Vector2.ONE * base_scale * (1.0 + 0.3 * (quadro_k - 1.0))
 
 
 func show_name(v: bool) -> void:

@@ -1,0 +1,30 @@
+Personagens: camadas do Universal LPC Spritesheet Character Generator (Liberated Pixel Cup), usadas pela licença de atribuição
+(OGA-BY 3.0 / CC-BY / CC0). Recolorizadas e combinadas por tools/gen_chars_lpc.py.
+
+Camadas, autores e fontes:
+- body/bodies/child/walk.png | bluecarrot16,Benjamin K. Smith (BenCreating),ElizaWy,MuffinElZangano,Durrani,Nila122,kheftel,Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- body/bodies/female/walk.png | Benjamin K. Smith (BenCreating),bluecarrot16,TheraHedwig,Evert,MuffinElZangano,Durrani,Pierre Vigier (pvigier),ElizaWy,Matthew Krohn (makrohn),Johannes Sjölund (wulax),Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- body/bodies/male/walk.png | bluecarrot16,JaidynReiman,Benjamin K. Smith (BenCreating),Evert,Eliza Wyatt (ElizaWy),TheraHedwig,MuffinElZangano,Durrani,Johannes Sjölund (wulax),Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- feet/boots/basic/male/walk.png | JaidynReiman,bluecarrot16,Nila122 | OGA-BY 3.0,CC-BY-SA 3.0,GPL 2.0,GPL 3.0 | https://opengameart.org/content/lpc-clothes-and-hair
+- feet/sandals/male/walk.png | Nila122,JaidynReiman,Matthew Krohn (makrohn),Johannes Sjölund (wulax) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 2.0,GPL 3.0 | https://opengameart.org/content/lpc-roman-armor
+- feet/shoes/basic/male/walk.png | JaidynReiman,bluecarrot16,Johannes Sjölund (wulax) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- hair/balding/adult/walk.png | ElizaWy | OGA-BY 3.0 | https://opengameart.org/content/lpc-hair
+- hair/bob/adult/walk.png | ElizaWy,bluecarrot16 | CC0 | https://opengameart.org/content/lpc-hair
+- hair/buzzcut/adult/walk.png | ElizaWy | OGA-BY 3.0 | https://opengameart.org/content/lpc-hair
+- hair/page/adult/walk.png | Page,Johannes Sjölund (wulax) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- hat/cloth/bandana/adult/walk.png | Matthew Krohn (makrohn),JaidynReiman,Marcel van de Steeg (MadMarcel),JaidynReiman | OGA-BY 3.0,CC-BY-SA 3.0 | https://opengameart.org/content/lpc-female-orcogregoblintroll-base-walkcycle
+- hat/cloth/hood/adult/walk.png | Johannes Sjölund (wulax),JaidynReiman | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- hat/helmet/flattop/male/walk.png | bluecarrot16 | OGA-BY 3.0,CC-BY 3.0,CC-BY 4.0,GPL 2.0,GPL 3.0 | https://opengameart.org/content/lpc-helmets
+- head/heads/human/child/walk.png | Stephen Challener (Redshrike),kheftel,bluecarrot16 | OGA-BY 3.0,CC-BY 3.0,GPL 3.0 | https://opengameart.org/content/
+- head/heads/human/female/walk.png | bluecarrot16,Benjamin K. Smith (BenCreating),Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/
+- head/heads/human/male/walk.png | bluecarrot16,Benjamin K. Smith (BenCreating),Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- head/heads/human/male_elderly/walk.png | Benjamin K. Smith (BenCreating),Eliza Wyatt (ElizaWy),Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- legs/pants/child/walk.png | Nila122 | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-clothes-for-children
+- legs/pants/male/walk.png | bluecarrot16,JaidynReiman,ElizaWy,Matthew Krohn (makrohn),Johannes Sjölund (wulax),Stephen Challener (Redshrike) | OGA-BY 3.0,GPL 3.0,CC-BY-SA 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- legs/skirts/plain/male/walk.png | bluecarrot16,Pierre Vigier (pvigier),Johannes Sjölund (wulax),Ahmad3366,JaidynReiman | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- torso/aprons/apron/male/walk.png | Nila122 | OGA-BY 3.0,CC-BY-SA 3.0,GPL 2.0,GPL 3.0 | https://opengameart.org/content/lpc-aprons
+- torso/armour/leather/male/walk.png | Johannes Sjölund (wulax),bluecarrot16,JaidynReiman | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- torso/chainmail/male/walk.png | Johannes Sjölund (wulax),Napsio (Vitruvian Studio),JaidynReiman | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- torso/clothes/blouse/female/walk.png | bluecarrot16,ElizaWy,Lanea Zimmerman (Sharm) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- torso/clothes/longsleeve/longsleeve2/male/walk.png | ElizaWy,JaidynReiman,Stephen Challener (Redshrike),Johannes Sjölund (wulax) | OGA-BY 3.0 | https://opengameart.org/content/lpc-revised-character-basics
+- torso/clothes/shortsleeve/shortsleeve/male/walk.png | bluecarrot16,ElizaWy,JaidynReiman,Stephen Challener (Redshrike) | OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 | https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles

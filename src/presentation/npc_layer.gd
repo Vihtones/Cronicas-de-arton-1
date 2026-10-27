@@ -11,6 +11,8 @@ const ARCHETYPE := {
 	"elsa": "guarda", "rurik": "guarda", "tobias": "guarda", "ysolde": "sacerdote", "lucan": "sacerdote",
 	"lisel": "crianca", "nina": "crianca", "davi": "crianca", "teodoro": "idoso", "joran": "idoso", "quill": "idoso", "celia": "idoso",
 	"garrick": "artesao", "bento": "artesao", "otto": "artesao", "orin": "idoso", "dorn": "aldeao",
+	"hilda": "aldea", "ivi": "aldea", "fenna": "aldea", "berta": "aldea", "rosana": "mercadora", "mara": "mercadora", "saria": "mercadora",
+	"marta": "mercadora", "hesk": "guarda", "lia": "guarda", "caio": "artesao", "gunther": "idoso",
 }
 
 

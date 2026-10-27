@@ -125,17 +125,17 @@
   {
    "asset_id": "char_player",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -151,23 +151,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "7210480dc53f546fd8f637f69cdad8ec190f94a106022983f1d07c9db77f381a",
+   "hash": "d713b5e93e0e4ee44dcd7f7fd6a4b33f91ec8d270b96a94cc4b4d11f520d21da",
    "caminho": "res://assets/chars/player.png"
   },
   {
    "asset_id": "char_aldeao",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -183,23 +183,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "caea6243ac44c3f6731b141156c70ae0bb5a8ebbc3a0a79a959fbfaae7a171b2",
+   "hash": "afa3f9f354378673f3657074e10b1893a0cc4ef9ca6c22919a749bc9a066ee6b",
    "caminho": "res://assets/chars/aldeao.png"
   },
   {
    "asset_id": "char_artesao",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -215,23 +215,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "1633e0dcd670d6bb3f8ba34faa6740ccb73cdaa30c0b8519f94d375993d9b822",
+   "hash": "1f8939329176add0abb6bf82503734b2826ae71a8c0604b3f494165acc89610b",
    "caminho": "res://assets/chars/artesao.png"
   },
   {
    "asset_id": "char_guarda",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -247,23 +247,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "1df3ee617e81b01bb0e03174585981a59e1e3c1a112e7919d0f6f1c3e560ad5b",
+   "hash": "01ff6978646fd0bd3a12cbfeca9fa052c5f5e9c39835a3d5956011a11443c5fa",
    "caminho": "res://assets/chars/guarda.png"
   },
   {
    "asset_id": "char_sacerdote",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -279,23 +279,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "563c893a659bc0a29343d9fea46ec31b15f676b99272de23dbb2ccecbce53c00",
+   "hash": "cf975c281f354094db1ccb158efc7b193ba5e23b35be8f74234c956aff60f396",
    "caminho": "res://assets/chars/sacerdote.png"
   },
   {
    "asset_id": "char_crianca",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -311,23 +311,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "c2bc0dcfd1ff88dd52fdd51360de826848a1b6aec2774cdfb94607a43cddfb66",
+   "hash": "55c37e3fc05574cae14f3a5403513d5037be2dbf8c0d502e225ca66d4cdf2a5e",
    "caminho": "res://assets/chars/crianca.png"
   },
   {
    "asset_id": "char_idoso",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -343,23 +343,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "37601b9e45328a2da280f01697db9254e447d0a78055f0acb68f33bc5e717529",
+   "hash": "a8c43c19eb78dc7ad68c7efa750d439e609925a00cb9fb534a23d5516f2d0c63",
    "caminho": "res://assets/chars/idoso.png"
   },
   {
    "asset_id": "char_bandido",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -375,23 +375,23 @@
     ]
    },
    "dependencias": [],
-   "hash": "f5dbf3a7a5f6707fd409c58ebd697520cfa1b9c99438910e0999dadfc83a7cbd",
+   "hash": "224503ece81b4ea62a25c79e3a343e01a59fb058c2333c585bd92de1ffe9364f",
    "caminho": "res://assets/chars/bandido.png"
   },
   {
    "asset_id": "char_kael",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
-   "licenca": "original_do_projeto",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    96,
-    128
+    192,
+    256
    ],
    "pivot": [
-    16,
-    28
+    32,
+    58
    ],
    "animacoes": {
     "linhas": [
@@ -407,7 +407,7 @@
     ]
    },
    "dependencias": [],
-   "hash": "813166c42df643dc7a2162c9bed5368a7f65f351048316bc5091ab1599946c3d",
+   "hash": "59e4be09392ff414b1b700f7face1fdf915680f56a48b5eb7973271963c76190",
    "caminho": "res://assets/chars/kael.png"
   },
   {
@@ -1131,6 +1131,70 @@
    "hash": "a8a12b86705ff660a7aa87b4c27e9fe6195b9765f024622dafc0d60bc0246954",
    "hash_origem": "a8a12b86705ff660a7aa87b4c27e9fe6195b9765f024622dafc0d60bc0246954",
    "caminho": "res://assets/approved/vegetacao/lpc_jungle/veg_floresta_planta_de_caule_alto_b_v01.png"
+  },
+  {
+   "asset_id": "char_aldea",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    192,
+    256
+   ],
+   "pivot": [
+    32,
+    58
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "1560c852fb566b5feb8ed5d9acd291a06af30cb9a6bf1fcb0eaf5e82e7c01496",
+   "caminho": "res://assets/chars/aldea.png"
+  },
+  {
+   "asset_id": "char_mercadora",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
+   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    192,
+    256
+   ],
+   "pivot": [
+    32,
+    58
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "7814bd1ec17451cd543cd711b3ed374ce38688a5c66114a807972c6a6acd1b50",
+   "caminho": "res://assets/chars/mercadora.png"
   }
  ]
 }

@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Gráficos (provisórios): os personagens humanos agora são sprites de 64 px montados a partir das camadas do LPC Generator (jogador, aldeão, artesão, guarda, sacerdote, idoso, criança, bandido, Kael, aldeã e mercadora), recoloridos por `tools/gen_chars_lpc.py`; só camadas com licença de atribuição (OGA-BY, CC-BY, CC0), com créditos em `assets/CREDITOS_PERSONAGENS.txt` (aparecem em Créditos de arte). `ActorView` aceita quadros de qualquer tamanho; a hiena segue com o sprite antigo. Pendente de aprovação artística do usuário.
+
 - Pedra Branca: a Estalagem da Ponte Velha cobra o pernoite (1 T$) como a taverna; Berta vende pão e cerveja, Marta (entreposto) vende corda, tocha, pão, saco de dormir e poção de cura; duas hienas rondam a serra à noite.
 
 - Pedra Branca ganha gente: Berta e Caio (estalagem), Tuco (barqueiro), Gunther (lavrador), Marta (entreposto), Sargento Hesk e Lia (torre), com rotinas próprias, família Pontes e vozes por profissão. `tools/build_content.py` não sobrescreve mais map.json e items.json (mantidos à mão); `--forcar` regera.
