@@ -334,6 +334,7 @@ func _armor_penalty() -> int:
 func _new_sim() -> CombatSim:
 	var s := CombatSim.new()
 	s.rules = world.rules
+	s.rng = world.rng
 	s.db = world.db
 	# C16: Callables de método (não lambdas) — uma lambda capturava o módulo e criava ciclo módulo → sim → lambda → módulo.
 	s.walk_fn = Callable(self, "_sim_walkable")
@@ -762,6 +763,12 @@ func _manto_inicio_de_turno(id: String, facts: Array) -> void:
 
 
 func _begin_turn(id: String) -> Dictionary:
+	var r := _begin_turn_base(id)
+	r.facts.append_array(_propagar_ligacoes())
+	return r
+
+
+func _begin_turn_base(id: String) -> Dictionary:
 	_refresh_bencaos()
 	var x := sim.c(id)
 	var s: CharacterSheet = x.sheet
@@ -1208,6 +1215,21 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					"pv_after": ts_cz.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": passou_cz, "tags": tags_cz}, [id, tg_cz]))
 			if apr_cz.has(2):
 				_dissipar_na_area(tiles_cz, "Necromancia", out)
+		"ligacao_sombria":
+			# Ligação Sombria (4º círculo): o alvo faz Fortitude; se falhar, fica ligado a você por um dia. Enquanto a ligação
+			# durar, o dano e as condições que você sofrer também atingem o alvo (ele faz Fortitude; falha, sofre igual).
+			# A ligação acaba se o alvo cair a 0 PV, exceto com o aprimoramento de 5 PM.
+			var alvo_ls: String = a.get("target", id)
+			var cd_ls := spell_dc(sh, a)
+			var sv_ls := Checks.skill(sim.c(alvo_ls).sheet, "fortitude", cd_ls, world.rules, world.rng, "combat")
+			sv_ls = _pos_teste(alvo_ls, sv_ls, cd_ls, out)
+			if sv_ls.get("success", false):
+				out.append(fact("SPELL_MISSED", {"caster": id, "target": alvo_ls, "spell": a.spell}, [id, alvo_ls]))
+			else:
+				sh.add_efeito("magia.ligacao_sombria", "ligacao", cd_ls, "dia", alvo_ls)
+				if a.get("aprimoramentos", []).has(0):
+					sh.add_efeito("magia.ligacao_sombria", "ligacao_perene", 1, "dia")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_ls, "buff": "ligacao_sombria", "tags": ["magia"]}, [id, alvo_ls]))
 		"poeira_da_podridao":
 			# Poeira da Podridão (3º círculo): nuvem de 6m de raio no alvo, pela cena. Ao lançar e no início de cada turno do
 			# conjurador, quem está na nuvem faz Fortitude: 2d8+8 de trevas (metade no teste). Quem falha não recupera PV
@@ -1789,6 +1811,32 @@ func _try(id: String, a: Dictionary) -> Array:
 		return []
 	var out := _execute_action(id, a, v)
 	_refresh_bencaos()
+	out.append_array(_propagar_ligacoes())
+	return out
+
+
+## Ligação Sombria: condições novas do conjurador passam ao alvo da ligação (ele faz Fortitude; falha, sofre a condição).
+## Também registra os danos repassados pelo simulador. Drena a fila a cada ação e a cada início de turno.
+func _propagar_ligacoes() -> Array:
+	var out: Array = []
+	for conj in sim.combatants:
+		var s: CharacterSheet = sim.c(conj).sheet
+		var novas := s.condicoes_novas.duplicate()
+		s.condicoes_novas = PackedStringArray()
+		if novas.is_empty():
+			continue
+		var lig := sim.ligacao_de(conj)
+		if lig.is_empty() or not sim.combatants.has(lig.alvo):
+			continue
+		for cond in novas:
+			var sv := Checks.skill(sim.c(lig.alvo).sheet, "fortitude", int(lig.cd), world.rules, world.rng, "combat")
+			var passou: bool = sv.get("success", false)
+			if not passou:
+				sim.c(lig.alvo).sheet.add_condition(str(cond), world.rules)
+			out.append(fact("BUFF_APPLIED", {"actor": conj, "target": lig.alvo, "buff": "ligacao_sombria", "condicao": str(cond), "passou": passou, "tags": ["magia"]}, [conj, lig.alvo]))
+	for p in sim.pendencias:
+		out.append(fact("BUFF_APPLIED", {"actor": p.conj, "target": p.alvo, "buff": "ligacao_sombria", "dano": p.valor, "passou": p.passou, "tags": ["magia"]}, [p.conj, p.alvo]))
+	sim.pendencias.clear()
 	return out
 
 

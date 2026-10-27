@@ -36,6 +36,7 @@ var pending_powers: int = 0
 var caster_attr: String = ""
 var size: String = "medio"         # LB p.107 (Tabela 1-21)
 var creature_type: String = "humanoide"
+var condicoes_novas: PackedStringArray = PackedStringArray()   # condições recebidas desde a última drenagem do combate
 var dr: Dictionary = {}            # redução de dano por tipo (osteon, qareen, golem)
 var vuln: Dictionary = {}          # dano adicional por dado, por tipo (kliren: impacto; trog: frio)
 var race_skills: Dictionary = {}   # bônus de perícia da raça e do tamanho
@@ -190,6 +191,7 @@ func add_condition(c: String, rules: RuleRegistry) -> void:
 			remove_condition(leve)
 	if not conditions.has(c):
 		conditions.append(c)
+		condicoes_novas.append(c)   # fila para ligações de magia (Ligação Sombria); não é salva
 
 
 ## Adiciona um efeito temporário (troca o anterior com o mesmo id).

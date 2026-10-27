@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -675,3 +675,78 @@ func test_colera_dissipa_so_a_necromancia_da_area() -> void:
 	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
 	check(not ts.has_efeito("magia.perdicao"), "a magia de necromancia da área é dissipada")
 	check(ts.has_efeito("magia.escudo_da_fe"), "magia de outra escola permanece")
+
+
+# --- Ligação Sombria (4º círculo) -----------------------------------------------------------
+func test_ligacao_sombria_exige_circulo_4() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(12)[2], "player", {"type": "cast", "spell": "ligacao_sombria", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 12 não lança magia de 4º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(13)[2], "player", {"type": "cast", "spell": "ligacao_sombria", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 13 lança a Ligação Sombria")
+
+
+func test_ligacao_sombria_criatura_que_passa_na_fortitude_nao_fica_ligada() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	var a := {"type": "cast", "spell": "ligacao_sombria", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not sim.c("player").sheet.has_efeito("magia.ligacao_sombria"), "quem passa na Fortitude não fica ligado")
+
+
+func _ligar(m: Array) -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")   # falha na Fortitude, para a ligação
+	var a := {"type": "cast", "spell": "ligacao_sombria", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+
+
+func test_ligacao_sombria_repassa_o_dano_quando_o_alvo_falha() -> void:
+	var m := _cena_grupo(13)
+	_ligar(m)
+	var sim: CombatSim = m[2]
+	check(sim.c("player").sheet.has_efeito("magia.ligacao_sombria"), "a ligação foi criada")
+	sim.apply_damage("player", 10)
+	eq(sim.c("player").sheet.pv, 989, "o conjurador sofre o dano")
+	eq(sim.c("bandido_1").sheet.pv, 989, "o alvo sofre o mesmo dano quando falha na Fortitude")
+
+
+func test_ligacao_sombria_nao_repassa_o_dano_quando_o_alvo_passa() -> void:
+	var m := _cena_grupo(13)
+	_ligar(m)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	sim.apply_damage("player", 10)
+	eq(sim.c("bandido_1").sheet.pv, 999, "quem passa na Fortitude não sofre o dano")
+	eq(sim.pendencias[0].passou, true, "a passagem fica registrada")
+
+
+func test_ligacao_sombria_termina_quando_o_alvo_cai_a_0_pv() -> void:
+	var m := _cena_grupo(13)
+	_ligar(m)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.pv = 5
+	sim.apply_damage("player", 10)
+	check(not sim.c("player").sheet.has_efeito("magia.ligacao_sombria"), "a ligação acaba quando o alvo cai")
+
+
+func test_ligacao_sombria_com_aprimoramento_nao_acaba_a_0_pv() -> void:
+	var m := _cena_grupo(17)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	var a := {"type": "cast", "spell": "ligacao_sombria", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	sim.c("bandido_1").sheet.pv = 5
+	sim.apply_damage("player", 10)
+	check(sim.c("player").sheet.has_efeito("magia.ligacao_sombria"), "com o aprimoramento, a ligação continua mesmo com o alvo a 0 PV")
+
+
+func test_ligacao_sombria_repassa_condicoes_quando_o_alvo_falha() -> void:
+	var m := _cena_grupo(13)
+	_ligar(m)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_condition("cego", m[3])
+	c._propagar_ligacoes()
+	check(sim.c("bandido_1").sheet.conditions.has("cego"), "o alvo recebe a condição do conjurador quando falha")

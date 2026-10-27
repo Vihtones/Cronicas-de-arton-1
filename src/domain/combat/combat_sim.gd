@@ -23,6 +23,8 @@ var zonas: Array = []
 var marcas: Array = []
 ## Ids que expiraram na última passagem de rodada (a apresentação pode mostrar o fim do efeito).
 var expiradas: Array = []
+var rng: RngStreams                 # null em simulações do fantasma: sem rolagens
+var pendencias: Array = []          # efeitos de ligação ocorridos, drenados pelo módulo para o registro
 
 
 func clone() -> CombatSim:
@@ -331,7 +333,36 @@ static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
 
 
 ## Aplica dano e retorna tags para a câmera (queda, morte).
+## Dano com ligações: se `target` está ligado por Ligação Sombria, o alvo da ligação faz Fortitude e sofre o mesmo dano
+## quando falha. A ligação acaba se o alvo cair a 0 PV (exceto com o aprimoramento de 5 PM).
 func apply_damage(target: String, amount: int) -> Array:
+	var tags := _dano_bruto(target, amount)
+	var lig := ligacao_de(target)
+	if not lig.is_empty() and amount > 0 and rng != null:
+		var alvo := str(lig.alvo)
+		if combatants.has(alvo) and not c(alvo).sheet.is_dead():
+			var sv := Checks.skill(c(alvo).sheet, "fortitude", int(lig.cd), rules, rng, "combat")
+			var passou: bool = sv.get("success", false)
+			pendencias.append({"tipo": "dano", "conj": target, "alvo": alvo, "valor": amount, "passou": passou})
+			if not passou:
+				tags.append_array(_dano_bruto(alvo, amount))
+			if c(alvo).sheet.is_down() and not lig.perene:
+				c(target).sheet.remove_efeito("magia.ligacao_sombria")
+	return tags
+
+
+## Ligação de um conjurador: {alvo, cd, perene} ou {} se não houver.
+func ligacao_de(conj: String) -> Dictionary:
+	if not combatants.has(conj):
+		return {}
+	var s: CharacterSheet = c(conj).sheet
+	for e in s.efeitos:
+		if e.stat == "ligacao":
+			return {"alvo": str(e.tipo), "cd": int(e.bonus), "perene": s.efeito_bonus("ligacao_perene") > 0}
+	return {}
+
+
+func _dano_bruto(target: String, amount: int) -> Array:
 	var T := c(target)
 	var s: CharacterSheet = T.sheet
 	if s.has_effective_condition(rules, "petrificado"):
