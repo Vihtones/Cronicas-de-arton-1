@@ -142,6 +142,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "caminhos_da_natureza" and not a.get("truque", false):
+				for tg in targets:
+					if not sim.combatants.has(tg) or sim.is_enemy(actor, tg):
+						return {"ok": false, "reason": "Caminhos da Natureza abre o caminho de aliados"}
 			if sp_id == "armamento_da_natureza":
 				var alvo_an: String = a.get("target", actor)
 				if not sim.combatants.has(alvo_an) or SpellRules.armamento_ataque(sim.rules, sim.c(alvo_an).sheet, str(a.get("arma", ""))).is_empty():

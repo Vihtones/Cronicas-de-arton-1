@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Caminhos da Natureza (divina, 1º círculo) completa: aliados escolhidos ganham +3m (+3m por aprimoramento) e ignoram terreno difícil natural por 1 dia, em combate e na viagem (pelos ermos, sem a penalidade); aprimoramento de rastros (+10 na CD para rastrear em terreno natural); truque de +5 em Sobrevivência para se orientar. Fora de combate vale para você e os companheiros presentes.
+- Rastrear (LB p.123): ao fugir de um combate, inimigos treinados em Sobrevivência tentam seguir os rastros (CD pelo solo, visibilidade e grupo) e, se conseguem, alcançam o jogador meia hora depois. O mapa ganhou terreno natural e tipo de solo. Viagem: deslocamento fora da tabela usa a regra (x4 km por dia). Correção: efeitos de um dia nos companheiros agora acabam com o dia.
+
 - Truque (LB p.171): magias com "Truque:" no texto têm a versão de 0 PM, sem aprimoramentos (tecla T no combate). Correção: Curar Ferimentos normal agora fere mortos-vivos com a própria cura (Vontade reduz à metade, Ameaças p.13); o dano de 1d8 é só o truque.
 
 - Armamento da Natureza (divina, 1º círculo) completa: arma primitiva (clava, funda, bordão e tacape, os dois últimos novos no catálogo), arma natural ou ataque desarmado ganha um passo de dano (Tabela 3-2, nova), conta como mágica e pode mudar o tipo de dano; +1 e +1 a mais no ataque, execução de movimento e mais um passo.

@@ -21,6 +21,7 @@ const COMPLETAS := {
 	"despedacar": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1d8+2 (repetível); objeto Médio/Grande/Enorme/Colossal; esfera de 6m
 	"arma_espiritual": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1 Defesa (+1 repetível); sustentada com ataque livre; essência; +1d6; duas armas
 	"armamento_da_natureza": {"aprimoramentos": [0, 1, 2, 3]},   # +1 ataque; execução de movimento; +1 ataque (repetível); +1 passo (repetível)
+	"caminhos_da_natureza": {"aprimoramentos": [0, 1]},   # rastrear os alvos: CD +10; +3m (repetível); truque: +5 em Sobrevivência para se orientar
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -240,3 +241,17 @@ static func armamento_ataque(rules: RuleRegistry, sheet: CharacterSheet, nome: S
 ## com aprimoramentos.
 static func tem_truque(rules: RuleRegistry, sp_id: String) -> bool:
 	return str(rules.value("magia." + sp_id, {}).get("texto", "")).contains("Truque:")
+
+
+## Caminhos da Natureza nos alvos (em combate ou fora): 1 dia. Normal: +3m de deslocamento (+3m por aprimoramento de
+## 2 PM) e ignora terreno difícil natural; aprimoramento de 1 PM: CD +10 para rastreá-los em terreno natural.
+## Truque: só o conjurador, +5 em Sobrevivência para se orientar.
+static func aplicar_caminhos(sh: CharacterSheet, apr: Array, truque: bool, ate_dia: int) -> void:
+	sh.remove_efeito("magia.caminhos_da_natureza")
+	if truque:
+		sh.add_efeito("magia.caminhos_da_natureza", "sobrevivencia_orientar", 5, "dia", "", ate_dia)
+		return
+	sh.add_efeito("magia.caminhos_da_natureza", "deslocamento_m", 3 * (1 + apr.count(1)), "dia", "", ate_dia)
+	sh.add_efeito("magia.caminhos_da_natureza", "ignora_dificil_natural", 1, "dia", "", ate_dia)
+	if apr.has(0):
+		sh.add_efeito("magia.caminhos_da_natureza", "rastro_dificil", 10, "dia", "", ate_dia)

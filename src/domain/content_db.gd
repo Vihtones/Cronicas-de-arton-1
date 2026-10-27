@@ -93,6 +93,16 @@ func is_water(t: Vector2i) -> bool:
 	return bool(tile_info(t).get("water", false))
 
 
+## Terreno natural (grama, floresta, plantação, rio...), em oposição a construído (estrada, piso, entulho).
+func is_natural(t: Vector2i) -> bool:
+	return bool(tile_info(t).get("natural", false))
+
+
+## Solo para rastrear (LB p.123): macio, comum ou duro.
+func solo(t: Vector2i) -> String:
+	return str(tile_info(t).get("solo", "comum"))
+
+
 ## Desnível (barranco): intransponível a pé; só quem voa atravessa.
 func is_chasm(t: Vector2i) -> bool:
 	return bool(tile_info(t).get("chasm", false))

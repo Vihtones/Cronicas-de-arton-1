@@ -31,11 +31,13 @@ func available_routes() -> Array:
 
 
 func km_per_day(route: Dictionary) -> float:
-	var speed := str(int(world.player_sheet.speed_m))
+	var sh := world.player_sheet
+	var speed_m := sh.speed_m + sh.efeito_bonus("deslocamento_m")   # Caminhos da Natureza: +3m
 	var tab: Dictionary = world.rules.value("viagem.velocidade")
-	var kmd := float(tab.get(speed, tab["9"]).km_dia)
+	# Tabela de viagem (LB p.270): por dia = deslocamento x 4 km; valores fora da tabela seguem a regra
+	var kmd := float(tab[str(int(speed_m))].km_dia) if tab.has(str(int(speed_m))) else speed_m * 4.0
 	var w = world.module("weather")
-	if not route.road:
+	if not route.road and sh.efeito_bonus("ignora_dificil_natural") <= 0:   # ermos: terreno difícil natural
 		kmd *= float(tab.terreno_dificil_ou_clima_ruim)
 	if w != null and w.region.condition in ["chuva", "tempestade", "neblina"]:
 		kmd *= float(tab.terreno_dificil_ou_clima_ruim)
@@ -92,7 +94,7 @@ func execute(cmd: GameCommand) -> Array:
 		var ok := 0
 		var fails := 0
 		while ok < int(j.curta) and fails < int(j.limite_falhas):
-			var r := Checks.skill(s, "sobrevivencia", cd, world.rules, world.rng)
+			var r := Checks.skill(s, "sobrevivencia", cd, world.rules, world.rng, "world", s.efeito_bonus("sobrevivencia_orientar"))   # Caminhos (truque)
 			if r.success: ok += 1
 			else:
 				fails += 1

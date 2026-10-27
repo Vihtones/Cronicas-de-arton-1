@@ -46,6 +46,10 @@ versões de magia que agem no mundo (`FORA_DE_COMBATE`); guarda os cadáveres pr
 (`cadaver_preservado`, que as magias de morto-vivo devem consultar) e as áreas de Consagrar e Profanar
 (`maximiza`, `mod_morto_vivo_em`; o combate passa os dados de luz e trevas por `CombatModule._dados_energia`).
 
+Terreno: o mapa marca `natural` e `solo` por tipo de quadrado. Rastrear (LB p.123) é `Checks.cd_rastrear`; ao fugir de
+um combate, inimigos treinados em Sobrevivência tentam seguir os rastros e alcançam o jogador (`_tentar_rastrear`).
+Truque (LB p.171): `truque: true` no lançamento, 0 PM, sem aprimoramentos.
+
 Duração sustentada (LB p.227): `CombatSim.sustentadas` e `CombatModule._sustentar` cobram 1 PM no início de cada
 turno do conjurador; sem pagar, a magia termina (`_encerrar_sustentada`). Uma por vez. Usada por Manto do Cruzado e
 Arma Espiritual; as próximas sustentadas devem entrar em `_encerrar_sustentada`.
@@ -69,8 +73,8 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (10): abencoar_alimentos, acalmar_animal,
-  caminhos_da_natureza, comando, controlar_plantas, criar_elementos,
+- Divinas de 1º círculo (9): abencoar_alimentos, acalmar_animal,
+  comando, controlar_plantas, criar_elementos,
   detectar_ameacas, santuario, suporte_ambiental, tranquilidade.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
   controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
@@ -87,7 +91,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual e Armamento da Natureza (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza e Caminhos da Natureza (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

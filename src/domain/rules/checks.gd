@@ -65,3 +65,19 @@ static func attribute(sheet: CharacterSheet, attr: String, cd: int, rules: RuleR
 static func chance(mod: int, cd: int) -> float:
 	var need := cd - mod
 	return clampf((21 - need) / 20.0, 0.0, 1.0)
+
+
+## Rastrear (Sobrevivência, apenas treinado, LB p.123): CD pelo solo (macio 15, comum 20, duro 25), –5 contra grupo
+## grande, +5 em visibilidade precária, +1 por dia desde a criação dos rastros. Caminhos da Natureza (aprimoramento):
+## +10 para rastrear o alvo em terreno natural.
+static func cd_rastrear(rules: RuleRegistry, solo: String, alvo: CharacterSheet, natural: bool, grupo: int, visibilidade_ruim: bool, dias: int) -> int:
+	var r: Dictionary = rules.value("pericia.rastrear")
+	var cd := int(r.cd.get(solo, r.cd.comum))
+	if grupo >= int(r.grupo_grande_min):
+		cd += int(r.grupo_grande)
+	if visibilidade_ruim:
+		cd += int(r.visibilidade_precaria)
+	cd += int(r.por_dia) * maxi(0, dias)
+	if natural and alvo != null:
+		cd += alvo.efeito_bonus("rastro_dificil")
+	return cd

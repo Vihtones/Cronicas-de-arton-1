@@ -14,6 +14,7 @@ const FORA_DE_COMBATE := {
 	"consagrar": [],
 	"profanar": [],
 	"despedacar": [],   # contra um objeto mundano
+	"caminhos_da_natureza": [],   # você e os companheiros presentes
 }
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
@@ -51,6 +52,11 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	for i in FORA_DE_COMBATE[sp_id]:
 		if not apr.has(i):
 			return PackedStringArray(["essa versão da magia só é lançada em combate"])
+	if cmd.payload.get("truque", false):
+		if not SpellRules.tem_truque(world.rules, sp_id):
+			return PackedStringArray(["essa magia não tem truque"])
+		if not apr.is_empty():
+			return PackedStringArray(["truques não se combinam com aprimoramentos"])
 	var sp := GhostPlanner.spell_rule(world.rules, sp_id)
 	if int(sp.get("circulo", 0)) > SpellRules.circulo_maximo(sh, world.rules):
 		return PackedStringArray(["magia acima do círculo que você conjura"])
@@ -101,6 +107,18 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"caminhos_da_natureza":
+			var truque: bool = cmd.payload.get("truque", false)
+			var apr_c: Array = cmd.payload.get("aprimoramentos", [])
+			SpellRules.aplicar_caminhos(sh, apr_c, truque, world.day_index() + 1)
+			var alvos: Array = ["player"]
+			var party = world.module("party")
+			if not truque and party != null:
+				for npc in party.members:
+					if party.destino_de(npc) == "":
+						party.aplicar_na_ficha(npc, func(f: CharacterSheet): SpellRules.aplicar_caminhos(f, apr_c, false, world.day_index() + 1))
+						alvos.append(npc)
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "targets": alvos, "buff": "caminhos_da_natureza", "tags": ["magia"]}, ["player"]))
 		"despedacar":
 			var objs_m = world.module("objects")
 			var dano := 2 * int(Dice.roll(SpellRules.despedacar_dano(cmd.payload.get("aprimoramentos", [])), world.rng, "world").total)

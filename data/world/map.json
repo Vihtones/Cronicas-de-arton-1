@@ -75,77 +75,111 @@
  "legend": {
   ".": {
    "name": "grama",
-   "walk": true
+   "walk": true,
+   "natural": true,
+   "solo": "comum"
   },
   "=": {
    "name": "estrada",
-   "walk": true
+   "walk": true,
+   "natural": false,
+   "solo": "comum"
   },
   ":": {
    "name": "trilha",
-   "walk": true
+   "walk": true,
+   "natural": true,
+   "solo": "comum"
   },
   ",": {
    "name": "chão de floresta",
-   "walk": true
+   "walk": true,
+   "natural": true,
+   "solo": "comum"
   },
   "c": {
    "name": "plantação",
    "walk": true,
-   "difficult": true
+   "difficult": true,
+   "natural": true,
+   "solo": "macio"
   },
   "T": {
    "name": "árvore",
    "walk": false,
-   "cover": true
+   "cover": true,
+   "natural": true,
+   "solo": "comum"
   },
   "~": {
    "name": "rio",
    "walk": false,
-   "water": true
+   "water": true,
+   "natural": true,
+   "solo": "macio"
   },
   "#": {
    "name": "parede",
-   "walk": false
+   "walk": false,
+   "natural": false,
+   "solo": "duro"
   },
   "_": {
    "name": "piso",
-   "walk": true
+   "walk": true,
+   "natural": false,
+   "solo": "duro"
   },
   "%": {
    "name": "entulho",
    "walk": true,
-   "difficult": true
+   "difficult": true,
+   "natural": false,
+   "solo": "duro"
   },
   "D": {
    "name": "porta",
    "walk": true,
-   "object": true
+   "object": true,
+   "natural": false,
+   "solo": "duro"
   },
   "S": {
    "name": "escada",
-   "walk": true
+   "walk": true,
+   "natural": false,
+   "solo": "duro"
   },
   "U": {
    "name": "escada",
-   "walk": true
+   "walk": true,
+   "natural": false,
+   "solo": "duro"
   },
   "o": {
    "name": "poço",
-   "walk": false
+   "walk": false,
+   "natural": false,
+   "solo": "duro"
   },
   "X": {
    "name": "vazio",
-   "walk": false
+   "walk": false,
+   "natural": false,
+   "solo": "duro"
   },
   "B": {
    "name": "barranco",
    "walk": false,
-   "chasm": true
+   "chasm": true,
+   "natural": true,
+   "solo": "comum"
   },
   "p": {
    "name": "ponte",
-   "walk": true
+   "walk": true,
+   "natural": false,
+   "solo": "duro"
   }
  },
  "zones": [
@@ -618,7 +652,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -636,7 +670,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -654,7 +688,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -672,7 +706,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -690,7 +724,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -708,7 +742,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -726,7 +760,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -744,7 +778,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -762,7 +796,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -780,7 +814,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -798,7 +832,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -816,7 +850,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {
@@ -871,7 +905,7 @@
     "rd": 5,
     "pv": 20,
     "rule": "LB p.239 Tabela 5-4 porta de madeira",
-     "tamanho": "Grande"
+    "tamanho": "Grande"
    }
   },
   {

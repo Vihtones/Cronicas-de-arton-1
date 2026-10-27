@@ -78,7 +78,7 @@ static func cheb(a: Vector2i, b: Vector2i) -> int:
 func speed_squares(id: String) -> int:
 	var s: CharacterSheet = c(id).sheet
 	var quadrado := float(rules.value("mapa.quadrado_m", 1.5))
-	var q := int(s.speed_m / quadrado)
+	var q := int((s.speed_m + s.efeito_bonus("deslocamento_m")) / quadrado)   # bônus de magia (Caminhos da Natureza)
 	var eff := s.effective_conditions(rules)
 	if eff.has("imovel"): return 0
 	if eff.has("caido"): return 1
@@ -124,9 +124,12 @@ func spend(kind: String) -> void:
 
 
 ## --- Movimento (LB p.238) ----------------------------------------------------
-func step_cost(from: Vector2i, to: Vector2i) -> int:
+func step_cost(from: Vector2i, to: Vector2i, mover: String = "") -> int:
 	var base := 2 if (from.x != to.x and from.y != to.y) else 1
-	if db.is_difficult(to) or zona_em(to, "terreno_dificil"): base *= 2
+	if zona_em(to, "terreno_dificil"):
+		base *= 2   # terreno difícil criado por magia vale para todos
+	elif db.is_difficult(to) and not (mover != "" and db.is_natural(to) and c(mover).sheet.efeito_bonus("ignora_dificil_natural") > 0):
+		base *= 2   # Caminhos da Natureza: ignora terreno difícil natural
 	return base
 
 
@@ -174,8 +177,8 @@ func arma_espiritual_livre(id: String) -> int:
 ## está dentro tem deslocamento 3m, seja qual for o normal: cada quadrado ali vale metade do deslocamento da criatura.
 func custo_meio(mover: String, from: Vector2i, to: Vector2i) -> int:
 	if nevoa_espessa_em(from) or nevoa_espessa_em(to):
-		return step_cost(from, to) * maxi(1, speed_squares(mover))
-	return step_cost(from, to) * 2
+		return step_cost(from, to, mover) * maxi(1, speed_squares(mover))
+	return step_cost(from, to, mover) * 2
 
 
 func nevoa_espessa_em(t: Vector2i) -> bool:

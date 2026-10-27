@@ -38,7 +38,7 @@ func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
 	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH", "ORDER_SET"])
+	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH", "ORDER_SET", "SCHEDULED_PURSUIT"])
 
 
 func _ensure() -> void:
@@ -271,6 +271,8 @@ func on_event(e: GameEvent) -> Array:
 			if active:
 				return []
 			return _check_encounter()
+		"SCHEDULED_PURSUIT":
+			return _perseguir(e.payload)
 	return []
 
 
@@ -1063,6 +1065,64 @@ func _objetos_quebraveis_em(tiles: Array, tam_max: int) -> Array:
 	return out
 
 
+## Fuga: os inimigos que restam tentam seguir os rastros do jogador (Rastrear, Sobrevivência apenas treinado,
+## LB p.123). Se algum conseguir, o grupo o alcança pouco depois (perseguição, ORIGINAL_DO_JOGO).
+const TICKS_PERSEGUICAO := 3
+func _tentar_rastrear() -> Array:
+	var P := sim.c("player")
+	var tile: Vector2i = P.tile
+	var natural := world.db.is_natural(tile)
+	var w = world.module("weather")
+	var clima: bool = w != null and w.enabled
+	var ruim: bool = clima and (w.is_night() or ["chuva", "tempestade", "neblina"].has(str(w.region.condition)))
+	var solo := world.db.solo(tile)
+	if clima and natural and ["lama", "neve"].has(str(w.region.get("surface", ""))):
+		solo = "macio"
+	var grupo := 0
+	var perseguidores: Array = []
+	for id in sim.combatants:
+		if sim.c(id).side == "player":
+			grupo += 1
+		elif sim.conscious(id) and not str(id).begins_with("inv_") and not sim.c(id).flags.has("fora"):
+			perseguidores.append(id)
+	if perseguidores.is_empty():
+		return []
+	var cd := Checks.cd_rastrear(world.rules, solo, P.sheet, natural, grupo, ruim, 0)
+	var achou := ""
+	for id in perseguidores:
+		var sh_r: CharacterSheet = sim.c(id).sheet
+		if not sh_r.trained.has("sobrevivencia") and not sh_r.flat_skills.has("sobrevivencia"):
+			continue   # rastrear é apenas treinado (fichas de criatura listam as perícias treinadas)
+		var r := Checks.skill(sh_r, "sobrevivencia", cd, world.rules, world.rng, "world")
+		if r.get("success", false):
+			achou = id
+			break
+	if achou == "":
+		return [fact("TRACKING_FAILED", {"by": perseguidores, "cd": cd}, ["player"])]
+	world.clock.schedule(world.clock.tick + TICKS_PERSEGUICAO, "PURSUIT", {"creatures": perseguidores, "region": str(world.player.region_id)})
+	return [fact("PLAYER_TRACKED", {"by": perseguidores, "tracker": achou, "cd": cd}, ["player"])]
+
+
+## Perseguição: quem seguiu os rastros chega perto do jogador (na mesma região) e o encontro acontece normalmente.
+func _perseguir(payload: Dictionary) -> Array:
+	if active or str(world.player.region_id) != str(payload.get("region", "")):
+		return []
+	var p := world.db.world_to_tile(world.player.position)
+	var chegaram: Array = []
+	var i := 0
+	for id in payload.get("creatures", []):
+		if not creature_state.has(id) or not creature_state[id].alive:
+			continue
+		var t := _nearest_walkable(p + Vector2i(2 + i % 2, i / 2 - 1))
+		creature_state[id].tile = [t.x, t.y]
+		creature_state[id].present = true
+		chegaram.append(id)
+		i += 1
+	if chegaram.is_empty():
+		return []
+	return [fact("CREATURES_MOVED", {"creatures": chegaram, "reason": "perseguicao"})] + _check_encounter()
+
+
 ## Duração sustentada (LB p.227): 1 PM como ação livre no início de cada turno do conjurador; se não pagar (sem PM,
 ## sem poder agir ou por escolha, política "sustentar" = "nunca"), a magia termina. Uma magia sustentada por vez.
 func _sustentar(id: String, facts: Array) -> void:
@@ -1508,6 +1568,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"caminhos_da_natureza":
+			# Caminhos da Natureza (divina 1): criaturas escolhidas em alcance curto, por 1 dia (SpellRules.aplicar_caminhos).
+			var truque_cn: bool = a.get("truque", false)
+			var alvos_cn: Array = [id] if truque_cn else a.get("targets", [a.get("target", id)])
+			for tg_cn in alvos_cn:
+				SpellRules.aplicar_caminhos(sim.c(tg_cn).sheet, a.get("aprimoramentos", []), truque_cn, world.day_index() + 1)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_cn, "buff": "caminhos_da_natureza", "tags": ["magia"]}, [id, tg_cn]))
 		"armamento_da_natureza":
 			# Armamento da Natureza (divina 1): arma primitiva, natural ou desarmado do alvo (toque) tem o dano aumentado
 			# em um passo e é considerada mágica, pela cena; pode mudar o tipo de dano (corte, impacto, perfuração).
@@ -2630,6 +2697,8 @@ func _end_combat(outcome: String) -> Array:
 					creature_state[id].tile = world.db.creature_def(id).spawn.duplicate()
 		"morte":
 			out.append(fact("PLAYER_DIED", {"location": loc, "round": sim.round_no}, ["player"]))
+		"fuga":
+			out.append_array(_tentar_rastrear())
 	var enemies: Array = sim.combatants.keys().filter(func(x): return sim.c(x).side == "enemy")
 	stats.rounds = sim.round_no
 	stats.pv_end = maxi(0, P.sheet.pv)

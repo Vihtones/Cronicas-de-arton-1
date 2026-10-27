@@ -810,6 +810,26 @@
    "pagina": 394,
    "pdf_page": 400,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "pericia.rastrear",
+   "valor": {
+    "cd": {
+     "macio": 15,
+     "comum": 20,
+     "duro": 25
+    },
+    "grupo_grande": -5,
+    "grupo_grande_min": 10,
+    "visibilidade_precaria": 5,
+    "por_dia": 1,
+    "apenas_treinado": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 123,
+   "pdf_page": 129,
+   "status": "VERIFICADA",
+   "nota": "Sobrevivência, Rastrear"
   }
  ]
 }

@@ -189,9 +189,20 @@ func on_event(e: GameEvent) -> Array:
 	return []
 
 
+## Muda a ficha guardada de um companheiro (magias lançadas nele fora de combate). `fn` recebe a CharacterSheet.
+func aplicar_na_ficha(id: String, fn: Callable) -> void:
+	if not members.has(id):
+		return
+	var sh := CharacterSheet.from_dict(members[id].sheet) if members[id].has("sheet") else ficha_de(id)
+	fn.call(sh)
+	members[id].sheet = sh.to_dict()
+
+
 ## Um dia de descanso recupera um quarto dos PV máximos (companheiro ferido não entra em luta até se recuperar).
+## Efeitos de magia "por um dia" também acabam.
 func _descansa(id: String) -> void:
-	var sh := CharacterSheet.from_dict(members[id].sheet)
+	var sh := CharacterSheet.from_dict(members[id].sheet) if members[id].has("sheet") else ficha_de(id)
+	sh.limpar_dia(world.day_index())
 	sh.pv = mini(sh.pv_max, sh.pv + maxi(1, sh.pv_max / 4))
 	members[id].sheet = sh.to_dict()
 

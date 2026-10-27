@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1886,3 +1886,82 @@ func test_armamento_da_natureza_em_arma_natural() -> void:
 	sh.attacks = [{"nome": "Chifres", "skill": "luta", "dano": "1d6", "for_no_dano": true, "margem": 20, "mult": 2, "alcance_q": 1, "distancia": false, "tipo": "perfuracao", "natural": true}]
 	check(_lanca(m, {"type": "cast", "spell": "armamento_da_natureza", "target": "player"}).ok, "arma natural")
 	eq(str(m[2].attack_profile("player", "bandido_1", 0, false, false).atk.dano), "1d8", "chifres sobem um passo")
+
+
+# --- Caminhos da Natureza (divina, 1º círculo) e Rastrear ----------------------------------------
+func _tile_de(db, ch: String) -> Vector2i:
+	for y in db.size.y:
+		for x in db.size.x:
+			if db.tile_char(Vector2i(x, y)) == ch:
+				return Vector2i(x, y)
+	return Vector2i(-1, -1)
+
+
+func test_caminhos_da_natureza_desloca_mais_e_ignora_terreno_dificil_natural() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var q0 := sim.speed_squares("player")
+	var planta := _tile_de(sim.db, "c")
+	var entulho := _tile_de(sim.db, "%")
+	eq(sim.step_cost(planta + Vector2i(-1, 0), planta, "player"), 2, "plantação é terreno difícil")
+	sim.c("bandido_1").side = "player"
+	check(_lanca(m, {"type": "cast", "spell": "caminhos_da_natureza", "targets": ["player", "bandido_1"], "target": "player"}).ok, "aliados escolhidos")
+	eq(sim.speed_squares("player"), q0 + 2, "+3m (2 quadrados)")
+	eq(sim.step_cost(planta + Vector2i(-1, 0), planta, "player"), 1, "ignora terreno difícil natural")
+	eq(sim.step_cost(entulho + Vector2i(-1, 0), entulho, "player"), 2, "entulho não é natural")
+	check(not _lanca(m, {"type": "cast", "spell": "caminhos_da_natureza", "targets": ["bandido_2"], "target": "bandido_2"}).ok, "não em inimigos")
+
+
+func test_caminhos_da_natureza_aprimoramentos_e_truque() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	_lanca(m, {"type": "cast", "spell": "caminhos_da_natureza", "targets": ["player"], "target": "player", "aprimoramentos": [0, 1]})
+	eq(sh.efeito_bonus("deslocamento_m"), 6, "+3m a mais")
+	eq(sh.efeito_bonus("rastro_dificil"), 10, "rastros mais difíceis")
+	var r: RuleRegistry = m[3]
+	eq(Checks.cd_rastrear(r, "comum", sh, true, 1, false, 0), 30, "CD 20 + 10 em terreno natural")
+	eq(Checks.cd_rastrear(r, "duro", sh, false, 1, true, 2), 32, "fora do natural: 25 + 5 visibilidade + 2 dias")
+	var m2 := _cena_grupo(1)
+	var v := GhostPlanner.validate_action(m2[2], "player", {"type": "cast", "spell": "caminhos_da_natureza", "target": "player", "truque": true})
+	check(v.ok and int(v.cost) == 0, "truque de 0 PM")
+	m2[1]._cast("player", {"type": "cast", "spell": "caminhos_da_natureza", "target": "player", "truque": true}, v)
+	eq(m2[2].c("player").sheet.efeito_bonus("sobrevivencia_orientar"), 5, "+5 para se orientar")
+	eq(m2[2].c("player").sheet.efeito_bonus("deslocamento_m"), 0, "o truque não dá deslocamento")
+
+
+func test_caminhos_da_natureza_fora_de_combate_acelera_a_viagem_por_um_dia() -> void:
+	var w := WorldHelpers.world(5)
+	var sh := CharacterBuilder.build(w.rules, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.spells = PackedStringArray(["caminhos_da_natureza"])
+	sh.pm = 10
+	w.player_sheet = sh
+	var tr = w.module("travel")
+	var ermo := {"km": 30, "road": false}
+	var antes: float = tr.km_per_day(ermo)
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "caminhos_da_natureza"}).accepted, "lançada fora de combate")
+	check(tr.km_per_day(ermo) > antes * 1.5, "12m e sem a penalidade dos ermos (%.1f -> %.1f)" % [antes, tr.km_per_day(ermo)])
+	WorldHelpers.advance_hours(w, 48)
+	eq(sh.efeito_bonus("deslocamento_m"), 0, "dura 1 dia")
+
+
+func test_fuga_inimigo_treinado_segue_os_rastros() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var w = m[0]
+	for id in ["bandido_1", "bandido_2"]:
+		var s: CharacterSheet = sim.c(id).sheet
+		s.trained.append("sobrevivencia")
+		s.flat_skills["sobrevivencia"] = 99
+	var out: Array = c._end_combat("fuga")
+	check(out.any(func(f): return f.type == "PLAYER_TRACKED"), "os bandidos acham os rastros")
+	var res := WorldHelpers.advance_hours(w, 1)
+	var evs: Array = res.emitted_events.map(func(e): return e.event_type)
+	check(evs.has("CREATURES_MOVED"), "eles chegam perto do jogador")
+
+
+func test_fuga_sem_rastreador_treinado_nao_ha_perseguicao() -> void:
+	var m := _cena_grupo(1)
+	var out: Array = m[1]._end_combat("fuga")
+	check(not out.any(func(f): return f.type == "PLAYER_TRACKED"), "sem treino em Sobrevivência, ninguém rastreia")
