@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Dissipar Magia (universal, 2º círculo) completa: teste de Misticismo (exige treino) dissipa as magias com CD igual ou menor que o resultado, numa criatura ou numa esfera de 3m (clique no chão); com o aprimoramento (5º círculo), disjunção de 9m em que todas as magias caem sem teste. Testes em `tests/unit/test_magia_complexa.gd`.
+
 - Divinas de 3º círculo (lote 1): Heroísmo, Proteção contra Magia, Potência Divina, Dispersar as Trevas e Anular a Luz completas com todos os aprimoramentos. Heroísmo: 40 PV temporários, imunidade a medo e bônus contra o inimigo de maior ND. Proteção contra Magia: bônus de resistência ou imunidade a uma ou duas escolas (tecla T escolhe a escola). Potência Divina: sustentada, Força, RD e tamanho; toque em aliado devoto da mesma divindade. Dispersar e Anular dissipam magias de até 3º, 4º ou 5º círculo com teste de Religião contra a CD de cada uma; Dispersar cega inimigos e dá resistência e RD aos aliados; Anular dá Defesa aos aliados e enjoa inimigos (uma vez por cena). Corrigido o catálogo de Heroísmo, que tinha aprimoramentos do Hipnotismo. Testes em `tests/unit/test_magia_complexa.gd`.
 
 - Ambiente (provisório, por código): grama com tufos, moitas com frutinhas, pedras e cogumelos; margem de rio e lago com lama, espuma e juncos; adereços junto das casas (barris, caixotes, lenha, feno, canteiros de flores); lavouras com sulcos, trigo e hortaliças, cercadas; as casas de Pedra Branca agora têm telhado e fachada (o local do prédio é o interior, como na vila).

@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3510,3 +3510,58 @@ func test_dissipacao_depende_do_teste_de_religiao() -> void:
 	sim.c("bandido_1").sheet.add_efeito("magia.bencao", "ataque", 1, "cena")
 	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "Dispersar lançada")
 	check(sim.c("bandido_1").sheet.has_efeito("magia.bencao"), "sem passar no teste, a magia fica")
+
+
+# --- Dissipar Magia (universal, 2º círculo) ---------------------------------------------------
+func _treina_misticismo(m: Array) -> void:
+	var P: CharacterSheet = m[2].c("player").sheet
+	if not P.can_use_skill("misticismo", m[3]):
+		P.trained.append("misticismo")
+
+
+func test_dissipar_magia_exige_misticismo_treinado() -> void:
+	var m := _cena_grupo(5)
+	var P: CharacterSheet = m[2].c("player").sheet
+	if not P.can_use_skill("misticismo", m[3]):
+		check(not _lanca(m, {"type": "cast", "spell": "dissipar_magia", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "sem Misticismo treinado a magia não é lançada")
+
+
+func test_dissipar_magia_dissipa_so_as_de_cd_ate_o_resultado() -> void:
+	var m := _cena_grupo(5)
+	_treina_misticismo(m)
+	var sim: CombatSim = m[2]
+	var b1: CharacterSheet = sim.c("bandido_1").sheet
+	b1.add_efeito("magia.bencao", "ataque", 1, "cena")
+	sim.c("player").sheet.add_efeito("teste", "testes", 99, "cena")   # Misticismo altíssimo
+	check(_lanca(m, {"type": "cast", "spell": "dissipar_magia", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Dissipar Magia")
+	check(not b1.has_efeito("magia.bencao"), "magia com CD baixa dissipada")
+	var m2 := _cena_grupo(5)
+	_treina_misticismo(m2)
+	m2[2].c("bandido_1").sheet.add_efeito("magia.bencao", "ataque", 1, "cena")
+	m2[2].c("player").sheet.add_efeito("teste", "testes", -99, "cena")   # Misticismo baixíssimo
+	check(_lanca(m2, {"type": "cast", "spell": "dissipar_magia", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "lançada")
+	check(m2[2].c("bandido_1").sheet.has_efeito("magia.bencao"), "resultado abaixo da CD: a magia fica")
+
+
+func test_dissipar_magia_em_area_pega_zonas_e_criaturas_da_esfera_de_3m() -> void:
+	var m := _cena_grupo(5)
+	_treina_misticismo(m)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("teste", "testes", 99, "cena")
+	var longe := Vector2i(sim.c("bandido_2").tile.x + 1, sim.c("bandido_2").tile.y)
+	sim.add_zona("z_teste", [sim.c("bandido_2").tile], "luz", -1, "luz", {"conjurador": "player"})
+	sim.c("bandido_1").sheet.add_efeito("magia.bencao", "ataque", 1, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "dissipar_magia", "area": true, "tile": sim.c("bandido_2").tile, "targets": ["player"]}).ok, "área de 3m")
+	check(sim.zonas.all(func(z): return str(z.id) != "z_teste"), "zona dentro da esfera caiu")
+	check(sim.c("bandido_1").sheet.has_efeito("magia.bencao"), "criatura fora da esfera não foi atingida")
+	check(longe != Vector2i.ZERO, "referência")
+
+
+func test_dissipar_magia_disjuncao_exige_5_circulo_e_dissipa_tudo_sem_teste() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(9)[2], "player", {"type": "cast", "spell": "dissipar_magia", "tile": Vector2i(27, 57), "targets": ["player"], "aprimoramentos": [0]}).ok, "disjunção exige 5º círculo")
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("teste", "testes", -99, "cena")   # sem teste: o resultado não importa
+	sim.c("bandido_1").sheet.add_efeito("magia.circulo_da_restauracao", "defesa", 1, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "dissipar_magia", "tile": sim.c("bandido_1").tile, "targets": ["player"], "aprimoramentos": [0]}).ok, "disjunção")
+	check(not sim.c("bandido_1").sheet.has_efeito("magia.circulo_da_restauracao"), "magia de 4º círculo caiu sem teste")

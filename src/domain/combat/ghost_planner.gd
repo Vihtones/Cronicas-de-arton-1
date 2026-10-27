@@ -189,6 +189,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "dissipar_magia" and not apr.has(0) and not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Dissipar Magia exige Misticismo treinado"}
+			if sp_id == "dissipar_magia" and (apr.has(0) or a.get("no_chao", false) or a.get("area", false)):
+				var tile_dm: Vector2i = a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, tile_dm) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 12)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "heroismo" or sp_id == "protecao_contra_magia":
 				for tg_h in targets:
 					if not sim.combatants.has(tg_h) or sim.is_enemy(actor, tg_h) or sim.c(tg_h).sheet.is_dead():

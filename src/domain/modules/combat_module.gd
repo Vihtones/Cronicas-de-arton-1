@@ -2232,6 +2232,39 @@ func _remover_magia_sem_teste(sp: String, tiles: Array, out: Array) -> void:
 ## contra a CD da própria magia (CD de quem a lançou, se ainda estiver na cena; senão a de quem dissipa).
 func _dispersar_magias(caster: String, tiles: Array, circ_max: int, out: Array) -> void:
 	var csh: CharacterSheet = sim.c(caster).sheet
+	for cand in _candidatos_dissipar(tiles, circ_max):
+		var cd := _cd_da_magia(csh, cand)
+		var r := Checks.skill(csh, "religiao", cd, world.rules, world.rng, "combat")
+		if not r.get("success", false):
+			continue
+		_encerrar_magia_dissipada(cand, out)
+		out.append(fact("SPELL_ENDED", {"caster": caster, "spell": cand.sp, "reason": "dissipada", "cd": cd, "d20": int(r.get("d20", 0)), "total": int(r.get("total", 0))}, [caster]))
+
+
+## Dissipar Magia (universal 2): um teste de Misticismo; dissipa as magias com CD igual ou menor que o resultado.
+## `auto` (disjunção, 5º círculo): todas as magias da área caem, sem teste.
+func _dissipar_magia(caster: String, tiles: Array, auto: bool, out: Array) -> void:
+	var csh: CharacterSheet = sim.c(caster).sheet
+	var total := 0
+	if not auto:
+		var r := Checks.skill(csh, "misticismo", 0, world.rules, world.rng, "combat")
+		total = int(r.get("total", 0))
+	for cand in _candidatos_dissipar(tiles, 99):
+		var cd := _cd_da_magia(csh, cand)
+		if not auto and total < cd:
+			continue
+		_encerrar_magia_dissipada(cand, out)
+		out.append(fact("SPELL_ENDED", {"caster": caster, "spell": cand.sp, "reason": "dissipada", "cd": cd, "total": total}, [caster]))
+
+
+## CD da magia candidata: a de quem a lançou, se ainda está na cena; senão a de quem dissipa.
+func _cd_da_magia(csh: CharacterSheet, cand: Dictionary) -> int:
+	var conj_sh: CharacterSheet = sim.c(cand.conj).sheet if sim.combatants.has(cand.conj) else csh
+	return spell_dc(conj_sh, {"spell": cand.sp})
+
+
+## Magias ativas (efeitos, zonas e marcas) de até `circ_max` dentro dos tiles.
+func _candidatos_dissipar(tiles: Array, circ_max: int) -> Array:
 	var candidatos: Array = []
 	var vistos := {}
 	for cid in sim.combatants:
@@ -2251,14 +2284,7 @@ func _dispersar_magias(caster: String, tiles: Array, circ_max: int, out: Array) 
 		var sp_m := _sp_de_fonte("magia." + str(m.fonte))
 		if sp_m != "" and _circulo_ate(sp_m, circ_max) and tiles.has(sim.c(m.alvo).tile):
 			candidatos.append({"sp": sp_m, "kind": "marca", "id": str(m.id), "alvo": str(m.alvo), "conj": str((m.get("dados", {}) as Dictionary).get("conjurador", ""))})
-	for cand in candidatos:
-		var conj_sh: CharacterSheet = sim.c(cand.conj).sheet if sim.combatants.has(cand.conj) else csh
-		var cd := spell_dc(conj_sh, {"spell": cand.sp})
-		var r := Checks.skill(csh, "religiao", cd, world.rules, world.rng, "combat")
-		if not r.get("success", false):
-			continue
-		_encerrar_magia_dissipada(cand, out)
-		out.append(fact("SPELL_ENDED", {"caster": caster, "spell": cand.sp, "reason": "dissipada", "cd": cd, "d20": int(r.get("d20", 0)), "total": int(r.get("total", 0))}, [caster]))
+	return candidatos
 
 
 func _encerrar_magia_dissipada(cand: Dictionary, out: Array) -> void:
@@ -3744,6 +3770,18 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"dissipar_magia":
+			# Dissipar Magia (universal 2): teste de Misticismo; dissipa magias com CD igual ou menor. Aprimoramento (5º círculo):
+			# disjunção numa esfera de 9m, tudo cai sem teste. (O jogo ainda não tem itens mágicos permanentes além dos encantos
+			# de magia, que são efeitos e caem junto.)
+			var apr_dm: Array = a.get("aprimoramentos", [])
+			var area_dm: bool = apr_dm.has(0) or bool(a.get("no_chao", false)) or bool(a.get("area", false))
+			var centro_dm: Vector2i = a.get("tile", sim.c(id).tile) if area_dm else sim.c(a.get("target", id)).tile
+			var tiles_dm: Array = [centro_dm]
+			if area_dm:
+				tiles_dm = Area.esfera(centro_dm, Area.quadrados(9.0 if apr_dm.has(0) else 3.0))
+			_dissipar_magia(id, tiles_dm, apr_dm.has(0), out)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "dissipar_magia", "tags": ["magia"]}, [id]))
 		"manto_do_cruzado":
 			# Manto do Cruzado (4º círculo): sustentada (1 PM por turno, _sustentar); a versão é a escolhida ao aprender.
 			_iniciar_sustentada(id, "manto_do_cruzado", out)
