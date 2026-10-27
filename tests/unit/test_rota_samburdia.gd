@@ -87,3 +87,35 @@ func test_cronica_registra_rota_com_nome_e_entrega() -> void:
 		cronica.on_event(GameEvent.create("f_%s" % f.type, f.type, w.clock.tick, f.payload))
 	var textos2: Array = cronica.entries.map(func(e): return e.text)
 	check(textos2.any(func(t): return str(t).contains("Tarso Pedrada trouxe mercadoria de fora")), "a crônica registra a entrega do mensageiro")
+
+
+func test_madeira_vem_de_samburdia_quando_a_vila_fica_sem() -> void:
+	var w := _world()
+	var eco: EconomyModule = w.modules.economy
+	var r := _sambur(w)
+	eco._ensure()
+	eco.regions.vila.stock.madeira = 0
+	var sam_antes := int(eco.regions.samburdia.stock.madeira)
+	var out: Array = eco.on_event(_chegada(w, r.id, r.courier))
+	check(out.size() == 1 and out[0].type == "TRADE_DELIVERED", "a chegada traz carga")
+	var carga: Dictionary = out[0].payload.goods if out.size() == 1 else {}
+	check(carga.has("madeira") and int(carga.madeira) > 0, "a carga inclui madeira: %s" % str(carga))
+	eq(int(eco.regions.samburdia.stock.madeira), sam_antes - int(carga.get("madeira", 0)), "madeira sai de Sambúrdia na mesma quantidade")
+	check(int(eco.regions.vila.stock.madeira) > 0, "a vila recebe madeira")
+	eq(eco.GOOD_NAMES.get("madeira", ""), "madeira", "madeira tem nome de exibição")
+
+
+func test_resumo_das_rotas_segue_a_chegada_do_mensageiro() -> void:
+	var w := _world()
+	var eco: EconomyModule = w.modules.economy
+	var resumo: Array = eco.route_summary()
+	var sam: Dictionary = {}
+	for rota in resumo:
+		if rota.id == "samburdia_vila":
+			sam = rota
+	check(not sam.is_empty(), "resumo traz a rota de Sambúrdia")
+	eq(sam.mensageiro, "Tarso Pedrada", "resumo traz o nome do mensageiro")
+	var pos: int = w.day_index() % 6
+	eq(bool(sam.na_vila), pos < 2, "na vila quando dia % 6 < 2 (dia %d)" % w.day_index())
+	check(int(sam.dias) >= 1, "dias até sair ou chegar são positivos")
+	eq(bool(sam.aberta), true, "rota começa aberta")

@@ -9,7 +9,7 @@ const FACTION_FRIENDLY_AT := 30.0   # acima disso, 10% de desconto
 var treasury := 0  # ouro pago em refeições da vila (circulação monetária, ORIGINAL_DO_JOGO)
 const SHORTAGE_AT := 0.3        # estoque da vila abaixo de 30% da meta: falta do bem (crise de escassez)
 const SHORTAGE_END_AT := 0.7    # só acaba acima de 70% (histerese: não oscila em torno do limite)
-const GOOD_NAMES := {"comida": "comida", "bebida": "bebida", "ferramentas": "ferramentas", "remedio": "remédios"}
+const GOOD_NAMES := {"comida": "comida", "bebida": "bebida", "ferramentas": "ferramentas", "remedio": "remédios", "madeira": "madeira"}
 var shortage: Dictionary = {}   # bem -> true enquanto a vila está em falta (Fase 4)
 var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regiões (Arton Viva, Fase 4)
 
@@ -185,6 +185,35 @@ func on_event(e: GameEvent) -> Array:
 					if not moved.is_empty():
 						return [fact("TRADE_DELIVERED", {"by": e.payload.npc, "goods": moved})]
 	return []
+
+
+## Resumo das rotas para a interface: estado, mensageiro e quando ele está (ou chega) na vila.
+## Regra igual à do NpcModule: o mensageiro fica na vila quando dia % ciclo < dias_de_presenca.
+func route_summary() -> Array:
+	_ensure()
+	var out: Array = []
+	var dia: int = world.day_index()
+	for id in routes:
+		var rt: Dictionary = routes[id]
+		var mensageiro := ""
+		var ciclo := 0
+		var presenca := 0
+		for reg in world.db.distant.get("regions", []):
+			if reg.id == rt.get("from", ""):
+				mensageiro = str(reg.get("courier", ""))
+				ciclo = int(reg.get("courier_cycle_days", 0))
+				presenca = int(reg.get("courier_present_days", 0))
+		var pos := dia % ciclo if ciclo > 0 else 0
+		var na_vila := ciclo > 0 and pos < presenca
+		out.append({
+			"id": id,
+			"nome": str(rt.get("nome", id)),
+			"aberta": bool(rt.get("open", true)),
+			"mensageiro": str(world.db.npc_def(mensageiro).get("name", mensageiro)),
+			"na_vila": na_vila,
+			"dias": (presenca - pos) if na_vila else (ciclo - pos),
+		})
+	return out
 
 
 func _route_open(from_region: String) -> bool:

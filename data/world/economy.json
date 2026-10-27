@@ -11,6 +11,9 @@
   },
   "remedio": {
    "base": 1.0
+  },
+  "madeira": {
+   "base": 1.0
   }
  },
  "regions": {
@@ -19,25 +22,29 @@
     "comida": 120,
     "bebida": 80,
     "ferramentas": 30,
-    "remedio": 4
+    "remedio": 4,
+    "madeira": 40
    },
    "production": {
     "comida": 14,
     "bebida": 8,
     "ferramentas": 2,
-    "remedio": 0
+    "remedio": 0,
+    "madeira": 0
    },
    "consumption": {
     "comida": 13,
     "bebida": 8,
     "ferramentas": 1,
-    "remedio": 0
+    "remedio": 0,
+    "madeira": 2
    },
    "target": {
     "comida": 120,
     "bebida": 80,
     "ferramentas": 30,
-    "remedio": 6
+    "remedio": 6,
+    "madeira": 40
    }
   },
   "valkaria": {
@@ -45,25 +52,29 @@
     "comida": 5000,
     "bebida": 3000,
     "ferramentas": 2000,
-    "remedio": 300
+    "remedio": 300,
+    "madeira": 3000
    },
    "production": {
     "comida": 500,
     "bebida": 300,
     "ferramentas": 200,
-    "remedio": 20
+    "remedio": 20,
+    "madeira": 200
    },
    "consumption": {
     "comida": 500,
     "bebida": 300,
     "ferramentas": 190,
-    "remedio": 18
+    "remedio": 18,
+    "madeira": 190
    },
    "target": {
     "comida": 5000,
     "bebida": 3000,
     "ferramentas": 2000,
-    "remedio": 300
+    "remedio": 300,
+    "madeira": 3000
    }
   },
   "samburdia": {
@@ -71,25 +82,29 @@
     "comida": 800,
     "bebida": 300,
     "ferramentas": 300,
-    "remedio": 400
+    "remedio": 400,
+    "madeira": 600
    },
    "production": {
     "comida": 60,
     "bebida": 30,
     "ferramentas": 25,
-    "remedio": 30
+    "remedio": 30,
+    "madeira": 15
    },
    "consumption": {
     "comida": 40,
     "bebida": 20,
     "ferramentas": 20,
-    "remedio": 10
+    "remedio": 10,
+    "madeira": 15
    },
    "target": {
     "comida": 800,
     "bebida": 300,
     "ferramentas": 300,
-    "remedio": 400
+    "remedio": 400,
+    "madeira": 600
    }
   }
  },
@@ -108,7 +123,8 @@
    "tocha",
    "pao",
    "saco_de_dormir",
-   "ferramenta_oficio"
+   "ferramenta_oficio",
+   "tabua"
   ],
   "ysolde": [
    "pocao_cura"

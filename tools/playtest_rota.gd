@@ -93,6 +93,13 @@ func _run() -> void:
 	for sc in main.ui.panel_journal.find_children("*", "ScrollContainer", true, false):
 		sc.scroll_vertical = 100000
 	await _shot("r3_cronica")
+	for sc in main.ui.panel_journal.find_children("*", "ScrollContainer", true, false):
+		sc.scroll_vertical = 0
+	var resumo: Array = eco.route_summary()
+	_confere("o diário mostra as duas rotas", resumo.size() == 2)
+	for sc in main.ui.panel_journal.find_children("*", "ScrollContainer", true, false):
+		sc.scroll_vertical = 330
+	await _shot("r4_rotas")
 	main.ui.toggle_journal()
 	await _frames(3)
 

@@ -212,6 +212,7 @@ vendedor = {
     "comida": ["Pão fresco, saindo do forno!", "Maçãs doces, doces!", "Peixe do rio, fresquinho!", "Queijo curado da Fenna!", "Mel puro, prova só!"],
     "ferramenta": ["Facas afiadas!", "Foices e enxadas, preço justo!", "Ferradura nova, garantida!", "Machado bom não quebra!"],
     "remedio": ["Ervas para a tosse!", "Unguento de Lena, cura tudo!", "Chá de camomila, alivia a alma!"],
+    "madeira": ["Tábuas frescas, direto da serraria!", "Madeira de lei, não racha!"],
     "tecido": ["Panos de Valkaria!", "Lã macia, linho fino!", "Fio de Hilda, o melhor da vila!"],
 }
 vendedor_noite = ["Última chamada! Leve tudo!", "Hoje faço preço de custo!"]

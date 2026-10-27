@@ -656,6 +656,16 @@ func refresh_journal() -> void:
 	var cr: CrimeModule = w.modules.crime
 	if cr.enabled and cr.total_fines() > 0:
 		journal_body.add_child(_label("Multas pendentes: T$ %d (pague à Guarda)." % cr.total_fines(), 9))
+	# rotas comerciais (Arton Viva, Fase 4): estado da estrada e quando o mensageiro chega
+	journal_body.add_child(_h("Rotas comerciais"))
+	for rota in w.modules.economy.route_summary():
+		var estado := "aberta" if rota.aberta else "fechada"
+		var quando := ("%s está na vila (vai embora em %d dia(s))" % [rota.mensageiro, rota.dias]) if rota.na_vila else ("%s chega em %d dia(s)" % [rota.mensageiro, rota.dias])
+		if not rota.aberta and not rota.na_vila:
+			quando += ", mas sem carga"
+		var titulo := str(rota.nome)
+		titulo = titulo.substr(0, 1).to_upper() + titulo.substr(1)
+		journal_body.add_child(_label("• %s: %s. %s." % [titulo, estado, quando], 9))
 	# crônica da vila: o que aconteceu no mundo, mais recente primeiro (Arton Viva, Fase 9)
 	journal_body.add_child(_h("Crônica da vila"))
 	var diario_mundo = w.modules.chronicle

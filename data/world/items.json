@@ -86,5 +86,10 @@
   "name": "Ferramenta de ofício",
   "price": 8,
   "good": "ferramentas"
+ },
+ "tabua": {
+  "name": "Tábua de madeira",
+  "price": 2,
+  "good": "madeira"
  }
 }

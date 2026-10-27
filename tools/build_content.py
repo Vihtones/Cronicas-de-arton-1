@@ -332,6 +332,7 @@ items = {
  "couro_batido": {"name": "Couro batido", "price": 35, "good": "ferramentas", "rule": "armadura.couro_batido"},
  "cota_malha": {"name": "Cota de malha", "price": 150, "good": "ferramentas", "rule": "armadura.cota_malha"},
  "ferramenta_oficio": {"name": "Ferramenta de ofício", "price": 8, "good": "ferramentas"},
+ "tabua": {"name": "Tábua de madeira", "price": 2, "good": "madeira"},
 }
 economy = {
  "goods": {"comida": {"base": 1.0}, "bebida": {"base": 1.0}, "ferramentas": {"base": 1.0}, "remedio": {"base": 1.0}},
@@ -357,6 +358,7 @@ economy["ferramenta_de_oficio"] = {
  "item": "ferramenta_oficio", "vendedor": "mara", "idade_inicio_oficio": 16, "anos_para_ter": 2,
  "profissoes": ["ferreiro", "aprendiz", "lavrador", "lavradora", "moleiro", "ajudante de moleiro", "caçador", "pastora"]}
 economy["shops"]["mara"].append("ferramenta_oficio")
+economy["shops"]["mara"].append("tabua")
 # Arton Viva, Fase 4: segunda região, com remédio em excesso (o bem mais escasso da vila).
 economy["regions"]["samburdia"] = {
  "stock": {"comida": 800, "bebida": 300, "ferramentas": 300, "remedio": 400},
@@ -367,6 +369,14 @@ economy["regions"]["samburdia"] = {
 economy["routes"] = {
  "valkaria_vila": {"nome": "estrada de Valkaria", "from": "valkaria", "to": "vila", "open": True},
  "samburdia_vila": {"nome": "estrada de Sambúrdia", "from": "samburdia", "to": "vila", "open": True}}
+# Arton Viva, Fase 4: madeira só existe em Sambúrdia. A vila consome e não produz; sem a estrada, a falta vem.
+economy["goods"]["madeira"] = {"base": 1.0}
+for _reg, _vals in {"vila": (40, 0, 2, 40), "valkaria": (3000, 200, 190, 3000), "samburdia": (600, 15, 15, 600)}.items():
+    _est, _prod, _cons, _alvo = _vals
+    economy["regions"][_reg]["stock"]["madeira"] = _est
+    economy["regions"][_reg]["production"]["madeira"] = _prod
+    economy["regions"][_reg]["consumption"]["madeira"] = _cons
+    economy["regions"][_reg]["target"]["madeira"] = _alvo
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
 distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "events": [

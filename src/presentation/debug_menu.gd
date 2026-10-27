@@ -57,7 +57,7 @@ func rebuild() -> void:
 	var npc := _option(npcs.names, 0)
 	_row([npc.control, _btn("Ir até", func(): _tele({"npc": npcs.ids[npc.index()]}))])
 	_title("Vila")
-	var bem := _option(["comida", "bebida", "ferramentas", "remedio"], 0)
+	var bem := _option(["comida", "bebida", "ferramentas", "remedio", "madeira"], 0)
 	var estoque := _spin(int(Game.world.modules.economy.regions.vila.stock.comida), 0, 9999)
 	var aplicar_estoque := func(): _ajustar({"key": "stock", "good": bem.text(), "value": int(estoque.value())})
 	_row([bem.control, estoque.control, _btn("Aplicar", aplicar_estoque)])
