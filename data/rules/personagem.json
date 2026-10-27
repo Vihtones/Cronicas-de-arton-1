@@ -10687,6 +10687,397 @@
    "pagina": 34,
    "pdf_page": 36,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.santo",
+   "valor": {
+    "variante_de": "classe.paladino",
+    "substitui": "Abençoado (não pode ser santo do bem), ladainha de combate, santo curandeiro, vaso do espírito, mártir, pira santa e vingador santificado; demais poderes de paladino são os do básico",
+    "pericias": "Religião (Sab) e Vontade (Sab), mais 2 a escolha entre Adestramento, Atletismo, Conhecimento, Cura, Diplomacia, Fortitude, Guerra, Iniciativa, Intuição, Luta, Ofício e Percepção. Pontos de mana: 4 por nível. Proficiências como o paladino básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Abençoado",
+      "texto": "Como o paladino básico, mas não pode escolher ser um santo do bem"
+     },
+     {
+      "nivel": 1,
+      "nome": "Código do herói",
+      "texto": "Como o paladino básico"
+     },
+     {
+      "nivel": 1,
+      "nome": "Ladainha de combate (+1)",
+      "texto": "Ação padrão e 2 PM: aura de 9m (sustentada) com +1 em testes de ataque, rolagens de dano e Defesa para você e aliados; +2 PM a cada quatro níveis aumentam o bônus em +1. Conta como Aura Sagrada"
+     },
+     {
+      "nivel": 2,
+      "nome": "Santo curandeiro",
+      "texto": "Ação de movimento e PM (limitados pelo Car): para cada PM, o aliado de maior perda de PV em alcance médio recupera 2d8 PV. A partir do 6º nível, pode também remover uma condição entre abalado, apavorado, atordoado, cego, doente, exausto, fatigado ou surdo"
+     },
+     {
+      "nivel": 3,
+      "nome": "Vaso do espírito",
+      "texto": "Gasta 1 PM para somar o Carisma em um teste de resistência"
+     },
+     {
+      "nivel": 5,
+      "nome": "Ladainha de combate (+2, sacra)",
+      "texto": "Aura passa a dar +2; você e aliados causam +1d8 de dano de luz contra devotos que canalizam apenas energia negativa e criaturas malignas (a critério do mestre)"
+     },
+     {
+      "nivel": 6,
+      "nome": "Mártir",
+      "texto": "Gasta 1 PM para dar a aliado em alcance médio bônus igual ao seu Car em teste de resistência. A partir do 12º nível, uma vez por cena, se ele falhar, você sofre o efeito no lugar dele"
+     },
+     {
+      "nivel": 8,
+      "nome": "Pira santa",
+      "texto": "Enquanto sob Ladainha, ação de movimento e PM (limitados pelo Car): para cada PM, o inimigo de maior ND em alcance médio sofre 2d8 de dano de luz e fica ofuscado por uma rodada (Fortitude CD Car reduz à metade)"
+     },
+     {
+      "nivel": 9,
+      "nome": "Ladainha de combate (+3, veloz)",
+      "texto": "Suas armas e as dos aliados na aura recebem o encanto veloz"
+     },
+     {
+      "nivel": 13,
+      "nome": "Ladainha de combate (+4)",
+      "texto": "Bônus da ladainha sobe para +4"
+     },
+     {
+      "nivel": 17,
+      "nome": "Ladainha de combate (+5)",
+      "texto": "Bônus da ladainha sobe para +5"
+     },
+     {
+      "nivel": 20,
+      "nome": "Vingador santificado",
+      "texto": "Ao usar Ladainha, gasta +5 PM: os bônus numéricos dobram e você e aliados na aura recebem imunidade a acertos críticos e RD igual a 5 + Car"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 37,
+   "pdf_page": 39,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.seteiro",
+   "valor": {
+    "variante_de": "classe.cacador",
+    "substitui": "Caminho do atirador (habilidades de arma só valem com arcos e bestas), tiro de supressão, evasão, disparo constritor, rajada de flechas, evasão aprimorada, sentinela e mestre do disparo; demais poderes de caçador são os do básico",
+    "pericias": "Pontaria (Des) e Sobrevivência (Sab), mais 6 a escolha entre Adestramento, Atletismo, Cavalgar, Cura, Fortitude, Furtividade, Iniciativa, Investigação, Luta, Ofício, Percepção e Reflexos. Proficiências: armas marciais",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Caminho do atirador",
+      "texto": "Abre mão do treinamento convencional do caçador; habilidades de seteiro de ataque e armas só funcionam com arcos e bestas"
+     },
+     {
+      "nivel": 1,
+      "nome": "Marca da presa +1d4",
+      "texto": "Como o caçador básico (+1d8 no 5º, +1d12 no 9º, +2d8 no 13º, +2d10 no 17º)"
+     },
+     {
+      "nivel": 1,
+      "nome": "Tiro de supressão",
+      "texto": "Ao causar dano com arco ou besta em criatura sob Marca da Presa, ela sofre –1 cumulativo em rolagens de dano até o fim da cena, até o valor de PM gasto em Marca da Presa"
+     },
+     {
+      "nivel": 3,
+      "nome": "Evasão",
+      "texto": "Em efeito que permite Reflexos para reduzir o dano à metade, não sofre dano se passar e sofre dano normal se falhar. Exige liberdade de movimentos (não funciona de armadura pesada ou imóvel)"
+     },
+     {
+      "nivel": 5,
+      "nome": "Disparo constritor",
+      "texto": "Ao usar mirar, gasta 2 PM para executar desarmar, empurrar ou quebrar com um dos ataques à distância feitos até o fim do turno"
+     },
+     {
+      "nivel": 10,
+      "nome": "Rajada de flechas",
+      "texto": "Ação completa e 2 PM para alvejar uma área: escolhe um ponto no alcance da arma, faz um ataque contra cada inimigo em raio de 3m (cada acerto soma +2 cumulativo ao dano) e gasta apenas uma munição"
+     },
+     {
+      "nivel": 13,
+      "nome": "Evasão aprimorada",
+      "texto": "Em efeito de Reflexos para metade do dano, não sofre dano se passar e sofre metade se falhar (mesmas restrições da evasão)"
+     },
+     {
+      "nivel": 15,
+      "nome": "Sentinela",
+      "texto": "Uma vez por rodada, quando criatura sob sua Marca da Presa acerta um aliado, gasta 1 PM para atacar essa criatura"
+     },
+     {
+      "nivel": 20,
+      "nome": "Mestre do disparo",
+      "texto": "Usa a Marca da Presa como ação livre; uma vez por rodada, ao atacar alvo marcado com arco ou besta, pode fazer um ataque adicional contra ele"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 39,
+   "pdf_page": 41,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.usurpador",
+   "valor": {
+    "variante_de": "classe.clerigo",
+    "substitui": "Inimigo dos deuses (não pode ter devoção), magias divinas de 1º círculo com Car, usurpar, canalização falsa, discrição divina, poder capturado e roubo divino; poderes de clérigo usam Car no lugar de Sab",
+    "pericias": "Enganação (Car) e Vontade (Sab), mais 2 a escolha entre Atuação, Conhecimento, Cura, Diplomacia, Furtividade, Iniciativa, Intimidação, Intuição, Misticismo, Nobreza, Ofício, Percepção, Reflexos e Religião. Sem proficiências. Pontos de vida e mana como o clérigo básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Inimigo dos deuses",
+      "texto": "Não aceito por nenhum deus: não pode ter nenhuma devoção"
+     },
+     {
+      "nivel": 1,
+      "nome": "Magias",
+      "texto": "Magias divinas de 1º círculo; a cada quatro níveis, um círculo maior (2º no 5º, 3º no 9º). Não começa com magias. Atributo-chave Carisma, somado ao total de PM"
+     },
+     {
+      "nivel": 1,
+      "nome": "Usurpar",
+      "texto": "Lança qualquer magia divina de círculo a que tenha acesso com teste de Enganação (CD 15 + PM da magia). Se falhar, perde a magia e os PM. Não pode escolher 10; sofre penalidade de armadura; –5 em local com símbolo sagrado visível"
+     },
+     {
+      "nivel": 2,
+      "nome": "Canalização falsa",
+      "texto": "Pode canalizar energia positiva e negativa"
+     },
+     {
+      "nivel": 2,
+      "nome": "Poder de clérigo",
+      "texto": "Como o clérigo básico, exceto Conhecimento Mágico; Carisma substitui Sabedoria em poderes de clérigo e concedidos baseados em atributo"
+     },
+     {
+      "nivel": 3,
+      "nome": "Discrição divina +1",
+      "texto": "+1 em Furtividade e testes de resistência; +1 a cada seis níveis (+2 no 9º e +3 no 15º)"
+     },
+     {
+      "nivel": 4,
+      "nome": "Poder capturado",
+      "texto": "Gasta uma hora e faz Enganação (CD 20, +5 por uso adicional no mesmo dia): se passar, é considerado devoto de um deus maior escolhido (um por nível) para habilidades e itens e pode usar um poder concedido dele, sem obrigações e restrições. Se falhar, perde 3 PM. Dura até o fim do dia ou até usar de novo. Não pode escolher poderes exclusivos de classe"
+     },
+     {
+      "nivel": 20,
+      "nome": "Roubo divino",
+      "texto": "Ao lançar magia com Usurpar, para cada 10 pontos no teste de Enganação, o custo em PM reduz –1 (cumulativo) e a CD para resistir sobe +1"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 40,
+   "pdf_page": 42,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.vassalo",
+   "valor": {
+    "variante_de": "classe.cavaleiro",
+    "substitui": "Habilidades de cavaleiro substituídas por progressão narrativa do vassalo (baluarte, código de honra, jovem pajem, suserano, valete, escudeiro, guarda, vigilante, títulos e caminhos); demais poderes de cavaleiro são os do básico",
+    "pericias": "Como o cavaleiro básico. Armas marciais e escudos. Treinamento repetido em perícia dá +2 nela no lugar do treinamento",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Baluarte +2",
+      "texto": "Como o cavaleiro básico (+4 no 5º, +6 no 9º, +8 no 13º e +10 no 17º nível)"
+     },
+     {
+      "nivel": 1,
+      "nome": "Código de honra",
+      "texto": "Como o cavaleiro básico"
+     },
+     {
+      "nivel": 1,
+      "nome": "Jovem pajem",
+      "texto": "Começa como pajem: treinado em Adestramento ou Ofício (armeiro)"
+     },
+     {
+      "nivel": 1,
+      "nome": "Suserano",
+      "texto": "Escolhe um nobre aprovado pelo mestre para servir; é reconhecido como parte de sua corte. Se deixar de servir, perde todos os PM até ser aceito por outro"
+     },
+     {
+      "nivel": 2,
+      "nome": "Valete",
+      "texto": "Treinado em Diplomacia ou Nobreza e recebe um poder de cavaleiro"
+     },
+     {
+      "nivel": 3,
+      "nome": "Escudeiro aprendiz",
+      "texto": "Treinado em Cavalgar e proficiente em armaduras pesadas (+2 na Defesa com armadura pesada se já for proficiente)"
+     },
+     {
+      "nivel": 4,
+      "nome": "Guarda do castelo",
+      "texto": "Treinado em Intuição e recebe um poder de cavaleiro"
+     },
+     {
+      "nivel": 5,
+      "nome": "Vigilante das estradas",
+      "texto": "Recebe Montaria e treinamento em Percepção"
+     },
+     {
+      "nivel": 6,
+      "nome": "Cavaleiro do reino",
+      "texto": "Título de sir ou dame; arma, armadura ou escudo superior com duas melhorias; um poder de cavaleiro"
+     },
+     {
+      "nivel": 7,
+      "nome": "Sargento do reino",
+      "texto": "Posição no exército: um poder de cavaleiro ou de guerreiro (como guerreiro de mesmo nível para pré-requisitos)"
+     },
+     {
+      "nivel": 8,
+      "nome": "Capitão do reino",
+      "texto": "Oficial do exército: poder Escudeiro e Golpe Divino como paladino de mesmo nível (provém de senso de justiça, não de magia)"
+     },
+     {
+      "nivel": 9,
+      "nome": "Lorde",
+      "texto": "Recebe um feudo e o poder Autoridade Feudal (parceiros convocados contam como veteranos). Escolhe Caminho do Soldado (poder de guerreiro) ou Caminho do Governante (poder de nobre)"
+     },
+     {
+      "nivel": 10,
+      "nome": "Barão",
+      "texto": "Impostos dos plebeus; poder Título e domínio de nível 1 (ou construção gratuita se já tiver domínio)"
+     },
+     {
+      "nivel": 11,
+      "nome": "Visconde",
+      "texto": "Título mais alto. Caminho do Soldado: +1 PV por nível de vassalo. Caminho do Governante: +1 em Inteligência"
+     },
+     {
+      "nivel": 12,
+      "nome": "Conde",
+      "texto": "Orçamento de T$ 30.000 em itens mágicos por aventura (devolvidos ao fim) e um poder de cavaleiro ou geral"
+     },
+     {
+      "nivel": 13,
+      "nome": "Marquês",
+      "texto": "Caminho do Soldado: RD 5 e +2 na Defesa. Caminho do Governante: soma Car nos testes de resistência"
+     },
+     {
+      "nivel": 14,
+      "nome": "Duque",
+      "texto": "Autoridade Feudal aumenta o nível do parceiro convocado em um passo; um poder de cavaleiro"
+     },
+     {
+      "nivel": 15,
+      "nome": "Arquiduque",
+      "texto": "Uma vez por rodada, quando criatura inteligente causa dano, gasta 5 PM para reduzi-lo a 0"
+     },
+     {
+      "nivel": 16,
+      "nome": "Conselheiro real",
+      "texto": "Poder de cavaleiro e uma magia divina de até 4º círculo (atributo-chave Car)"
+     },
+     {
+      "nivel": 17,
+      "nome": "Rei mercenário",
+      "texto": "Caminho do Soldado: 3 pontos de atributo para Força, Destreza e Constituição. Caminho do Governante: 3 pontos para Inteligência, Sabedoria e Carisma"
+     },
+     {
+      "nivel": 18,
+      "nome": "Rei",
+      "texto": "+1 em Carisma e um poder de cavaleiro"
+     },
+     {
+      "nivel": 19,
+      "nome": "Alto rei",
+      "texto": "Orçamento de itens mágicos T$ 100.000 e limite de parceiros +2"
+     },
+     {
+      "nivel": 20,
+      "nome": "Imperador",
+      "texto": "+1 em dois atributos e uma magia divina de até 5º círculo (atributo-chave Car)"
+     }
+    ],
+    "narrativa": "Progressão narrativa: exige conversa com o mestre antes e a história determina parte da ascensão; a classe é mais fixa que as outras"
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 41,
+   "pdf_page": 43,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.ventanista",
+   "valor": {
+    "variante_de": "classe.ladino",
+    "substitui": "Truques do ofício e disfarces elaborados, virar a casaca, provocação ousada e o grande golpe; charme substitui habilidades de ladino conforme a tabela; demais poderes de ladino são os do básico",
+    "pericias": "Ladinagem (Des) e Reflexos (Des), mais 8 a escolha entre Acrobacia, Atletismo, Atuação, Cavalgar, Conhecimento, Diplomacia, Enganação, Furtividade, Iniciativa, Intimidação, Intuição, Investigação, Jogatina, Nobreza, Ofício, Percepção e Pilotagem. Proficiências como o ladino básico",
+    "habilidades": [
+     {
+      "nivel": 1,
+      "nome": "Charme",
+      "texto": "Soma Carisma no total de PM. Em teste de perícia (exceto ataque), gasta PM (limitados pelo Car): +2 no teste por PM"
+     },
+     {
+      "nivel": 1,
+      "nome": "Truques do ofício",
+      "texto": "Lança magias arcanas de 1º círculo, apenas de encantamento e ilusão, como magia simulada (p. 44). 2º círculo no 6º nível, 3º no 10º e 4º no 14º. Começa com duas de 1º círculo e aprende uma de qualquer círculo que possa lançar em cada nível par. Pode lançar vestindo armadura leve sem teste de Misticismo. Atributo-chave Inteligência"
+     },
+     {
+      "nivel": 2,
+      "nome": "Evasão",
+      "texto": "Como o ladino básico"
+     },
+     {
+      "nivel": 3,
+      "nome": "Disfarce elaborado (1 poder)",
+      "texto": "Ao fazer Enganação para disfarce, pode escolher um poder (exceto da Tormenta) cujos pré-requisitos cumpra e que se relacione ao disfarce: gasta –3 PM e usa o poder. A cada seis níveis, pode assumir mais uma penalidade de –3 PM para escolher um poder adicional"
+     },
+     {
+      "nivel": 4,
+      "nome": "Esquiva sobrenatural",
+      "texto": "Como o ladino básico"
+     },
+     {
+      "nivel": 7,
+      "nome": "Virar a casaca",
+      "texto": "Disfarçado, gasta 1 PM para remover o disfarce e fazer esconder-se usando Enganação no lugar de Furtividade, mesmo sem camuflagem ou cobertura"
+     },
+     {
+      "nivel": 8,
+      "nome": "Olhos nas costas",
+      "texto": "Como o ladino básico"
+     },
+     {
+      "nivel": 9,
+      "nome": "Disfarce elaborado (2 poderes)",
+      "texto": "Dois poderes de disfarce (ver nível 3)"
+     },
+     {
+      "nivel": 10,
+      "nome": "Evasão aprimorada",
+      "texto": "Como o ladino básico"
+     },
+     {
+      "nivel": 11,
+      "nome": "Provocação ousada",
+      "texto": "No primeiro turno em cada cena, ação completa para provocar: inimigos recebem +2 em Percepção, Sobrevivência e Vontade contra você até o fim da cena, mas você recupera 2 PM no início de cada turno (só com risco associado, a critério do mestre; máximo por cena igual ao nível)"
+     },
+     {
+      "nivel": 15,
+      "nome": "Disfarce elaborado (3 poderes)",
+      "texto": "Três poderes de disfarce (ver nível 3)"
+     },
+     {
+      "nivel": 20,
+      "nome": "O grande golpe",
+      "texto": "No início de cada aventura escolhe magias (quantidade igual à Int; pode repetir) e um tipo de cena (ação, exploração ou interpretação) para cada uma. Em cena do tipo definido, pode lançá-la sem gastar PM (limite 20 PM, atributo-chave Int)"
+     }
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 43,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
   }
  ]
 }
