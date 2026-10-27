@@ -2669,6 +2669,1324 @@
    "pagina": 45,
    "pdf_page": 51,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.clerigo",
+   "valor": {
+    "pv_inicial": 16,
+    "pv_nivel": 4,
+    "soma_con": true,
+    "pm_nivel": 5,
+    "pericias_fixas": [
+     "religiao",
+     "vontade"
+    ],
+    "pericias_escolha": 2,
+    "lista": [
+     "conhecimento",
+     "cura",
+     "diplomacia",
+     "fortitude",
+     "iniciativa",
+     "intuicao",
+     "luta",
+     "misticismo",
+     "nobreza",
+     "oficio",
+     "percepcao"
+    ],
+    "proficiencias": [
+     "armaduras_pesadas",
+     "escudos"
+    ],
+    "magia": {
+     "tipo": "divina",
+     "atributo": "sab",
+     "circulos": {
+      "2": 5,
+      "3": 9,
+      "4": 13,
+      "5": 17
+     },
+     "magias_iniciais": 3,
+     "aprende_a_cada_nivel": true
+    },
+    "habilidades": [
+     "Devoto fiel (dois poderes concedidos; ou culto ao Panteão)",
+     "Mão da divindade no 20º nível (três magias, 15 PM)"
+    ],
+    "poderes": [
+     "abencoar_arma",
+     "aumento_atributo",
+     "autoridade_eclesiastica",
+     "canalizar_energia",
+     "canalizar_amplo",
+     "comunhao_vital",
+     "conhecimento_magico",
+     "expulsar_comandar_mortos_vivos",
+     "liturgia_magica",
+     "magia_sagrada_profana",
+     "mestre_celebrante",
+     "missa_bencao_da_vida",
+     "missa_chamado_as_armas",
+     "missa_elevacao_do_espirito",
+     "missa_escudo_divino",
+     "missa_superar_limitacoes",
+     "prece_de_combate",
+     "simbolo_sagrado_energizado"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 57,
+   "pdf_page": 63,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.abencoar_arma",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Proficiência na arma preferida da divindade; com 3 PM a arma vira mágica até o fim da cena, o dano sobe um passo e usa Sabedoria no ataque e no dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 57,
+   "pdf_page": 63,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.autoridade_eclesiastica",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Posição formal na igreja: +5 em Diplomacia ou Intimidação com devotos e metade do preço de itens em templos da divindade (efeitos definidos pelo mestre)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 5,
+     "texto": "devoto de um deus maior"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 57,
+   "pdf_page": 63,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.canalizar_energia",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Ação padrão e PM: luz cura 1d6 PV em vivos e causa 1d6 de luz em mortos-vivos por PM (trevas, o inverso), em alcance curto",
+    "implementado": false,
+    "prereq": {
+     "texto": "divindade que canaliza energia"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 57,
+   "pdf_page": 63,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.canalizar_amplo",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Gasta +2 PM para aumentar o alcance da Canalização para médio",
+    "implementado": false,
+    "prereq": {
+     "poder": "canalizar_energia"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.comunhao_vital",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Ao curar com magia, gasta +2 PM para outra criatura em alcance curto recuperar metade dos PV da cura",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.expulsar_comandar_mortos_vivos",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Ação padrão e 3 PM: expulsa (apavora) ou comanda mortos-vivos em alcance curto (Vontade CD Sab)",
+    "implementado": false,
+    "prereq": {
+     "poder": "canalizar_energia"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.liturgia_magica",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Ação de movimento: CD da próxima habilidade de clérigo até o fim do próximo turno aumenta em +2",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_sagrada_profana",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Gasta +1 PM ao lançar magia divina de dano para mudar o dano para luz ou trevas, conforme a divindade",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_celebrante",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "O número de afetados por uma Missa aumenta em dez vezes e os benefícios dobram",
+    "implementado": false,
+    "prereq": {
+     "nivel": 12,
+     "texto": "qualquer poder de Missa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.missa_bencao_da_vida",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Participantes recebem PV temporários igual ao nível + Sabedoria",
+    "implementado": false,
+    "prereq": {
+     "texto": "Missa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.missa_chamado_as_armas",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Participantes recebem +1 em testes de ataque e rolagens de dano",
+    "implementado": false,
+    "prereq": {
+     "texto": "Missa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.missa_elevacao_do_espirito",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Participantes recebem PM temporários igual à Sabedoria",
+    "implementado": false,
+    "prereq": {
+     "texto": "Missa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.missa_escudo_divino",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Participantes recebem +1 na Defesa e em testes de resistência",
+    "implementado": false,
+    "prereq": {
+     "texto": "Missa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.missa_superar_limitacoes",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Cada participante recebe +1d6 em um teste à escolha, podendo usá-lo após rolar",
+    "implementado": false,
+    "prereq": {
+     "texto": "Missa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.prece_de_combate",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Magia divina de ação padrão em si mesmo pode ser lançada como ação de movimento por +2 PM",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.simbolo_sagrado_energizado",
+   "valor": {
+    "classe": "clerigo",
+    "efeito": "Ação de movimento e 1 PM: símbolo emite luz até o fim da cena; enquanto o empunha, magias divinas custam 1 PM a menos",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 58,
+   "pdf_page": 64,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.druida",
+   "valor": {
+    "pv_inicial": 16,
+    "pv_nivel": 4,
+    "soma_con": true,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "sobrevivencia",
+     "vontade"
+    ],
+    "pericias_escolha": 4,
+    "lista": [
+     "adestramento",
+     "atletismo",
+     "cavalgar",
+     "conhecimento",
+     "cura",
+     "fortitude",
+     "iniciativa",
+     "intuicao",
+     "luta",
+     "misticismo",
+     "oficio",
+     "percepcao",
+     "religiao"
+    ],
+    "proficiencias": [
+     "escudos"
+    ],
+    "magia": {
+     "tipo": "divina",
+     "atributo": "sab",
+     "escolas_escolha": 3,
+     "circulos": {
+      "2": 6,
+      "3": 10,
+      "4": 14
+     },
+     "magias_iniciais": 2,
+     "aprende_a_cada_nivel_par": true
+    },
+    "habilidades": [
+     "Devoto fiel (dois poderes concedidos)",
+     "Empatia selvagem",
+     "Caminho dos ermos (2º nível)",
+     "Força da natureza (20º nível: –2 PM e +2 CD; –4 e +4 em terreno natural)"
+    ],
+    "poderes": [
+     "aspecto_da_primavera",
+     "aspecto_do_inverno",
+     "aspecto_do_outono",
+     "aspecto_do_verao",
+     "aumento_atributo",
+     "companheiro_animal",
+     "companheiro_animal_aprimorado",
+     "companheiro_animal_lendario",
+     "companheiro_animal_magico",
+     "espirito_dos_equinocios",
+     "espirito_dos_solsticios",
+     "forca_dos_penhascos",
+     "forma_primal",
+     "forma_selvagem",
+     "forma_selvagem_aprimorada",
+     "forma_selvagem_superior",
+     "liberdade_da_pradaria",
+     "magia_natural",
+     "presas_afiadas",
+     "segredos_da_natureza",
+     "tranquilidade_dos_lagos"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 61,
+   "pdf_page": 67,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aspecto_da_primavera",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Aprende uma magia de encantamento ou ilusão; escolhe magias (até o Carisma) com custo –1 PM",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 61,
+   "pdf_page": 67,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aspecto_do_inverno",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Aprende uma magia de convocação ou evocação; redução de frio 5 e +1 de dano por dado nas magias de frio",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 61,
+   "pdf_page": 67,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aspecto_do_outono",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Aprende uma magia de necromancia; gasta 1 PM para –2 nos testes de resistência de inimigos em alcance curto",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 61,
+   "pdf_page": 67,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aspecto_do_verao",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Aprende uma magia de transmutação; gasta 1 PM para cobrir arma com chamas (+1d6 fogo) e ganha PM temporário ao acertar",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 61,
+   "pdf_page": 67,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.companheiro_animal",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Recebe um companheiro animal (parceiro iniciante; veterano no 7º nível e mestre no 15º); pode ser escolhido várias vezes com espécies diferentes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 61,
+   "pdf_page": 67,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.companheiro_animal_aprimorado",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Um companheiro recebe um segundo tipo, ganhando os bônus do nível",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6,
+     "poder": "companheiro_animal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.companheiro_animal_lendario",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Um companheiro passa a dobrar os bônus de seu tipo original",
+    "implementado": false,
+    "prereq": {
+     "nivel": 18,
+     "poder": "companheiro_animal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.companheiro_animal_magico",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Um companheiro recebe um segundo tipo: adepto, destruidor, magivocador ou médico",
+    "implementado": false,
+    "prereq": {
+     "nivel": 8,
+     "poder": "companheiro_animal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.espirito_dos_equinocios",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Gasta 4 PM: até o fim da cena, pode rolar de novo qualquer resultado 1",
+    "implementado": false,
+    "prereq": {
+     "nivel": 10,
+     "poder": "aspecto_da_primavera"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.espirito_dos_solsticios",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Ao lançar magia, gasta +4 PM para maximizar os efeitos numéricos variáveis",
+    "implementado": false,
+    "prereq": {
+     "nivel": 10,
+     "poder": "aspecto_do_inverno"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forca_dos_penhascos",
+   "valor": {
+    "classe": "druida",
+    "efeito": "+2 em Fortitude; em contato com pedra, gasta PM (limitado pela Sabedoria) para reduzir 10 de dano por PM",
+    "implementado": false,
+    "prereq": {
+     "nivel": 4
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forma_primal",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Na Forma Selvagem, recebe os benefícios de dois tipos de animais",
+    "implementado": false,
+    "prereq": {
+     "nivel": 18,
+     "poder": "forma_selvagem"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forma_selvagem",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Ação completa e 3 PM: assume a forma de criatura selvagem (formas ágil, feroz, resistente etc., em três graus)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forma_selvagem_aprimorada",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Gasta 6 PM ao todo para assumir uma forma aprimorada",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6,
+     "poder": "forma_selvagem"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forma_selvagem_superior",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Gasta 10 PM ao todo para assumir uma forma superior",
+    "implementado": false,
+    "prereq": {
+     "nivel": 12,
+     "poder": "forma_selvagem_aprimorada"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.liberdade_da_pradaria",
+   "valor": {
+    "classe": "druida",
+    "efeito": "+2 em Reflexos; ao ar livre, gasta 1 PM para aumentar o alcance de uma magia em um passo",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_natural",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Na forma selvagem, pode lançar magias e empunhar catalisadores",
+    "implementado": false,
+    "prereq": {
+     "poder": "forma_selvagem"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 62,
+   "pdf_page": 68,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.presas_afiadas",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Margem de ameaça das armas naturais aumenta em +2",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 63,
+   "pdf_page": 69,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.segredos_da_natureza",
+   "valor": {
+    "classe": "druida",
+    "efeito": "Aprende duas magias de qualquer círculo que possa lançar (de escolas conhecidas); pode ser escolhido várias vezes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 63,
+   "pdf_page": 69,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.tranquilidade_dos_lagos",
+   "valor": {
+    "classe": "druida",
+    "efeito": "+2 em Vontade; com recipiente de água, gasta 1 PM por rodada para refazer um teste de resistência",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 63,
+   "pdf_page": 69,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.paladino",
+   "valor": {
+    "pv_inicial": 20,
+    "pv_nivel": 5,
+    "soma_con": true,
+    "pm_nivel": 3,
+    "pericias_fixas": [
+     "luta",
+     "vontade"
+    ],
+    "pericias_escolha": 2,
+    "lista": [
+     "adestramento",
+     "atletismo",
+     "cavalgar",
+     "cura",
+     "diplomacia",
+     "fortitude",
+     "guerra",
+     "iniciativa",
+     "intuicao",
+     "nobreza",
+     "percepcao",
+     "religiao"
+    ],
+    "proficiencias": [
+     "armas_marciais",
+     "armaduras_pesadas",
+     "escudos"
+    ],
+    "habilidades": [
+     "Abençoado (soma Carisma nos PM no 1º nível; devoto ou paladino do bem)",
+     "Código do Herói (perde os PM se violar)",
+     "Golpe Divino (+Car no ataque, +1d8 no dano)",
+     "Cura pelas Mãos (a partir do 2º nível)",
+     "Aura Sagrada (3º nível)",
+     "Montaria Sagrada (5º nível)"
+    ],
+    "poderes": [
+     "arma_sagrada",
+     "aumento_atributo",
+     "aura_antimagia",
+     "aura_ardente",
+     "aura_de_cura",
+     "aura_de_invencibilidade",
+     "aura_poderosa",
+     "fulgor_divino",
+     "julgamento_arrependimento",
+     "julgamento_autoridade",
+     "julgamento_coragem",
+     "julgamento_iluminacao",
+     "julgamento_justica",
+     "julgamento_libertacao",
+     "julgamento_salvacao",
+     "julgamento_vindicacao",
+     "julgamento_zelo",
+     "orar",
+     "virtude_caridade",
+     "virtude_castidade",
+     "virtude_compaixao",
+     "virtude_humildade",
+     "virtude_temperanca"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 82,
+   "pdf_page": 88,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arma_sagrada",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Com Golpe Divino usando a arma preferida, o dado de dano sobe para d12",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de uma divindade (exceto Lena e Marah)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 82,
+   "pdf_page": 88,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_antimagia",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Com a aura ativa, você e aliados podem rolar de novo testes de resistência contra magia",
+    "implementado": false,
+    "prereq": {
+     "nivel": 14
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 82,
+   "pdf_page": 88,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_ardente",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Com a aura ativa, espíritos e mortos-vivos na aura sofrem dano de luz igual a 5 + Carisma no início de seus turnos",
+    "implementado": false,
+    "prereq": {
+     "nivel": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_de_cura",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Com a aura ativa, você e aliados curam 5 + Carisma PV no início de seus turnos",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_de_invencibilidade",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Com a aura ativa, ignora o primeiro dano da cena (você e aliados na aura)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 18
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_poderosa",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "O raio da aura aumenta para 30m",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fulgor_divino",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Ao usar Golpe Divino, inimigos em alcance curto ficam ofuscados até o início do seu próximo turno",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_arrependimento",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 2 PM para marcar inimigo; na próxima vez que ele acertar você ou aliado, faz Vontade (CD Car) ou fica atordoado (uma vez por cena)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_autoridade",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 1 PM e vence Diplomacia oposta à Vontade: a criatura obedece a um comando simples (uma vez por cena)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_coragem",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 2 PM: criatura em alcance curto fica imune a medo e recebe +2 contra o inimigo de maior ND",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_iluminacao",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Marca inimigo; ao acertá-lo em corpo a corpo, recebe 2 PM temporários (uma vez por cena)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_justica",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 2 PM: se o inimigo marcado causar dano a você ou aliado, faz Vontade (CD Car) ou sofre luz igual à metade do dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_libertacao",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 5 PM para cancelar condição negativa de criatura em alcance curto",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_salvacao",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 2 PM para marcar inimigo; até o fim da cena, cada acerto corpo a corpo nele cura 5 PV",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_vindicacao",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 2 PM para marcar inimigo que causou dano na cena: +1 ataque e +1d8 dano contra ele, –5 nos demais",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.julgamento_zelo",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Gasta 1 PM para marcar alvo em alcance longo: ao se mover em sua direção, o deslocamento dobra",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.orar",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Aprende e pode lançar uma magia divina de 1º círculo (atributo-chave Sabedoria); pode ser escolhido várias vezes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.virtude_caridade",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Custo das habilidades de paladino que têm aliado como alvo reduzido em –1 PM (virtude: deve ajudar os necessitados)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.virtude_castidade",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Imune a efeitos de encantamento e +5 em Intuição contra blefes (virtude)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.virtude_compaixao",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Cura pelas Mãos em alcance curto; cada PM cura 2d6+1 (virtude)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.virtude_humildade",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Na primeira rodada, ação completa para rezar: PM temporários igual ao Carisma (virtude)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 83,
+   "pdf_page": 89,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.virtude_temperanca",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Ao consumir alimento, item alquímico ou poção, consome só metade (virtude)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 84,
+   "pdf_page": 90,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.nobre",
+   "valor": {
+    "pv_inicial": 16,
+    "pv_nivel": 4,
+    "soma_con": true,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "vontade"
+    ],
+    "pericias_escolha": 4,
+    "pericias_fixas_alternativa": [
+     "diplomacia",
+     "intimidacao"
+    ],
+    "lista": [
+     "adestramento",
+     "atuacao",
+     "cavalgar",
+     "conhecimento",
+     "diplomacia",
+     "enganacao",
+     "fortitude",
+     "guerra",
+     "iniciativa",
+     "intimidacao",
+     "intuicao",
+     "investigacao",
+     "jogatina",
+     "luta",
+     "nobreza",
+     "oficio",
+     "percepcao",
+     "pontaria"
+    ],
+    "proficiencias": [
+     "armas_marciais",
+     "armaduras_pesadas",
+     "escudos"
+    ],
+    "habilidades": [
+     "Autoconfiança (Car na Defesa)",
+     "Espólio (item de até T$ 2.000)",
+     "Orgulho (PM por +2 em testes)",
+     "Palavras afiadas (2d6 a 10d6 em níveis 2, 6, 10, 14, 18)",
+     "Riqueza (nível 3)",
+     "Gritar ordens (nível 4)",
+     "Presença aristocrática (nível 5)",
+     "Realeza (nível 20)"
+    ],
+    "poderes": [
+     "armadura_brilhante",
+     "autoridade_feudal",
+     "aumento_atributo",
+     "educacao_privilegiada",
+     "estrategista",
+     "favor",
+     "general",
+     "grito_tiranico",
+     "inspirar_confianca",
+     "inspirar_gloria",
+     "jogo_da_corte",
+     "lideranca_pelo_exemplo",
+     "lingua_de_ouro",
+     "lingua_de_prata",
+     "lingua_rapida",
+     "presenca_majestosa",
+     "titulo",
+     "voz_poderosa"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armadura_brilhante",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Usa Carisma na Defesa com armadura pesada (sem somar Destreza)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.autoridade_feudal",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta 1 hora e 2 PM para conclamar o povo: conta como parceiro iniciante até o fim da aventura (critério do mestre)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.educacao_privilegiada",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Torna-se treinado em duas perícias de nobre à escolha",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estrategista",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta ação padrão e 1 PM por aliado: direciona aliados em alcance curto, que ganham ação de movimento no turno",
+    "implementado": false,
+    "prereq": {
+     "int": 1,
+     "treinado": "guerra",
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.favor",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta 5 PM e uma hora de conversa para pedir favores a pessoas poderosas (funciona como persuasão de Diplomacia)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.general",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Aliados direcionados pelo Estrategista recebem 1d4 PM temporários",
+    "implementado": false,
+    "prereq": {
+     "poder": "estrategista",
+     "nivel": 12
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 79,
+   "pdf_page": 85,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.grito_tiranico",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Usa Palavras Afiadas como ação completa: dados d8 e atinge todos os inimigos em alcance curto",
+    "implementado": false,
+    "prereq": {
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inspirar_confianca",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta 2 PM para aliado em alcance curto rolar de novo um teste",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inspirar_gloria",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta 5 PM: aliado em alcance curto ganha ação padrão extra no próximo turno (uma vez por cena por aliado)",
+    "implementado": false,
+    "prereq": {
+     "poder": "inspirar_confianca",
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.jogo_da_corte",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta 1 PM para rolar de novo testes de Diplomacia, Intuição ou Nobreza",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lideranca_pelo_exemplo",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta 2 PM: até o próximo turno, aliados podem usar seu teste de perícia bem-sucedido",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lingua_de_ouro",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Gasta ação padrão e 4 PM: efeito de Enfeitiçar com sugerir ação em todas as criaturas no alcance (CD Car)",
+    "implementado": false,
+    "prereq": {
+     "poder": "lingua_de_prata",
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lingua_de_prata",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Em teste de perícia de Carisma, gasta 2 PM para somar metade do nível",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lingua_rapida",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Mudar atitude como ação completa sofre –5 em vez de –10",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.presenca_majestosa",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Presença Aristocrática afeta criaturas com Int (inclusive animais) e pode ser usada mais de uma vez por cena",
+    "implementado": false,
+    "prereq": {
+     "nivel": 16
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.titulo",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "Adquire título de nobreza; benefícios definidos com o mestre (ex.: 20 TO por nível de nobre por aventura)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 10,
+     "poder": "autoridade_feudal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.voz_poderosa",
+   "valor": {
+    "classe": "nobre",
+    "efeito": "+2 em Diplomacia e Intimidação; habilidades de alcance curto passam a médio",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 80,
+   "pdf_page": 86,
+   "status": "VERIFICADA"
   }
  ]
 }
