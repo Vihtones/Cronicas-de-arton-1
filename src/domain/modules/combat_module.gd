@@ -17,9 +17,10 @@ var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict),
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
 const POWER_POLICIES := {"escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
-	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"]}
+	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"],
+	"golpe_divino": ["auto", "nunca"], "golpe_divino_extra": ["nunca", "auto"]}
 const DEFAULT_POLICY := {"escudo_da_fe": "auto", "protecao_divina": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
-	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto"}
+	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto", "golpe_divino": "auto", "golpe_divino_extra": "nunca"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
 var stance_sneak := false
@@ -502,6 +503,9 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var special: bool = a.get("special", false)
 			if special:
 				sim.c(id).sheet.pm -= sim.special_tier(sim.c(id).sheet)
+			var golpe_n := int(v.get("golpe_dados", 0))
+			if golpe_n > 0:
+				sim.c(id).sheet.pm -= 1 + golpe_n   # Golpe Divino: 2 PM + 1 PM por dado extra
 			(sim.c(id).flags as Array).append("agrediu_%d" % sim.round_no)
 			_cur_action = a
 			var was_up: bool = not sim.c(a.target).sheet.is_down()
@@ -994,6 +998,9 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			extra += 2
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
 		dmg = maxi(1, int(r.total))
+		var golpe_n := int(v.get("golpe_dados", 0))
+		if golpe_n > 0:
+			dmg += int(Dice.roll("%dd8" % golpe_n, world.rng, "combat", int(atk.mult) if crit else 1).total)   # Golpe Divino
 		rolls = r.rolls
 		# Ataque Furtivo (LB p.73): 1/rodada, alvo desprevenido ou flanqueado; dados extras não multiplicam.
 		var sa_key := "furtivo_%d" % sim.round_no
@@ -1098,6 +1105,7 @@ func _track_attack(attacker: String, target: String, v: Dictionary, special: boo
 				stats.tactics[m[0]] = true
 		if tags.has("furtivo"): stats.tactics["ataque furtivo"] = true
 		if special: stats.pm_spent = int(stats.pm_spent) + 1
+		if int(v.get("golpe_dados", 0)) > 0: stats.pm_spent = int(stats.pm_spent) + 1 + int(v.golpe_dados)
 		if int(v.get("miss_chance", 0)) > 0: stats.adverse["visibilidade"] = true
 	elif target == "player":
 		stats.dmg_taken = int(stats.dmg_taken) + dmg

@@ -429,3 +429,45 @@ func test_habilidades_do_barbaro_escalam_com_o_nivel() -> void:
 	eq(ClassFeatures.furia_bonus(sh), 10, "fúria titânica dobra o bônus")
 	eq(ClassFeatures.instinto_pericia(sh, "reflexos"), ClassFeatures.instinto_bonus(sh), "instinto vale em Reflexos")
 	eq(ClassFeatures.instinto_pericia(sh, "atletismo"), 0, "instinto não vale em outras perícias")
+
+
+func _cena_paladino(nivel: int) -> WorldState:
+	var sh := _build("paladino")
+	sh.level = nivel
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1"], true, false)
+	w.modules.combat.sim.c("player").tile = Vector2i(26, 57)
+	w.modules.combat.sim.c("bandido_1").tile = Vector2i(27, 57)
+	return w
+
+
+func test_golpe_divino_soma_carisma_e_dado_e_custa_pm() -> void:
+	var w := _cena_paladino(1)
+	var sim: CombatSim = w.modules.combat.sim
+	var P: CharacterSheet = sim.c("player").sheet
+	P.pm = 10
+	sim.toggles["golpe_divino"] = "nunca"
+	var off := sim.attack_profile("player", "bandido_1", 0, false, false)
+	eq(int(off.get("golpe_dados", 0)), 0, "desligado: sem dado extra")
+	sim.toggles["golpe_divino"] = "auto"
+	var on := sim.attack_profile("player", "bandido_1", 0, false, false)
+	eq(int(on.golpe_dados), 1, "nível 1: 1d8 por 2 PM")
+	eq(int(on.mod) - int(off.mod), int(P.attrs["car"]), "+Carisma no ataque")
+	eq(float(on.avg_damage) - float(off.avg_damage), 4.5, "+1d8 no dano médio")
+
+
+func test_golpe_divino_passos_extras_em_niveis_altos() -> void:
+	var w := _cena_paladino(8)
+	var sim: CombatSim = w.modules.combat.sim
+	var P: CharacterSheet = sim.c("player").sheet
+	P.pm = 10
+	sim.toggles["golpe_divino_extra"] = "auto"
+	var p := sim.attack_profile("player", "bandido_1", 0, false, false)
+	eq(int(p.golpe_dados), 3, "nível 8: até 2 passos extras (1 + 2 dados)")
+	P.pm = 3
+	var pouco := sim.attack_profile("player", "bandido_1", 0, false, false)
+	eq(int(pouco.golpe_dados), 2, "com 3 PM: 2 PM do golpe e só 1 passo")
+	sim.toggles["golpe_divino_extra"] = "nunca"
+	eq(int(sim.attack_profile("player", "bandido_1", 0, false, false).golpe_dados), 1, "extras desligados")

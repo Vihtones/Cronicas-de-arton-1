@@ -243,6 +243,17 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if sheet.has_power("valentao") and (T.sheet.has_effective_condition(rules, "caido") or T.sheet.has_effective_condition(rules, "desprevenido") \
 			or T.sheet.has_effective_condition(rules, "indefeso") or (not ranged and flanking(attacker, target))):
 		mods.append(["valentão", 2])  # LB p.66
+	# Golpe Divino do paladino (LB p.82): corpo a corpo, 2 PM (+1 PM por dado extra), +Car no ataque e +1d8 por dado.
+	var golpe_dados := 0
+	var golpe_on := not ranged and ClassFeatures.golpe_divino_disponivel(sheet) and sheet.pm >= 2
+	if attacker == "player" and str(toggles.get("golpe_divino", "auto")) == "nunca":
+		golpe_on = false
+	if golpe_on:
+		var passos := 0
+		if attacker == "player" and str(toggles.get("golpe_divino_extra", "nunca")) == "auto":
+			passos = mini(ClassFeatures.golpe_passos_max(sheet), sheet.pm - 2)
+		golpe_dados = 1 + passos
+		mods.append(["golpe divino", int(sheet.attrs["car"])])
 	# Ataque Poderoso (LB p.124): corpo a corpo, -2 ataque / +5 dano. "auto" usa se a chance continuar boa.
 	if not ranged and sheet.has_power("ataque_poderoso") and _power_on(attacker, "ataque_poderoso", mods, T):
 		mods.append(["ataque poderoso", -2])
@@ -269,11 +280,12 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
 	if mods.any(func(m): return m[0] == "ataque poderoso"): avg += 5
+	avg += Dice.average("%dd8" % golpe_dados) if golpe_dados > 0 else 0.0
 	var hit_p := Checks.chance(total_mod, defense) * (1.0 - miss_chance / 100.0)
 	var crit_p := clampf((21 - int(atk.margem)) / 20.0, 0.0, 1.0)
 	crit_p = minf(crit_p, hit_p)
 	return {"ok": true, "atk": atk, "mod": total_mod, "mods": mods, "defense": defense, "ranged": ranged, "miss_chance": miss_chance,
-		"hit_chance": hit_p, "crit_chance": crit_p, "avg_damage": avg}
+		"hit_chance": hit_p, "crit_chance": crit_p, "avg_damage": avg, "golpe_dados": golpe_dados}
 
 
 ## Poder opcional ligado? Inimigos com o poder usam sempre (IA simples); o jogador segue sua política.
