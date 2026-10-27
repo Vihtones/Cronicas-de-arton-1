@@ -13618,6 +13618,800 @@
    "pagina": 211,
    "pdf_page": 217,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.aliado_animal",
+   "valor": {
+    "nome": "Aliado Animal",
+    "tipo": "divina",
+    "escola": "Encantamento",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 animal prestativo",
+    "duracao": "1 dia",
+    "resistencia": "nenhuma",
+    "texto": "Você cria um vínculo mental com um animal prestativo em relação a você. O Aliado Animal obedece a você no melhor de suas capacidades, mesmo que isso arrisque a vida dele. Ele funciona como um parceiro veterano, de um tipo a sua escolha entre ajudante, combatente, fortão, guardião, montaria ou perseguidor.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda o alvo para 1 animal Minúsculo e a duração para 1 semana. Em vez do normal, o animal se desloca no melhor de suas capacidades até um local designado por você — em geral, para levar um item, carta ou similar. Quando o animal chega ao destino, fica esperando até o fim da magia, permitindo apenas que uma ou mais criaturas escolhidas por você se aproximem e peguem o que ele estiver carregando."
+     },
+     {
+      "pm": 7,
+      "texto": "muda o parceiro para mestre. Requer 3º círculo."
+     },
+     {
+      "pm": 12,
+      "texto": "muda o alvo para 2 animais prestativos. Cada animal funciona como um parceiro de um tipo diferente, e você pode receber a ajuda de ambos (mas ainda precisa seguir o limite de parceiros de acordo com o seu nível de personagem). Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 178,
+   "pdf_page": 184,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.augurio",
+   "valor": {
+    "nome": "Augúrio",
+    "tipo": "divina",
+    "escola": "Adivinhação",
+    "circulo": 2,
+    "execucao": "completa",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia diz se uma ação que você tomará em breve — no máximo uma hora no futuro — trará resultados bons ou ruins. O mestre rola 1d6 em segredo; com um resultado de 2 a 6, a magia funciona e você recebe uma das seguintes respostas: “felicidade” (a ação trará bons resultados); “miséria” (a ação trará maus resultados); “felicidade e miséria” (para ambos) ou “nada” (para ações que não trarão resultados bons ou ruins). Com um resultado 1, a magia falha e oferece o resultado “nada”. Não há como saber se esse resultado foi dado porque a magia falhou ou não. Lançar esta magia múltiplas vezes sobre o mesmo assunto gera sempre o primeiro resultado. Por exemplo, se o grupo está prestes a entrar em uma câmara, o augúrio dirá “felicidade” se a câmara contém um tesouro desprotegido, “miséria” se contém um monstro, “felicidade e miséria” se houver um tesouro e um monstro ou “nada” se a câmara estiver vazia.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "muda a execução para 1 minuto. Em vez do normal, você pode consultar uma divindade, fazendo uma pergunta sobre um evento que acontecerá até um dia no futuro. O mestre rola a chance de falha; com um resultado de 2 a 6, você recebe uma resposta, desde uma simples frase até uma profecia ou enigma. Em geral, este uso sempre oferece pistas, indicando um caminho a tomar para descobrir a resposta que se procura. Numa falha você não recebe resposta alguma. Requer 3º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "muda a execução para 10 minutos e a duração para 1 minuto. Em vez do normal, você consulta uma divindade, podendo fazer uma pergunta por rodada, desde que ela possa ser respondida com “sim”, “não” ou “não sei” (embora poderosos, os deuses não são oniscientes). O mestre rola a chance de falha para cada pergunta. Em caso de falha, a resposta também é “não sei”. Requer 4º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "o mestre rola 1d12; a magia só falha em um resultado 1."
+     },
+     {
+      "pm": 12,
+      "texto": "o mestre rola 1d20; a magia só falha em um resultado 1."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 181,
+   "pdf_page": 187,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.circulo_da_justica",
+   "valor": {
+    "nome": "Círculo da Justiça",
+    "tipo": "divina",
+    "escola": "Abjuração",
+    "circulo": 2,
+    "execucao": "completa",
+    "alcance": "curto",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 9m de raio",
+    "duracao": "1 dia",
+    "resistencia": "Vontade parcial",
+    "texto": "Também conhecida como Lágrimas de Hyninn, esta magia é usada em tribunais e para proteger áreas sensíveis. Criaturas na área sofrem –10 em testes de Acrobacia, Enganação, Furtividade e Ladinagem e não podem mentir deliberadamente — mas podem tentar evitar perguntas que normalmente responderiam com uma mentira (sendo evasivas ou cometendo omissões, por exemplo). Uma criatura que passe na resistência tem as penalidades reduzidas para –5 e pode mentir.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda a execução para ação padrão, o alcance para pessoal, o alvo para você, a duração para cena e a resistência para nenhuma. Em vez do normal, qualquer criatura ou objeto invisível em alcance curto se torna visível. Isso não dissipa o efeito mágico; se sair do seu alcance, a criatura ou objeto voltam a ficar invisíveis."
+     },
+     {
+      "pm": 3,
+      "texto": "muda a penalidade nas perícias para –10 (se passar na resistência) e –20 (se falhar). Requer 4º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "muda a duração para permanente e adiciona componente material (balança de prata no valor de T$ 5.000)."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 183,
+   "pdf_page": 189,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.condicao",
+   "valor": {
+    "nome": "Condição",
+    "tipo": "divina",
+    "escola": "Adivinhação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "até 5 criaturas",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Pela duração da magia, você sabe a posição e status (PV atuais, se estão com uma condição ou sob efeito de magia...) dos alvos. Depois de lançada, a distância dos alvos não importa — a magia só deixa de detectar um alvo se ele morrer ou for para outro plano.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta o número de alvos em +1."
+     },
+     {
+      "pm": 1,
+      "texto": "muda a duração para um dia."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 185,
+   "pdf_page": 191,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.conjurar_mortos_vivos",
+   "valor": {
+    "nome": "Conjurar Mortos-Vivos",
+    "tipo": "universal",
+    "escola": "Necromancia",
+    "circulo": 2,
+    "execucao": "completa",
+    "alcance": "curto",
+    "alvo_tipo": "Efeito",
+    "alvo": "6 mortos-vivos",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Você conjura seis esqueletos capangas de tamanho Médio feitos de energia negativa em espaços desocupados dentro do alcance. Você pode gastar uma ação de movimento para fazer os mortos-vivos andarem (eles têm deslocamento 9m) ou uma ação padrão para fazê-los causar dano a criaturas adjacentes (1d6+2 pontos de dano de trevas cada). Os esqueletos têm For 2, Des 2, Defesa 18 e todos os outros atributos nulos; eles têm 1 PV e falham automaticamente em qualquer teste de resistência ou oposto, mas são imunes a atordoamento, cansaço, dano não letal, doença, encantamento , frio, ilusão, paralisia, sono e veneno. Eles desaparecem quando são reduzidos a 0 PV ou no fim da cena. Os mortos- -vivos não agem sem receber uma ordem. Usos criativos para capangas fora de combate ficam a critério do mestre.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o número de mortos- -vivos conjurados em +1."
+     },
+     {
+      "pm": 3,
+      "texto": "em vez de esqueletos, conjura carniçais. Requer 3º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "em vez de esqueletos, conjura sombras. Requer 4º círculo. Carniçal: como esqueletos, mas têm For 3, Des 3, Defesa 27 e causam 1d8+3 pontos de dano de trevas mais perda de 1d8 PV por veneno. Além disso, criaturas atingidas por um carniçal devem passar num teste de Fortitude ou ficam paralisadas por 1 rodada. Uma criatura que passe no teste de resistência fica imune à paralisia dos carniçais por um dia. Sombra: como esqueletos, mas têm Des 4, Defesa 35, são incorpóreas e causam 2d10 pontos de dano de trevas. Além disso, criaturas vivas atingidas por uma sombra devem passar num teste de Fortitude ou perdem 1d4 PM. Sombras perdem a habilidade incorpóreo quando expostas à luz do sol."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 186,
+   "pdf_page": 192,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.controlar_fogo",
+   "valor": {
+    "nome": "Controlar Fogo",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "veja texto",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você pode criar, moldar, mover ou extinguir chamas e emanações de calor. Ao lançar a magia, escolha um dos efeitos. Chamejar: o alvo é armas escolhidas. Elas causam +1d6 de dano de fogo. Também afeta armas naturais e ataques desarmados. Esquentar: o alvo é 1 objeto, que começa a esquentar. Ele sofre 1d6 pontos de dano de fogo por rodada e causa o mesmo dano a qualquer criatura que o esteja segurando ou vestindo. A critério do mestre, o objeto ou a criatura vestindo-o também podem ficar em chamas. Uma criatura pode gastar uma ação completa para resfriar o objeto (jogando areia ou se jogando numa fonte de água próxima, por exemplo) e cancelar o efeito da magia. Extinguir: o alvo é 1 chama de tamanho Grande ou menor, que é apagada. Isso cria uma nuvem de fumaça que ocupa uma esfera com 3m de raio centrada onde estava a chama. Dentro da fumaça, criaturas têm camuflagem leve. Modelar: o alvo é 1 chama de tamanho Grande ou menor. A cada rodada, você pode gastar uma ação livre para movimentá-la 9m em qualquer direção. Se atravessar o espaço ocupado por uma criatura, causa 2d6 pontos de dano de fogo. Uma criatura só pode receber dano dessa maneira uma vez por rodada.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda a duração para sustentada e a resistência para Reflexos reduz à metade. Em vez do normal, você deve escolher o seguinte efeito. Labaredas: a cada rodada, você pode gastar uma ação de movimento para projetar uma labareda, acertando um alvo em alcance curto a partir da chama. O alvo sofre 4d6 pontos de dano de fogo (Reflexos reduz à metade)."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +1d6 (exceto do efeito chamejar)."
+     },
+     {
+      "pm": 3,
+      "texto": "muda o alvo para 1 criatura composta principalmente por fogo, lava ou magma (como um elemental do fogo) e a resistência para Fortitude parcial. Em vez do normal, se a criatura falhar no teste de resistência, é reduzida a 0 PV. Se passar, sofre 5d6 pontos de dano."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 187,
+   "pdf_page": 193,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.controlar_madeira",
+   "valor": {
+    "nome": "Controlar Madeira",
+    "tipo": "divina",
+    "escola": "Transmutação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 objeto de madeira Grande ou menor",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você molda, retorce, altera ou repele madeira. Se lançar esta magia num objeto de uma criatura involuntária, ela tem direito a um teste de Vontade para anulá-la. Ao lançar a magia, escolha. Fortalecer: deixa o alvo mais resistente. Armas têm seu dano aumentado em um passo. Escudos têm seu bônus de Defesa aumentado em +2 (isso é uma melhoria no item, portanto é cumulativa com outras magias). Esses e outros itens de madeira recebem +5 na RD e dobram seus PV. Modelar: muda a forma do alvo. Pode transformar um galho em espada, criar uma porta onde antes havia apenas uma parede, transformar um tronco em uma caixa... Mas não pode criar mecanismos complexos (como uma besta) ou itens consumíveis. Repelir: o alvo é repelido por você. Se for uma arma, ataques feitos com ela contra você falham automaticamente. Se for uma porta ou outro objeto que possa ser aberto, ele vai se abrir quando você se aproximar, mesmo que esteja trancado. Um objeto que vá atingi-lo, como uma carroça, tronco ou barril, vai desviar ou parar adjacente a você, sem lhe causar dano. Os efeitos de regras em outros objetos de madeira ficam a cargo do mestre. Retorcer: estraga o alvo. Uma porta retorcida emperra (exigindo um teste de Força contra CD 25 para ser aberta). Armas e itens retorcidos impõem –5 em testes de perícia. Escudos retorcidos deixam de oferecer bônus (mas ainda impõem penalidades). Um barco retorcido começa a afundar e naufraga ao final da cena. Os efeitos de regras em outros objetos de madeira ficam a cargo do mestre.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda o alcance para pessoal, o alvo para você e a duração para um dia. Você e seu equipamento se transformam em uma árvore de tamanho Grande. Nessa forma, você não pode falar ou fazer ações físicas, mas consegue perceber seus arredores normalmente. Se for atacado nessa forma, a magia é dissipada. Um teste de Sobrevivência (CD 30) revela que você não é uma árvore verdadeira."
+     },
+     {
+      "pm": 3,
+      "texto": "muda o alvo para área de quadrado com 9m de lado e a duração para cena. Em vez do normal, qualquer vegetação na área fica rígida e afiada. A área é considerada terreno difícil e criaturas que andem nela sofrem 1d6 pontos de dano de corte para cada 1,5m que avancem."
+     },
+     {
+      "pm": 7,
+      "texto": "muda o tamanho do alvo para Enorme ou menor. Requer 3º círculo."
+     },
+     {
+      "pm": 12,
+      "texto": "muda o tamanho do alvo para Colossal ou menor. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 187,
+   "pdf_page": 193,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.dissipar_magia",
+   "valor": {
+    "nome": "Dissipar Magia",
+    "tipo": "universal",
+    "escola": "Abjuração",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Alvo ou Área",
+    "alvo": "1 criatura ou 1 objeto mágico ou esfera com 3m de raio",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Você dissipa outras magias que estejam ativas, como se sua duração tivesse acabado. Note que efeitos de magias instantâneas não podem ser dissipados (não se pode dissipar uma Bola de Fogo ou Relâmpago depois que já causaram dano...). Se lançar essa magia em uma criatura ou área, faça um teste de Misticismo; você dissipa as magias com CD igual ou menor que o resultado do teste. Se lançada contra um item mágico, o transforma em um item mundano por 1d6 rodadas (Vontade anula).",
+    "aprimoramentos": [
+     {
+      "pm": 12,
+      "texto": "muda a área para esfera com 9m de raio. Em vez do normal, cria um efeito de disjunção. Todas as magias na área são automaticamente dissipadas e todos os itens mágicos na área, exceto aqueles que você estiver carregando, viram itens mundanos por uma cena (com direito a um teste de Vontade para evitar esse efeito). Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 191,
+   "pdf_page": 197,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.enxame_de_pestes",
+   "valor": {
+    "nome": "Enxame de Pestes",
+    "tipo": "divina",
+    "escola": "Convocação",
+    "circulo": 2,
+    "execucao": "completa",
+    "alcance": "médio",
+    "alvo_tipo": "Efeito",
+    "alvo": "1 enxame Médio (quadrado de 1,5m)",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Resistência: Fortitude reduz à metade. Você conjura um enxame de criaturas a sua escolha, como besouros, gafanhotos, ratos, morcegos ou serpentes. O enxame pode passar pelo espaço de outras criaturas e não impede que outras criaturas entrem no espaço dele. No final de seus turnos, o enxame causa 2d12 pontos de dano de corte a qualquer criatura em seu espaço (Fortitude reduz à metade). Você pode gastar uma ação de movimento para mover o enxame 12m.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +1d12."
+     },
+     {
+      "pm": 3,
+      "texto": "muda a resistência para Reflexos reduz à metade e o enxame para criaturas maiores, como gatos, guaxinins, compsognatos ou kobolds. Ele causa 3d12 pontos de dano (a sua escolha entre corte, impacto ou perfuração). O resto da magia segue normal."
+     },
+     {
+      "pm": 5,
+      "texto": "aumenta o número de enxames em +1. Eles não podem ocupar o mesmo espaço. Requer 3º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "muda a resistência para Reflexos reduz à metade e o enxame para criaturas elementais. Ele causa 5d12 pontos do dano (a sua escolha entre ácido, eletricidade, fogo ou frio). O resto da magia segue normal. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 192,
+   "pdf_page": 198,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.fisico_divino",
+   "valor": {
+    "nome": "Físico Divino",
+    "tipo": "divina",
+    "escola": "Transmutação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você fortalece o corpo do alvo. Ele recebe +2 em Força, Destreza ou Constituição, a sua escolha. Esse aumento não oferece PV ou PM adicionais.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "muda o alcance para curto e o alvo para criaturas escolhidas."
+     },
+     {
+      "pm": 3,
+      "texto": "em vez do normal, o alvo recebe +2 nos três atributos físicos. Requer 3º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "em vez do normal, o alvo recebe +4 no atributo escolhido. Requer 4º círculo."
+     },
+     {
+      "pm": 12,
+      "texto": "em vez do normal, o alvo recebe +4 nos três atributos físicos. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 193,
+   "pdf_page": 199,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.marca_da_obediencia",
+   "valor": {
+    "nome": "Marca da Obediência",
+    "tipo": "universal",
+    "escola": "Encantamento",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "Vontade anula",
+    "texto": "Você toca uma criatura, gravando uma marca mística no corpo dela enquanto profere uma ordem, como “não ataque a mim ou meus aliados”, “siga-me” ou “não saia desta sala”. A criatura deve seguir essa ordem, gastando todas as ações de seu turno para isso. A ordem não pode ser genérica demais (como “ajude-me”, por exemplo), nem forçar o alvo a atos suicidas. A cada rodada, o alvo pode fazer um teste de Vontade. Se passar, a magia é dissipada.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "muda a duração para um dia. Se não estiver em combate, a criatura só pode fazer o teste de Vontade a cada hora. Requer 3º círculo."
+     },
+     {
+      "pm": 3,
+      "texto": "sempre que o alvo fizer o teste de Vontade e falhar, a marca causa 3d6 pontos de dano psíquico. Requer 3º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 198,
+   "pdf_page": 204,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.mente_divina",
+   "valor": {
+    "nome": "Mente Divina",
+    "tipo": "divina",
+    "escola": "Adivinhação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você fortalece a mente do alvo. Ele recebe +2 em Inteligência, Sabedoria ou Carisma, a sua escolha. Esse aumento não oferece PV, PM ou perícias adicionais.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "muda o alcance para curto e o alvo para criaturas escolhidas."
+     },
+     {
+      "pm": 3,
+      "texto": "em vez do normal, o alvo recebe +2 nos três atributos mentais. Requer 3º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "em vez do normal, o alvo recebe +4 no atributo escolhido. Requer 4º círculo."
+     },
+     {
+      "pm": 12,
+      "texto": "em vez do normal, o alvo recebe +4 nos três atributos mentais. Requer 5º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 198,
+   "pdf_page": 204,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.miasma_mefitico",
+   "valor": {
+    "nome": "Miasma Mefítico",
+    "tipo": "divina",
+    "escola": "Necromancia",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Área",
+    "alvo": "nuvem com 6m de raio",
+    "duracao": "instantânea",
+    "resistencia": "Fortitude (veja texto)",
+    "texto": "A área é coberta por emanações letais. Criaturas na área sofrem 5d6 pontos de dano de ácido e ficam enjoadas por 1 rodada. Se passarem na resistência, sofrem metade do dano e não ficam enjoadas. Truque: muda o alcance para toque, a área para alvo (1 criatura com 0 PV ou menos), a duração para instantânea, a resistência para Fortitude anula e adiciona componente material (pó de ônix no valor de T$ 10). Em vez do normal, você canaliza o Miasma contra uma vítima. Se falhar na resistência, ela morre e você recebe +2 na CD de suas magias por um dia. Se passar, fica imune a este truque por um dia.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +1d6."
+     },
+     {
+      "pm": 3,
+      "texto": "muda o tipo do dano para trevas."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 199,
+   "pdf_page": 205,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.oracao",
+   "valor": {
+    "nome": "Oração",
+    "tipo": "divina",
+    "escola": "Encantamento",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvos",
+    "alvo": "todas as criaturas (veja texto)",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Você e os seus aliados no alcance recebem +2 em testes de perícia e rolagens de dano, e todos os seus inimigos no alcance sofrem –2 em testes de perícia e rolagens de dano. Esse efeito é cumulativo com outras magias. Componente material: T$ 20 por PM gasto em incensos ou outras oferendas.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta os bônus em +1 (bônus máximo limitado pelo círculo máximo de magia que você pode lançar)."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta as penalidades em –1 (penalidade máxima limitada pelo círculo máximo de magia que você pode lançar)."
+     },
+     {
+      "pm": 7,
+      "texto": "muda o alcance para médio. Requer 3º círculo."
+     },
+     {
+      "pm": 12,
+      "texto": "muda a duração para cena. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 200,
+   "pdf_page": 206,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.purificacao",
+   "valor": {
+    "nome": "Purificação",
+    "tipo": "divina",
+    "escola": "evocação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "nenhuma",
+    "texto": "Você purifica a criatura tocada, removendo uma condição dela entre abalado, apavorado, alquebrado, atordoado, cego, confuso, debilitado, enjoado, envenenado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, ofuscado, paralisado, pasmo ou surdo.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "também recupera todos os PV perdidos por veneno."
+     },
+     {
+      "pm": 2,
+      "texto": "em vez de uma, remove todas as condições listadas."
+     },
+     {
+      "pm": 3,
+      "texto": "também permite que o alvo solte qualquer item amaldiçoado que esteja segurando (mas não remove a maldição do item em si)."
+     },
+     {
+      "pm": 7,
+      "texto": "também dissipa magias e efeitos prejudiciais de encantamento, necromancia e transmutação afetando o alvo. Requer 3º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 202,
+   "pdf_page": 208,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.raio_solar",
+   "valor": {
+    "nome": "Raio Solar",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Área",
+    "alvo": "linha de 30m",
+    "duracao": "instantânea",
+    "resistencia": "Reflexos (veja texto)",
+    "texto": "Você canaliza uma poderosa rajada de energia positiva que ilumina o campo de batalha. Criaturas na área sofrem 4d8 pontos de dano de luz (ou 4d12, se forem mortos-vivos) e ficam ofuscadas por uma rodada. Se passarem na resistência, sofrem metade do dano e não ficam ofuscadas. Truque: muda a duração para cena e a resistência para nenhuma. Em vez do normal, cria um facho de luz que ilumina a área da magia. Uma vez por rodada, você pode mudar a direção do facho como uma ação livre.",
+    "aprimoramentos": [
+     {
+      "pm": 2,
+      "texto": "aumenta o dano ou cura em +1d8 (ou +1d12 em mortos-vivos)."
+     },
+     {
+      "pm": 3,
+      "texto": "em vez do normal, criaturas vivas a sua escolha na área curam 4d8 pontos de vida; o restante sofre o dano normalmente."
+     },
+     {
+      "pm": 3,
+      "texto": "criaturas que falhem na resistência ficam cegas por 1d4 rodadas."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 203,
+   "pdf_page": 209,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.rogar_maldicao",
+   "valor": {
+    "nome": "Rogar Maldição",
+    "tipo": "divina",
+    "escola": "Necromancia",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "curto",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "sustentada",
+    "resistencia": "Fortitude anula",
+    "texto": "Você entoa cânticos maléficos que amaldiçoam uma vítima, criando efeitos variados. Ao lançar a magia, escolha entre os seguintes. Debilidade: o alvo fica esmorecido e não pode se comunicar ou lançar magias. Ainda reconhece seus aliados e pode segui-los e ajudá-los, mas sempre de maneira simplória. Doença: muda a duração para instantânea. O alvo contrai uma doença a sua escolha, que o afeta imediatamente (sem período de incubação). Fraqueza: o alvo fica debilitado e lento. Isolamento: o alvo perde o uso de um de seus cinco sentidos a sua escolha. Se perder a visão, fica cego. Se perder a audição, fica surdo. Se perder o olfato ou paladar, não pode usar a habilidade faro. Se perder o tato, fica caído e não pode se levantar. Você também pode inventar sua própria maldição, usando esses exemplos como sugestões, mas o mestre tem a palavra final sobre o efeito.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "aumenta o número de efeitos que você pode escolher em +1. Requer 3º círculo."
+     },
+     {
+      "pm": 7,
+      "texto": "muda a duração para permanente e resistência para Fortitude parcial. Se passar, a criatura ainda sofre os efeitos da maldição, mas por 1 rodada. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 204,
+   "pdf_page": 210,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.runa_de_protecao",
+   "valor": {
+    "nome": "Runa de Proteção",
+    "tipo": "universal",
+    "escola": "Abjuração",
+    "circulo": 2,
+    "execucao": "1 hora",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "uma área de 6m de raio",
+    "duracao": "permanente até ser descarregada",
+    "resistencia": "nenhuma",
+    "texto": "Resistência: varia (veja o texto). Você escreve uma runa pessoal em uma superfície fixa, como uma parede ou o chão, que protege uma pequena área ao redor. Quando uma criatura entra na área afetada a runa explode, causando 6d6 pontos de dano em todos os alvos a até 6m. A criatura que ativa a runa não tem direito a teste de resistência; outras criatu ras na área têm direito a um teste de Reflexos para reduzir o dano à metade. Quando lança a magia, você escolhe o tipo de dano, entre ácido, eletricidade, fogo, frio, luz ou trevas. Você pode determinar que a runa se ative apenas em condições específicas — por exemplo, apenas por goblins ou apenas por mortos-vivos. Você tam bém pode criar uma palavra mágica que impeça a runa de se ativar. Um personagem pode encontrar a runa com um teste de Investigação e desar má-la com um teste de Ladinagem. Componente material: pó de diamante no valor de T$ 200, com o qual o conjura dor desenha a runa, que brilha por al guns instantes e depois se torna prati camente invisível.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta o dano em +2d6."
+     },
+     {
+      "pm": 1,
+      "texto": "muda o alvo para “você” e o alcance para “pessoal”. Ao invés do normal, escolha uma magia de 1º círculo que você conhece e pode lançar, com tempo de execução de uma ação padrão ou menor. Você escreve a runa em seu corpo e especifica uma condição de ativação como, por exemplo, “quando eu for alvo de um ataque” ou “quando for alvo de uma magia”. Quando a condição for cumprida, você pode ativar a runa e lançar a magia escolhida como uma reação. Você só pode escrever uma runa em seu corpo ao mesmo tempo."
+     },
+     {
+      "pm": 3,
+      "texto": "como o aprimoramento anterior, mas você pode escolher magias de 2º círculo. Requer 3º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 204,
+   "pdf_page": 210,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.silencio",
+   "valor": {
+    "nome": "Silêncio",
+    "tipo": "divina",
+    "escola": "Ilusão",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Área",
+    "alvo": "esfera com 6m de raio",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Um silêncio sepulcral recai sobre a área e nenhum som é produzido nela. Enquanto estiverem na área, todas as criaturas ficam surdas. Além disso, como lançar magias exige palavras mágicas, normalmente nenhuma magia pode ser lançada dentro da área.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda a área para alvo de 1 objeto. Em vez do normal, o alvo emana uma área de silêncio com 3m de raio. Se lançar a magia num objeto de uma criatura involuntária, ela tem direito a um teste de Vontade para anulá-la."
+     },
+     {
+      "pm": 2,
+      "texto": "muda a duração para cena. Em vez do normal, nenhum som pode deixar a área, mas criaturas dentro da área podem falar, ouvir e lançar magias com palavras mágicas normalmente."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 206,
+   "pdf_page": 212,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.soco_de_arsenal",
+   "valor": {
+    "nome": "Soco de Arsenal",
+    "tipo": "divina",
+    "escola": "Convocação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "médio",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "Fortitude parcial",
+    "texto": "Ninguém sabe se Mestre Arsenal foi realmente o criador desta magia — mas ele foi o primeiro a utilizá-la. Você fecha o punho e gesticula como se estivesse golpeando o alvo, causando dano de impacto igual a 4d6 + sua Força. A vítima é empurrada 3m na direção oposta à sua. Passar no teste de resistência reduz o dano à metade e evita o empurrão.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "muda o alcance para pessoal, o alvo para você, a duração para cena e a resistência para nenhuma. Em vez do normal, seus ataques corpo a corpo passam a acertar inimigos distantes. Seu alcance natural aumenta em 3m; uma criatura Média pode atacar adversários a até 4,5m, por exemplo."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta o dano em +1d6."
+     },
+     {
+      "pm": 4,
+      "texto": "aumenta o empurrão em +3m."
+     },
+     {
+      "pm": 5,
+      "texto": "muda o tipo do dano para essência."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 206,
+   "pdf_page": 212,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.tempestade_divina",
+   "valor": {
+    "nome": "Tempestade Divina",
+    "tipo": "divina",
+    "escola": "Evocação",
+    "circulo": 2,
+    "execucao": "completa",
+    "alcance": "longo",
+    "alvo_tipo": "Área",
+    "alvo": "cilindro com 15m de raio e 15m de altura",
+    "duracao": "sustentada",
+    "resistencia": "nenhuma",
+    "texto": "Esta magia só pode ser usada em ambientes abertos. A área fica sujeita a um vendaval — ataques à distância sofrem penalidade de –5, chamas são apagadas e névoas são dissipadas. Você também pode gerar chuva (–5 em testes de Percepção), neve (como chuva, e a área se torna terreno difícil) ou granizo (como chuva, mais 1 ponto de dano de impacto por rodada, no início de seus turnos).",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "além do normal, uma vez por rodada você pode gastar uma ação padrão para fazer um raio cair sobre um alvo na área, causando 3d8 pontos de dano de eletricidade (Reflexos reduz à metade)."
+     },
+     {
+      "pm": 2,
+      "texto": "aumenta o dano de raios (veja acima) em +1d8."
+     },
+     {
+      "pm": 3,
+      "texto": "se escolheu causar chuva, ela se torna mais grossa, revelando a silhueta de criaturas invisíveis na área. Criaturas Médias ou menores ficam lentas e criaturas voadoras precisam passar num teste de Atletismo por rodada ou caem ao solo (mas podem fazer testes de Acrobacia para reduzir o dano de queda, como o normal)."
+     },
+     {
+      "pm": 3,
+      "texto": "se escolheu causar granizo, muda o dano para 2d6 por rodada."
+     },
+     {
+      "pm": 3,
+      "texto": "se escolheu causar neve, criaturas na área sofrem 2d6 pontos de dano de frio no início de seus turnos."
+     },
+     {
+      "pm": 3,
+      "texto": "muda a área para cilindro com 90m de raio e 90m de altura."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 208,
+   "pdf_page": 214,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.vestimenta_da_fe",
+   "valor": {
+    "nome": "Vestimenta da Fé",
+    "tipo": "divina",
+    "escola": "Abjuração",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "toque",
+    "alvo_tipo": "Alvo",
+    "alvo": "1 armadura, escudo ou vestuário",
+    "duracao": "1 dia",
+    "resistencia": "nenhuma",
+    "texto": "Você fortalece um item, aumentando o bônus de Defesa de uma armadura ou escudo em +2. No caso de um vestuário, ele passa a oferecer +2 na Defesa (não cumulativo com armadura). Os efeitos desta magia contam como um bônus de encanto.",
+    "aprimoramentos": [
+     {
+      "pm": 3,
+      "texto": "o objeto oferece o mesmo bônus em testes de resistência. Requer 3º círculo."
+     },
+     {
+      "pm": 4,
+      "texto": "aumenta o bônus em +1."
+     },
+     {
+      "pm": 7,
+      "texto": "o objeto também oferece redução de dano 5. Requer 4º círculo."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 210,
+   "pdf_page": 216,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "magia.voz_divina",
+   "valor": {
+    "nome": "Voz Divina",
+    "tipo": "divina",
+    "escola": "Adivinhação",
+    "circulo": 2,
+    "execucao": "padrão",
+    "alcance": "pessoal",
+    "alvo_tipo": "Alvo",
+    "alvo": "você",
+    "duracao": "cena",
+    "resistencia": "nenhuma",
+    "texto": "Você pode conversar com criaturas de qualquer raça e tipo: animal, construto, espírito, humanoide, monstro ou morto-vivo. Pode fazer perguntas e entende suas respostas, mesmo sem um idioma em comum ou se a criatura não for capaz de falar, mas respeitando os limites da Inteligência dela. A atitude dessas criaturas não é alterada, mas você pode usar a perícia Diplomacia para tentar mudar sua atitude.",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "você concede um pouco de vida a um cadáver, suficiente para que ele responda a suas perguntas. O conhecimento do corpo é limitado ao que ele tinha enquanto vivo e suas respostas são curtas e enigmáticas. Um corpo só pode ser alvo desta magia uma vez. Ela também não funciona em um corpo cuja cabeça tenha sido destruída."
+     },
+     {
+      "pm": 1,
+      "texto": "você pode falar com plantas (normais ou monstruosas) e rochas. Plantas e rochas têm percepção limitada de seus arredores e normalmente fornecem respostas simplórias."
+     }
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 211,
+   "pdf_page": 217,
+   "status": "VERIFICADA"
   }
  ]
 }
