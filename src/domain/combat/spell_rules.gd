@@ -8,15 +8,19 @@ const COMPLETAS := {
 	"infligir_ferimentos": {"aprimoramentos": [0, 1, 2, 3]},
 	"resistencia_a_energia": {"aprimoramentos": [0, 1, 2, 3, 4]},
 	"escudo_da_fe": {"aprimoramentos": [0, 1, 2, 3, 4]},
+	"protecao_divina": {"aprimoramentos": [0, 1, 2, 3]},
 }
 ## Magias que são reação: o base só ocorre como reação (quando um aliado é atacado). Aprimoramentos
 ## que mudam a execução para ação padrão permitem lançar no próprio turno.
 const REACAO := ["escudo_da_fe"]
 const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
+## Aprimoramentos que trocam a execução para reação mesmo sem a magia ser reação no base (Proteção Divina +2 PM).
+const REACAO_APR := {"protecao_divina": [1]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"}}
+const ALCANCE_APR := {"infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+	"protecao_divina": {1: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
 const TIPOS_ENERGIA := ["acido", "eletricidade", "fogo", "frio", "luz", "trevas"]
@@ -100,6 +104,9 @@ static func e_reacao(sp_id: String) -> bool:
 
 ## Lançar manualmente (no próprio turno): magias de reação só com aprimoramento de execução padrão.
 static func pode_lancar_no_turno(sp_id: String, apr: Array) -> bool:
+	for i in REACAO_APR.get(sp_id, []):
+		if apr.has(i):
+			return false   # execução de reação: só dispara em resposta a um evento
 	if not REACAO.has(sp_id):
 		return true
 	for i in EXECUCAO_PADRAO_APR.get(sp_id, []):

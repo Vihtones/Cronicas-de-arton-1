@@ -15,10 +15,10 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
-const POWER_POLICIES := {"escudo_da_fe": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
+const POWER_POLICIES := {"escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"]}
-const DEFAULT_POLICY := {"escudo_da_fe": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
+const DEFAULT_POLICY := {"escudo_da_fe": "auto", "protecao_divina": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
 	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
@@ -533,6 +533,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sh_o.olhar_usado = true
 			# Bestiário (medusa): Fort CD 19 evita; falhou, fica atordoada por 1 rodada (sem ações)
 			var alvo: CharacterSheet = sim.c(a.target).sheet
+			_reacao_protecao(id, a.target, out)
 			var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
 			if res.get("success", false):
 				out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": a.target, "tags": ["racial"]}, [id]))
@@ -618,6 +619,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var T: CharacterSheet = sim.c(tgt).sheet
 			var cd := spell_dc(sh, a)
 			var metal := bool(world.rules.value("armadura." + str(T.equipment.get("armor", "")), {}).get("metal", false))
+			_reacao_protecao(id, tgt, out)
 			var sv := Checks.skill(T, "fortitude", cd, world.rules, world.rng, "combat", int(sp.penalidade_metal) if metal else 0)
 			var r := Dice.roll(sp.dano, world.rng, "combat", 1, battle_bonus(sh))
 			var dmg := int(r.total)
@@ -634,6 +636,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var tgt: String = a.get("target", (a.get("targets", [""]) as Array)[0])
 			var T: CharacterSheet = sim.c(tgt).sheet
 			var cd := spell_dc(sh, a)
+			_reacao_protecao(id, tgt, out)
 			var sv := Checks.skill(T, "reflexos", cd, world.rules, world.rng, "combat")
 			var r := Dice.roll(GhostPlanner.raio_dice(sh), world.rng, "combat", 1, battle_bonus(sh))
 			var dmg := int(r.total)
@@ -691,6 +694,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					total += int(Dice.roll("1d8+1", world.rng, "combat").total)
 				var passou := false
 				if not apr.has(2):
+					_reacao_protecao(id, tg, out)
 					var res := Checks.skill(ts, "fortitude", dc, world.rules, world.rng, "combat")
 					passou = res.get("success", false)
 				if ts.creature_type == "morto-vivo":
@@ -725,10 +729,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 						alvos3.append(other)
 			for tg in alvos3:
 				var ts3: CharacterSheet = sim.c(tg).sheet
-				if apr3.has(1):
-					ts3.add_efeito("magia.protecao_divina", "proxima_resistencia", 5, "proxima_resistencia")
-				else:
-					ts3.add_efeito("magia.protecao_divina", "resistencia", 2 + (1 if apr3.has(0) else 0), "cena")
+				# (o aprimoramento 1 é de reação e não chega aqui: ver _reacao_protecao)
+				ts3.add_efeito("magia.protecao_divina", "resistencia", 2 + (1 if apr3.has(0) else 0), "cena")
 				if apr3.has(3):
 					# +5 PM: imune a efeitos mentais e de medo (LB, Proteção Divina) — tipos da tabela de condições
 					var tabela_cond: Dictionary = world.rules.value("condicoes", {})
@@ -889,6 +891,32 @@ func _reacao_escudo(attacker: String, target: String, out: Array) -> int:
 	P.flags.append("escudo_%d" % sim.round_no)
 	_aplicar_escudo("player", target, apr, true, out)
 	return 2
+
+
+## Proteção Divina com aprimoramento 1 (reação): quando um inimigo força um aliado a curto a fazer teste de
+## resistência, o jogador reage e o aliado recebe +5 nesse teste (em vez do bônus normal). Automática pela
+## política "protecao_divina"; uma vez por alvo por rodada.
+func _reacao_protecao(atacante: String, alvo: String, out: Array) -> void:
+	if alvo == "player" or not sim.is_enemy(atacante, alvo) or sim.is_enemy("player", alvo):
+		return
+	if str(power_policy.get("protecao_divina", "auto")) == "nunca":
+		return
+	var P := sim.c("player")
+	if P.is_empty() or not P.sheet.spells.has("protecao_divina"):
+		return
+	var flag := "protecao_%d_%s" % [sim.round_no, alvo]
+	if P.flags.has(flag) or sim.c(alvo).sheet.is_dead():
+		return
+	if CombatSim.cheb(P.tile, sim.c(alvo).tile) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
+		return
+	var sp := GhostPlanner.spell_rule(world.rules, "protecao_divina")
+	var custo := GhostPlanner.spell_cost(world.rules, sp, {"spell": "protecao_divina", "aprimoramentos": [1]})
+	if P.sheet.pm < custo:
+		return
+	P.sheet.pm -= custo
+	P.flags.append(flag)
+	sim.c(alvo).sheet.add_efeito("magia.protecao_divina", "proxima_resistencia", 5, "proxima_resistencia")
+	out.append(fact("BUFF_APPLIED", {"actor": "player", "target": alvo, "buff": "protecao_divina", "tags": ["magia", "reacao"]}, ["player", alvo]))
 
 
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:

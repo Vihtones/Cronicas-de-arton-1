@@ -96,6 +96,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var targets: Array = a.get("targets", [a.get("target", actor)])
 			var apr: Array = a.get("aprimoramentos", [])
 			if not SpellRules.pode_lancar_no_turno(sp_id, apr):
+				if sp_id == "protecao_divina":
+					return {"ok": false, "reason": "com o aprimoramento de reação, Proteção Divina age quando um aliado vai fazer teste de resistência"}
 				return {"ok": false, "reason": "Escudo da Fé é reação: age quando um aliado é atacado (ou escolha execução padrão)"}
 			if not SpellRules.aprimoramentos_validos(sp_id, apr, A.sheet, sim.rules):
 				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}

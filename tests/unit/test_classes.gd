@@ -250,8 +250,7 @@ func test_protecao_divina_3_imune_a_medo_e_mental() -> void:
 	sim.c("bandido_1")["side"] = sim.c("player")["side"]
 	sim.c("player").sheet.pm = 20   # custo de +5 PM além da magia
 	var a := {"type": "cast", "spell": "protecao_divina", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [3]}
-	check(not GhostPlanner.validate_action(sim, "player", a).ok, "Proteção Divina segue fora de COMPLETAS (ap1 pendente)")
-	c._cast("player", a, {"ok": true, "cost": 7})   # ramo de efeito direto, sem a liberação do validador
+	c._cast("player", a, {"ok": true, "cost": 7})   # ramo de efeito direto (sem validar aprimoramentos de reação)
 	var alvo: CharacterSheet = sim.c("bandido_1").sheet
 	for cond in ["apavorado", "abalado", "confuso", "enfeiticado", "fascinado"]:
 		alvo.add_condition(cond, sim.rules)
@@ -313,3 +312,38 @@ func test_escudo_da_fe_conexao_divide_o_dano_com_o_conjurador() -> void:
 	sim.apply_damage("bandido_1", 10)
 	check(sim.c("bandido_1").sheet.pv == pv_alvo - 5, "alvo sofre metade")
 	check(eu.pv == pv_meu - 5, "conjurador recebe a outra metade")
+
+
+func test_protecao_divina_reacao_ap1_e_bloqueada_no_turno() -> void:
+	var m := _cena_com("protecao_divina", 5, Vector2i(27, 57))
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	sim.c("player").sheet.pm = 20
+	var a := {"type": "cast", "spell": "protecao_divina", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [1]}
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "reação (ap1) não pode ser lançada no próprio turno")
+	var base := {"type": "cast", "spell": "protecao_divina", "target": "bandido_1", "targets": ["bandido_1"]}
+	check(GhostPlanner.validate_action(sim, "player", base).ok, "base de Proteção Divina é lançável no turno")
+
+
+func test_protecao_divina_reacao_da_mais_cinco_no_teste() -> void:
+	var m := _duas_cenas(5)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.spells = PackedStringArray(["protecao_divina"])
+	sim.c("player").sheet.pm = 20
+	var pm_antes: int = sim.c("player").sheet.pm
+	var out: Array = []
+	c._reacao_protecao("bandido_2", "bandido_1", out)
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	eq(alvo.efeito_bonus("proxima_resistencia"), 5, "reação dá +5 no próximo teste de resistência")
+	check(sim.c("player").sheet.pm < pm_antes, "a reação custa PM")
+	var pm_depois: int = sim.c("player").sheet.pm
+	c._reacao_protecao("bandido_2", "bandido_1", out)
+	eq(sim.c("player").sheet.pm, pm_depois, "uma reação por alvo por rodada")
+	var base := alvo.skill_value("fortitude", sim.rules)
+	var teste := Checks.skill(alvo, "fortitude", 10, sim.rules, RngStreams.new(3), "combat")
+	eq(teste.mod, base + 5, "o +5 entra no teste de Fortitude")
+	eq(alvo.efeito_bonus("proxima_resistencia"), 0, "o bônus é gasto no teste")
+	var fora: Array = []
+	c._reacao_protecao("bandido_2", "player", fora)
+	eq(sim.c("player").sheet.pm, pm_depois, "não reage por quem não é aliado")
