@@ -1,6 +1,7 @@
 class_name CombatModule
 extends WorldModule
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 ## Combate tático híbrido (§9). Planejamento congelado no turno, fantasma sem
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
@@ -442,6 +443,8 @@ func _begin_turn(id: String) -> Dictionary:
 	var x := sim.c(id)
 	var s: CharacterSheet = x.sheet
 	var facts: Array = []
+	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
+	s.limpar_efeitos("rodada")
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
 	if x.surprised:
@@ -652,6 +655,14 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"perdicao":
+			# Perdição (divina 1): alvos inimigos recebem penalidade em ataques e dano pela cena.
+			var pen: int = SpellRules.penalidade_perdicao(sh, world.rules, a.get("aprimoramentos", []))
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts: CharacterSheet = sim.c(tg).sheet
+				ts.add_efeito("magia.perdicao", "ataque", -pen, "cena")
+				ts.add_efeito("magia.perdicao", "dano", -pen, "cena")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "perdicao", "penalidade": -pen, "tags": ["magia"]}, [id, tg]))
 		"curar_ferimentos":
 			var tgt: String = a.get("target", id)
 			var r := Dice.roll(sp.cura, world.rng, "combat")
@@ -771,6 +782,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		if bully: extra += 2
 		if v.mods.any(func(m): return m[0] == "ataque poderoso"): extra += 5   # Ataque Poderoso (LB p.124)
 		extra += CombatSim.archer_bonus(A.sheet, bool(v.get("ranged", false)))   # Arqueiro (LB p.65)
+		extra += A.sheet.efeito_bonus("dano")   # efeitos de magia (Bênção, Perdição)
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
 		if not bool(v.get("ranged", false)):
 			extra += ClassFeatures.furia_bonus(A.sheet)   # Fúria do bárbaro: +dano corpo a corpo
@@ -795,6 +807,9 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			dmg += int(T.sheet.vuln[dtype]) * maxi(1, rolls.size())
 		if T.sheet.dr.has(dtype):
 			dmg = maxi(0, dmg - int(T.sheet.dr[dtype]))
+			tags.append("reducao")
+		if T.sheet.efeito_rd(dtype) > 0:
+			dmg = maxi(0, dmg - T.sheet.efeito_rd(dtype))   # Resistência a Energia (magia)
 			tags.append("reducao")
 		tags.append("impacto")
 		if crit: tags.append("critico")
@@ -1069,6 +1084,9 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet = P.sheet
 	world.player_sheet.remove_condition("surpreendido")
 	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
+	world.player_sheet.limpar_efeitos("cena")
+	world.player_sheet.limpar_efeitos("rodada")
+	world.player_sheet.limpar_efeitos("turno")
 	world.player_sheet.allihanna_ativa = false
 	world.player_sheet.olhar_usado = false
 	world.player.position = world.db.tile_to_world(P.tile)

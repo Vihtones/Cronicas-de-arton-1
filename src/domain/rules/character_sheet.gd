@@ -46,6 +46,9 @@ var sorte_usada: bool = false        # Sorte Salvadora (hynne): uma vez por roda
 var olhar_usado: bool = false          # Olhar Atordoante (medusa): uma vez por cena; zera no fim do combate
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
+## Efeitos temporários de magias e habilidades: {id, stat, bonus, fim, tipo}. stat: ataque | dano | defesa |
+## resistencia | proxima_resistencia | rd (tipo de dano) | imune (condição). fim: rodada | turno | cena | proxima_resistencia.
+var efeitos: Array = []
 
 
 func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> int:
@@ -136,8 +139,50 @@ func remove_condition(c: String) -> void:
 
 
 func add_condition(c: String) -> void:
+	if efeito_bonus("imune", c) != 0:
+		return   # imunidade concedida por magia (ex.: Proteção Divina de 3º círculo)
 	if not conditions.has(c):
 		conditions.append(c)
+
+
+## Adiciona um efeito temporário (troca o anterior com o mesmo id).
+func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: String = "") -> void:
+	efeitos = efeitos.filter(func(e): return not (e.id == id_efeito and e.stat == stat and str(e.tipo) == tipo))
+	efeitos.append({"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo})
+
+
+func remove_efeito(id_efeito: String) -> void:
+	efeitos = efeitos.filter(func(e): return e.id != id_efeito)
+
+
+func has_efeito(id_efeito: String) -> bool:
+	return efeitos.any(func(e): return e.id == id_efeito)
+
+
+## Redução de dano concedida por magia contra um tipo de dano.
+func efeito_rd(tipo: String) -> int:
+	var total := 0
+	for e in efeitos:
+		if e.stat == "rd" and str(e.tipo) == tipo:
+			total += int(e.bonus)
+	return total
+
+
+## Soma dos bônus de um tipo de efeito. Para "imune" e "rd", o tipo (condição ou dano) precisa bater.
+func efeito_bonus(stat: String, tipo: String = "") -> int:
+	var total := 0
+	for e in efeitos:
+		if e.stat != stat:
+			continue
+		if stat in ["imune", "rd"] and str(e.tipo) != tipo:
+			continue
+		total += int(e.bonus)
+	return total
+
+
+## Remove os efeitos que terminam em um momento (rodada, turno, cena, proxima_resistencia).
+func limpar_efeitos(fim: String) -> void:
+	efeitos = efeitos.filter(func(e): return e.fim != fim)
 
 
 func training_bonus() -> int:
@@ -149,6 +194,7 @@ func training_bonus() -> int:
 func defense(rules: RuleRegistry, vs_melee: bool = true) -> int:
 	var d := defense_fixed if defense_fixed >= 0 else defense_base + int(attrs.des)
 	d += condition_mod(rules, "defesa") + scene_defense + allihanna_defense(allihanna_ativa) + (race_defense if defense_fixed < 0 else 0)
+	d += efeito_bonus("defesa")
 	if powers.has("esquiva"): d += 2   # Esquiva (LB p.125)
 	if has_effective_condition(rules, "caido"):
 		d += -5 if vs_melee else 5
@@ -218,7 +264,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
+		"efeitos": efeitos.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -244,6 +290,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.equipment = d.get("equipment", {"weapon": "", "armor": ""}).duplicate()
 	s.pending_powers = int(d.get("pending_powers", 0)); s.caster_attr = str(d.get("caster_attr", ""))
 	s.powers = d.get("powers", {}).duplicate(true)
+	s.efeitos = Array(d.get("efeitos", [])).duplicate(true)
 	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()

@@ -1,5 +1,6 @@
 class_name GhostPlanner
 extends RefCounted
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 ## Projeção fantasma (§9): recebe o estado (somente leitura), clona e simula o plano
 ## sem dados. Mostra custos, alcance, chance de acerto e onde o plano fica inválido.
 ## Regra crítica: nunca altera o CombatSim original.
@@ -93,6 +94,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var cost := spell_cost(sim.rules, sp, a)
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
+			if not SpellRules.aprimoramentos_validos(sp_id, a.get("aprimoramentos", [])):
+				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}
+			if sp_id == "perdicao":
+				for tg in targets:
+					if tg == actor or not sim.is_enemy(actor, tg):
+						return {"ok": false, "reason": "Perdição só afeta inimigos"}
 			if str(sp.alcance) == "pessoal": targets = [actor]
 			var reach := int(sim.rules.value("alcance.quadrados", {}).get(str(sp.alcance), 1))  # LB p.143 (toque/pessoal = 1)
 			if str(sp.alcance) == "toque":
@@ -167,6 +174,7 @@ static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary) -> in
 	var base := 0 if int(sp.get("circulo", 1)) == 0 else int(rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
 	if a.get("pungente", false):
 		base += int(rules.value("poder.magia_pungente").custo_pm)
+	base += SpellRules.custo_aprimoramentos(rules, str(a.get("spell", "")), a.get("aprimoramentos", []))
 	return base
 
 

@@ -1,5 +1,6 @@
 extends TestCase
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 ## Primeira leva de classes na criação (bárbaro, paladino, nobre, bucaneiro, cavaleiro, caçador, inventor)
 ## e habilidade mecânica do bárbaro (Fúria).
 
@@ -98,3 +99,41 @@ func test_clerigo_conjura_com_sabedoria_e_cura() -> void:
 		if f.type == "HEALED":
 			curou = int(f.payload.amount) > 0
 	check(curou, "Curar Ferimentos cura o alvo")
+
+
+func test_perdicao_penaliza_inimigo_e_aprimoramento_custa_2_pm() -> void:
+	var r := RuleRegistry.load_default()
+	var sh := _build("clerigo")
+	sh.spells = PackedStringArray(["curar_ferimentos", "perdicao"])
+	sh.equipment["armor"] = ""   # sem armadura: não há teste de concentração/armadura ao lançar
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1"], true, false)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(28, 57)
+	var base := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "perdicao", "targets": ["bandido_1"]})
+	check(base.ok and int(base.cost) == 1, "Perdição custa 1 PM na base: %s" % str(base))
+	var com := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "perdicao", "targets": ["bandido_1"], "aprimoramentos": [0]})
+	check(not com.ok or int(com.cost) == 3, "aprimoramento soma 2 PM (círculo 1 limita a penalidade)")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "perdicao", "targets": ["bandido_1"], "aprimoramentos": [3]}).ok, "aprimoramento inexistente é recusado")
+	var fx := c._cast("player", {"type": "cast", "spell": "perdicao", "targets": ["bandido_1"]}, base)
+	check(fx.size() > 0 and str(fx[0].type) != "SPELL_FAILED", "lançou: %s" % str(fx[0].type))
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	check(alvo.efeito_bonus("ataque") == -1, "inimigo recebe –1 em ataques")
+	check(alvo.efeito_bonus("dano") == -1, "inimigo recebe –1 no dano")
+	check(SpellRules.penalidade_perdicao(sh, r, [0]) == 1, "círculo 1 limita a penalidade a –1")
+	sh.level = 5
+	check(SpellRules.penalidade_perdicao(sh, r, [0]) == 2, "com 2º círculo o aprimoramento dá –2")
+
+
+func test_efeito_de_cena_acaba_com_o_combate() -> void:
+	var sh := _build("clerigo")
+	sh.add_efeito("magia.teste", "ataque", -1, "cena")
+	sh.add_efeito("magia.outro", "ataque", -1, "turno")
+	sh.limpar_efeitos("cena")
+	check(sh.efeito_bonus("ataque") == -1 and not sh.has_efeito("magia.teste"), "cena limpa só o efeito de cena")
+	var copia := CharacterSheet.from_dict(sh.to_dict())
+	check(copia.efeito_bonus("ataque") == -1, "efeitos sobrevivem à gravação")

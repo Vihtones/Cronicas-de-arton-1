@@ -9,8 +9,13 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 	if not sheet.can_use_skill(skill_name, rules):
 		return {"allowed": false, "reason": "perícia somente treinada: " + skill_name}
 	var mod := sheet.skill_value(skill_name, rules) + extra_mod + sheet.condition_mod(rules, "pericias")
+	var eh_resistencia := skill_name in RESISTANCIAS
+	if eh_resistencia:
+		mod += sheet.efeito_bonus("resistencia") + sheet.efeito_bonus("proxima_resistencia")   # efeitos de magia
 	var d20: int = rng.roll(stream, 1, 20)[0]
 	var total := d20 + mod
+	if eh_resistencia:
+		sheet.limpar_efeitos("proxima_resistencia")   # "próximo teste de resistência" é gasto ao rolar
 	var sorte := false
 	# Sorte Salvadora: se a resistência falha, o hynne rola de novo (1 PM, uma vez por rodada)
 	if total < cd and skill_name in RESISTANCIAS and sheet.can_sorte_salvadora():

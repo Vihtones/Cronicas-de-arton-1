@@ -243,6 +243,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if sheet.has_power("combate_defensivo") and str(toggles.get("combate_defensivo", "nunca")) == "sempre" and attacker == "player":
 		mods.append(["combate defensivo", -2])
 	if not ranged and ClassFeatures.furia_bonus(sheet) > 0: mods.append(["fúria", ClassFeatures.furia_bonus(sheet)])   # Fúria do bárbaro
+	if sheet.efeito_bonus("ataque") != 0: mods.append(["magia", sheet.efeito_bonus("ataque")])
 	if ranged and dist > reach: mods.append(["dobro do alcance", -5])
 	if ranged and engaged_in_melee(target): mods.append(["alvo em corpo a corpo", -5])
 	var total_mod := 0
