@@ -7461,7 +7461,7 @@
     "classe": "geral",
     "grupo": "destino",
     "efeito": "Você recebe +2 em Percepção e não fica desprevenido contra inimigos que não possa perceber. Sempre que erra um ataque por camuflagem, pode rolar mais uma vez o dado da chance de falha",
-    "implementado": false,
+    "implementado": true,
     "prereq": {
      "sab": 1,
      "texto": "treinado em Percepção"

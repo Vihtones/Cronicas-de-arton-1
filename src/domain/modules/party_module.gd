@@ -18,10 +18,12 @@ const CONTRACT_LOYALTY_GAIN := 5.0   # lealdade de quem cumpre um contrato
 const SHARE_LOYALTY_GAIN := 3.0      # lealdade de quem recebe parte do caixa da guilda
 
 const Doencas := preload("res://src/domain/rules/doencas.gd")
+const Parceiros := preload("res://src/domain/rules/parceiros.gd")
 
 var members: Dictionary = {}   # npc_id -> {loyalty: float, order: String}
 var guild: Dictionary = {}     # {} ou {name, members}
 var last_day := -1
+var parceiros: Array = []   # parceiros do jogador (LB p.260): {id, tipo, nivel, nome, especie, pericias, fonte, ate_dia (-1: sem fim)}
 var caixa: int = 0                 # ouro da guilda (contratos pagam aqui; administração distribui)
 var contratos: Dictionary = {}    # id da instância -> {contrato, membros, fim_dia}
 
@@ -189,6 +191,7 @@ func on_event(e: GameEvent) -> Array:
 			if members[id_d].has("sheet") or not f_d.doencas.is_empty():
 				members[id_d].sheet = f_d.to_dict()
 		var rituais: Array = doentes
+		rituais.append_array(_parceiros_expirados())
 		var combat = world.module("combat")
 		if combat != null:
 			rituais = combat.processar_rituais_do_dia()   # Lágrimas de Wynna: o ritual de um dia termina aqui
@@ -197,6 +200,44 @@ func on_event(e: GameEvent) -> Array:
 			_descansa(id)
 		return rituais + _resolve_contracts()
 	return []
+
+
+## Parceiro novo do jogador (magia, habilidade, contrato). Devolve o erro ("" se entrou). Os bônus são reaplicados.
+func adicionar_parceiro(p: Dictionary) -> String:
+	var err := Parceiros.validar(world.rules, p)
+	if err != "":
+		return err
+	remover_parceiro(str(p.id))
+	parceiros.append(p.duplicate(true))
+	_reaplicar_parceiros()
+	return ""
+
+
+func remover_parceiro(id: String) -> void:
+	parceiros = parceiros.filter(func(p): return str(p.id) != id)
+	_reaplicar_parceiros()
+
+
+func parceiro(id: String) -> Dictionary:
+	for p in parceiros:
+		if str(p.id) == id:
+			return p
+	return {}
+
+
+func _reaplicar_parceiros() -> void:
+	if world.player_sheet != null:
+		Parceiros.aplicar(world.player_sheet, parceiros, world.rules)
+
+
+## Parceiros temporários (Aliado Animal) que acabam hoje.
+func _parceiros_expirados() -> Array:
+	var out: Array = []
+	for p in parceiros.duplicate(true):
+		if int(p.get("ate_dia", -1)) >= 0 and world.day_index() >= int(p.ate_dia):
+			remover_parceiro(str(p.id))
+			out.append(fact("PARTNER_LEFT", {"partner": str(p.id), "fonte": str(p.get("fonte", ""))}, ["player"]))
+	return out
 
 
 ## Doenças (LB p.318): o teste de Fortitude do início do dia de quem está contaminado.
@@ -244,7 +285,7 @@ func _resolve_contracts() -> Array:
 
 
 func to_dict() -> Dictionary:
-	return {"members": members.duplicate(true), "guild": guild.duplicate(true), "last_day": last_day, "caixa": caixa, "contratos": contratos.duplicate(true)}
+	return {"members": members.duplicate(true), "guild": guild.duplicate(true), "last_day": last_day, "caixa": caixa, "contratos": contratos.duplicate(true), "parceiros": parceiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -253,3 +294,4 @@ func from_dict(d: Dictionary) -> void:
 	last_day = int(d.get("last_day", -1))
 	caixa = int(d.get("caixa", 0))
 	contratos = d.get("contratos", {}).duplicate(true)
+	parceiros = (d.get("parceiros", []) as Array).duplicate(true)

@@ -46,6 +46,7 @@ const COMPLETAS := {
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
 	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
 	"circulo_da_justica": {"aprimoramentos": [0, 1, 2]},   # pessoal: ver o invisível em alcance curto; –10/–20; permanente
+	"aliado_animal": {"aprimoramentos": [0, 1, 2]},   # mensageiro Minúsculo; parceiro mestre (3º); 2 animais (4º)
 	"tempestade_divina": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # raios; +1d8; chuva grossa; granizo 2d6; neve 2d6 de frio; 90m
 	"rogar_maldicao": {"aprimoramentos": [0, 1]},   # +1 efeito (repetível); permanente, Fortitude parcial
 	"enxame_de_pestes": {"aprimoramentos": [0, 1, 2, 3]},   # +1d12; criaturas maiores; +1 enxame; elementais

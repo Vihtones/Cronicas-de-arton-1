@@ -1,6 +1,7 @@
 extends TestCase
 ## Sistemas para magias complexas (docs/MAGIA_COMPLEXA.md): áreas, zonas, marcas, invocações e PV temporários.
 const Doencas := preload("res://src/domain/rules/doencas.gd")
+const Parceiros := preload("res://src/domain/rules/parceiros.gd")
 const Area := preload("res://src/domain/combat/area.gd")
 const Atitudes := preload("res://src/domain/rules/atitudes.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
@@ -230,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3257,3 +3258,49 @@ func test_tempestade_divina_vendaval_clima_e_raios() -> void:
 	var m3 := _cena_aberta(5)
 	_lanca(m3, {"type": "cast", "spell": "tempestade_divina", "tile": centro, "clima": "neve"})
 	check(m3[2].zona_em(centro, "terreno_dificil"), "neve: terreno difícil")
+
+
+func test_parceiros_limite_bonus_e_tipos() -> void:
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "guerreiro", CharacterBuilder.presets("guerreiro")[0], ["for", "des", "con"], "guerreiro")
+	sh.level = 3
+	var lista := [{"id": "a", "tipo": "combatente", "nivel": "veterano"}, {"id": "b", "tipo": "guardiao", "nivel": "mestre"}]
+	Parceiros.aplicar(sh, lista, r)
+	eq(sh.efeito_bonus("ataque"), 3, "combatente veterano: +3 em ataques")
+	eq(sh.efeito_bonus("defesa"), 0, "até o 4º nível, só um parceiro")
+	sh.level = 5
+	Parceiros.aplicar(sh, lista, r)
+	eq(sh.efeito_bonus("defesa"), 4, "5º nível: dois parceiros; guardião mestre +4 na Defesa")
+	eq(sh.efeito_bonus("resistencia"), 2, "guardião mestre: +2 em resistência")
+	Parceiros.aplicar(sh, [{"id": "f", "tipo": "fortao", "nivel": "mestre"}], r)
+	eq(Parceiros.dano_corpo(sh), "3d6", "fortão mestre: 3d6")
+	check(Parceiros.validar(r, {"id": "x", "tipo": "ajudante", "nivel": "veterano", "pericias": ["luta", "furtividade", "percepcao"]}) != "", "ajudante: nada de Luta")
+	eq(Parceiros.validar(r, {"id": "x", "tipo": "ajudante", "nivel": "veterano", "pericias": ["atletismo", "furtividade", "percepcao"]}), "", "ajudante válido")
+	Parceiros.aplicar(sh, [{"id": "p", "tipo": "perseguidor", "nivel": "mestre"}], r)
+	check(sh.has_power("percepcao_as_cegas") and sh.has_power("sentidos_agucados"), "perseguidor mestre: poderes emprestados")
+	eq(sh.efeito_bonus("pericia_percepcao"), 2, "+2 em Percepção")
+	Parceiros.aplicar(sh, [], r)
+	check(not sh.has_power("sentidos_agucados"), "sem parceiros, sem bônus")
+
+
+func test_aliado_animal_parceiro_e_mensageiro() -> void:
+	var m := _clerigo_mundo(["aliado_animal"])
+	var w = m[0]
+	var combat = w.module("combat")
+	var id := "hiena_1"
+	if not combat.creature_state.has(id):
+		id = str(combat.creature_state.keys()[0])
+	var t: Array = combat.creature_state[id].tile
+	WorldHelpers.put(w, int(t[0]) + 1, int(t[1]))
+	combat.creature_state[id].sheet["creature_type"] = "animal"
+	var payload := {"spell": "aliado_animal", "target": id, "parceiro_tipo": "combatente"}
+	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "o animal precisa ser prestativo")
+	combat.creature_state[id]["atitude"] = "prestativo"
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "aliado_animal", "target": id, "parceiro_tipo": "rei"}).accepted, "tipo inválido")
+	check(WorldHelpers.cmd(w, "CastSpell", payload).accepted, "Aliado Animal")
+	var party = w.module("party")
+	eq(str(party.parceiros[0].nivel), "veterano", "parceiro veterano")
+	eq(m[1].efeito_bonus("ataque"), 3, "bônus aplicado na ficha")
+	WorldHelpers.advance_hours(w, 26)
+	eq(party.parceiros.size(), 0, "dura um dia")
+	eq(m[1].efeito_bonus("ataque"), 0, "bônus some")

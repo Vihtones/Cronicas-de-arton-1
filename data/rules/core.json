@@ -1309,6 +1309,127 @@
    "pagina": 318,
    "pdf_page": 324,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "parceiro.tipos",
+   "valor": {
+    "adepto": {
+     "implementado": false,
+     "texto": "Iniciante: –1 PM nas magias de 1º círculo. Veterano: também nas de 2º. Mestre: a redução se acumula com outras."
+    },
+    "ajudante": {
+     "implementado": true,
+     "pericias": {
+      "iniciante": [
+       2,
+       2
+      ],
+      "veterano": [
+       3,
+       2
+      ],
+      "mestre": [
+       3,
+       4
+      ]
+     },
+     "proibidas": [
+      "luta",
+      "pontaria"
+     ],
+     "texto": "+2 em duas perícias; veterano: +2 em três; mestre: +4 em três. Não Luta nem Pontaria."
+    },
+    "assassino": {
+     "implementado": false,
+     "texto": "Iniciante: Ataque Furtivo +1d6. Veterano: bônus por flanquear contra um inimigo por rodada. Mestre: +2d6."
+    },
+    "atirador": {
+     "implementado": false,
+     "texto": "Uma vez por rodada, +1d6 numa rolagem de dano à distância; veterano 1d10; mestre 2d8."
+    },
+    "combatente": {
+     "implementado": true,
+     "ataque": {
+      "iniciante": 2,
+      "veterano": 3,
+      "mestre": 4
+     },
+     "ataque_extra_pm": 5,
+     "texto": "+2 em ataques; veterano +3; mestre +4 e, uma vez por rodada, 5 PM para um ataque extra."
+    },
+    "destruidor": {
+     "implementado": false,
+     "texto": "Ação livre, 1 PM: 2d6 de energia em alcance curto; veterano: 2 PM para 4d6; mestre: 4 PM para 6d6 numa área de 6m em alcance médio."
+    },
+    "fortao": {
+     "implementado": true,
+     "dano_corpo": {
+      "iniciante": "1d8",
+      "veterano": "1d12",
+      "mestre": "3d6"
+     },
+     "texto": "Uma vez por rodada, +1d8 numa rolagem de dano corpo a corpo; veterano 1d12; mestre 3d6."
+    },
+    "guardiao": {
+     "implementado": true,
+     "defesa": {
+      "iniciante": 2,
+      "veterano": 3,
+      "mestre": 4
+     },
+     "resistencia_mestre": 2,
+     "texto": "+2 na Defesa; veterano +3; mestre +4 e +2 em testes de resistência."
+    },
+    "magivocador": {
+     "implementado": false,
+     "texto": "+1 dado no dano das magias; veterano: +1 na CD; mestre: dobra os bônus."
+    },
+    "medico": {
+     "implementado": false,
+     "texto": "Uma vez por rodada, 1 PM para curar 1d8+1 de criatura adjacente; veterano: 3 PM para 3d8+3 ou remover condição; mestre: 5 PM para 6d8+6."
+    },
+    "montaria": {
+     "implementado": true,
+     "texto": "Ver parceiro.montarias: o benefício depende da espécie."
+    },
+    "perseguidor": {
+     "implementado": true,
+     "pericias": {
+      "percepcao": 2,
+      "sobrevivencia": 2
+     },
+     "poderes": {
+      "veterano": [
+       "sentidos_agucados"
+      ],
+      "mestre": [
+       "sentidos_agucados",
+       "percepcao_as_cegas"
+      ]
+     },
+     "texto": "+2 em Percepção e Sobrevivência; veterano: Sentidos Aguçados; mestre: Percepção às Cegas."
+    },
+    "vigilante": {
+     "implementado": false,
+     "texto": "+2 em Percepção e Iniciativa; veterano: Esquiva Sobrenatural; mestre: Olhos nas Costas."
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 260,
+   "pdf_page": 266,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "parceiro.limite",
+   "valor": {
+    "ate_4": 1,
+    "ate_16": 2,
+    "acima": 3
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 260,
+   "pdf_page": 266,
+   "status": "VERIFICADA"
   }
  ]
 }

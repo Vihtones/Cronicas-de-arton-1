@@ -30,6 +30,7 @@ const FORA_DE_COMBATE := {
 	"silencio": [0, 1],   # fora de combate, o objeto que você carrega, pela cena: nenhum som sai (furtividade)
 	"escuridao": [],
 	"voz_divina": [],
+	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
 	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
@@ -44,6 +45,7 @@ const BALANCA_DE_PRATA := 5000   # T$ da versão permanente do Círculo da Justi
 const PERICIAS_JUSTICA := ["acrobacia", "enganacao", "furtividade", "ladinagem"]
 const MINUTOS_DIA := 24 * 60
 
+var mensageiros: Array = []   # Aliado Animal (mensageiro): {item, destino, chega_dia, ate_dia}
 var augurios: Dictionary = {}   # Augúrio: assunto -> primeira resposta (lançar de novo sobre o mesmo assunto a repete)
 var justicas: Array = []   # Círculo da Justiça: {centro:[x,y], raio, ate (minuto, -1 permanente), cd, forte, resistiu:{id: bool}}
 var interrogados: Dictionary = {}   # Voz Divina: cadáveres que já responderam (um corpo só uma vez)
@@ -59,13 +61,15 @@ var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim
 
 
 func module_id() -> String: return "magia"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
 	var combat = world.module("combat")
 	if combat != null and combat.active:
 		return PackedStringArray(["em combate: use as ações de combate"])
+	if cmd.type == "CollectMessenger":
+		return PackedStringArray() if mensageiros.any(func(m): return str(m.destino) == str(cmd.payload.get("destino", ""))) else PackedStringArray(["nenhum mensageiro lá"])
 	if cmd.type == "DetectMagic":
 		if world.player_sheet == null or not world.player_sheet.can_use_skill("misticismo", world.rules):
 			return PackedStringArray(["Misticismo é somente treinada"])
@@ -176,6 +180,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["fora do alcance"])
 				if not SpellRules.alvo_social_valido(sp_id, apr, CharacterSheet.from_dict(combat_v.creature_state[tg].sheet)):
 					return PackedStringArray(["tipo de criatura que a magia não afeta"])
+		"aliado_animal":
+			var err_aa := validar_aliado_animal(cmd.payload, sh)
+			if err_aa != "":
+				return PackedStringArray([err_aa])
 		"augurio":
 			var err_au := validar_augurio(cmd.payload)
 			if err_au != "":
@@ -214,6 +222,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 
 func execute(cmd: GameCommand) -> Array:
 	var sh: CharacterSheet = world.player_sheet
+	if cmd.type == "CollectMessenger":
+		return _coletar_mensageiro(str(cmd.payload.get("destino", "")))
 	if cmd.type == "DetectMagic":
 		# Misticismo, Detectar Magia (LB p.121): ação completa, CD 15; presença e intensidade em alcance curto.
 		var r := Checks.skill(sh, "misticismo", 15, world.rules, world.rng, "world")
@@ -361,6 +371,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, ["player"]))
 			else:
 				out.append(falar_com_plantas(p_cp))
+		"aliado_animal":
+			out.append_array(aliado_animal(cmd.payload, sh))
 		"augurio":
 			out.append_array(augurio(cmd.payload))
 		"circulo_da_justica":
@@ -445,6 +457,79 @@ func criar_area(tipo: String, centro: Vector2i, apr: Array, sh: CharacterSheet, 
 			mod = -mod
 	areas.append({"tipo": tipo, "centro": [centro.x, centro.y], "raio": raio, "ate": -1 if apr.has(2) else world.clock.total_minutes() + MINUTOS_DIA,
 		"mod_mv": mod, "conjurador": conj})
+
+
+## Aliado Animal (divina 2): vínculo com 1 animal prestativo em alcance curto por 1 dia. Ele vira um parceiro veterano
+## (mestre com o aprimoramento do 3º círculo; 2 animais de tipos diferentes no 4º) de um tipo à escolha: ajudante,
+## combatente, fortão, guardião, montaria ou perseguidor. Aprimoramento de 1 PM: animal Minúsculo por 1 semana leva um
+## item a um local; espera lá e só entrega a quem o conjurador escolher.
+const TIPOS_ALIADO := ["ajudante", "combatente", "fortao", "guardiao", "montaria", "perseguidor"]
+
+
+func _tipo_do_animal(p: Dictionary, i: int) -> String:
+	if p.has("parceiro_tipos"):
+		return str((p.parceiro_tipos as Array)[i])
+	return str(p.get("parceiro_tipo", ""))
+
+
+func validar_aliado_animal(p: Dictionary, sh: CharacterSheet) -> String:
+	var apr: Array = p.get("aprimoramentos", [])
+	if apr.has(0):
+		if apr.size() > 1: return "o mensageiro não se combina com outros aprimoramentos"
+		var st = world.module("state")
+		if st == null or not st.has_item(str(p.get("item", ""))): return "você não tem esse item"
+		if not _local_existe(str(p.get("destino", ""))): return "escolha o local de destino"
+	var animais: Array = p.get("targets", [p.get("target", "")])
+	if animais.size() != (2 if apr.has(2) else 1): return "escolha %d animal(is)" % (2 if apr.has(2) else 1)
+	var combat = world.module("combat")
+	var tipos_vistos: Array = []
+	for i in animais.size():
+		var id := str(animais[i])
+		if combat == null or not combat.creature_state.has(id) or not bool(combat.creature_state[id].get("alive", false)):
+			return "escolha um animal vivo"
+		var f := CharacterSheet.from_dict(combat.creature_state[id].sheet)
+		if f.creature_type != "animal": return "o alvo precisa ser um animal"
+		if apr.has(0) and f.size != "minusculo": return "o mensageiro é um animal Minúsculo"
+		if combat.atitude_fora(id) != "prestativo": return "o animal precisa ser prestativo"
+		var t: Vector2i = combat.creature_tile(id)
+		var p_j := _tile_jogador()
+		if maxi(absi(p_j.x - t.x), absi(p_j.y - t.y)) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)): return "animal fora do alcance"
+		if not apr.has(0):
+			var tipo := _tipo_do_animal(p, i)
+			if not TIPOS_ALIADO.has(tipo) or tipos_vistos.has(tipo): return "escolha tipos de parceiro diferentes: " + ", ".join(TIPOS_ALIADO)
+			tipos_vistos.append(tipo)
+	return ""
+
+
+func aliado_animal(p: Dictionary, sh: CharacterSheet) -> Array:
+	var out: Array = []
+	var apr: Array = p.get("aprimoramentos", [])
+	var party = world.module("party")
+	if apr.has(0):
+		out.append(fact("ITEM_LOST", {"item": str(p.item), "reason": "aliado_animal"}))
+		mensageiros.append({"item": str(p.item), "destino": str(p.destino), "chega_dia": world.day_index() + 1, "ate_dia": world.day_index() + DIAS_SEMANA})
+		out.append(fact("MESSENGER_SENT", {"item": str(p.item), "destino": str(p.destino)}, ["player"]))
+		return out
+	var animais: Array = p.get("targets", [p.get("target", "")])
+	for i in animais.size():
+		var tipo := _tipo_do_animal(p, i)
+		var novo := {"id": "aliado_animal_%s" % str(animais[i]), "tipo": tipo, "nivel": "mestre" if apr.has(1) else "veterano", "nome": str(animais[i]),
+			"especie": str(animais[i]), "fonte": "aliado_animal", "ate_dia": world.day_index() + 1}
+		if tipo == "ajudante":
+			novo["pericias"] = (p.get("pericias", []) as Array).duplicate()
+		var err: String = party.adicionar_parceiro(novo) if party != null else "sem módulo de parceiros"
+		out.append(fact("PARTNER_JOINED" if err == "" else "SPELL_MISSED", {"partner": novo.id, "tipo": tipo, "nivel": novo.nivel, "reason": err}, ["player"]))
+	return out
+
+
+## Mensageiro de Aliado Animal: no local de destino, o jogador recebe o item.
+func _coletar_mensageiro(destino: String) -> Array:
+	var out: Array = []
+	for m in mensageiros.duplicate(true):
+		if str(m.destino) == destino and world.day_index() >= int(m.chega_dia) and world.day_index() <= int(m.ate_dia):
+			mensageiros.erase(m)
+			out.append(fact("ITEM_GAINED", {"item": str(m.item), "from": "aliado_animal"}))
+	return out
 
 
 ## Augúrio (divina 2): o assunto é um lugar do mapa ("local") — a ação de entrar nele e explorá-lo em breve.
@@ -938,7 +1023,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate()}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -954,3 +1039,4 @@ func from_dict(d: Dictionary) -> void:
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()
 	justicas = (d.get("justicas", []) as Array).duplicate(true)
 	augurios = (d.get("augurios", {}) as Dictionary).duplicate()
+	mensageiros = (d.get("mensageiros", []) as Array).duplicate(true)

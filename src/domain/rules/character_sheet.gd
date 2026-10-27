@@ -92,6 +92,7 @@ func skill_value(skill: String, rules: RuleRegistry, context: String = "") -> in
 	if skill == "fortitude" and powers.has("vitalidade"): v += 2
 	if skill == "vontade" and powers.has("vontade_de_ferro"): v += 2
 	if skill == "iniciativa" and powers.has("saque_rapido"): v += 2
+	if skill == "percepcao" and has_power("sentidos_agucados"): v += 2   # Sentidos Aguçados (LB p.130)
 	return v + race_bonus
 
 
@@ -101,7 +102,7 @@ func armor_penalty(rules: RuleRegistry) -> int:
 
 
 func has_power(p: String) -> bool:
-	return powers.has(p)
+	return powers.has(p) or efeitos.any(func(e): return e.stat == "poder_temp" and str(e.tipo) == p)   # poder emprestado (parceiro)
 
 
 ## Aura Sagrada (LB p.84): paladino a partir do 3º nível.

@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Aliado Animal (divina, 2º círculo) completa, com o novo sistema de parceiros do livro (LB p.260): ajudante, combatente, fortão, guardião, montaria e perseguidor nos poderes iniciante, veterano e mestre, limite de 1, 2 ou 3 parceiros por nível e bônus aplicados na ficha (ataque, Defesa, resistência, perícias, dano extra do fortão, ataque extra do combatente mestre, Sentidos Aguçados e Percepção às Cegas). A magia vincula um animal prestativo por um dia (mestre e dois animais com os aprimoramentos) ou envia um mensageiro Minúsculo com um item até um local.
+
 - Tempestade Divina (divina, 2º círculo) completa: cilindro de 15m (ou 90m) em alcance longo, sustentado, só ao ar livre; vendaval (–5 em ataques à distância, apaga chamas, dissipa névoas); chuva (–5 em Percepção), neve (terreno difícil; 2d6 de frio com aprimoramento) ou granizo (1 ou 2d6 de impacto por rodada); raios de 3d8 (+1d8) uma vez por rodada; chuva grossa (Médios ou menores lentos; voadores fazem Atletismo ou caem).
 
 - Rogar Maldição (divina, 2º círculo) completa: debilidade (esmorecido, sem falar nem lançar magias), doença (contrai e já sofre o primeiro efeito), fraqueza (debilitado e lento), isolamento de um sentido (cego, surdo, sem faro, ou caído sem se levantar); +1 efeito; permanente com Fortitude parcial. Novo sistema de doenças (LB p.318): as oito doenças do livro, contaminação, teste de Fortitude no início de cada dia, efeitos progressivos que avançam e regridem, cura após dois sucessos seguidos (três na Maldição Pegajosa), perda permanente de atributo e morte.

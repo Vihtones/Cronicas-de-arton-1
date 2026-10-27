@@ -1,6 +1,7 @@
 class_name CombatModule
 extends WorldModule
 const Doencas := preload("res://src/domain/rules/doencas.gd")
+const Parceiros := preload("res://src/domain/rules/parceiros.gd")
 const ClassFeatures := preload("res://src/domain/rules/class_features.gd")
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const Area := preload("res://src/domain/combat/area.gd")
@@ -2717,6 +2718,13 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			_cur_action = a
 			out.append_array(_resolve_attack(id, a.target, v, false))
 			_cur_action = {}
+		"ataque_parceiro":
+			sim.c(id).sheet.pm -= 5
+			(sim.c(id).flags as Array).append("ataque_parceiro_%d" % sim.round_no)
+			out.append(fact("POWER_USED", {"actor": id, "power": "ataque_parceiro", "pm_cost": 5, "pm_after": sim.c(id).sheet.pm}, [id]))
+			_cur_action = a
+			out.append_array(_resolve_attack(id, a.target, v, false))
+			_cur_action = {}
 		"impeto", "velocidade_ladina", "emboscar":
 			GhostPlanner.apply_power_action(sim, id, a.type, v)
 			out.append(fact("POWER_USED", {"actor": id, "power": a.type, "pm_cost": v.cost, "pm_after": sim.c(id).sheet.pm}, [id]))
@@ -3081,6 +3089,10 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_rogar_maldicao(id, a))
 		"tempestade_divina":
 			out.append_array(_tempestade(id, a))
+		"aliado_animal":
+			var magia_aa = world.module("magia")
+			if id == "player" and magia_aa != null and magia_aa.validar_aliado_animal(a, sh) == "":
+				out.append_array(magia_aa.aliado_animal(a, sh))
 		"augurio":
 			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
 			var magia_au = world.module("magia")
@@ -3970,6 +3982,9 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	if int(v.miss_chance) > 0:
 		camo_roll = world.rng.roll("combat", 1, 10)[0]
 		camo_miss = camo_roll <= int(v.miss_chance) / 10
+		if camo_miss and A.sheet.has_power("sentidos_agucados"):   # Sentidos Aguçados: rola de novo a chance de falha
+			camo_roll = world.rng.roll("combat", 1, 10)[0]
+			camo_miss = camo_roll <= int(v.miss_chance) / 10
 	var total := d20 + int(v.mod)
 	var hit := total >= int(v.defense) and not camo_miss
 	var imune_critico: bool = int(T.sheet.efeito_bonus("imune", "critico")) > 0   # Invulnerabilidade (física)
@@ -3999,6 +4014,11 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			var dano_el: int = T.sheet.dano_por_tipo(str(elem.tipo), int(rd.total))
 			dmg += dano_el
 			tags.append(str(elem.tipo))
+		var dado_parceiro := Parceiros.dano_corpo(A.sheet)
+		if dado_parceiro != "" and not bool(v.get("ranged", false)) and not (A.flags as Array).has("parceiro_dano_%d" % sim.round_no):
+			(A.flags as Array).append("parceiro_dano_%d" % sim.round_no)   # Fortão: uma vez por rodada
+			dmg += int(Dice.roll(dado_parceiro, world.rng, "combat").total)
+			tags.append("parceiro")
 		var golpe_n := int(v.get("golpe_dados", 0))
 		if golpe_n > 0:
 			dmg += int(Dice.roll("%dd8" % golpe_n, world.rng, "combat", int(atk.mult) if crit else 1).total)   # Golpe Divino

@@ -57,6 +57,16 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.is_enemy(actor, a.target): return {"ok": false, "reason": "não é inimigo"}
 			prof2["kind"] = "livre"
 			return prof2
+		"ataque_parceiro":
+			# Parceiro combatente mestre (LB p.261): uma vez por rodada, 5 PM para um ataque extra (ação livre).
+			if A.sheet.efeito_bonus("parceiro_ataque_extra") <= 0: return {"ok": false, "reason": "sem parceiro combatente mestre"}
+			if (A.flags as Array).has("ataque_parceiro_%d" % sim.round_no): return {"ok": false, "reason": "uma vez por rodada"}
+			if A.sheet.pm < 5: return {"ok": false, "reason": "PM insuficiente (5)"}
+			var prof3 := sim.attack_profile(actor, a.get("target", ""), int(a.get("attack", 0)), false, false)
+			if not prof3.ok: return prof3
+			if not sim.is_enemy(actor, a.target): return {"ok": false, "reason": "não é inimigo"}
+			prof3["kind"] = "livre"
+			return prof3
 		"charge":
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "investida exige ação completa"}
 			if A.sheet.has_effective_condition(sim.rules, "lento"): return {"ok": false, "reason": "lento não pode fazer investida"}

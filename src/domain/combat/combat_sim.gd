@@ -548,6 +548,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if ranged and T.sheet.efeito_bonus("camuflagem") > 0:
 		miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)   # Escudo da Fé (camuflagem leve)
 	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
+	var as_cegas := sheet.has_power("percepcao_as_cegas")   # Percepção às Cegas: escuridão, névoa e fumaça não atrapalham
 	var sees_dark: bool = sheet.senses.has("visao_penumbra") or sheet.senses.has("visao_escuro") or sheet.efeito_bonus("visao_escuro") > 0
 	if (env.get("darkness", false) and not sees_dark and not iluminado(T.tile) and not zona_em(T.tile, "globo_luz")) or env.get("fog", false):
 		if dist > 1 or env.get("fog", false):
@@ -558,6 +559,8 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # Escuridão (pessoal)
 	if zona_em(T.tile, "fumaca") or zona_em(T.tile, "fumaca_leve"):
 		miss_chance = maxi(miss_chance, int(rules.value("situacao.camuflagem_leve").falha_pct))   # fumaça densa (LB p.318)
+	if as_cegas and T.sheet.efeito_bonus("camuflagem") <= 0:
+		miss_chance = 0
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
 	if mods.any(func(m): return m[0] == "ataque poderoso"): avg += 5
 	if mods.any(func(m): return m[0] == "névoa espessa"): avg -= 2
