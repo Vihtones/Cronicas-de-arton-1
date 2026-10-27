@@ -11,6 +11,7 @@ const COMPLETAS := {
 	"protecao_divina": {"aprimoramentos": [0, 1, 2, 3]},
 	"curar_ferimentos": {"aprimoramentos": [0, 1, 2, 3]},
 	"vestimenta_da_fe": {"aprimoramentos": [0, 1, 2]},
+	"manto_do_cruzado": {"aprimoramentos": []},   # sem aprimoramentos; versão luz ou trevas escolhida ao aprender
 }
 ## Magias que são reação: o base só ocorre como reação (quando um aliado é atacado). Aprimoramentos
 ## que mudam a execução para ação padrão permitem lançar no próprio turno.

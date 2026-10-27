@@ -452,9 +452,12 @@ func _refresh_bencaos() -> void:
 		var sh: CharacterSheet = sim.c(id).sheet
 		sh.remove_efeito("aura_sagrada")
 		sh.remove_efeito("egide_sagrada")
+		sh.remove_efeito("manto_do_cruzado")
 	for h in sim.combatants:
 		var hx: Dictionary = sim.c(h)
 		var hs: CharacterSheet = hx.sheet
+		if hs.manto_cruzado == "luz" and sim.conscious(h):
+			hs.add_efeito("manto_do_cruzado", "imune", 1, "cena", "trevas")   # Manto de Luz: imunidade a dano de trevas
 		if not (hs.aura_sagrada_ativa or hs.egide_ativa) or not sim.conscious(h):
 			continue
 		var car := hs.carisma()
@@ -469,6 +472,41 @@ func _refresh_bencaos() -> void:
 				ax.sheet.add_efeito("egide_sagrada", "defesa", car, "cena")
 
 
+## Manto do Cruzado no início de cada turno do conjurador (LB p.84 do 4º círculo, ver catálogo).
+## Luz: 2d8 PV a você e aliados em alcance curto. Trevas: 4d8 de dano de trevas a inimigos em alcance curto;
+## o conjurador cura metade do dano causado.
+func _manto_inicio_de_turno(id: String, facts: Array) -> void:
+	var x: Dictionary = sim.c(id)
+	var s: CharacterSheet = x.sheet
+	if s.manto_cruzado == "" or not sim.conscious(id):
+		return
+	var curto := int(world.rules.value("alcance.quadrados", {}).get("curto", 6))
+	if s.manto_cruzado == "luz":
+		for a in sim.combatants:
+			var ax: Dictionary = sim.c(a)
+			if ax.side != x.side or not sim.conscious(a) or CombatSim.cheb(x.tile, ax.tile) > curto:
+				continue
+			var cura := int(Dice.roll("2d8", world.rng, "combat").total)
+			ax.sheet.pv = mini(ax.sheet.pv_max, ax.sheet.pv + cura)
+			facts.append(fact("HEALED", {"actor": id, "target": a, "amount": cura, "pv_after": ax.sheet.pv, "source": "manto_do_cruzado", "tags": ["magia", "cura"]}, [id, a]))
+		return
+	var total := 0
+	for a in sim.combatants:
+		var ax: Dictionary = sim.c(a)
+		if not sim.is_enemy(id, a) or not sim.conscious(a) or CombatSim.cheb(x.tile, ax.tile) > curto:
+			continue
+		var dano := int(Dice.roll("4d8", world.rng, "combat").total)
+		total += dano
+		var tags_t: Array = ["magia", "trevas"]
+		tags_t.append_array(sim.apply_damage(a, dano))
+		facts.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": a, "weapon": "Manto do Cruzado (trevas)", "d20": 0, "mod": 0,
+			"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
+			"pv_after": ax.sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags_t}, [id, a]))
+	if total > 0:
+		s.pv = mini(s.pv_max, s.pv + total / 2)
+		facts.append(fact("HEALED", {"actor": id, "target": id, "amount": total / 2, "pv_after": s.pv, "source": "manto_do_cruzado", "tags": ["magia", "cura"]}, [id]))
+
+
 func _begin_turn(id: String) -> Dictionary:
 	_refresh_bencaos()
 	var x := sim.c(id)
@@ -476,6 +514,7 @@ func _begin_turn(id: String) -> Dictionary:
 	var facts: Array = []
 	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
 	s.limpar_efeitos("rodada")
+	_manto_inicio_de_turno(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
 	if x.surprised:
@@ -830,6 +869,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, tipo, ate)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "resistencia_a_energia", "tipo": tipo, "tags": ["magia"]}, [id, tg]))
+		"manto_do_cruzado":
+			# Manto do Cruzado (4º círculo): sustentada até o fim do combate; a versão é a escolhida ao aprender.
+			sh.manto_cruzado = sh.manto_versao
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "manto_do_cruzado", "versao": sh.manto_cruzado, "tags": ["magia"]}, [id]))
+			_refresh_bencaos()
 		"vestimenta_da_fe":
 			# Vestimenta da Fé (LB p.216): +2 na Defesa por um dia (bônus de encanto). Aplicada ao alvo,
 			# já que o jogo não tem itens encantados por instância. Aprimoramentos: +2 em resistências,
@@ -1069,6 +1113,9 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		var golpe_n := int(v.get("golpe_dados", 0))
 		if golpe_n > 0:
 			dmg += int(Dice.roll("%dd8" % golpe_n, world.rng, "combat", int(atk.mult) if crit else 1).total)   # Golpe Divino
+		if not bool(v.get("ranged", false)) and A.sheet.manto_cruzado == "luz":
+			dmg += int(Dice.roll("2d8", world.rng, "combat", int(atk.mult) if crit else 1).total)   # Manto do Cruzado (versão luz): +2d8 de luz
+			tags.append("luz")
 		rolls = r.rolls
 		# Ataque Furtivo (LB p.73): 1/rodada, alvo desprevenido ou flanqueado; dados extras não multiplicam.
 		var sa_key := "furtivo_%d" % sim.round_no
@@ -1377,6 +1424,8 @@ func _end_combat(outcome: String) -> Array:
 		var sh_f: CharacterSheet = sim.c(id).sheet
 		sh_f.aura_sagrada_ativa = false
 		sh_f.egide_ativa = false
+		sh_f.manto_cruzado = ""
+		sh_f.remove_efeito("manto_do_cruzado")
 		sh_f.remove_efeito("aura_sagrada")
 		sh_f.remove_efeito("egide_sagrada")
 	world.player_sheet.olhar_usado = false

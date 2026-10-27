@@ -110,6 +110,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if sp_id == "protecao_divina":
 					return {"ok": false, "reason": "com o aprimoramento de reação, Proteção Divina age quando um aliado vai fazer teste de resistência"}
 				return {"ok": false, "reason": "Escudo da Fé é reação: age quando um aliado é atacado (ou escolha execução padrão)"}
+			if int(sp.get("circulo", 0)) > SpellRules.circulo_maximo(A.sheet, sim.rules):
+				return {"ok": false, "reason": "magia de %dº círculo acima do que você conjura" % int(sp.get("circulo", 0))}
 			if not SpellRules.aprimoramentos_validos(sp_id, apr, A.sheet, sim.rules):
 				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}
 			if sp_id == "resistencia_a_energia" and not SpellRules.tipo_energia_valido(str(a.get("tipo_energia", "fogo"))):

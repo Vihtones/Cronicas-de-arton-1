@@ -590,3 +590,88 @@ func test_aura_e_egide_salvam_e_carregam() -> void:
 	var volta := CharacterSheet.from_dict(P.to_dict())
 	check(volta.aura_sagrada_ativa and volta.egide_ativa, "flags de aura e égide sobrevivem ao save")
 	check(volta.pode_aura_sagrada(), "paladino de 5º nível pode a aura")
+
+
+func test_manto_do_cruzado_so_a_partir_do_13_nivel_por_ser_de_4_circulo() -> void:
+	var r := _cena_com("manto_do_cruzado", 12)
+	var sim: CombatSim = r[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.pm = 30
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "manto_do_cruzado"}).ok, "negada no 12º nível (4º círculo exige 13º)")
+	sh.level = 13
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "manto_do_cruzado"})
+	check(v.ok and v.cost == 10, "válida no 13º nível e custa 10 PM (4º círculo): %s" % str(v))
+
+
+func test_manto_de_luz_cura_aliados_no_inicio_do_turno_e_imuniza_a_trevas() -> void:
+	var r := _cena_com("manto_do_cruzado", 13)
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.pm = 30
+	c._try("player", {"type": "cast", "spell": "manto_do_cruzado"})
+	eq(sh.manto_cruzado, "luz", "versão luz por padrão")
+	check(sh.efeito_bonus("imune", "trevas") > 0, "imune a dano de trevas")
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	var ally: CharacterSheet = sim.c("bandido_1").sheet
+	ally.pv = 1
+	var res := c._begin_turn("player")
+	check(ally.pv > 1, "aliado a curto recebe 2d8 PV no início do turno (pv %d)" % ally.pv)
+
+
+func test_manto_de_luz_da_2d8_de_luz_nos_ataques_corpo_a_corpo() -> void:
+	var r := _cena_com("manto_do_cruzado", 13)
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.pm = 30
+	c._try("player", {"type": "cast", "spell": "manto_do_cruzado"})
+	sim.c("bandido_1").sheet.pv = 999
+	var v := sim.attack_profile("player", "bandido_1", 0, false, false)
+	var viu_luz := false
+	for i in 40:
+		for f in c._resolve_attack("player", "bandido_1", v, false):
+			if f.type == "ATTACK_RESOLVED" and (f.payload.tags as Array).has("luz"):
+				viu_luz = true
+	check(viu_luz, "pelo menos um acerto corpo a corpo leva o dano de luz do manto")
+
+
+func test_manto_de_trevas_causa_dano_a_inimigos_no_raio_e_cura_metade() -> void:
+	var r := _cena_com("manto_do_cruzado", 13)
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.pm = 30
+	sh.manto_versao = "trevas"
+	c._try("player", {"type": "cast", "spell": "manto_do_cruzado"})
+	eq(sh.manto_cruzado, "trevas", "versão trevas, escolhida ao aprender")
+	var inimigo: CharacterSheet = sim.c("bandido_1").sheet
+	inimigo.pv = 50
+	sh.pv = 1
+	c._begin_turn("player")
+	check(inimigo.pv < 50, "inimigo a curto sofre 4d8 de trevas (pv %d)" % inimigo.pv)
+	check(sh.pv > 1, "conjurador cura metade do dano causado (pv %d)" % sh.pv)
+
+
+func test_manto_de_trevas_nao_atinge_quem_esta_fora_do_raio_curto() -> void:
+	var r := _cena_com("manto_do_cruzado", 13, Vector2i(40, 57))
+	var c: CombatModule = r[1]
+	var sim: CombatSim = r[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.pm = 30
+	sh.manto_versao = "trevas"
+	c._try("player", {"type": "cast", "spell": "manto_do_cruzado"})
+	var inimigo: CharacterSheet = sim.c("bandido_1").sheet
+	inimigo.pv = 50
+	c._begin_turn("player")
+	eq(inimigo.pv, 50, "fora do alcance curto não recebe dano")
+
+
+func test_manto_do_cruzado_salva_a_versao_e_a_cena() -> void:
+	var P := _build("clerigo")
+	P.level = 13
+	P.manto_versao = "trevas"
+	P.manto_cruzado = "trevas"
+	var volta := CharacterSheet.from_dict(P.to_dict())
+	eq(volta.manto_versao, "trevas", "versão escolhida sobrevive ao save")
+	eq(volta.manto_cruzado, "trevas", "versão ativa sobrevive ao save")
