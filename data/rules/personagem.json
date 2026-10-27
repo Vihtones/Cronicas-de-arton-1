@@ -5776,6 +5776,848 @@
    "pagina": 77,
    "pdf_page": 83,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.acolito",
+   "valor": {
+    "itens": [
+     "Símbolo sagrado",
+     "traje de sacerdote"
+    ],
+    "pericias": [
+     "cura",
+     "religiao",
+     "vontade"
+    ],
+    "poderes": [
+     "medicina",
+     "membro_da_igreja",
+     "vontade_de_ferro"
+    ],
+    "poder_unico": "membro_da_igreja",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 85,
+   "pdf_page": 91,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.amigo_dos_animais",
+   "valor": {
+    "itens": [
+     "cão de caça, cavalo, pônei ou trobo (escolha um)"
+    ],
+    "pericias": [
+     "adestramento",
+     "cavalgar"
+    ],
+    "poderes": [
+     "amigo_especial"
+    ],
+    "poder_unico": "amigo_especial",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 85,
+   "pdf_page": 91,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.amnesico",
+   "valor": {
+    "itens": [
+     "um ou mais itens somando até T$ 500, aprovados pelo mestre"
+    ],
+    "pericias": [],
+    "poderes": [
+     "lembrancas_graduais"
+    ],
+    "poder_unico": "lembrancas_graduais",
+    "escolha": "uma perícia e um poder escolhidos pelo mestre, mais Lembranças Graduais"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.aristocrata",
+   "valor": {
+    "itens": [
+     "joia de família (T$ 300)",
+     "traje da corte"
+    ],
+    "pericias": [
+     "diplomacia",
+     "enganacao",
+     "nobreza"
+    ],
+    "poderes": [
+     "comandar",
+     "sangue_azul"
+    ],
+    "poder_unico": "sangue_azul",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.artesao",
+   "valor": {
+    "itens": [
+     "instrumentos de ofício (qualquer)",
+     "item que possa fabricar de até T$ 50"
+    ],
+    "pericias": [
+     "oficio",
+     "vontade"
+    ],
+    "poderes": [
+     "frutos_do_trabalho",
+     "sortudo"
+    ],
+    "poder_unico": "frutos_do_trabalho",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.artista",
+   "valor": {
+    "itens": [
+     "estojo de disfarces ou instrumento musical"
+    ],
+    "pericias": [
+     "atuacao",
+     "enganacao"
+    ],
+    "poderes": [
+     "atraente",
+     "dom_artistico",
+     "sortudo",
+     "torcida"
+    ],
+    "poder_unico": "dom_artistico",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.assistente_de_laboratorio",
+   "valor": {
+    "itens": [
+     "instrumentos de ofício (alquimista)"
+    ],
+    "pericias": [
+     "oficio_alquimista",
+     "misticismo"
+    ],
+    "poderes": [
+     "esse_cheiro",
+     "venefico",
+     "poder_da_tormenta_a_escolha"
+    ],
+    "poder_unico": "esse_cheiro",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.batedor",
+   "valor": {
+    "itens": [
+     "barraca",
+     "equipamento de viagem",
+     "arma simples ou marcial à distância"
+    ],
+    "pericias": [
+     "furtividade",
+     "percepcao",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "a_prova_de_tudo",
+     "estilo_de_disparo",
+     "sentidos_agucados"
+    ],
+    "poder_unico": "a_prova_de_tudo",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.capanga",
+   "valor": {
+    "itens": [
+     "tatuagem ou adereço de gangue (+1 em Intimidação)",
+     "arma simples corpo a corpo"
+    ],
+    "pericias": [
+     "luta",
+     "intimidacao"
+    ],
+    "poderes": [
+     "confissao",
+     "poder_de_combate_a_escolha"
+    ],
+    "poder_unico": "confissao",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.charlatao",
+   "valor": {
+    "itens": [
+     "estojo de disfarces",
+     "joia falsificada (valor aparente de T$ 100)"
+    ],
+    "pericias": [
+     "enganacao",
+     "jogatina"
+    ],
+    "poderes": [
+     "alpinista_social",
+     "aparencia_inofensiva",
+     "sortudo"
+    ],
+    "poder_unico": "alpinista_social",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.circense",
+   "valor": {
+    "itens": [
+     "três bolas coloridas para malabarismo (+1 em Atuação)"
+    ],
+    "pericias": [
+     "acrobacia",
+     "atuacao",
+     "reflexos"
+    ],
+    "poderes": [
+     "acrobatico",
+     "torcida",
+     "truque_de_magica"
+    ],
+    "poder_unico": "truque_de_magica",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.criminoso",
+   "valor": {
+    "itens": [
+     "estojo de disfarces ou gazua"
+    ],
+    "pericias": [
+     "enganacao",
+     "furtividade",
+     "ladinagem"
+    ],
+    "poderes": [
+     "punguista",
+     "venefico"
+    ],
+    "poder_unico": "punguista",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.curandeiro",
+   "valor": {
+    "itens": [
+     "bálsamo restaurador (x2)",
+     "maleta de medicamentos"
+    ],
+    "pericias": [
+     "cura",
+     "vontade"
+    ],
+    "poderes": [
+     "medicina",
+     "medico_de_campo",
+     "venefico"
+    ],
+    "poder_unico": "medico_de_campo",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.eremita",
+   "valor": {
+    "itens": [
+     "barraca",
+     "equipamento de viagem"
+    ],
+    "pericias": [
+     "misticismo",
+     "religiao",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "busca_interior",
+     "lobo_solitario"
+    ],
+    "poder_unico": "busca_interior",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.escravo",
+   "valor": {
+    "itens": [
+     "algemas",
+     "ferramenta pesada (como maça)"
+    ],
+    "pericias": [
+     "atletismo",
+     "fortitude",
+     "furtividade"
+    ],
+    "poderes": [
+     "desejo_de_liberdade",
+     "vitalidade"
+    ],
+    "poder_unico": "desejo_de_liberdade",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.estudioso",
+   "valor": {
+    "itens": [
+     "coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza)"
+    ],
+    "pericias": [
+     "conhecimento",
+     "guerra",
+     "misticismo"
+    ],
+    "poderes": [
+     "aparencia_inofensiva",
+     "palpite_fundamentado"
+    ],
+    "poder_unico": "palpite_fundamentado",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.fazendeiro",
+   "valor": {
+    "itens": [
+     "carroça",
+     "ferramenta agrícola (como lança)",
+     "10 rações de viagem",
+     "animal não combativo"
+    ],
+    "pericias": [
+     "adestramento",
+     "cavalgar",
+     "oficio",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "agua_no_feijao",
+     "ginete"
+    ],
+    "poder_unico": null,
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.forasteiro",
+   "valor": {
+    "itens": [
+     "equipamento de viagem",
+     "instrumento musical exótico (+1 em perícia de Carisma aprovada)",
+     "traje estrangeiro"
+    ],
+    "pericias": [
+     "cavalgar",
+     "pilotagem",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "cultura_exotica",
+     "lobo_solitario"
+    ],
+    "poder_unico": "cultura_exotica",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.gladiador",
+   "valor": {
+    "itens": [
+     "arma marcial ou exótica",
+     "item sem valor recebido de um admirador"
+    ],
+    "pericias": [
+     "atuacao",
+     "luta"
+    ],
+    "poderes": [
+     "atraente",
+     "pao_e_circo",
+     "torcida",
+     "poder_de_combate_a_escolha"
+    ],
+    "poder_unico": "pao_e_circo",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.guarda",
+   "valor": {
+    "itens": [
+     "apito",
+     "insígnia da milícia",
+     "arma marcial"
+    ],
+    "pericias": [
+     "investigacao",
+     "luta",
+     "percepcao"
+    ],
+    "poderes": [
+     "detetive",
+     "investigador",
+     "poder_de_combate_a_escolha"
+    ],
+    "poder_unico": "detetive",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.herdeiro",
+   "valor": {
+    "itens": [
+     "símbolo de sua herança (anel de sinete ou manto cerimonial)"
+    ],
+    "pericias": [],
+    "poderes": [],
+    "poder_unico": null,
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder",
+    "pendente": "benefícios não localizados no texto extraído: verificar LB p.91"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.heroi_campones",
+   "valor": {
+    "itens": [
+     "instrumentos de ofício ou arma simples",
+     "traje de plebeu"
+    ],
+    "pericias": [
+     "adestramento",
+     "oficio"
+    ],
+    "poderes": [
+     "coracao_heroico",
+     "sortudo",
+     "surto_heroico",
+     "torcida"
+    ],
+    "poder_unico": "coracao_heroico",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.marujo",
+   "valor": {
+    "itens": [
+     "T$ 2d6 (seu último salário)",
+     "corda"
+    ],
+    "pericias": [
+     "atletismo",
+     "jogatina",
+     "pilotagem"
+    ],
+    "poderes": [
+     "acrobatico",
+     "passagem_de_navio"
+    ],
+    "poder_unico": "passagem_de_navio",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.mateiro",
+   "valor": {
+    "itens": [
+     "arco curto",
+     "barraca",
+     "equipamento de viagem",
+     "20 flechas"
+    ],
+    "pericias": [
+     "atletismo",
+     "furtividade",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "lobo_solitario",
+     "sentidos_agucados",
+     "vendedor_de_carcacas"
+    ],
+    "poder_unico": "vendedor_de_carcacas",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.membro_de_guilda",
+   "valor": {
+    "itens": [
+     "gazua ou instrumentos de ofício"
+    ],
+    "pericias": [
+     "diplomacia",
+     "enganacao",
+     "misticismo",
+     "oficio"
+    ],
+    "poderes": [
+     "foco_em_pericia",
+     "rede_de_contatos"
+    ],
+    "poder_unico": "rede_de_contatos",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.mercador",
+   "valor": {
+    "itens": [
+     "carroça",
+     "trobo",
+     "mercadorias para vender (T$ 100)"
+    ],
+    "pericias": [
+     "diplomacia",
+     "intuicao",
+     "oficio"
+    ],
+    "poderes": [
+     "negociacao",
+     "proficiencia",
+     "sortudo"
+    ],
+    "poder_unico": "negociacao",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.minerador",
+   "valor": {
+    "itens": [
+     "gemas preciosas (T$ 100)",
+     "picareta"
+    ],
+    "pericias": [
+     "atletismo",
+     "fortitude",
+     "oficio_minerador"
+    ],
+    "poderes": [
+     "ataque_poderoso",
+     "escavador",
+     "sentidos_agucados"
+    ],
+    "poder_unico": "escavador",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.nomade",
+   "valor": {
+    "itens": [
+     "bordão",
+     "equipamento de viagem"
+    ],
+    "pericias": [
+     "cavalgar",
+     "pilotagem",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "lobo_solitario",
+     "mochileiro",
+     "sentidos_agucados"
+    ],
+    "poder_unico": "mochileiro",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.pivete",
+   "valor": {
+    "itens": [
+     "gazua",
+     "traje de plebeu",
+     "animal urbano (cão, gato, rato ou pombo)"
+    ],
+    "pericias": [
+     "furtividade",
+     "iniciativa",
+     "ladinagem"
+    ],
+    "poderes": [
+     "acrobatico",
+     "aparencia_inofensiva",
+     "quebra_galho"
+    ],
+    "poder_unico": "quebra_galho",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.refugiado",
+   "valor": {
+    "itens": [
+     "item estrangeiro de até T$ 100"
+    ],
+    "pericias": [
+     "fortitude",
+     "reflexos",
+     "vontade"
+    ],
+    "poderes": [
+     "estoico",
+     "vontade_de_ferro"
+    ],
+    "poder_unico": "estoico",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.seguidor",
+   "valor": {
+    "itens": [
+     "item recebido do mestre (até T$ 100)"
+    ],
+    "pericias": [
+     "adestramento",
+     "oficio"
+    ],
+    "poderes": [
+     "antigo_mestre",
+     "proficiencia",
+     "surto_heroico"
+    ],
+    "poder_unico": "antigo_mestre",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.selvagem",
+   "valor": {
+    "itens": [
+     "arma simples",
+     "pequeno animal de estimação (pássaro ou esquilo)"
+    ],
+    "pericias": [
+     "percepcao",
+     "reflexos",
+     "sobrevivencia"
+    ],
+    "poderes": [
+     "lobo_solitario",
+     "vida_rustica",
+     "vitalidade"
+    ],
+    "poder_unico": "vida_rustica",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.soldado",
+   "valor": {
+    "itens": [
+     "arma marcial",
+     "uniforme militar",
+     "insígnia do exército"
+    ],
+    "pericias": [
+     "fortitude",
+     "guerra",
+     "luta",
+     "pontaria"
+    ],
+    "poderes": [
+     "influencia_militar",
+     "poder_de_combate_a_escolha"
+    ],
+    "poder_unico": "influencia_militar",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.taverneiro",
+   "valor": {
+    "itens": [
+     "rolo de macarrão ou martelo de carne (como clava)",
+     "panela",
+     "avental",
+     "caneca",
+     "pano sujo"
+    ],
+    "pericias": [
+     "diplomacia",
+     "jogatina",
+     "oficio_cozinheiro"
+    ],
+    "poderes": [
+     "gororoba",
+     "proficiencia",
+     "vitalidade"
+    ],
+    "poder_unico": "gororoba",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "origem.trabalhador",
+   "valor": {
+    "itens": [
+     "ferramenta pesada (como maça ou lança)"
+    ],
+    "pericias": [
+     "atletismo",
+     "fortitude"
+    ],
+    "poderes": [
+     "atletico",
+     "esforcado"
+    ],
+    "poder_unico": "esforcado",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
   }
  ]
 }

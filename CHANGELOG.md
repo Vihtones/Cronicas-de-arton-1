@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.7.1 (em andamento)
+- Catálogo do Livro Básico (cadastro): as 14 classes (guerreiro, ladino, arcanista, bárbaro, bardo, bucaneiro, cavaleiro, caçador, clérigo, druida, inventor, lutador, nobre, paladino) com características e poderes de classe, página do livro e status; 35 origens com itens, perícias e poderes em `data/rules/personagem.json`. Só guerreiro, ladino e arcanista são jogáveis no jogo; os demais esperam efeito e criação. Testes em `tests/unit/test_poderes_livro.gd`.
 - Catálogo de poderes do Livro Básico: 41 poderes de classe novos (guerreiro, ladino e arcanista) cadastrados com página do livro (`data/rules/personagem.json`). Os sem efeito no jogo ficam na árvore como "não implementado" (`CLASS_TREE_ONLY`) e fora das opções de subida. Pré-requisitos de nível e de caminho passam a ser checados e explicados na árvore (`prereq_texto`, `falta_texto`). Testes em `tests/unit/test_poderes_livro.gd`.
 - Arton Viva, Fase 0 (auditoria em `docs/ARTON_VIVA.md`) e Fase 1 parcial: necessidades dos moradores (fome, cansaço, ouro) com objetivo urgente, comer na taverna e descansar em casa (`NpcNeedsModule`).
 - Fuga e captura não rendem mais XP; evasão furtiva rende uma vez por criatura (fecha o exploit de entrar/sair da visão).
