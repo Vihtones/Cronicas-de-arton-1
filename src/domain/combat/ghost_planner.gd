@@ -142,6 +142,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "santuario" and apr.has(0) and not ["animal", "construto", "morto-vivo"].has(str(a.get("tipo_criatura", ""))):
+				return {"ok": false, "reason": "escolha o tipo: animal, construto ou morto-vivo"}
 			if sp_id == "controlar_plantas":
 				var centro_cp: Vector2i = a.get("tile", sim.c(a.get("target", actor)).tile) if sim.combatants.has(a.get("target", actor)) else a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, centro_cp) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)):
@@ -227,9 +229,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.alcance), apr)
 			if alc == "pessoal": targets = [actor]
 			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
-			if alc == "toque":
-				for tg in targets:
-					if tg == actor and not ["arma_magica", "armamento_da_natureza"].has(sp_id): return {"ok": false, "reason": "escolha um alvo adjacente"}   # a própria arma empunhada
+			# Toque (LB p.225): o alvo precisa estar no alcance natural; o próprio conjurador está (pode tocar a si mesmo).
 			for tg in targets:
 				var T := sim.c(tg)
 				if T.is_empty(): return {"ok": false, "reason": "alvo inválido"}

@@ -990,6 +990,111 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
 
 
+## Santuário: marca do alvo protegido ({} se não tem).
+func _santuario_de(alvo: String) -> Dictionary:
+	for m in sim.marcas:
+		if m.alvo == alvo and m.tipo == "santuario":
+			return m
+	return {}
+
+
+## Alvos diretos de uma ação hostil (ataques, Olhar, Arma Espiritual; magia com alvo inimigo).
+func _alvos_hostis(id: String, a: Dictionary) -> Array:
+	match str(a.get("type", "")):
+		"attack", "charge", "coup", "olhar_atordoante", "arma_espiritual":
+			return [str(a.get("target", ""))]
+		"cast":
+			var out: Array = []
+			for tg in a.get("targets", [a.get("target", id)]):
+				if sim.combatants.has(tg) and sim.is_enemy(id, tg):
+					out.append(tg)
+			return out
+	return []
+
+
+## Área das magias de área ofensivas (para o Santuário com proteção contra área). [] se a magia não é de área.
+func _area_hostil(id: String, a: Dictionary) -> Array:
+	if str(a.get("type", "")) != "cast":
+		return []
+	var apr: Array = a.get("aprimoramentos", [])
+	var alvo_t: Vector2i = sim.c(a.get("target", id)).tile if sim.combatants.has(a.get("target", id)) else sim.c(id).tile
+	match str(a.get("spell", "")):
+		"coluna_de_chamas": return Area.esfera(alvo_t, Area.quadrados(3.0))
+		"poeira_da_podridao": return Area.esfera(alvo_t, Area.quadrados(6.0))
+		"colera_de_azgher": return Area.esfera(alvo_t, Area.quadrados(12.0 if apr.has(1) else 6.0))
+		"despedacar": return Area.esfera(sim.c(id).tile, Area.quadrados(6.0)) if apr.has(5) else []
+		"nevoa": return Area.esfera(a.get("tile", alvo_t), Area.quadrados(6.0)) if apr.has(2) or apr.has(3) else []
+		"controlar_plantas":
+			return Area.quadrado(a.get("tile", alvo_t), Area.quadrados(9.0)) if not a.get("truque", false) and not apr.has(0) and not apr.has(2) else []
+	return []
+
+
+## Santuário: o atacante que não percebe o alvo (aprimoramento) ou já falhou não consegue; senão faz Vontade.
+## Na área (aprimoramento de 9 PM): falhou, só tenta de novo se o alvo sair da área.
+func _santuario_impede(id: String, a: Dictionary, out: Array) -> bool:
+	var checar: Array = []
+	for tg in _alvos_hostis(id, a):
+		if tg != id and not _santuario_de(tg).is_empty():
+			checar.append([tg, false])
+	var area := _area_hostil(id, a)
+	for tg in _criaturas_vivas_em(area):
+		var m := _santuario_de(tg)
+		if tg != id and not m.is_empty() and bool(m.dados.area) and not checar.any(func(x): return x[0] == tg):
+			checar.append([tg, true])
+	for par in checar:
+		var tg: String = par[0]
+		var em_area: bool = par[1]
+		var m := _santuario_de(tg)
+		var dados: Dictionary = m.dados
+		if not _percebe(id, tg):
+			out.append(fact("SANCTUARY_BLOCKED", {"actor": id, "target": tg, "reason": "nao_percebe"}, [id, tg]))
+			return true
+		if (dados.falharam as Array).has(id):
+			out.append(fact("SANCTUARY_BLOCKED", {"actor": id, "target": tg, "reason": "ja_falhou"}, [id, tg]))
+			return true
+		var fa: Dictionary = dados.falhas_area
+		if em_area and fa.has(id) and str(fa[id]) == "%d,%d" % [sim.c(tg).tile.x, sim.c(tg).tile.y]:
+			out.append(fact("SANCTUARY_BLOCKED", {"actor": id, "target": tg, "reason": "ja_falhou"}, [id, tg]))
+			return true
+		var sv := Checks.skill(sim.c(id).sheet, "vontade", int(dados.cd), world.rules, world.rng, "combat")
+		sv = _pos_teste(id, sv, int(dados.cd), out)
+		if not sv.get("success", false):
+			if em_area:
+				fa[id] = "%d,%d" % [sim.c(tg).tile.x, sim.c(tg).tile.y]
+			else:
+				(dados.falharam as Array).append(id)
+			out.append(fact("SANCTUARY_BLOCKED", {"actor": id, "target": tg, "reason": "vontade", "check": sv}, [id, tg]))
+			return true
+	return false
+
+
+## Santuário, aprimoramento: criaturas não inteligentes (Int –4 ou menos) do tipo escolhido não percebem o alvo.
+func _percebe(observador: String, alvo: String) -> bool:
+	var m := _santuario_de(alvo)
+	if m.is_empty() or str(m.dados.get("tipo_criatura", "")) == "":
+		return true
+	var s: CharacterSheet = sim.c(observador).sheet
+	return not (s.creature_type == str(m.dados.tipo_criatura) and int(s.attrs.get("int", 0)) <= -4)
+
+
+## O protegido que faz ação hostil (incluindo magia de área ofensiva) dissipa o Santuário. Cura e suporte, não.
+func _santuario_quebra(id: String, a: Dictionary, out: Array) -> void:
+	if _santuario_de(id).is_empty():
+		return
+	if _alvos_hostis(id, a).is_empty() and _area_hostil(id, a).is_empty():
+		return
+	sim.remove_marca("santuario", id)
+	out.append(fact("SPELL_ENDED", {"caster": id, "spell": "santuario", "reason": "acao_hostil"}, [id]))
+
+
+## A IA não mira quem não percebe nem quem já não consegue atacar (Santuário).
+func _pode_mirar(id: String, alvo: String) -> bool:
+	var m := _santuario_de(alvo)
+	if m.is_empty():
+		return true
+	return _percebe(id, alvo) and not (m.dados.falharam as Array).has(id)
+
+
 ## Controlar Plantas: Reflexos ou fica enredado (e imóvel, com o aprimoramento) enquanto não se libertar.
 func _enredar_plantas(tg: String, z: Dictionary, out: Array) -> void:
 	if not _marca_presa(tg).is_empty():
@@ -1394,6 +1499,9 @@ func _begin_turn_base(id: String) -> Dictionary:
 func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 	sim.spend(v.kind)
 	var out: Array = []
+	if _santuario_impede(id, a, out):
+		return out   # Santuário: não consegue e perde a ação
+	_santuario_quebra(id, a, out)
 	match a.type:
 		"move":
 			var path := GhostPlanner._tiles(a.path)
@@ -1637,6 +1745,16 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"santuario":
+			# Santuário (divina 1): toque, pela cena. Quem tentar ação hostil contra o alvo faz Vontade; se falhar, não
+			# consegue, perde a ação e não tenta de novo (_santuario_impede). Não protege de área. O alvo que fizer ação
+			# hostil dissipa a magia (_santuario_quebra). Aprimoramentos: criaturas não inteligentes (Int –4 ou menos) do
+			# tipo escolhido (animal, construto ou morto-vivo) não percebem o alvo (1 PM); também protege de área (9 PM).
+			var apr_sa: Array = a.get("aprimoramentos", [])
+			var alvo_sa: String = a.get("target", id)
+			sim.add_marca("santuario", alvo_sa, "santuario", "santuario", -1, {"cd": spell_dc(sh, a), "conjurador": id, "falharam": [],
+				"area": apr_sa.has(1), "tipo_criatura": str(a.get("tipo_criatura", "")) if apr_sa.has(0) else "", "falhas_area": {}})
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_sa, "buff": "santuario", "tags": ["magia"]}, [id, alvo_sa]))
 		"controlar_plantas":
 			# Controlar Plantas (divina 1): quadrado de 9m de lado com vegetação, pela cena. Quem falha em Reflexos fica
 			# enredado (libertar-se: ação padrão e Acrobacia ou Atletismo, ação "escapar"); a área vira terreno difícil e,
@@ -2538,7 +2656,7 @@ func _ai_turn(id: String) -> Array:
 	var origem: Vector2i = sim.c("player").tile if ordem == "proteger" else me.tile
 	for oid in sim.combatants:
 		var o := sim.c(oid)
-		if o.side == me.side or o.sheet.is_dead() or o.flags.has("fora"):
+		if o.side == me.side or o.sheet.is_dead() or o.flags.has("fora") or not _pode_mirar(id, oid):
 			continue
 		if o.sheet.is_down() and not is_animal:
 			continue  # bandidos não executam quem caiu (ORIGINAL_DO_JOGO: preferem capturar)

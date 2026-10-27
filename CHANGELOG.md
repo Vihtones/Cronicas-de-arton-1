@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Santuário (divina, 1º círculo) completa: quem tenta ação hostil contra o protegido faz Vontade; falhando, perde a ação e não tenta de novo (a IA procura outro alvo); não protege de área; o protegido que age com hostilidade dissipa a magia. Aprimoramentos: criaturas não inteligentes do tipo escolhido não o percebem; proteção contra área (quem falha só tenta de novo se o alvo sair da área).
+- Correção: magias de toque podem ser lançadas no próprio conjurador (LB p.225), como Curar Ferimentos em si mesmo.
+
 - Controlar Plantas (divina, 1º círculo) completa: em área com vegetação (quadrado de 9m), Reflexos ou enredado, a área vira terreno difícil e tenta enredar de novo no início de cada turno; libertar-se com ação padrão e Acrobacia ou Atletismo (tecla C; a IA imóvel tenta). Aprimoramentos: também imóvel; poda (o terreno difícil natural vira normal, fica no mundo e dissipa a versão normal); falar com plantas (respondem quantas criaturas há por perto). Truque: anima uma planta.
 
 - Caminhos da Natureza (divina, 1º círculo) completa: aliados escolhidos ganham +3m (+3m por aprimoramento) e ignoram terreno difícil natural por 1 dia, em combate e na viagem (pelos ermos, sem a penalidade); aprimoramento de rastros (+10 na CD para rastrear em terreno natural); truque de +5 em Sobrevivência para se orientar. Fora de combate vale para você e os companheiros presentes.

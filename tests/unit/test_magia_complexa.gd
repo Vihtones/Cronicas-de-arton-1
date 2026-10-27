@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2062,3 +2062,75 @@ func test_controlar_plantas_ia_presa_e_imovel_tenta_se_libertar() -> void:
 	sim.budget = {"std": 1, "move": 1}
 	var out: Array = c._ai_turn("bandido_2")
 	check(out.any(func(f): return f.type == "ESCAPE_ATTEMPT"), "a IA tenta se libertar")
+
+
+# --- Santuário (divina, 1º círculo) -----------------------------------------------------------------
+func _ataque_planejado(m: Array, atacante: String, alvo: String) -> Array:
+	var sim: CombatSim = m[2]
+	sim.budget = {"std": 1, "move": 1}
+	var a := {"type": "attack", "target": alvo, "attack": 0}
+	var v := GhostPlanner.validate_action(sim, atacante, a)
+	return m[1]._execute_action(atacante, a, v) if v.ok else []
+
+
+func test_santuario_quem_falha_nao_ataca_e_nao_tenta_de_novo() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var b: CharacterSheet = sim.c("bandido_1").sheet
+	b.remove_condition("surpreendido")
+	b.add_efeito("teste", "resistencia", -50, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "santuario", "target": "player"}).ok, "Santuário em si mesmo (toque)")
+	var out := _ataque_planejado(m, "bandido_1", "player")
+	check(out.any(func(f): return f.type == "SANCTUARY_BLOCKED"), "falhou na Vontade: não consegue")
+	check(not out.any(func(f): return f.type == "ATTACK_RESOLVED"), "o ataque não acontece")
+	b.remove_efeito("teste")
+	b.add_efeito("teste", "resistencia", 99, "cena")
+	var out2 := _ataque_planejado(m, "bandido_1", "player")
+	check(out2.any(func(f): return f.type == "SANCTUARY_BLOCKED" and f.payload.reason == "ja_falhou"), "não pode tentar de novo")
+	check(not m[1]._pode_mirar("bandido_1", "player"), "a IA procura outro alvo")
+
+
+func test_santuario_quem_passa_ataca_e_o_protegido_hostil_dissipa() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var b: CharacterSheet = sim.c("bandido_1").sheet
+	b.remove_condition("surpreendido")
+	b.add_efeito("teste", "resistencia", 99, "cena")
+	_lanca(m, {"type": "cast", "spell": "santuario", "target": "player"})
+	check(_ataque_planejado(m, "bandido_1", "player").any(func(f): return f.type == "ATTACK_RESOLVED"), "passou: ataca")
+	var out := _ataque_planejado(m, "player", "bandido_1")
+	check(out.any(func(f): return f.type == "SPELL_ENDED" and f.payload.spell == "santuario"), "atacar dissipa o Santuário")
+	check(m[1]._santuario_de("player").is_empty(), "sem proteção")
+
+
+func test_santuario_nao_protege_de_area_sem_o_aprimoramento() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	sim.c("bandido_1").tile = Vector2i(28, 57)
+	m[1]._cast("player", {"type": "cast", "spell": "santuario", "target": "bandido_1"}, {"cost": 0})
+	var a := {"type": "cast", "spell": "despedacar", "target": "player", "aprimoramentos": [5]}
+	var out: Array = m[1]._execute_action("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(sim.c("bandido_1").sheet.pv < 999, "a área atinge o protegido")
+	var m2 := _cena_grupo(9)
+	var sim2: CombatSim = m2[2]
+	sim2.c("player").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	sim2.c("bandido_1").tile = Vector2i(28, 57)
+	m2[1]._cast("player", {"type": "cast", "spell": "santuario", "target": "bandido_1", "aprimoramentos": [1]}, {"cost": 0})
+	var out2: Array = m2[1]._execute_action("player", a, GhostPlanner.validate_action(sim2, "player", a))
+	check(out2.any(func(f): return f.type == "SANCTUARY_BLOCKED"), "com o aprimoramento, quem ataca a área faz Vontade")
+	eq(sim2.c("bandido_1").sheet.pv, 999, "e, falhando, não consegue")
+
+
+func test_santuario_nao_inteligentes_do_tipo_nao_percebem() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var z: CharacterSheet = sim.c("bandido_1").sheet
+	z.remove_condition("surpreendido")
+	z.creature_type = "morto-vivo"
+	z.attrs["int"] = -5
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "santuario", "target": "player", "aprimoramentos": [0]}).ok, "precisa escolher o tipo")
+	_lanca(m, {"type": "cast", "spell": "santuario", "target": "player", "aprimoramentos": [0], "tipo_criatura": "morto-vivo"})
+	var out := _ataque_planejado(m, "bandido_1", "player")
+	check(out.any(func(f): return f.type == "SANCTUARY_BLOCKED" and f.payload.reason == "nao_percebe"), "o zumbi não percebe o protegido")
+	check(not m[1]._pode_mirar("bandido_1", "player"), "e não o escolhe como alvo")
