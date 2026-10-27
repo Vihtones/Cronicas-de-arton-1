@@ -222,7 +222,7 @@ func test_efeito_de_um_dia_expira_na_virada_do_dia() -> void:
 func test_condicao_de_magia_acaba_com_a_cena() -> void:
 	var sh := _build("clerigo")
 	sh.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
-	sh.add_condition("fraco")
+	sh.add_condition("fraco", RuleRegistry.load_default())
 	sh.limpar_efeitos("cena")
 	check(not sh.conditions.has("fraco"), "fraco some ao fim da cena")
 
@@ -239,8 +239,25 @@ func test_protecao_divina_base_esfera_e_medo() -> void:
 	c._cast("player", a, v)
 	check(sim.c("bandido_1").sheet.efeito_bonus("resistencia") == 2, "base: +2 em resistências")
 	sim.c("bandido_1").sheet.add_efeito("magia.protecao_divina", "imune", 1, "cena", "apavorado")
-	sim.c("bandido_1").sheet.add_condition("apavorado")
+	sim.c("bandido_1").sheet.add_condition("apavorado", sim.rules)
 	check(not sim.c("bandido_1").sheet.conditions.has("apavorado"), "imunidade bloqueia medo")
+
+
+func test_protecao_divina_3_imune_a_medo_e_mental() -> void:
+	var m := _cena_com("protecao_divina", 9, Vector2i(27, 57))
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	sim.c("player").sheet.pm = 20   # custo de +5 PM além da magia
+	var a := {"type": "cast", "spell": "protecao_divina", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [3]}
+	check(not GhostPlanner.validate_action(sim, "player", a).ok, "Proteção Divina segue fora de COMPLETAS (ap1 pendente)")
+	c._cast("player", a, {"ok": true, "cost": 7})   # ramo de efeito direto, sem a liberação do validador
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	for cond in ["apavorado", "abalado", "confuso", "enfeiticado", "fascinado"]:
+		alvo.add_condition(cond, sim.rules)
+		check(not alvo.conditions.has(cond), "imune (mental ou medo): %s" % cond)
+	alvo.add_condition("fraco", sim.rules)
+	check(alvo.conditions.has("fraco"), "sem imunidade a condições físicas: fraco")
 
 
 func _duas_cenas(nivel: int) -> Array:

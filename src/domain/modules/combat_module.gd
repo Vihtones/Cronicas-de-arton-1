@@ -455,7 +455,7 @@ func _begin_turn(id: String) -> Dictionary:
 	if s.is_down():
 		if not s.stable:
 			# LB p.236: teste de Constituição CD 15 no início do turno.
-			var r := Checks.attribute(s, "con", 15, world.rng, "combat")
+			var r := Checks.attribute(s, "con", 15, world.rules, world.rng, "combat")
 			var lost := 0
 			if r.success:
 				s.stable = true
@@ -537,7 +537,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			if res.get("success", false):
 				out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": a.target, "tags": ["racial"]}, [id]))
 			else:
-				alvo.add_condition("atordoado")
+				alvo.add_condition("atordoado", world.rules)
 				out.append(fact("CONDITION_APPLIED", {"actor": id, "target": a.target, "condition": "atordoado", "tags": ["racial"]}, [id]))
 		"allihanna":
 			var sh_a: CharacterSheet = sim.c(id).sheet
@@ -706,7 +706,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "tags": tags_d}, [id, tg]))
 				if apr.has(0) and not passou:
 					ts.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
-					ts.add_condition("fraco")
+					ts.add_condition("fraco", world.rules)
 					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": "fraco", "tags": ["magia"]}, [id, tg]))
 		"escudo_da_fe":
 			# Escudo da Fé (divina 1), lançada no próprio turno (aprimoramento de execução padrão).
@@ -730,8 +730,14 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts3.add_efeito("magia.protecao_divina", "resistencia", 2 + (1 if apr3.has(0) else 0), "cena")
 				if apr3.has(3):
-					for cond in ["abalado", "apavorado"]:
-						ts3.add_efeito("magia.protecao_divina", "imune", 1, "cena", cond)
+					# +5 PM: imune a efeitos mentais e de medo (LB, Proteção Divina) — tipos da tabela de condições
+					var tabela_cond: Dictionary = world.rules.value("condicoes", {})
+					for cond in tabela_cond.keys():
+						if not tabela_cond[cond] is Dictionary:
+							continue   # "_regra" é texto, não condição
+						var info_cond: Dictionary = tabela_cond[cond]
+						if str(info_cond.get("tipo", "")) in ["medo", "mental"]:
+							ts3.add_efeito("magia.protecao_divina", "imune", 1, "cena", str(cond))
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "protecao_divina", "tags": ["magia"]}, [id, tg]))
 		"resistencia_a_energia":
 			# Resistência a Energia (universal 1): redução de dano 10 contra um tipo de energia (aprimoramentos ajustam).
@@ -977,7 +983,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		var theirs: int = world.rng.roll("combat", 1, 20)[0] + T.sheet.skill_value("luta", world.rules)
 		var ok := mine > theirs
 		if ok:
-			T.sheet.add_condition("caido")
+			T.sheet.add_condition("caido", world.rules)
 		out.append(fact("MANEUVER_RESOLVED", {"attacker": attacker, "target": target, "maneuver": "derrubar", "attacker_total": mine,
 			"target_total": theirs, "success": ok, "tags": ["queda"] if ok else []}, [attacker, target]))
 	if v.mods.any(func(m): return m[0] == "combate defensivo") and not A.flags.has("defensivo"):

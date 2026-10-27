@@ -572,18 +572,33 @@
    "valor": {
     "abalado": {
      "pericias": -2,
-     "acumula_em": "apavorado",
+     "escala_para": "apavorado",
      "tipo": "medo"
+    },
+    "agarrado": {
+     "implica": [
+      "desprevenido",
+      "imovel"
+     ],
+     "ataque": -2,
+     "so_armas_leves": true,
+     "tipo": "movimento"
+    },
+    "alquebrado": {
+     "custo_pm_extra": 1,
+     "tipo": "mental"
     },
     "apavorado": {
      "pericias": -5,
+     "nao_aproxima_fonte": true,
      "tipo": "medo"
     },
     "atordoado": {
      "implica": [
       "desprevenido"
      ],
-     "sem_acoes": true
+     "sem_acoes": true,
+     "tipo": "mental"
     },
     "caido": {
      "defesa_cac": -5,
@@ -595,24 +610,112 @@
      "implica": [
       "desprevenido",
       "lento"
-     ]
+     ],
+     "pericias_atrib": {
+      "for": -5,
+      "des": -5
+     },
+     "sem_percepcao_observar": true,
+     "alvos_camuflagem_total": true,
+     "tipo": "sentidos"
+    },
+    "confuso": {
+     "aleatorio": true,
+     "tipo": "mental"
+    },
+    "debilitado": {
+     "pericias_atrib": {
+      "for": -5,
+      "des": -5,
+      "con": -5
+     },
+     "escala_para": "inconsciente"
     },
     "desprevenido": {
      "defesa": -5,
-     "reflexos": -5
+     "pericias_nomes": {
+      "reflexos": -5
+     }
+    },
+    "doente": {
+     "tipo": "metabolismo"
+    },
+    "em_chamas": {
+     "dano_inicio_turno": "1d6",
+     "dano_tipo": "fogo",
+     "apagar_acao": "padrao"
+    },
+    "enfeiticado": {
+     "tipo": "mental"
+    },
+    "enjoado": {
+     "acoes_max": "padrao_ou_movimento",
+     "investida_max_deslocamento": true,
+     "tipo": "metabolismo"
     },
     "enredado": {
      "implica": [
       "lento",
       "vulneravel"
      ],
-     "ataque": -2
+     "ataque": -2,
+     "tipo": "movimento"
+    },
+    "envenenado": {
+     "tipo": "veneno"
+    },
+    "esmorecido": {
+     "pericias_atrib": {
+      "int": -5,
+      "sab": -5,
+      "car": -5
+     },
+     "tipo": "mental"
+    },
+    "exausto": {
+     "implica": [
+      "debilitado",
+      "lento",
+      "vulneravel"
+     ],
+     "escala_para": "inconsciente",
+     "tipo": "cansaco"
+    },
+    "fascinado": {
+     "sem_acoes": true,
+     "pericias_nomes": {
+      "percepcao": -5
+     },
+     "tipo": "mental"
+    },
+    "fatigado": {
+     "implica": [
+      "fraco",
+      "vulneravel"
+     ],
+     "escala_para": "exausto",
+     "tipo": "cansaco"
     },
     "fraco": {
-     "for_des_con": -2
+     "pericias_atrib": {
+      "for": -2,
+      "des": -2,
+      "con": -2
+     },
+     "escala_para": "debilitado"
+    },
+    "frustrado": {
+     "pericias_atrib": {
+      "int": -2,
+      "sab": -2,
+      "car": -2
+     },
+     "escala_para": "esmorecido",
+     "tipo": "mental"
     },
     "imovel": {
-     "deslocamento_m": 0
+     "deslocamento_m": 0,
+     "tipo": "movimento"
     },
     "inconsciente": {
      "implica": [
@@ -630,15 +733,56 @@
     },
     "lento": {
      "deslocamento_mult": 0.5,
-     "sem_investida": true
+     "sem_investida": true,
+     "tipo": "movimento"
     },
     "ofuscado": {
      "ataque": -2,
-     "percepcao": -2
+     "pericias_nomes": {
+      "percepcao": -2
+     },
+     "tipo": "sentidos"
+    },
+    "paralisado": {
+     "implica": [
+      "imovel",
+      "indefeso"
+     ],
+     "so_acoes_mentais": true,
+     "tipo": "movimento"
+    },
+    "pasmo": {
+     "sem_acoes": true,
+     "tipo": "mental"
+    },
+    "petrificado": {
+     "implica": [
+      "inconsciente"
+     ],
+     "reducao_dano": 8,
+     "tipo": "metamorfose"
     },
     "sangrando": {
-     "teste": "Con CD 15",
-     "falha": "perde 1d6 PV"
+     "teste_inicio_turno": {
+      "atributo": "con",
+      "cd": 15
+     },
+     "falha": "perde 1d6 PV, continua",
+     "passou": "remove",
+     "tipo": "metabolismo"
+    },
+    "sobrecarregado": {
+     "penalidade_armadura": -5,
+     "deslocamento_m": -3,
+     "tipo": "movimento"
+    },
+    "surdo": {
+     "pericias_nomes": {
+      "iniciativa": -5
+     },
+     "percepcao_ouvir_proibida": true,
+     "ruim_para_magia": true,
+     "tipo": "sentidos"
     },
     "surpreendido": {
      "implica": [
@@ -649,7 +793,7 @@
     "vulneravel": {
      "defesa": -2
     },
-    "_regra": "condições iguais não se acumulam; aplicar a mais severa; terminam no fim da cena salvo indicação"
+    "_regra": "condições com os mesmos efeitos não se acumulam; aplicar a mais severa; 'escala_para' = ao ficar na condição de novo, passa para a indicada; terminam no fim da cena salvo indicação"
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 394,

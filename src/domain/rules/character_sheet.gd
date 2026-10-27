@@ -138,9 +138,33 @@ func remove_condition(c: String) -> void:
 		i = conditions.find(c)
 
 
-func add_condition(c: String) -> void:
+## Condições que vêm depois de c na escada (abalado -> apavorado; fraco -> debilitado -> inconsciente).
+func _cadeia_escada(c: String, rules: RuleRegistry) -> Array:
+	var cond: Dictionary = rules.value("condicoes", {})
+	var out: Array = []
+	var atual := str(cond.get(c, {}).get("escala_para", ""))
+	while atual != "" and not out.has(atual):
+		out.append(atual)
+		atual = str(cond.get(atual, {}).get("escala_para", ""))
+	return out
+
+
+## Aplica uma condição respeitando a escada (LB p.394): ficar abalado de novo vira apavorado;
+## uma condição mais severa substitui as mais leves da mesma escada; a mais leve é ignorada.
+func add_condition(c: String, rules: RuleRegistry) -> void:
 	if efeito_bonus("imune", c) != 0:
 		return   # imunidade concedida por magia (ex.: Proteção Divina de 3º círculo)
+	var cadeia := _cadeia_escada(c, rules)
+	for sup in cadeia:
+		if conditions.has(sup):
+			return   # já sofre algo mais severo da mesma escada
+	if conditions.has(c) and not cadeia.is_empty():
+		remove_condition(c)
+		add_condition(cadeia[0], rules)   # "ficar X novamente": passa para a seguinte
+		return
+	for leve in conditions.duplicate():
+		if leve != c and _cadeia_escada(leve, rules).has(c):
+			remove_condition(leve)
 	if not conditions.has(c):
 		conditions.append(c)
 
@@ -270,6 +294,44 @@ func condition_mod(rules: RuleRegistry, field: String) -> int:
 		if v is float or v is int:
 			worst = mini(worst, int(v))
 	return worst
+
+
+## Penalidade de condições em um teste de perícia ou resistência: soma os campos
+## "pericias" (todas), "pericias_atrib" (pelo atributo da perícia) e "pericias_nomes" (a perícia),
+## usando o pior valor de cada campo (LB p.394).
+func condition_skill_mod(rules: RuleRegistry, skill: String) -> int:
+	var cond: Dictionary = rules.value("condicoes", {})
+	var attr := str(rules.value("pericia.tabela", {}).get(skill, {}).get("atributo", "")).to_lower()
+	var geral := 0
+	var por_attr := 0
+	var por_nome := 0
+	for c in effective_conditions(rules):
+		var info: Dictionary = cond.get(c, {})
+		geral = mini(geral, int(info.get("pericias", 0)))
+		var pa: Dictionary = info.get("pericias_atrib", {})
+		por_attr = mini(por_attr, int(pa.get(attr, 0)))
+		var pn: Dictionary = info.get("pericias_nomes", {})
+		por_nome = mini(por_nome, int(pn.get(skill, 0)))
+	return geral + por_attr + por_nome
+
+
+## Penalidade de condições em um teste de atributo (For, Des, Con, Int, Sab, Car).
+func condition_attr_mod(rules: RuleRegistry, attr: String) -> int:
+	var cond: Dictionary = rules.value("condicoes", {})
+	var worst := 0
+	for c in effective_conditions(rules):
+		var pa: Dictionary = cond.get(c, {}).get("pericias_atrib", {})
+		worst = mini(worst, int(pa.get(attr, 0)))
+	return worst
+
+
+## Verdadeiro se alguma condição ativa tiver a marcação (ex.: "falha_reflexos" do indefeso).
+func has_condition_flag(rules: RuleRegistry, flag: String) -> bool:
+	var cond: Dictionary = rules.value("condicoes", {})
+	for c in effective_conditions(rules):
+		if cond.get(c, {}).get(flag, false):
+			return true
+	return false
 
 
 func to_dict() -> Dictionary:
