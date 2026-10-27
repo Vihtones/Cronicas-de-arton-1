@@ -17,6 +17,10 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 		mod += sheet.bonus_aptidao(chave_apt)
 	mod += sheet.efeito_bonus("testes")   # efeitos sobre todos os testes (Consagrar e Profanar em mortos-vivos)
 	mod += sheet.efeito_bonus("pericia_" + skill_name)   # bônus de magia numa perícia (Luz: Diplomacia; Escuridão: Furtividade)
+	var proximo := sheet.efeito_bonus("proxima_" + skill_name)   # bônus só no próximo teste (Aviso: Percepção)
+	if proximo != 0:
+		mod += proximo
+		sheet.remove_efeito_stat("proxima_" + skill_name)
 	var eh_resistencia := skill_name in RESISTANCIAS
 	if eh_resistencia:
 		mod += sheet.efeito_bonus("resistencia") + sheet.efeito_bonus("proxima_resistencia")   # efeitos de magia

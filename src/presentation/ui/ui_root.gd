@@ -1564,6 +1564,8 @@ func _botoes_magia_fora(w: WorldState, s: CharacterSheet, row: HFlowContainer) -
 	var magia = w.module("magia")
 	if magia == null:
 		return
+	if s.can_use_skill("misticismo", w.rules):
+		row.add_child(_button("Detectar magia (Misticismo)", func(): _cmd_log("DetectMagic", {}); refresh_journal()))
 	var p := w.db.world_to_tile(w.player.position)
 	var combat = w.module("combat")
 	for sp in s.spells:
@@ -1571,6 +1573,18 @@ func _botoes_magia_fora(w: WorldState, s: CharacterSheet, row: HFlowContainer) -
 			continue
 		var nome := str(w.rules.value("magia." + sp, {}).get("nome", sp))
 		match sp:
+			"aviso":
+				row.add_child(_button("Aviso: alerta em mim", func(): _cmd_log("CastSpell", {"spell": sp, "modo": "alerta"}); refresh_journal()))
+			"visao_mistica":
+				row.add_child(_button("Lançar " + nome, func(): _cmd_log("CastSpell", {"spell": sp}); refresh_journal()))
+			"compreensao":
+				var npcs_c = w.module("npcs")
+				if npcs_c != null:
+					for npc in npcs_c.npcs_at(w.db.location_at(p)):
+						if s.efeito_tipo_existe("compreende", npc):
+							row.add_child(_button("Ouvir pensamentos de " + str(npc), func(): _cmd_log("ReadThoughts", {"target": npc}); refresh_journal()))
+						else:
+							row.add_child(_button("Compreensão em " + str(npc), func(): _cmd_log("CastSpell", {"spell": sp, "targets": [npc]}); refresh_journal()))
 			"criar_elementos":
 				row.add_child(_button("Criar água", func(): _cmd_log("CastSpell", {"spell": sp, "elemento": "agua"}); refresh_journal()))
 				row.add_child(_button("Chama na palma", func(): _cmd_log("CastSpell", {"spell": sp, "elemento": "fogo"}); refresh_journal()))

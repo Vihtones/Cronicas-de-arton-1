@@ -96,8 +96,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			return {"ok": true, "kind": "completa"}
 		"cast":
 			# Armamento da Natureza (aprimoramento de 2 PM): execução de ação de movimento.
-			var kind_c := "movimento" if str(a.get("spell", "")) == "armamento_da_natureza" and (a.get("aprimoramentos", []) as Array).has(1) else "padrao"
-			if not sim.can_spend(kind_c): return {"ok": false, "reason": "lançar magia exige ação padrão" if kind_c == "padrao" else "sem ação de movimento"}
+			# Execução do catálogo (padrão, movimento, completa, livre); Armamento da Natureza com aprimoramento: movimento.
+			var exec_c := str(spell_rule(sim.rules, str(a.get("spell", ""))).get("execucao", "padrão"))
+			var kind_c: String = {"movimento": "movimento", "completa": "completa", "livre": "livre"}.get(exec_c, "padrao")
+			if str(a.get("spell", "")) == "armamento_da_natureza" and (a.get("aprimoramentos", []) as Array).has(1):
+				kind_c = "movimento"
+			if not sim.can_spend(kind_c): return {"ok": false, "reason": "lançar magia exige ação padrão" if kind_c == "padrao" else "sem a ação que a magia exige"}
 			var sp_id: String = a.get("spell", "")
 			var sp := spell_rule(sim.rules, sp_id)
 			if sp_id == "raio_arcano":
@@ -143,6 +147,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "aviso":
+				if not ["alerta", "mensagem", "localizacao"].has(str(a.get("modo", "alerta"))): return {"ok": false, "reason": "escolha alerta, mensagem ou localização"}
+				if targets.size() > 1 + apr.count(3): return {"ok": false, "reason": "alvos demais"}
+				if apr.has(1) and str(a.get("modo", "")) != "mensagem": return {"ok": false, "reason": "a resposta é da mensagem"}
+				if apr.has(2) and str(a.get("modo", "")) != "localizacao": return {"ok": false, "reason": "a duração é da localização"}
+			if sp_id == "compreensao" and not apr.has(3):
+				if targets.size() > 1 and not apr.has(1): return {"ok": false, "reason": "várias criaturas pedem o aprimoramento"}
+			if sp_id == "visao_mistica":
+				targets = [actor]
 			if sp_id == "luz" or sp_id == "escuridao":
 				var luz_v: bool = sp_id == "luz"
 				var tg_l: String = a.get("target", "")
@@ -275,6 +288,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.alcance), apr)
 			if alc == "pessoal": targets = [actor]
 			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
+			if sp_id == "aviso":
+				reach *= int(pow(10, apr.count(0)))   # Aviso: alcance x10 por aprimoramento
 			# Toque (LB p.225): o alvo precisa estar no alcance natural; o próprio conjurador está (pode tocar a si mesmo).
 			for tg in targets:
 				var T := sim.c(tg)
@@ -346,6 +361,22 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var tc := Vector2i(int(chao.tile[0]), int(chao.tile[1]))
 			if CombatSim.cheb(A.tile, tc) > 1: return {"ok": false, "reason": "longe da arma"}
 			return {"ok": true, "kind": "movimento"}
+		"ouvir_pensamentos":
+			# Compreensão: ação de movimento, criatura tocada (ou no alcance da versão de curto alcance) com a magia ativa.
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			var TO := sim.c(a.get("target", ""))
+			if TO.is_empty() or not A.sheet.efeito_tipo_existe("compreende", str(a.target)): return {"ok": false, "reason": "lance Compreensão na criatura antes"}
+			return {"ok": true, "kind": "movimento"}
+		"analisar_aura":
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			if A.sheet.efeito_bonus("visao_mistica") <= 0: return {"ok": false, "reason": "precisa da Visão Mística"}
+			var TV := sim.c(a.get("target", ""))
+			if TV.is_empty() or CombatSim.cheb(A.tile, TV.tile) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 20)): return {"ok": false, "reason": "fora do alcance médio"}
+			return {"ok": true, "kind": "movimento"}
+		"detectar_magia":
+			if not sim.can_spend("completa"): return {"ok": false, "reason": "detectar magia exige ação completa"}
+			if not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Misticismo é somente treinada"}
+			return {"ok": true, "kind": "completa"}
 		"mover_globos":
 			# Luz (globos): ação livre, uma vez por rodada, dentro do alcance longo.
 			if (A.flags as Array).has("globos_%d" % sim.round_no): return {"ok": false, "reason": "os globos já se moveram nesta rodada"}

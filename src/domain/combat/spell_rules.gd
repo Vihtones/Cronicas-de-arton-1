@@ -33,6 +33,9 @@ const COMPLETAS := {
 	"criar_elementos": {"aprimoramentos": [0, 1, 2]},   # +1 passo de quantidade; arremesso 2d4 (água/terra); +1d6 de fogo
 	"luz": {"aprimoramentos": [0, 1, 2, 3, 4, 5, 6]},   # +3m; dia; permanente; olhos (arcano); globos (arcano); luz solar (divino); halo (divino)
 	"escuridao": {"aprimoramentos": [0, 1, 2, 3, 4]},   # +1,5m; escuridão total; olhos (cego); dia; sombras pessoais
+	"aviso": {"aprimoramentos": [0, 1, 2, 3]},   # alcance x10 (repetível); resposta; localização pela cena; +1 alvo
+	"compreensao": {"aprimoramentos": [0, 1, 2, 3]},   # curto; curto e criaturas escolhidas; vasculhar pensamentos; todos os idiomas
+	"visao_mistica": {"aprimoramentos": [0, 1, 2]},   # visão no escuro; um dia; ver o invisível
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -63,9 +66,9 @@ const REACAO_APR := {"protecao_divina": [1], "premonicao": [0]}
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
 const ALVO_QUADRADO := ["criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
-const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0]}
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
@@ -312,3 +315,18 @@ static func aplicar_suporte(sh: CharacterSheet, ate_dia: int) -> void:
 	sh.add_efeito("magia.suporte_ambiental", "imune_clima", 1, "dia", "", ate_dia)
 	sh.add_efeito("magia.suporte_ambiental", "respira_agua", 1, "dia", "", ate_dia)
 	sh.add_efeito("magia.suporte_ambiental", "imune_fumaca", 1, "dia", "", ate_dia)
+
+
+## Aviso (alerta): +5 no próximo teste de Iniciativa e de Percepção, até o fim da próxima cena.
+static func aplicar_alerta(sh: CharacterSheet) -> void:
+	sh.add_efeito("magia.aviso", "proxima_iniciativa", 5, "cena")
+	sh.add_efeito("magia.aviso", "proxima_percepcao", 5, "cena")
+
+
+## Intensidade da aura de uma magia pelo círculo (Misticismo, LB p.121): 1º-2º tênue, 3º-4º moderada, 5º poderosa.
+static func aura_por_circulo(circulo: int) -> String:
+	if circulo >= 5:
+		return "poderosa"
+	if circulo >= 3:
+		return "moderada"
+	return "tenue"

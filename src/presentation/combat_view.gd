@@ -238,6 +238,10 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "":
 				return []
 			return [{"type": "agua_benta", "target": target}]
+		"pensar":
+			if target == "":
+				return []
+			return [{"type": "ouvir_pensamentos" if Game.world.player_sheet.efeito_bonus("visao_mistica") <= 0 else "analisar_aura", "target": target}]
 		"conversar", "adestrar":
 			if target == "" or not gs.is_enemy("player", target):
 				return []
@@ -417,6 +421,7 @@ func set_mode(m: String) -> void:
 		"olhar": "Olhar atordoante: clique num inimigo em alcance curto.",
 		"arma": "Arma Espiritual (ação livre): clique num inimigo adjacente. Shift+W: sustentar ou soltar a magia sustentada.",
 		"agua": "Água benta (ação padrão): clique num morto-vivo ou abissal em alcance curto.",
+		"pensar": "Ação de movimento: ouvir pensamentos (Compreensão) ou analisar a aura (Visão Mística). Clique na criatura.",
 		"conversar": "Mudar atitude (Diplomacia, ação completa, –10): clique num inimigo em alcance curto.",
 		"adestrar": "Acalmar animal (Adestramento, ação completa, CD 25): clique num animal em alcance curto."}
 	message.emit(dicas.get(m, "Modo: " + m))
@@ -541,7 +546,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_Y: use_allihanna()
 			KEY_S: use_aura()
 			KEY_E: use_egide()
-			KEY_C: escape()
+			KEY_C:
+				if event.shift_pressed: set_mode("pensar")
+				else: escape()
 			KEY_K: set_mode("adestrar" if event.shift_pressed else "conversar")
 			KEY_F: cycle_policy("golpe_divino")
 			KEY_Z: cycle_policy("golpe_divino_extra")

@@ -470,7 +470,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if ranged and T.sheet.efeito_bonus("camuflagem") > 0:
 		miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)   # Escudo da Fé (camuflagem leve)
 	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
-	var sees_dark: bool = sheet.senses.has("visao_penumbra")
+	var sees_dark: bool = sheet.senses.has("visao_penumbra") or sheet.senses.has("visao_escuro") or sheet.efeito_bonus("visao_escuro") > 0
 	if (env.get("darkness", false) and not sees_dark and not iluminado(T.tile) and not zona_em(T.tile, "globo_luz")) or env.get("fog", false):
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)

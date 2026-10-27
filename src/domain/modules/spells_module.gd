@@ -23,6 +23,9 @@ const FORA_DE_COMBATE := {
 	"abencoar_alimentos": [],
 	"criar_elementos": [],
 	"luz": [],   # num objeto que você carrega (ou permanente, com pó de rubi)
+	"aviso": [],   # aviso telepático a NPCs e companheiros, mesmo longe
+	"compreensao": [],   # NPC no mesmo lugar (toque ou curto)
+	"visao_mistica": [],
 	"escuridao": [],   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
@@ -44,13 +47,24 @@ var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim
 
 
 func module_id() -> String: return "magia"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
 	var combat = world.module("combat")
 	if combat != null and combat.active:
 		return PackedStringArray(["em combate: use as ações de combate"])
+	if cmd.type == "DetectMagic":
+		if world.player_sheet == null or not world.player_sheet.can_use_skill("misticismo", world.rules):
+			return PackedStringArray(["Misticismo é somente treinada"])
+		return PackedStringArray()
+	if cmd.type == "ReadThoughts":
+		var alvo_rt := str(cmd.payload.get("target", ""))
+		if world.player_sheet == null or not world.player_sheet.efeito_tipo_existe("compreende", alvo_rt):
+			return PackedStringArray(["lance Compreensão nele antes"])
+		if not _no_mesmo_lugar(alvo_rt):
+			return PackedStringArray(["ele não está aqui"])
+		return PackedStringArray()
 	var sh: CharacterSheet = world.player_sheet
 	if sh == null:
 		return PackedStringArray(["sem personagem"])
@@ -101,6 +115,24 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 				return PackedStringArray(["objeto fora do alcance"])
 		"abencoar_alimentos":
 			return _valida_abencoar(cmd.payload, apr)
+		"aviso":
+			if not ["alerta", "mensagem", "localizacao"].has(str(cmd.payload.get("modo", "alerta"))):
+				return PackedStringArray(["escolha alerta, mensagem ou localização"])
+			var alvos_av: Array = cmd.payload.get("targets", ["player"])
+			if alvos_av.size() > 1 + apr.count(3):
+				return PackedStringArray(["alvos demais"])
+			var npcs_av = world.module("npcs")
+			for tg in alvos_av:
+				if tg != "player" and (npcs_av == null or npcs_av.npc(tg).is_empty() or not bool(npcs_av.npc(tg).alive)):
+					return PackedStringArray(["alvo inválido"])
+		"compreensao":
+			if not apr.has(3):
+				var alvos_co: Array = cmd.payload.get("targets", [])
+				if alvos_co.is_empty() or (alvos_co.size() > 1 and not apr.has(1)):
+					return PackedStringArray(["escolha quem tocar"])
+				for tg in alvos_co:
+					if not _no_mesmo_lugar(tg):
+						return PackedStringArray(["%s não está aqui" % tg])
 		"luz", "escuridao":
 			if sp_id == "luz" and apr.has(2) and int(world.player.gold) < 50:
 				return PackedStringArray(["faltam T$ 50 de pó de rubi"])
@@ -150,6 +182,19 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 
 func execute(cmd: GameCommand) -> Array:
 	var sh: CharacterSheet = world.player_sheet
+	if cmd.type == "DetectMagic":
+		# Misticismo, Detectar Magia (LB p.121): ação completa, CD 15; presença e intensidade em alcance curto.
+		var r := Checks.skill(sh, "misticismo", 15, world.rules, world.rng, "world")
+		return [fact("MAGIC_DETECTED", {"actor": "player", "check": r, "auras": auras_no_mundo(_tile_jogador(), 6, false) if r.get("success", false) else []}, ["player"])]
+	if cmd.type == "ReadThoughts":
+		# Compreensão: ação de movimento; NPC involuntário faz Vontade (CD da magia) para proteger os pensamentos.
+		var alvo := str(cmd.payload.target)
+		var ns := _ficha_npc(alvo)
+		var combat_rt = world.module("combat")
+		var cd_rt: int = combat_rt.spell_dc(sh, {"spell": "compreensao"}) if combat_rt != null else 10
+		if Checks.skill(ns, "vontade", cd_rt, world.rules, world.rng, "world").get("success", false):
+			return [fact("SPELL_MISSED", {"caster": "player", "target": alvo, "spell": "compreensao", "saved": true}, ["player", alvo])]
+		return _pensamentos(alvo, false)
 	var sp_id := str(cmd.payload.get("spell", ""))
 	var sp := GhostPlanner.spell_rule(world.rules, sp_id)
 	var custo := GhostPlanner.spell_cost(world.rules, sp, cmd.payload)
@@ -165,6 +210,48 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"aviso":
+			var modo := str(cmd.payload.get("modo", "alerta"))
+			var party_av = world.module("party")
+			var rel = world.module("relations")
+			for tg in cmd.payload.get("targets", ["player"]):
+				if modo == "alerta":
+					if tg == "player":
+						SpellRules.aplicar_alerta(sh)
+					elif party_av != null and party_av.members.has(tg):
+						party_av.aplicar_na_ficha(tg, func(f: CharacterSheet): SpellRules.aplicar_alerta(f))
+				var info := {"caster": "player", "target": tg, "modo": modo, "texto": str(cmd.payload.get("texto", "")).substr(0, 200)}
+				if modo == "mensagem" and (cmd.payload.get("aprimoramentos", []) as Array).has(1) and rel != null and tg != "player":
+					info["resposta"] = str(rel.reaction(tg, "player"))   # a resposta reflete o que o NPC sente
+				if modo == "localizacao":
+					info["cena"] = (cmd.payload.get("aprimoramentos", []) as Array).has(2)
+				out.append(fact("WARNING_SENT", info, ["player"]))
+		"compreensao":
+			var apr_co: Array = cmd.payload.get("aprimoramentos", [])
+			if apr_co.has(3):
+				sh.add_efeito("magia.compreensao", "todos_idiomas", 1, "cena")
+			else:
+				var combat_co = world.module("combat")
+				var cd_co: int = 10
+				if combat_co != null:
+					cd_co = combat_co.spell_dc(sh, cmd.payload)
+				for tg in cmd.payload.get("targets", []):
+					sh.add_efeito("magia.compreensao", "compreende", 1, "cena", tg)
+					out.append(fact("UNDERSTANDING", {"caster": "player", "target": tg}, ["player", tg]))
+					if apr_co.has(2):
+						if Checks.skill(_ficha_npc(tg), "vontade", cd_co, world.rules, world.rng, "world").get("success", false):
+							out.append(fact("SPELL_MISSED", {"caster": "player", "target": tg, "spell": "compreensao", "saved": true}, ["player", tg]))
+						else:
+							out.append_array(_pensamentos(tg, true))
+		"visao_mistica":
+			var apr_vm: Array = cmd.payload.get("aprimoramentos", [])
+			var dur_vm := "dia" if apr_vm.has(1) else "cena"
+			sh.add_efeito("magia.visao_mistica", "visao_mistica", 1, dur_vm, "", world.day_index() + 1 if apr_vm.has(1) else -1)
+			if apr_vm.has(0):
+				sh.add_efeito("magia.visao_mistica", "visao_escuro", 1, dur_vm, "", world.day_index() + 1 if apr_vm.has(1) else -1)
+			if apr_vm.has(2):
+				sh.add_efeito("magia.visao_mistica", "ve_invisivel", 1, dur_vm, "", world.day_index() + 1 if apr_vm.has(1) else -1)
+			out.append(fact("MAGIC_AURAS", {"caster": "player", "auras": auras_no_mundo(_tile_jogador(), 20, true), "conjuradores": _conjuradores_aqui()}, ["player"]))
 		"luz", "escuridao":
 			var apr_l: Array = cmd.payload.get("aprimoramentos", [])
 			var combat_l = world.module("combat")
@@ -455,6 +542,100 @@ func bonus_contra_armadilhas() -> int:
 	if (not ativo.is_empty() and (ativo.apr as Array).has(1)) or (not protecao_detectar.is_empty() and int(protecao_detectar.ate) > world.clock.tick):
 		return 5
 	return 0
+
+
+## --- Adivinhação fora de combate ---------------------------------------------------------------------
+## NPC no mesmo local do jogador (toque ou alcance curto, fora de combate).
+func _no_mesmo_lugar(npc: String) -> bool:
+	var npcs = world.module("npcs")
+	if npcs == null or npcs.npc(npc).is_empty() or not bool(npcs.npc(npc).alive):
+		return false
+	return str(npcs.npc(npc).location) == world.db.location_at(_tile_jogador())
+
+
+func _ficha_npc(npc: String) -> CharacterSheet:
+	var party = world.module("party")
+	if party != null and party.members.has(npc) and party.members[npc].has("sheet"):
+		return CharacterSheet.from_dict(party.members[npc].sheet)
+	return party.ficha_de(npc) if party != null else CharacterSheet.new()
+
+
+## O que um NPC (ou criatura) sabe: os fatos que o diálogo dele pode revelar.
+func fatos_que_sabe(id: String) -> Array:
+	var out: Array = []
+	var d: Dictionary = world.db.dialogue.get("npcs", {}).get(id, {})
+	_coletar_revelacoes(d, out)
+	return out
+
+
+func _coletar_revelacoes(v: Variant, out: Array) -> void:
+	if v is Dictionary:
+		if v.has("reveal") and not out.has(str(v.reveal)):
+			out.append(str(v.reveal))
+		for k in v:
+			_coletar_revelacoes(v[k], out)
+	elif v is Array:
+		for x in v:
+			_coletar_revelacoes(x, out)
+
+
+func _pensamentos(npc: String, todos: bool) -> Array:
+	var ex = world.module("exploration")
+	var out: Array = []
+	for f in fatos_que_sabe(npc):
+		if ex != null and ex.knows(f):
+			continue
+		out.append(fact("FACT_REVEALED", {"fact": f, "source": "pensamentos:" + npc}, ["player"]))
+		if not todos:
+			break
+	if out.is_empty():
+		out.append(fact("THOUGHTS_READ", {"target": npc, "nada_novo": true}, ["player"]))
+	return out
+
+
+## Auras mágicas no mundo a até `raio` quadrados: áreas de Consagrar e Profanar, cadáveres abençoados, a luz ou as
+## sombras de magia que o jogador carrega e os efeitos de magia na ficha dele.
+func auras_no_mundo(centro: Vector2i, raio: int, completo: bool) -> Array:
+	var out: Array = []
+	for ar in _areas_em(centro):
+		out.append(_aura(str(ar.tipo), Vector2i(int(ar.centro[0]), int(ar.centro[1])), completo))
+	var combat = world.module("combat")
+	for id in cadaveres:
+		if cadaver_preservado(id) and combat != null and combat.creature_state.has(id):
+			var t: Array = combat.creature_state[id].tile
+			if maxi(absi(int(t[0]) - centro.x), absi(int(t[1]) - centro.y)) <= raio:
+				out.append(_aura("bencao", Vector2i(int(t[0]), int(t[1])), completo))
+	if not escuridao_ativa().is_empty():
+		out.append(_aura("escuridao", _tile_jogador(), completo))
+	var vistos := {}
+	for e in world.player_sheet.efeitos:
+		var eid := str(e.id)
+		if eid.begins_with("magia.") and not vistos.has(eid):
+			vistos[eid] = true
+			out.append(_aura(eid.substr(6), _tile_jogador(), completo))
+	return out
+
+
+func _aura(sp: String, t: Vector2i, completo: bool) -> Dictionary:
+	var circ := int(world.rules.value("magia." + sp, {}).get("circulo", 1))
+	var a := {"intensidade": SpellRules.aura_por_circulo(circ)}
+	if completo:
+		a["magia"] = sp
+		a["onde"] = [t.x, t.y]
+	return a
+
+
+## Visão Mística fora de combate: os NPCs presentes que lançam magias e a aura da magia mais alta.
+func _conjuradores_aqui() -> Array:
+	var npcs = world.module("npcs")
+	var out: Array = []
+	if npcs == null:
+		return out
+	for id in npcs.npcs_at(world.db.location_at(_tile_jogador())):
+		var f := _ficha_npc(id)
+		if not f.spells.is_empty():
+			out.append({"npc": id, "aura": SpellRules.aura_por_circulo(SpellRules.circulo_maximo(f, world.rules))})
+	return out
 
 
 ## Consultado pelas magias que criam mortos-vivos.

@@ -439,7 +439,8 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 		if not pen_t.is_empty() and int(pen_t.ate) > world.clock.tick:
 			sim.c(id).sheet.add_efeito("magia.tranquilidade", "ataque", int(pen_t.ataque), "cena")   # Tranquilidade resistida
 	# Iniciativa (LB p.231): jogador rola; inimigos fazem um teste único com o menor valor.
-	var p_mod := world.player_sheet.skill_value("iniciativa", world.rules)
+	var p_mod := world.player_sheet.skill_value("iniciativa", world.rules) + world.player_sheet.efeito_bonus("proxima_iniciativa")
+	world.player_sheet.remove_efeito_stat("proxima_iniciativa")   # Aviso (alerta): +5 no próximo teste de Iniciativa
 	var e_mod := 999
 	for id in enemy_ids:
 		e_mod = mini(e_mod, sim.c(id).sheet.skill_value("iniciativa", world.rules))
@@ -1530,6 +1531,62 @@ func _luz_ou_escuridao(id: String, a: Dictionary) -> Array:
 	return out
 
 
+## Auras mágicas na cena a até `raio` quadrados: efeitos de magia nas criaturas, zonas e marcas de magia. Sem
+## `completo`, só presença e intensidade (Misticismo); com, também a magia e onde está (Visão Mística).
+func auras_na_cena(centro: Vector2i, raio: int, completo: bool) -> Array:
+	var out: Array = []
+	var vistos := {}
+	for cid in sim.combatants:
+		if CombatSim.cheb(sim.c(cid).tile, centro) > raio:
+			continue
+		for e in sim.c(cid).sheet.efeitos:
+			var eid := str(e.id)
+			if eid.begins_with("magia.") and not vistos.has(cid + eid):
+				vistos[cid + eid] = true
+				out.append(_aura(eid.substr(6), cid, sim.c(cid).tile, completo))
+	for z in sim.zonas:
+		var sp := str(z.fonte)
+		if world.rules.value("magia." + sp, {}).is_empty() or not (z.tiles as Array).any(func(t): return CombatSim.cheb(t, centro) <= raio):
+			continue
+		if not vistos.has(str(z.id)):
+			vistos[str(z.id)] = true
+			out.append(_aura(sp, "", (z.tiles as Array)[0] if not (z.tiles as Array).is_empty() else centro, completo))
+	var magia = world.module("magia")
+	if magia != null:
+		out.append_array(magia.auras_no_mundo(centro, raio, completo))
+	return out
+
+
+func _aura(sp: String, cid: String, t: Vector2i, completo: bool) -> Dictionary:
+	var circ := int(world.rules.value("magia." + sp, {}).get("circulo", 1))
+	var a := {"intensidade": SpellRules.aura_por_circulo(circ)}
+	if completo:
+		a["magia"] = sp
+		a["escola"] = str(world.rules.value("magia." + sp, {}).get("escola", ""))
+		a["onde"] = [t.x, t.y]
+		if cid != "":
+			a["criatura"] = cid
+	return a
+
+
+## Compreensão: o que a criatura sabe (os fatos que o diálogo dela pode revelar). Ouvir pensamentos revela um fato
+## ainda desconhecido; vasculhar revela todos.
+func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
+	var magia = world.module("magia")
+	var fatos: Array = magia.fatos_que_sabe(alvo) if magia != null else []
+	var ex = world.module("exploration")
+	var out: Array = []
+	for f in fatos:
+		if ex != null and ex.knows(f):
+			continue
+		out.append(fact("FACT_REVEALED", {"fact": f, "source": "pensamentos:" + alvo}, ["player"]))
+		if not todos:
+			break
+	if out.is_empty():
+		out.append(fact("THOUGHTS_READ", {"target": alvo, "nada_novo": true}, ["player"]))
+	return out
+
+
 ## Teste de resistência com a reação de Premonição; devolve se passou.
 func _resiste(alvo: String, pericia: String, cd: int, out: Array) -> bool:
 	var sv := Checks.skill(sim.c(alvo).sheet, pericia, cd, world.rules, world.rng, "combat")
@@ -2129,6 +2186,24 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			if r_x.get("success", false):
 				_soltar(id, marca_x)
 			out.append(fact("ESCAPE_ATTEMPT", {"actor": id, "skill": pericia_x, "check": r_x, "success": r_x.get("success", false)}, [id]))
+		"ouvir_pensamentos":
+			# Compreensão: ação de movimento, ouvir o que uma criatura tocada pensa (Vontade de involuntário evita).
+			var alvo_op := str(a.target)
+			var cd_op := spell_dc(sim.c(id).sheet, {"spell": "compreensao"})
+			if sim.is_enemy(id, alvo_op) and _resiste(alvo_op, "vontade", cd_op, out):
+				out.append(fact("SPELL_MISSED", {"caster": id, "target": alvo_op, "spell": "compreensao", "saved": true}, [id, alvo_op]))
+			else:
+				out.append_array(_revelar_pensamentos(alvo_op, false))
+		"analisar_aura":
+			# Visão Mística: ação de movimento; a criatura lança magias? e a aura da magia de círculo mais alto.
+			var ts_aa: CharacterSheet = sim.c(str(a.target)).sheet
+			var circ_aa := SpellRules.circulo_maximo(ts_aa, world.rules) if not ts_aa.spells.is_empty() else 0
+			out.append(fact("AURA_ANALYZED", {"actor": id, "target": a.target, "lanca_magias": circ_aa > 0, "aura": SpellRules.aura_por_circulo(circ_aa) if circ_aa > 0 else ""}, [id, str(a.target)]))
+		"detectar_magia":
+			# Misticismo, Detectar Magia (LB p.121): ação completa, CD 15; presença e intensidade das auras em alcance curto.
+			var r_dm := Checks.skill(sim.c(id).sheet, "misticismo", 15, world.rules, world.rng, "combat")
+			var auras_dm: Array = auras_na_cena(sim.c(id).tile, ALCANCE_CURTO_QUADRADOS, false) if r_dm.get("success", false) else []
+			out.append(fact("MAGIC_DETECTED", {"actor": id, "check": r_dm, "auras": auras_dm}, [id]))
 		"mover_globos":
 			# Luz (globos, aprimoramento arcano): uma vez por rodada, ação livre, os globos vão a outros quadrados.
 			(sim.c(id).flags as Array).append("globos_%d" % sim.round_no)
@@ -2309,6 +2384,46 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
 		"luz", "escuridao":
 			out.append_array(_luz_ou_escuridao(id, a))
+		"aviso":
+			# Aviso (universal 1): alcance longo (x10 por aprimoramento), sem precisar ver. Alerta: +5 no próximo teste de
+			# Iniciativa e de Percepção até o fim da próxima cena. Mensagem (25 palavras; resposta com aprimoramento) e
+			# Localização (pela cena com aprimoramento) são informação. +1 alvo por aprimoramento de 3 PM.
+			var modo_av := str(a.get("modo", "alerta"))
+			for tg_av in a.get("targets", [a.get("target", id)]):
+				if modo_av == "alerta":
+					SpellRules.aplicar_alerta(sim.c(tg_av).sheet)
+				out.append(fact("WARNING_SENT", {"caster": id, "target": tg_av, "modo": modo_av, "texto": str(a.get("texto", "")).substr(0, 200),
+					"resposta": (a.get("aprimoramentos", []) as Array).has(1), "cena": (a.get("aprimoramentos", []) as Array).has(2)}, [id, tg_av]))
+		"compreensao":
+			# Compreensão (universal 1): toque (curto com aprimoramento; criaturas escolhidas com outro). Entende e se comunica;
+			# com animal, percebe os sentimentos (a atitude). Ação de movimento: ouvir os pensamentos (Vontade de involuntário).
+			# Vasculhar (2º): extrai informações (Vontade anula). Pessoal (3º): todos os idiomas.
+			var apr_co: Array = a.get("aprimoramentos", [])
+			if apr_co.has(3):
+				sh.add_efeito("magia.compreensao", "todos_idiomas", 1, "cena")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "compreensao_idiomas", "tags": ["magia"]}, [id]))
+			else:
+				for tg_co in a.get("targets", [a.get("target", "")]):
+					sh.add_efeito("magia.compreensao", "compreende", 1, "cena", tg_co)
+					var info_co := {"caster": id, "target": tg_co}
+					if sim.c(tg_co).sheet.creature_type == "animal":
+						info_co["sentimento"] = atitude_de(tg_co)
+					out.append(fact("UNDERSTANDING", info_co, [id, tg_co]))
+					if apr_co.has(2) and not _resiste(tg_co, "vontade", spell_dc(sh, a), out):
+						out.append_array(_revelar_pensamentos(tg_co, true))
+		"visao_mistica":
+			# Visão Mística (universal 1): pessoal, pela cena (um dia com aprimoramento). Enxerga auras mágicas em alcance
+			# médio com todas as informações; ação de movimento para saber se uma criatura lança magias e a aura da magia
+			# mais alta. Aprimoramentos: visão no escuro; um dia; ver o invisível.
+			var apr_vm: Array = a.get("aprimoramentos", [])
+			var dur_vm := "dia" if apr_vm.has(1) else "cena"
+			var ate_vm := world.day_index() + 1 if dur_vm == "dia" else -1
+			sh.add_efeito("magia.visao_mistica", "visao_mistica", 1, dur_vm, "", ate_vm)
+			if apr_vm.has(0):
+				sh.add_efeito("magia.visao_mistica", "visao_escuro", 1, dur_vm, "", ate_vm)
+			if apr_vm.has(2):
+				sh.add_efeito("magia.visao_mistica", "ve_invisivel", 1, dur_vm, "", ate_vm)
+			out.append(fact("MAGIC_AURAS", {"caster": id, "auras": auras_na_cena(sim.c(id).tile, int(world.rules.value("alcance.quadrados", {}).get("medio", 20)), true)}, [id]))
 		"criar_elementos":
 			# Criar Elementos (divina 1): porção real de um elemento (LB p.187). Água: enche um recipiente (item frasco com
 			# água). Ar: vento num quadrado: tira fumaça e afasta a névoa por uma rodada. Fogo: chama que ilumina como uma

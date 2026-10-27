@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2664,3 +2664,74 @@ func test_escuridao_nos_olhos_e_sombras_pessoais() -> void:
 	_lanca(m, {"type": "cast", "spell": "escuridao", "target": "player", "targets": ["player"], "aprimoramentos": [4]})
 	eq(sim.c("player").sheet.efeito_bonus("pericia_furtividade"), 10, "+10 em Furtividade")
 	eq(int(sim.attack_profile("bandido_1", "player", 0, false, false).get("miss_chance", 0)), 20, "camuflagem leve das sombras")
+
+
+# --- Aviso, Compreensão e Visão Mística (universais, 1º círculo) ----------------------------------
+func test_aviso_alerta_da_mais_5_no_proximo_teste_e_e_acao_de_movimento() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	var a := {"type": "cast", "spell": "aviso", "target": "bandido_1", "targets": ["bandido_1"], "modo": "alerta"}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok and v.kind == "movimento", "execução de movimento")
+	m[1]._cast("player", a, v)
+	var b: CharacterSheet = sim.c("bandido_1").sheet
+	var r1 := Checks.skill(b, "percepcao", 0, m[3], m[0].rng, "combat")
+	var r2 := Checks.skill(b, "percepcao", 0, m[3], m[0].rng, "combat")
+	eq(int(r1.mod) - int(r2.mod), 5, "+5 só no próximo teste de Percepção")
+	sim.c("bandido_2").tile = Vector2i(26 + 500, 57)
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "aviso", "target": "bandido_2", "targets": ["bandido_2"]}).ok, "750m: além do alcance longo")
+	check(GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "aviso", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [0]}).ok, "x10 com o aprimoramento")
+
+
+func test_aviso_fora_de_combate_mensagem_com_resposta() -> void:
+	var w := _mundo_explorador(["aviso"])
+	var r := WorldHelpers.cmd(w, "CastSpell", {"spell": "aviso", "targets": ["dorn"], "modo": "mensagem", "texto": "Estou indo.", "aprimoramentos": [1]})
+	check(r.accepted, "mensagem telepática: %s" % str(r.errors))
+	var ev: Array = r.emitted_events.filter(func(e): return e.event_type == "WARNING_SENT")
+	check(not ev.is_empty() and ev[0].payload.has("resposta"), "com resposta")
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "aviso", "modo": "alerta"})
+	eq(w.player_sheet.efeito_bonus("proxima_percepcao"), 5, "alerta em si mesmo")
+
+
+func test_compreensao_ouvir_e_vasculhar_pensamentos_revela_o_que_o_npc_sabe() -> void:
+	var w := _mundo_explorador(["compreensao"])
+	var npcs = w.module("npcs")
+	var loc: String = npcs.npc("dorn").location
+	var spot := w.db.location_spot(loc)
+	WorldHelpers.put(w, spot.x, spot.y)
+	check(w.module("magia").fatos_que_sabe("dorn").has("f_dorn_informante"), "Dorn sabe que é informante")
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "compreensao", "targets": ["dorn"]}).accepted, "toca o Dorn")
+	var ex = w.module("exploration")
+	var antes: int = ex.known_facts.size()
+	var r := WorldHelpers.cmd(w, "ReadThoughts", {"target": "dorn"})
+	check(r.accepted, "ouvir pensamentos")
+	check(ex.known_facts.size() == antes + 1 or r.emitted_events.any(func(e): return e.event_type == "SPELL_MISSED"), "um fato novo (ou ele protegeu os pensamentos)")
+	var w2 := _mundo_explorador(["compreensao"])
+	w2.player_sheet.flat_skills["vontade"] = 0
+	var spot2 := w2.db.location_spot(w2.module("npcs").npc("dorn").location)
+	WorldHelpers.put(w2, spot2.x, spot2.y)
+	w2.player_sheet.attrs["sab"] = 20
+	WorldHelpers.cmd(w2, "CastSpell", {"spell": "compreensao", "targets": ["dorn"], "aprimoramentos": [2]})
+	check(w2.module("exploration").knows("f_dorn_informante") and w2.module("exploration").knows("f_bandidos_na_ruina"), "vasculhar: tudo o que ele sabe")
+
+
+func test_visao_mistica_auras_e_analise_e_detectar_magia() -> void:
+	var m := _cena_grupo(5)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_lanca(m, {"type": "cast", "spell": "bencao", "targets": ["player"], "target": "player"})
+	sim.budget = {"std": 1, "move": 1}
+	var out: Array = m[1]._cast("player", {"type": "cast", "spell": "visao_mistica", "target": "player", "aprimoramentos": [0]}, {"cost": 0})
+	var aur: Array = out.filter(func(f): return f.type == "MAGIC_AURAS")
+	check(not aur.is_empty() and (aur[0].payload.auras as Array).any(func(x): return x.get("magia", "") == "bencao"), "vê a Bênção com todas as informações")
+	check(sim.c("player").sheet.efeito_bonus("visao_escuro") > 0, "visão no escuro")
+	var a := {"type": "analisar_aura", "target": "bandido_1"}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok and v.kind == "movimento", "analisar é ação de movimento")
+	var o2: Array = c._execute_action("player", a, v)
+	check(o2.any(func(f): return f.type == "AURA_ANALYZED" and not f.payload.lanca_magias), "o bandido não lança magias")
+	sim.budget = {"std": 1, "move": 1}
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "detectar_magia"}).ok, "Misticismo é somente treinada")
+	sim.c("player").sheet.trained.append("misticismo")
+	check(GhostPlanner.validate_action(sim, "player", {"type": "detectar_magia"}).ok, "treinado: ação completa")

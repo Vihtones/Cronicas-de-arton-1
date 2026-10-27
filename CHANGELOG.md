@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Aviso, Compreensão e Visão Mística (universais, 1º círculo) completas; com elas, todas as universais de 1º círculo. Aviso (ação de movimento, alcance longo x10): alerta (+5 no próximo teste de Iniciativa e de Percepção), mensagem com resposta, localização. Compreensão: ouvir os pensamentos de um NPC tocado revela um fato que ele sabe; vasculhar revela tudo; todos os idiomas. Visão Mística: auras mágicas em alcance médio com a magia e o lugar, análise de quem lança magias, visão no escuro, um dia, ver o invisível. Misticismo ganhou Detectar Magia (CD 15). A execução das magias passa a vir do catálogo (movimento, completa).
+
 - Luz e Escuridão (universais, 1º círculo) completas: luz de 6m num objeto carregado ou num ponto (Vontade anula em objeto de involuntário), +3m, um dia, permanente com pó de rubi, olhos (ofuscado) e globos para arcanos, luz solar (aliados estabilizam e não sangram, inimigos ofuscados) e halo (+10 Diplomacia, RD trevas 10) para divinos; escuridão leve de 6m (+1,5m), total que bloqueia a visão, olhos (cego), um dia e sombras pessoais (+10 Furtividade, camuflagem leve). Luz natural não ilumina as sombras; uma anula a outra. O catálogo da Luz tinha quatro aprimoramentos colados num só; foram separados, com a marca "apenas" de tradição.
 
 - Criar Elementos (divina, 1º círculo) completa: água enche um recipiente, ar tira fumaça e afasta a névoa por uma rodada, fogo ilumina como tocha (na palma ou num quadrado, onde queima com 1d6 e pode deixar em chamas), terra cria um cubo; aprimoramentos de quantidade, arremesso de água ou terra (2d4 +1 passo por tamanho) e +1d6 de fogo. Com ela, todas as divinas de 1º círculo estão completas.
