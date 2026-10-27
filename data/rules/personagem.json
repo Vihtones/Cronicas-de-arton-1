@@ -2036,6 +2036,639 @@
    "pagina": 39,
    "pdf_page": 45,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.barbaro",
+   "valor": {
+    "pv_inicial": 24,
+    "pv_nivel": 6,
+    "soma_con": true,
+    "pm_nivel": 3,
+    "pericias_fixas": [
+     "fortitude",
+     "luta"
+    ],
+    "pericias_escolha": 4,
+    "lista": [
+     "adestramento",
+     "atletismo",
+     "cavalgar",
+     "iniciativa",
+     "intimidacao",
+     "oficio",
+     "percepcao",
+     "pontaria",
+     "sobrevivencia",
+     "vontade"
+    ],
+    "proficiencias": [
+     "armas_marciais",
+     "escudos"
+    ],
+    "habilidades": [
+     "1: Fúria +2",
+     "3: Instinto selvagem +1",
+     "5: Redução de dano 2",
+     "6: Fúria +3",
+     "9: Instinto selvagem +2",
+     "11: Fúria +4, redução de dano 6",
+     "14: redução de dano 8",
+     "15: Instinto selvagem +3",
+     "16: Fúria +5",
+     "17: redução de dano 10",
+     "20: Fúria titânica (bônus dobrado)"
+    ],
+    "poderes": [
+     "alma_de_bronze",
+     "aumento_atributo",
+     "brado_assustador",
+     "critico_brutal",
+     "destruidor",
+     "espirito_inquebravel",
+     "esquiva_sobrenatural",
+     "forca_indomavel",
+     "frenesi",
+     "furia_da_savana",
+     "furia_raivosa",
+     "golpe_poderoso",
+     "impeto",
+     "investida_imprudente",
+     "pele_de_aco",
+     "pele_de_ferro",
+     "sangue_dos_inimigos",
+     "supersticao",
+     "totem_espiritual",
+     "vigor_primal"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 41,
+   "pdf_page": 47,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.alma_de_bronze",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Ao entrar em fúria, recebe PV temporários igual ao nível + Força",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 41,
+   "pdf_page": 47,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.brado_assustador",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Ação de movimento e 1 PM: inimigos em alcance curto ficam vulneráveis até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "treinado": "intimidacao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 41,
+   "pdf_page": 47,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.critico_brutal",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Multiplicador de crítico corpo a corpo e de arremesso aumenta em +1",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 41,
+   "pdf_page": 47,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.espirito_inquebravel",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Em fúria, não cai inconsciente com 0 PV ou menos (morre só com valor negativo igual à metade do PV máximo)",
+    "implementado": false,
+    "prereq": {
+     "poder": "alma_de_bronze"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 41,
+   "pdf_page": 47,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.esquiva_sobrenatural",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Nunca fica surpreendido",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forca_indomavel",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Gasta 1 PM para somar o nível em testes de Força ou Atletismo, depois de rolar o dado",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.frenesi",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Uma vez por rodada, em fúria, ao agredir com ataque corpo a corpo ou de arremesso, gasta 2 PM para um ataque adicional",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.furia_da_savana",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Deslocamento +3m; o bônus de Fúria vale também para armas de arremesso",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.furia_raivosa",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Se a fúria fosse terminar por falta de ação hostil, gasta 1 PM para continuar nesta rodada",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_poderoso",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Ao acertar ataque corpo a corpo ou de arremesso, gasta 1 PM para +1 dado extra do mesmo tipo de dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.investida_imprudente",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Na investida, aumenta a penalidade de Defesa para –5 e recebe +1d12 no dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pele_de_aco",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "O bônus de Pele de Ferro aumenta para +8",
+    "implementado": false,
+    "prereq": {
+     "poder": "pele_de_ferro",
+     "nivel": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pele_de_ferro",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "+4 na Defesa sem armadura pesada",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sangue_dos_inimigos",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Em fúria, ao acertar crítico ou reduzir inimigo a 0 PV, ganha +1 cumulativo em ataque e dano (limitado pelo nível) até o fim da cena",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.supersticao",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Resistência a magia +5",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.totem_espiritual",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Soma Sabedoria nos PM e aprende a magia do animal totêmico escolhido (pode lançar em fúria)",
+    "implementado": false,
+    "prereq": {
+     "sab": 1,
+     "nivel": 4
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.vigor_primal",
+   "valor": {
+    "classe": "barbaro",
+    "efeito": "Ação de movimento e PM limitados pela Constituição: cada PM gasto recupera 1d12 PV",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 42,
+   "pdf_page": 48,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "classe.bardo",
+   "valor": {
+    "pv_inicial": 12,
+    "pv_nivel": 3,
+    "soma_con": true,
+    "pm_nivel": 4,
+    "pericias_fixas": [
+     "atuacao",
+     "reflexos"
+    ],
+    "pericias_escolha": 6,
+    "lista": [
+     "acrobacia",
+     "cavalgar",
+     "conhecimento",
+     "diplomacia",
+     "enganacao",
+     "furtividade",
+     "iniciativa",
+     "intuicao",
+     "investigacao",
+     "jogatina",
+     "ladinagem",
+     "luta",
+     "misticismo",
+     "nobreza",
+     "percepcao",
+     "pontaria",
+     "vontade"
+    ],
+    "proficiencias": [
+     "armas_marciais"
+    ],
+    "magia": {
+     "escolas_escolha": 3,
+     "atributo": "car",
+     "circulos": {
+      "2": 6,
+      "3": 10,
+      "4": 14
+     },
+     "magias_iniciais": 2,
+     "aprende_a_cada_nivel_par": true,
+     "armadura_leve_sem_teste": true
+    },
+    "habilidades": [
+     "Inspiração (+1 em perícias para aliados, a cada 4 níveis +1 com +2 PM)",
+     "Eclético a partir do 2º nível (1 PM: treinado na perícia)",
+     "Artista Completo no 20º nível"
+    ],
+    "poderes": [
+     "arte_magica",
+     "aumentar_repertorio",
+     "aumento_atributo",
+     "danca_das_laminas",
+     "esgrima_magica",
+     "estrelato",
+     "fascinar_em_massa",
+     "golpe_elemental",
+     "golpe_magico",
+     "inspiracao_marcial",
+     "lendas_e_historias",
+     "manipular",
+     "manipular_em_massa",
+     "melodia_restauradora",
+     "mestre_dos_sussurros",
+     "parodia",
+     "prestidigitacao",
+     "musica_balada_fascinante",
+     "musica_melodia_curativa",
+     "musica_cancao_assustadora"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arte_magica",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Sob Inspiração, a CD para resistir às habilidades de bardo aumenta em +2",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aumentar_repertorio",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Aprende duas magias de qualquer círculo que possa lançar (de escolas conhecidas); pode ser escolhido várias vezes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.danca_das_laminas",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Ao lançar magia com ação padrão, gasta 1 PM para um ataque corpo a corpo como ação livre",
+    "implementado": false,
+    "prereq": {
+     "poder": "esgrima_magica",
+     "nivel": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.esgrima_magica",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Sob Inspiração, usa Atuação no lugar de Luta com armas corpo a corpo leves ou de uma mão",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estrelato",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Ao usar Atuação para impressionar, o bônus em perícias de Carisma sobe para +5 (mais difícil passar despercebido)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fascinar_em_massa",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Com Balada Fascinante, gasta +2 PM para afetar todas as criaturas escolhidas no alcance",
+    "implementado": false,
+    "prereq": {
+     "poder": "musica_balada_fascinante"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 44,
+   "pdf_page": 50,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_elemental",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Sob Inspiração, ao acertar corpo a corpo gasta 1 PM para +1d6 de ácido, eletricidade, fogo ou frio",
+    "implementado": false,
+    "prereq": {
+     "poder": "golpe_magico"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_magico",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Sob Inspiração, ao acertar corpo a corpo ganha 2 PM temporários cumulativos (máximo por cena igual ao nível)",
+    "implementado": false,
+    "prereq": {
+     "poder": "esgrima_magica"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inspiracao_marcial",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Ao usar Inspiração, o bônus também vale em rolagens de dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lendas_e_historias",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Gasta 1 PM para rolar de novo testes de Conhecimento, Misticismo, Nobreza ou Religião para informação e identificação",
+    "implementado": false,
+    "prereq": {
+     "int": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.manipular",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Gasta 1 PM para deixar criatura fascinada enfeitiçada até o fim da cena (Vontade CD Car anula)",
+    "implementado": false,
+    "prereq": {
+     "poder": "musica_balada_fascinante"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.manipular_em_massa",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Com Manipular, gasta +2 PM para afetar todas as criaturas em alcance curto",
+    "implementado": false,
+    "prereq": {
+     "poder": "fascinar_em_massa",
+     "nivel": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.melodia_restauradora",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Com Melodia Curativa, gasta +2 PM para remover uma condição das criaturas afetadas",
+    "implementado": false,
+    "prereq": {
+     "poder": "musica_melodia_curativa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_dos_sussurros",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Rola dois dados e usa o melhor em Investigação para interrogar e Enganação para intriga; faz esses testes em ambiente social sem custo",
+    "implementado": false,
+    "prereq": {
+     "car": 1,
+     "treinado": "enganacao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.parodia",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Uma vez por rodada, ao ver magia em alcance médio, gasta 1 PM e Atuação (CD 15 + custo) para poder lançar a mesma magia",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.prestidigitacao",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Lança magia com execução de ação completa ou menor como ação livre, com teste de Atuação (CD 15 + custo)",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.musica_balada_fascinante",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Teste de Atuação oposto à Vontade: alvo fica fascinado enquanto você se concentrar",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.musica_melodia_curativa",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Criaturas escolhidas no alcance recuperam 1d6 PV; cada PM extra soma +1d6",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.musica_cancao_assustadora",
+   "valor": {
+    "classe": "bardo",
+    "efeito": "Teste de Atuação oposto à Vontade de cada criatura: as que falham ficam abaladas até o fim da cena",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 45,
+   "pdf_page": 51,
+   "status": "VERIFICADA"
   }
  ]
 }
