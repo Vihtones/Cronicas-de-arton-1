@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -617,3 +617,61 @@ func test_premonicao_politica_nunca_desliga_a_reacao() -> void:
 	var pm_antes: int = sim.c("player").sheet.pm
 	c._pos_teste("bandido_2", {"success": false, "total": 3, "cd": 15, "mod": 0, "skill": "fortitude"}, 15, [])
 	eq(sim.c("player").sheet.pm, pm_antes, "com a política em nunca, nada é gasto")
+
+
+# --- Cólera de Azgher (4º círculo) ---------------------------------------------------------
+func test_colera_exige_circulo_4_e_dissipacao_exige_nivel_17() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(12)[2], "player", {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 12 não lança magia de 4º círculo")
+	var m13 := _cena_grupo(13)
+	check(GhostPlanner.validate_action(m13[2], "player", {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "nível 13 lança a Cólera")
+	check(not GhostPlanner.validate_action(m13[2], "player", {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [2]}).ok, "a dissipação exige 5º círculo")
+	check(GhostPlanner.validate_action(_cena_grupo(17)[2], "player", {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [2]}).ok, "nível 17 lança a dissipação")
+
+
+func test_colera_falha_cega_e_poe_em_chamas() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")   # Reflexos falha
+	var a := {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(sim.c("bandido_1").sheet.conditions.has("cego"), "quem falha fica cego")
+	check(sim.c("bandido_1").sheet.conditions.has("em_chamas"), "quem falha fica em chamas")
+	check(sim.c("bandido_1").sheet.pv < 999, "e sofre dano")
+
+
+func test_colera_passou_no_teste_nao_fica_cega_nem_em_chamas() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", 99, "cena")   # Reflexos passa
+	var a := {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not sim.c("bandido_1").sheet.conditions.has("cego"), "quem passa não fica cego")
+	check(not sim.c("bandido_1").sheet.conditions.has("em_chamas"), "nem em chamas")
+
+
+func test_colera_aprimoramento_de_area_alcanca_mais_longe() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(34, 57)   # a 7 quadrados de bandido_1: fora dos 6m, dentro dos 12m
+	var a := {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	eq(sim.c("bandido_2").sheet.pv, 999, "sem o aprimoramento, a área de 6m não alcança")
+	var b := {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [1]}
+	c._cast("player", b, GhostPlanner.validate_action(sim, "player", b))
+	check(sim.c("bandido_2").sheet.pv < 999, "com +6m de raio, alcança a criatura a 7 quadrados")
+
+
+func test_colera_dissipa_so_a_necromancia_da_area() -> void:
+	var m := _cena_grupo(17)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var ts: CharacterSheet = sim.c("bandido_1").sheet
+	ts.add_efeito("magia.perdicao", "ataque", -1, "cena")         # Necromancia
+	ts.add_efeito("magia.escudo_da_fe", "defesa", 2, "cena")       # Abjuração
+	var a := {"type": "cast", "spell": "colera_de_azgher", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [2]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not ts.has_efeito("magia.perdicao"), "a magia de necromancia da área é dissipada")
+	check(ts.has_efeito("magia.escudo_da_fe"), "magia de outra escola permanece")

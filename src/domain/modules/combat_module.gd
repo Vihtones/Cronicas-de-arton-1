@@ -543,6 +543,38 @@ func _zona_afeta(z: Dictionary, id: String) -> bool:
 	return sim.c(id).side == lado
 
 
+## Dissipação por escola: encerra as magias ativas da escola (efeitos das criaturas, zonas e marcas) que estão na área.
+## Invocações de magia da escola saem do combate.
+func _dissipar_na_area(tiles: Array, escola: String, out: Array) -> void:
+	for id in sim.combatants:
+		if not tiles.has(sim.c(id).tile):
+			continue
+		var s: CharacterSheet = sim.c(id).sheet
+		for e in s.efeitos.duplicate(true):
+			if str(e.id).begins_with("magia.") and _escola_de(str(e.id).trim_prefix("magia.")) == escola.to_lower():
+				s.anular_magia(str(e.id))
+	sim.zonas = sim.zonas.filter(func(z): return not (_escola_de(str(z.fonte)) == escola.to_lower() and _alguma_em(z.tiles, tiles)))
+	for m in sim.marcas.duplicate(true):
+		if _escola_de(str(m.fonte)) == escola.to_lower() and tiles.has(sim.c(m.alvo).tile):
+			if m.tipo == "invocacao":
+				sim.remove_combatant(m.alvo)
+			else:
+				sim.remove_marca(m.id, m.alvo)
+	out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "area", "buff": "dissipacao_" + escola.to_lower(), "tags": ["magia"]}, []))
+
+
+## Escola de uma magia do catálogo, em minúsculas ("" se não for magia conhecida).
+func _escola_de(sp_id: String) -> String:
+	return str(world.rules.value("magia." + sp_id, {}).get("escola", "")).to_lower()
+
+
+func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
+	for t in tiles_a:
+		if tiles_b.has(t):
+			return true
+	return false
+
+
 ## Início do turno do conjurador: as nuvens dele afetam quem está dentro.
 func _nuvens_do_conjurador(id: String, facts: Array) -> void:
 	for z in sim.zonas.duplicate(true):
@@ -1146,6 +1178,36 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if apr_v.has(2):
 					tsv.add_efeito("magia.vestimenta_da_fe", "rd", 5, "dia", "*", ate_v)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "vestimenta_da_fe", "tags": ["magia"]}, [id, tg]))
+		"colera_de_azgher":
+			# Cólera de Azgher (4º círculo): esfera de 6m (6m a mais com o aprimoramento) no alvo. Reflexos reduz à metade.
+			# Quem falha fica cego por 1d4 rodadas e em chamas. 10d6 de fogo (10d8 contra mortos-vivos; +2d6/+2d8 com o aprimoramento).
+			# Aprimoramento de 5 PM: dissipa todas as magias de necromancia ativas na área.
+			var apr_cz: Array = a.get("aprimoramentos", [])
+			var raio_cz := 6.0 + (6.0 if apr_cz.has(1) else 0.0)
+			var tiles_cz: Array = Area.esfera(sim.c(a.get("target", id)).tile, Area.quadrados(raio_cz))
+			var cd_cz := spell_dc(sh, a)
+			for tg_cz in _criaturas_vivas_em(tiles_cz):
+				var ts_cz: CharacterSheet = sim.c(tg_cz).sheet
+				var faces_cz := 8 if ts_cz.creature_type == "morto-vivo" else 6
+				var dano_cz := int(Dice.roll("%dd%d" % [10 + (2 if apr_cz.has(0) else 0), faces_cz], world.rng, "combat").total)
+				var sv_cz := Checks.skill(ts_cz, "reflexos", cd_cz, world.rules, world.rng, "combat")
+				sv_cz = _pos_teste(tg_cz, sv_cz, cd_cz, out)
+				var passou_cz: bool = sv_cz.get("success", false)
+				if passou_cz:
+					dano_cz = dano_cz / 2
+				else:
+					sim.add_condicao(tg_cz, "cego", int(Dice.roll("1d4", world.rng, "combat").total), "colera_de_azgher")
+					sim.add_condicao(tg_cz, "em_chamas", 0, "colera_de_azgher")   # sem rodadas: dura até apagar o fogo
+				dano_cz = _dano_por_tipo(ts_cz, "fogo", dano_cz)
+				var tags_cz: Array = ["magia", "fogo"]
+				if passou_cz:
+					tags_cz.append("resistiu")
+				tags_cz.append_array(sim.apply_damage(tg_cz, dano_cz))
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg_cz, "weapon": "Cólera de Azgher", "d20": 0, "mod": 0,
+					"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_cz, "rolls": [],
+					"pv_after": ts_cz.pv, "special": false, "ranged": true, "spell": true, "save": "reflexos", "saved": passou_cz, "tags": tags_cz}, [id, tg_cz]))
+			if apr_cz.has(2):
+				_dissipar_na_area(tiles_cz, "Necromancia", out)
 		"poeira_da_podridao":
 			# Poeira da Podridão (3º círculo): nuvem de 6m de raio no alvo, pela cena. Ao lançar e no início de cada turno do
 			# conjurador, quem está na nuvem faz Fortitude: 2d8+8 de trevas (metade no teste). Quem falha não recupera PV
