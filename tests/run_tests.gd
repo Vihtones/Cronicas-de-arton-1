@@ -41,6 +41,7 @@ const SUITES := [
 	"res://tests/unit/test_companheiros_combate.gd",
 	"res://tests/unit/test_companheiros_persistencia.gd",
 	"res://tests/unit/test_progressao_dinamica.gd",
+	"res://tests/unit/test_poderes_livro.gd",
 	"res://tests/unit/test_cidades.gd",
 	"res://tests/unit/test_grupo.gd",
 	"res://tests/unit/test_tormenta.gd",

@@ -1442,6 +1442,600 @@
    "pdf_page": 326,
    "status": "VERIFICADA",
    "nota": "R1: CD varia conforme o terreno."
+  },
+  {
+   "id": "poder.ambidestria",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Com duas armas (uma leve), ataca com as duas na ação agredir; sofre –2 nos ataques até o próximo turno",
+    "prereq": {
+     "des": 2
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.esgrimista",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Soma Inteligência no dano com arma corpo a corpo leve ou ágil (limitado pelo nível)",
+    "prereq": {
+     "int": 1
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.especializacao_armadura",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Redução de dano 5 usando armadura pesada",
+    "prereq": {
+     "nivel": 12
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_pessoal",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Técnica única montada com efeitos de custo variável (mínimo 1 PM); pode ser escolhida várias vezes para golpes diferentes",
+    "prereq": {
+     "nivel": 5
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bater_e_correr",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Continua se movendo após uma investida; com 2 PM, investe em terreno difícil sem a penalidade de Defesa",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpe_demolidor",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Ao usar quebrar ou atacar um objeto, gasta 2 PM para ignorar a redução de dano dele",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.destruidor",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Com arma corpo a corpo de duas mãos, pode rolar de novo resultados 1 ou 2 no dano",
+    "prereq": {
+     "for": 1
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 65,
+   "pdf_page": 71,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_em_arma",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Com a arma escolhida, o dano aumenta um passo; gasta 2 PM para rolar de novo um teste de ataque",
+    "prereq": {
+     "poder": "especializacao_arma",
+     "nivel": 12
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.planejamento_marcial",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Uma vez por dia, gasta 1 hora e 3 PM para escolher um poder de guerreiro ou de combate cujos pré-requisitos cumpre; vale até o próximo dia",
+    "prereq": {
+     "treinado": "guerra",
+     "nivel": 10
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.romper_resistencias",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Ao fazer um Ataque Especial, gasta 1 PM adicional para ignorar 10 de redução de dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.solidez",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Com escudo, aplica o bônus de Defesa do escudo também em testes de resistência",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.tornado_de_dor",
+   "valor": {
+    "classe": "guerreiro",
+    "efeito": "Ação padrão e 2 PM: ataca todos os inimigos no alcance natural; o dano ganha +2 cumulativo a cada acerto",
+    "prereq": {
+     "nivel": 6
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 66,
+   "pdf_page": 72,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.assassinar",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Ação de movimento e 3 PM para analisar uma criatura; o próximo Ataque Furtivo contra ela tem os dados extras dobrados",
+    "prereq": {
+     "nivel": 5
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.contatos_no_submundo",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Em comunidade do tamanho de uma vila ou maior, gasta 2 PM e passa em Carisma CD 10: +5 em Investigação para interrogar e 20% de desconto em itens comuns",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escapista",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "+5 em Acrobacia para escapar, passar por espaço apertado ou por inimigo, e em testes para resistir a efeitos de movimento",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fuga_formidavel",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Ação completa e 1 PM: +3m de deslocamento, +5 em Acrobacia e Atletismo e ignora penalidade de terreno difícil; perde se fizer ação que não seja fugir",
+    "prereq": {
+     "int": 1
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 73,
+   "pdf_page": 79,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ladrao_arcano",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Ao causar dano com ataque furtivo em conjurador, rouba uma magia vista (1 PM por círculo, até o 4º) e pode lançá-la até o fim da cena",
+    "prereq": {
+     "poder": "roubo_de_mana",
+     "nivel": 13
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mao_na_boca",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "+2 em testes de agarrar; ao acertar ataque furtivo em criatura desprevenida, pode agarrar como ação livre",
+    "prereq": {
+     "treinado": "luta"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.maos_rapidas",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Uma vez por rodada, 1 PM: teste de Ladinagem (abrir fechadura, ocultar item, punga ou sabotar) como ação livre",
+    "prereq": {
+     "des": 2,
+     "treinado": "ladinagem"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mente_criminosa",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Soma Inteligência nos testes de Ladinagem e Furtividade",
+    "prereq": {
+     "int": 1
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.oportunismo",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Uma vez por rodada, quando um inimigo adjacente sofre dano de um aliado, gasta 2 PM para atacá-lo corpo a corpo",
+    "prereq": {
+     "nivel": 6
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.roubo_de_mana",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Ao causar dano furtivo, ganha 1 PM temporário e drena 1 PM do alvo por 1d6 de dano; uma vez por cena contra cada criatura",
+    "prereq": {
+     "poder": "truque_magico",
+     "nivel": 7
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.saqueador_de_tumbas",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "+5 em Investigação para achar armadilhas e em testes de resistência contra elas; desabilita mecanismos com ação padrão",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.veneno_persistente",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "Veneno aplicado a uma arma dura três ataques, em vez de apenas um",
+    "prereq": {
+     "poder": "veneno_potente",
+     "nivel": 8
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.veneno_potente",
+   "valor": {
+    "classe": "ladino",
+    "efeito": "CD para resistir aos seus venenos aumenta em +5 (exige treino em Ofício alquimista)",
+    "prereq": {
+     "treinado": "oficio"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 74,
+   "pdf_page": 80,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.caldeirao_do_bruxo",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Cria poções como se tivesse o poder geral Preparar Poção (até 5º círculo se tiver os dois)",
+    "prereq": {
+     "texto": "Bruxo; treinado em Ofício (alquimista)"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.conhecimento_magico",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Aprende duas magias de qualquer círculo que possa lançar; pode ser escolhido várias vezes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.contramagica_aprimorada",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Uma vez por rodada, faz uma contramágica como reação",
+    "prereq": {
+     "texto": "Dissipar Magia"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.envolto_em_misterio",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "+5 em Enganação e Intimidação contra pessoas não treinadas em Conhecimento ou Misticismo",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escriba_arcano",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Aprende magias copiando textos: 1 dia de trabalho e T$ 250 em matérias-primas por PM da magia",
+    "prereq": {
+     "texto": "Mago; treinado em Ofício (escriba)"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.especialista_em_escola",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Escolhe uma escola de magia: CD para resistir às suas magias dela aumenta em +2",
+    "prereq": {
+     "texto": "Bruxo ou Mago"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.familiar",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Animal de estimação mágico, comunicação telepática em alcance longo; escolha entre as opções do quadro (Borboleta, Cobra, Coruja etc.)",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fluxo_de_mana",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Mantém dois efeitos sustentados ativos com uma ação livre, pagando o custo de cada um",
+    "prereq": {
+     "nivel": 10
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.foco_vital",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Segurando o foco, ao sofrer dano que levaria a 0 PV, fica com 1 PV e o foco perde o excedente",
+    "prereq": {
+     "texto": "Bruxo"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fortalecimento_arcano",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "CD para resistir às suas magias aumenta em +1 (em +2 se puder lançar magias de 4º círculo)",
+    "prereq": {
+     "nivel": 5
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.heranca_aprimorada",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Recebe a herança aprimorada da linhagem sobrenatural",
+    "prereq": {
+     "texto": "Feiticeiro",
+     "nivel": 6
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.heranca_superior",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Recebe a herança superior da linhagem sobrenatural",
+    "prereq": {
+     "texto": "Herança Aprimorada",
+     "nivel": 11
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_em_escola",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Magias da escola escolhida custam –1 PM",
+    "prereq": {
+     "poder": "especialista_em_escola",
+     "nivel": 8
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 38,
+   "pdf_page": 44,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.raio_elemental",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Com Raio Arcano, paga 1 PM para causar ácido, eletricidade, fogo, frio ou trevas; se o alvo falhar em Reflexos, sofre a condição do tipo",
+    "prereq": {
+     "poder": "raio_arcano"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 39,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.raio_poderoso",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Os dados do Raio Arcano passam a ser d12 e o alcance passa a ser médio",
+    "prereq": {
+     "poder": "raio_arcano"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 39,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.tinta_do_mago",
+   "valor": {
+    "classe": "arcanista",
+    "efeito": "Cria pergaminhos como o poder Escrever Pergaminho; custo reduzido à metade se tiver os dois",
+    "prereq": {
+     "texto": "Mago; treinado em Ofício (escriba)"
+    },
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 39,
+   "pdf_page": 45,
+   "status": "VERIFICADA"
   }
  ]
 }

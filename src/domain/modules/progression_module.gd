@@ -31,6 +31,13 @@ const POWERS := {
 const GENERAL_POWERS := ["ataque_poderoso", "trespassar", "combate_defensivo", "esquiva", "reflexos_combate",
 	"saque_rapido", "vitalidade", "vontade_de_ferro"]
 const GENERAL_TREE_ONLY := ["quebrar_aprimorado", "derrubar_aprimorado", "desarmar_aprimorado"]
+## Poderes de classe do livro ainda sem efeito no jogo: aparecem na árvore como "não implementado",
+## mas não entram nas opções de subida de nível (available_powers só lê POWERS e GENERAL_POWERS).
+const CLASS_TREE_ONLY := {
+	"guerreiro": ["ambidestria", "esgrimista", "especializacao_armadura", "golpe_pessoal", "bater_e_correr", "golpe_demolidor", "destruidor", "mestre_em_arma", "planejamento_marcial", "romper_resistencias", "solidez", "tornado_de_dor"],
+	"ladino": ["assassinar", "contatos_no_submundo", "escapista", "fuga_formidavel", "ladrao_arcano", "mao_na_boca", "maos_rapidas", "mente_criminosa", "oportunismo", "roubo_de_mana", "saqueador_de_tumbas", "veneno_persistente", "veneno_potente"],
+	"arcanista": ["caldeirao_do_bruxo", "conhecimento_magico", "contramagica_aprimorada", "envolto_em_misterio", "escriba_arcano", "especialista_em_escola", "familiar", "fluxo_de_mana", "foco_vital", "fortalecimento_arcano", "heranca_aprimorada", "heranca_superior", "mestre_em_escola", "raio_elemental", "raio_poderoso", "tinta_do_mago"],
+}
 
 
 func module_id() -> String: return "progression"
@@ -85,6 +92,11 @@ func falta_texto(p: String) -> String:
 		elif k == "poder":
 			if not s.has_power(str(pre[k])):
 				falta.append("poder " + str(pre[k]).replace("_", " ").capitalize())
+		elif k == "nivel":
+			if s.level < int(pre[k]):
+				falta.append("%dº nível (tem %d)" % [int(pre[k]), s.level])
+		elif k == "texto":
+			pass
 		elif int(s.attrs.get(k, 0)) < int(pre[k]):
 			falta.append("%s %d (tem %d)" % [str(k).to_upper(), int(pre[k]), int(s.attrs.get(k, 0))])
 	return ", ".join(falta)
@@ -273,7 +285,7 @@ func power_tree() -> Dictionary:
 	var cls := s.class_id if s.class_id != "" else "guerreiro"
 	var avail := available_powers()
 	var nodes: Array = []
-	var branches := {cls: POWERS.get(cls, []), "geral": GENERAL_POWERS + GENERAL_TREE_ONLY}
+	var branches := {cls: POWERS.get(cls, []) + CLASS_TREE_ONLY.get(cls, []), "geral": GENERAL_POWERS + GENERAL_TREE_ONLY}
 	for br in branches:
 		for p in branches[br]:
 			var r: Dictionary = world.rules.value("poder." + p, {})
@@ -295,6 +307,8 @@ static func prereq_texto(pre: Dictionary) -> String:
 		match k:
 			"treinado": parts.append("treinado em " + str(pre[k]).capitalize())
 			"poder": parts.append(str(pre[k]).replace("_", " ").capitalize())
+			"nivel": parts.append("%dº nível" % int(pre[k]))
+			"texto": parts.append(str(pre[k]))
 			_: parts.append("%s %d" % [str(k).capitalize(), int(pre[k])])
 	return ", ".join(parts) if not parts.is_empty() else "—"
 
@@ -332,6 +346,10 @@ func prereq_ok(s: CharacterSheet, p: String) -> bool:
 			if not s.trained.has(str(pre[k])): return false
 		elif k == "poder":
 			if not s.has_power(str(pre[k])): return false
+		elif k == "nivel":
+			if s.level < int(pre[k]): return false
+		elif k == "texto":
+			pass  # condição de caminho ou de outro poder descrita em texto; não verificada aqui
 		elif int(s.attrs.get(k, 0)) < int(pre[k]):
 			return false
 	return true
