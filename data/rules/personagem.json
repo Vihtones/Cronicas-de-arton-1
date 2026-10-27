@@ -6618,6 +6618,493 @@
    "pagina": 87,
    "pdf_page": 93,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.acuidade_com_arma",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma corpo a corpo leve ou de arremesso, usa Destreza no lugar de Força no ataque e no dano",
+    "implementado": false,
+    "prereq": {
+     "des": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ataque_com_escudo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com escudo, na ação agredir, gasta 1 PM para um ataque corpo a corpo extra com o escudo, sem perder o bônus na Defesa",
+    "implementado": false,
+    "prereq": {
+     "poder": "estilo_de_arma_e_escudo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ataque_preciso",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma corpo a corpo em uma mão e a outra livre: +2 na margem de ameaça e +1 no multiplicador de crítico",
+    "implementado": false,
+    "prereq": {
+     "poder": "estilo_de_uma_arma"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ataque_pesado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma de duas mãos, gasta 1 PM: se acertar, além do dano faz manobra derrubar ou empurrar como ação livre",
+    "implementado": false,
+    "prereq": {
+     "poder": "estilo_de_duas_maos"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arma_secundaria_grande",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Pode empunhar duas armas de uma mão com o poder Estilo de Duas Armas",
+    "implementado": false,
+    "prereq": {
+     "poder": "estilo_de_duas_armas"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 126,
+   "pdf_page": 132,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arremesso_multiplo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Uma vez por rodada, com arma de arremesso, gasta 1 PM para um ataque extra contra o mesmo alvo",
+    "implementado": false,
+    "prereq": {
+     "des": 1,
+     "poder": "estilo_de_arremesso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arremesso_potente",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma de arremesso, usa Força no lugar de Destreza no ataque; com Ataque Poderoso, vale também com arremesso",
+    "implementado": false,
+    "prereq": {
+     "for": 1,
+     "poder": "estilo_de_arremesso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bloqueio_com_escudo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Ao sofrer dano, gasta 1 PM para reduzir o dano em valor igual ao bônus de Defesa do escudo",
+    "implementado": false,
+    "prereq": {
+     "poder": "estilo_de_arma_e_escudo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.carga_de_cavalaria",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Investida montada causa +2d8 de dano e pode continuar se movendo após o ataque em linha reta, até o dobro do deslocamento",
+    "implementado": false,
+    "prereq": {
+     "poder": "ginete"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.disparo_preciso",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Ataques à distância contra oponentes em combate corpo a corpo sem a penalidade de –5",
+    "implementado": false,
+    "prereq": {
+     "texto": "Estilo de Disparo ou Estilo de Arremesso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.disparo_rapido",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma de disparo que recarrega como ação livre, na ação completa de agredir faz um ataque extra; –2 em todos os ataques até o próximo turno",
+    "implementado": false,
+    "prereq": {
+     "des": 1,
+     "poder": "estilo_de_disparo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.empunhadura_poderosa",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma de categoria de tamanho maior, a penalidade nos ataques cai para –2 (normal: –5)",
+    "implementado": false,
+    "prereq": {
+     "for": 3
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.encouracado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com armadura pesada, +2 na Defesa; +2 para cada outro poder Encouraçado que possuir",
+    "implementado": false,
+    "prereq": {
+     "texto": "proficiência com armaduras pesadas"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_arma_e_escudo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com escudo, o bônus de Defesa do escudo aumenta em +2",
+    "implementado": false,
+    "prereq": {
+     "treinado": "luta",
+     "texto": "proficiência com escudos"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_arma_longa",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "+2 em ataques com armas alongadas, que também podem atingir alvos adjacentes",
+    "implementado": false,
+    "prereq": {
+     "for": 1,
+     "treinado": "luta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_arremesso",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Saca armas de arremesso como ação livre e recebe +2 no dano com elas; com Saque Rápido, +2 no ataque também",
+    "implementado": false,
+    "prereq": {
+     "treinado": "pontaria"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_disparo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma de disparo, soma Destreza no dano",
+    "implementado": false,
+    "prereq": {
+     "treinado": "pontaria"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 125,
+   "pdf_page": 131,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_duas_armas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com duas armas (uma leve), na ação agredir ataca com as duas; –2 em todos os ataques até o próximo turno (sem penalidade com Ambidestria)",
+    "implementado": false,
+    "prereq": {
+     "des": 2,
+     "treinado": "luta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_duas_maos",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma corpo a corpo de duas mãos, +5 no dano (não pode ser usado com armas leves)",
+    "implementado": false,
+    "prereq": {
+     "for": 2,
+     "treinado": "luta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_de_uma_arma",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com arma corpo a corpo em uma mão e a outra livre: +2 na Defesa e nos ataques com ela (exceto desarmados)",
+    "implementado": false,
+    "prereq": {
+     "treinado": "luta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estilo_desarmado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Ataques desarmados causam 1d6 de dano, letal ou não letal, sem penalidades",
+    "implementado": false,
+    "prereq": {
+     "treinado": "luta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fanatico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Armadura pesada não reduz o deslocamento",
+    "implementado": false,
+    "prereq": {
+     "nivel": 12,
+     "poder": "encouracado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.finta_aprimorada",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "+2 em Enganação para fintar, que pode ser feito como ação de movimento",
+    "implementado": false,
+    "prereq": {
+     "treinado": "enganacao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.foco_em_arma",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Escolhe uma arma: +2 em ataques com ela; pode ser escolhido para armas diferentes",
+    "implementado": false,
+    "prereq": {
+     "texto": "proficiência com a arma escolhida"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ginete",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Passa automaticamente em testes de Cavalgar para não cair ao sofrer dano; sem penalidade para atacar à distância ou lançar magias montado",
+    "implementado": false,
+    "prereq": {
+     "treinado": "cavalgar"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 124,
+   "pdf_page": 130,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inexpugnavel",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Com armadura pesada, +2 em todos os testes de resistência",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6,
+     "poder": "encouracado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mira_apurada",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Ao usar a ação mirar, +2 em ataques à distância e na margem de ameaça até o fim do turno",
+    "implementado": false,
+    "prereq": {
+     "sab": 1,
+     "poder": "disparo_preciso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.piqueiro",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Uma vez por rodada, com arma alongada, gasta 1 PM para atacar inimigo que entra no alcance; se ele investiu, +2 dados de dano",
+    "implementado": false,
+    "prereq": {
+     "poder": "estilo_de_arma_longa"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.presenca_aterradora",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Ação padrão e 1 PM: assusta todas as criaturas escolhidas em alcance curto",
+    "implementado": false,
+    "prereq": {
+     "treinado": "intimidacao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 128,
+   "pdf_page": 134,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.proficiencia",
+   "valor": {
+    "classe": "geral",
+    "grupo": "combate",
+    "efeito": "Escolhe armas marciais, armas de fogo, armaduras pesadas ou escudos (com armas marciais, também exóticas); pode ser escolhido várias vezes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 126,
+   "pdf_page": 132,
+   "status": "VERIFICADA"
   }
  ]
 }

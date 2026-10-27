@@ -30,7 +30,8 @@ const POWERS := {
 ## entram como opção; a árvore também mostra os ainda não implementados (marcados).
 const GENERAL_POWERS := ["ataque_poderoso", "trespassar", "combate_defensivo", "esquiva", "reflexos_combate",
 	"saque_rapido", "vitalidade", "vontade_de_ferro"]
-const GENERAL_TREE_ONLY := ["quebrar_aprimorado", "derrubar_aprimorado", "desarmar_aprimorado"]
+const GENERAL_TREE_ONLY := ["quebrar_aprimorado", "derrubar_aprimorado", "desarmar_aprimorado",
+	"acuidade_com_arma", "ataque_com_escudo", "ataque_preciso", "ataque_pesado", "arma_secundaria_grande", "arremesso_multiplo", "arremesso_potente", "bloqueio_com_escudo", "carga_de_cavalaria", "disparo_preciso", "disparo_rapido", "empunhadura_poderosa", "encouracado", "estilo_de_arma_e_escudo", "estilo_de_arma_longa", "estilo_de_arremesso", "estilo_de_disparo", "estilo_de_duas_armas", "estilo_de_duas_maos", "estilo_de_uma_arma", "estilo_desarmado", "fanatico", "finta_aprimorada", "foco_em_arma", "ginete", "inexpugnavel", "mira_apurada", "piqueiro", "presenca_aterradora", "proficiencia"]
 ## Poderes de classe do livro ainda sem efeito no jogo: aparecem na árvore como "não implementado",
 ## mas não entram nas opções de subida de nível (available_powers só lê POWERS e GENERAL_POWERS).
 const CLASS_TREE_ONLY := {
