@@ -166,7 +166,7 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 	if p_class == "clerigo":
 		# Clérigo: conjura com Sabedoria. Só Curar Ferimentos está implementada (ver ROADMAP).
 		s.caster_attr = "sab"
-		for sp in ["curar_ferimentos", "perdicao"]:   # só magias completas no jogo (SpellRules.COMPLETAS)
+		for sp in ["curar_ferimentos", "perdicao", "infligir_ferimentos"]:   # 3 magias iniciais, todas completas (SpellRules.COMPLETAS)
 			s.spells.append(sp)
 	s.pm = s.pm_max
 	for f in c.pericias_fixas:

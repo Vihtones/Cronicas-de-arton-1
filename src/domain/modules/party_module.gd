@@ -176,6 +176,8 @@ func on_event(e: GameEvent) -> Array:
 		return []
 	if e.event_type == "TIME_ADVANCED" and world.day_index() != last_day:
 		last_day = world.day_index()
+		if world.player_sheet != null:
+			world.player_sheet.limpar_dia(world.day_index())   # efeitos de magia "por um dia" acabam
 		for id in members:
 			members[id].loyalty = minf(100.0, float(members[id].loyalty) + 1.0)
 			_descansa(id)

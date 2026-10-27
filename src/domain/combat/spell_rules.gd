@@ -5,7 +5,16 @@ extends RefCounted
 
 const COMPLETAS := {
 	"perdicao": {"aprimoramentos": [0]},
+	"infligir_ferimentos": {"aprimoramentos": [0, 1, 2, 3]},
+	"resistencia_a_energia": {"aprimoramentos": [0, 1, 2, 3, 4]},
 }
+## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2]}
+## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
+const ALCANCE_APR := {"infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}}
+## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
+const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
+const TIPOS_ENERGIA := ["acido", "eletricidade", "fogo", "frio", "luz", "trevas"]
 
 
 ## Círculo máximo que o conjurador pode lançar. Usa a tabela de conjuração da classe (ex.: clérigo: 2º no 5º nível).
@@ -21,21 +30,46 @@ static func circulo_maximo(sheet: CharacterSheet, rules: RuleRegistry) -> int:
 	return best
 
 
-## Magia de alvos escolhidos (ex.: Perdição): o jogador marca vários inimigos antes de confirmar.
-static func multi_alvo(sp: Dictionary) -> bool:
-	return str(sp.get("alvo_tipo", "")) == "Alvos"
+## Círculo exigido pelo aprimoramento, lido do texto do catálogo ("Requer 2º círculo.").
+static func circulo_exigido(sp_id: String, i: int, rules: RuleRegistry) -> int:
+	var lista: Array = rules.value("magia." + sp_id, {}).get("aprimoramentos", [])
+	if i < 0 or i >= lista.size():
+		return 99
+	var m := RegEx.create_from_string("Requer (\\d)º círculo").search(str(lista[i].texto))
+	return int(m.get_string(1)) if m else 1
+
+
+static func multi_alvo(sp_id: String, sp: Dictionary, apr: Array) -> bool:
+	if str(sp.get("alvo_tipo", "")) == "Alvos":
+		return true
+	for i in MULTI_APR.get(sp_id, []):
+		if apr.has(i):
+			return true
+	return false
+
+
+## Alcance efetivo com os aprimoramentos escolhidos (ex.: Infligir Ferimentos muda para curto).
+static func alcance_efetivo(sp_id: String, base: String, apr: Array) -> String:
+	for i in ALCANCE_APR.get(sp_id, {}):
+		if apr.has(i):
+			return str(ALCANCE_APR[sp_id][i])
+	return base
 
 
 static func aprimoramentos_disponiveis(sp_id: String) -> Array:
 	return COMPLETAS.get(sp_id, {}).get("aprimoramentos", [])
 
 
-static func aprimoramentos_validos(sp_id: String, idx: Array) -> bool:
+static func aprimoramentos_validos(sp_id: String, idx: Array, sheet: CharacterSheet, rules: RuleRegistry) -> bool:
 	if not COMPLETAS.has(sp_id):
 		return idx.is_empty()
 	var permitidos: Array = COMPLETAS[sp_id].aprimoramentos
+	var cmax := circulo_maximo(sheet, rules)
 	for i in idx:
-		if not permitidos.has(int(i)):
+		if not permitidos.has(int(i)) or circulo_exigido(sp_id, int(i), rules) > cmax:
+			return false
+	for par in EXCLUSIVOS.get(sp_id, []):
+		if idx.has(par[0]) and idx.has(par[1]):
 			return false
 	return true
 
@@ -53,3 +87,7 @@ static func custo_aprimoramentos(rules: RuleRegistry, sp_id: String, idx: Array)
 static func penalidade_perdicao(sheet: CharacterSheet, rules: RuleRegistry, idx: Array) -> int:
 	var p := 1 + (1 if idx.has(0) else 0)
 	return mini(p, circulo_maximo(sheet, rules))
+
+
+static func tipo_energia_valido(t: String) -> bool:
+	return TIPOS_ENERGIA.has(t)

@@ -19,7 +19,9 @@ var special := false
 var spell := "seta_infalivel"   # magia selecionada no modo magia (tecla 4 alterna)
 var pungente := false   # Magia Pungente no próximo lançamento
 var spell_alvos: Array = []   # magias de alvos escolhidos: inimigos marcados antes de confirmar
-var spell_apr: Array = []     # aprimoramentos ligados na próxima magia (tecla B)
+var spell_apr: Array = []     # aprimoramentos ligados na próxima magia (tecla B; G troca o aprimoramento em foco)
+var apr_cursor := 0           # aprimoramento em foco (tecla G avança)
+var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla T)
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var hover := Vector2i(-1, -1)
 var preview: Dictionary = {}
@@ -111,6 +113,9 @@ func cycle_spell() -> void:
 	else:
 		spell = known[(known.find(spell) + 1) % known.size()]
 	mode = "magia"
+	spell_apr.clear()
+	spell_alvos.clear()
+	apr_cursor = 0
 	var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 	var cost := GhostPlanner.spell_cost(Game.world.rules, sp, {"pungente": pungente})
 	var c: Dictionary = Game.world.modules.combat.casting_cd(Game.world.player_sheet, sp, cost)
@@ -216,7 +221,7 @@ func candidate_actions(t: Vector2i) -> Array:
 				return [{"type": "cast", "spell": spell, "targets": ["player"], "pungente": pungente}]
 			if target == "" or not gs.is_enemy("player", target):
 				return []
-			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate()}]
+			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo}]
 	return []
 
 
@@ -227,7 +232,7 @@ func _update_preview() -> void:
 
 
 func add_hover_to_plan() -> void:
-	if mode == "magia" and SpellRules.multi_alvo(GhostPlanner.spell_rule(Game.world.rules, spell)):
+	if mode == "magia" and SpellRules.multi_alvo(spell, GhostPlanner.spell_rule(Game.world.rules, spell), spell_apr):
 		_toggle_alvo(hover)
 		return
 	var cand := candidate_actions(hover)
@@ -265,13 +270,36 @@ func toggle_aprimoramento() -> void:
 	if disp.is_empty():
 		message.emit("Esta magia não tem aprimoramentos disponíveis.")
 		return
-	spell_apr = [] if not spell_apr.is_empty() else [disp[0]]
-	message.emit("Aprimoramento %s." % ("ligado (+%d PM)" % Game.world.rules.value("magia." + spell).aprimoramentos[disp[0]].pm if not spell_apr.is_empty() else "desligado"))
+	var i: int = disp[apr_cursor % disp.size()]
+	if spell_apr.has(i):
+		spell_apr.erase(i)
+	else:
+		spell_apr.append(i)
+	var info: Dictionary = Game.world.rules.value("magia." + spell).aprimoramentos[i]
+	message.emit("%s (+%d PM): %s" % ["ligado" if spell_apr.has(i) else "desligado", int(info.pm), str(info.texto).substr(0, 90)])
+	_update_preview()
+
+
+func cycle_aprimoramento() -> void:
+	var disp: Array = SpellRules.aprimoramentos_disponiveis(spell)
+	if disp.is_empty():
+		return
+	apr_cursor = (apr_cursor + 1) % disp.size()
+	message.emit("Aprimoramento em foco: %d de %d (B liga/desliga)." % [apr_cursor + 1, disp.size()])
+
+
+func cycle_energia() -> void:
+	if spell != "resistencia_a_energia":
+		message.emit("Tipo de energia só se aplica à Resistência a Energia.")
+		return
+	var lista: Array = SpellRules.TIPOS_ENERGIA
+	energia_tipo = lista[(lista.find(energia_tipo) + 1) % lista.size()]
+	message.emit("Energia: %s (T troca)." % energia_tipo)
 
 
 func confirm() -> void:
 	if not spell_alvos.is_empty() and my_turn():
-		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente})
+		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo})
 		spell_alvos.clear()
 		mode = "mover"
 	if plan.is_empty() or not my_turn():
@@ -375,6 +403,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_3: mode = "misericordia"; _update_preview()
 			KEY_4: cycle_spell()
 			KEY_B: toggle_aprimoramento()
+			KEY_G: cycle_aprimoramento()
+			KEY_T: cycle_energia()
 			KEY_5: drink_potion()
 			KEY_6: mode = "atirar"; message.emit("Modo tiro: clique no alvo (sem se mover)."); _update_preview()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()

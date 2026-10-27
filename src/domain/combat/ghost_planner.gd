@@ -94,15 +94,19 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var cost := spell_cost(sim.rules, sp, a)
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
-			if not SpellRules.aprimoramentos_validos(sp_id, a.get("aprimoramentos", [])):
+			var apr: Array = a.get("aprimoramentos", [])
+			if not SpellRules.aprimoramentos_validos(sp_id, apr, A.sheet, sim.rules):
 				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}
+			if sp_id == "resistencia_a_energia" and not SpellRules.tipo_energia_valido(str(a.get("tipo_energia", "fogo"))):
+				return {"ok": false, "reason": "tipo de energia inválido"}
 			if sp_id == "perdicao":
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):
 						return {"ok": false, "reason": "Perdição só afeta inimigos"}
-			if str(sp.alcance) == "pessoal": targets = [actor]
-			var reach := int(sim.rules.value("alcance.quadrados", {}).get(str(sp.alcance), 1))  # LB p.143 (toque/pessoal = 1)
-			if str(sp.alcance) == "toque":
+			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.alcance), apr)
+			if alc == "pessoal": targets = [actor]
+			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
+			if alc == "toque":
 				for tg in targets:
 					if tg == actor: return {"ok": false, "reason": "escolha um alvo adjacente"}
 			for tg in targets:

@@ -146,9 +146,9 @@ func add_condition(c: String) -> void:
 
 
 ## Adiciona um efeito temporário (troca o anterior com o mesmo id).
-func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: String = "") -> void:
+func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: String = "", ate: int = -1) -> void:
 	efeitos = efeitos.filter(func(e): return not (e.id == id_efeito and e.stat == stat and str(e.tipo) == tipo))
-	efeitos.append({"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo})
+	efeitos.append({"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo, "ate": ate})
 
 
 func remove_efeito(id_efeito: String) -> void:
@@ -182,7 +182,19 @@ func efeito_bonus(stat: String, tipo: String = "") -> int:
 
 ## Remove os efeitos que terminam em um momento (rodada, turno, cena, proxima_resistencia).
 func limpar_efeitos(fim: String) -> void:
+	for e in efeitos:
+		if e.fim == fim and e.stat == "condicao":
+			remove_condition(str(e.tipo))   # condição de magia (ex.: fraco pela cena) acaba junto
 	efeitos = efeitos.filter(func(e): return e.fim != fim)
+
+
+## Efeitos "por um dia" acabam quando o dia de término chega (ate = índice do dia em que acabam).
+func limpar_dia(dia_atual: int) -> void:
+	for e in efeitos:
+		if e.fim == "dia" and dia_atual >= int(e.ate):
+			if e.stat == "condicao":
+				remove_condition(str(e.tipo))
+	efeitos = efeitos.filter(func(e): return not (e.fim == "dia" and dia_atual >= int(e.ate)))
 
 
 func training_bonus() -> int:

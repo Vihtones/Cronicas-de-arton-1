@@ -663,6 +663,68 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				ts.add_efeito("magia.perdicao", "ataque", -pen, "cena")
 				ts.add_efeito("magia.perdicao", "dano", -pen, "cena")
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "perdicao", "penalidade": -pen, "tags": ["magia"]}, [id, tg]))
+		"infligir_ferimentos":
+			# Infligir Ferimentos (divina 1): 2d8+2 de trevas (cura mortos-vivos); Fortitude reduz à metade.
+			var apr: Array = a.get("aprimoramentos", [])
+			var dc := spell_dc(sh, a)
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts: CharacterSheet = sim.c(tg).sheet
+				var golpe_ok := true
+				var golpe_dano := 0
+				if apr.has(2):
+					# Ataque corpo a corpo como parte da execução: se acertar, dano do ataque e a magia (sem resistência)
+					var corp := ts.defense(world.rules, true)
+					var arma: Dictionary = {}
+					for at in sh.attacks:
+						if not at.get("distancia", false):
+							arma = at
+							break
+					golpe_ok = sh.skill_value("luta", world.rules) + world.rng.roll("combat", 1, 20)[0] >= corp
+					if golpe_ok and not arma.is_empty():
+						golpe_dano = int(Dice.roll(str(arma.dano), world.rng, "combat").total)
+				if not golpe_ok:
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": a.spell}, [id, tg]))
+					continue
+				var dado := Dice.roll("2d8+2", world.rng, "combat")
+				var total := int(dado.total)
+				if apr.has(1):
+					total += int(Dice.roll("1d8+1", world.rng, "combat").total)
+				var passou := false
+				if not apr.has(2):
+					var res := Checks.skill(ts, "fortitude", dc, world.rules, world.rng, "combat")
+					passou = res.get("success", false)
+				if ts.creature_type == "morto-vivo":
+					ts.pv = mini(ts.pv_max, ts.pv + total)
+					out.append(fact("HEALED", {"actor": id, "target": tg, "amount": total, "pv_after": ts.pv, "source": a.spell, "tags": ["magia", "cura"]}, [id, tg]))
+					continue
+				if passou:
+					total /= 2
+				var tags_d: Array = ["magia", "impacto"]
+				tags_d.append_array(sim.apply_damage(tg, total + golpe_dano))
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Infligir Ferimentos", "d20": 0, "mod": 0, "mods": [],
+					"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": total + golpe_dano, "rolls": dado.rolls,
+					"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "tags": tags_d}, [id, tg]))
+				if apr.has(0) and not passou:
+					ts.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
+					ts.add_condition("fraco")
+					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": "fraco", "tags": ["magia"]}, [id, tg]))
+		"resistencia_a_energia":
+			# Resistência a Energia (universal 1): redução de dano 10 contra um tipo de energia (aprimoramentos ajustam).
+			var apr2: Array = a.get("aprimoramentos", [])
+			var tipo := str(a.get("tipo_energia", "fogo"))
+			var rd := 10 + (5 if apr2.has(0) else 0)
+			var fim := "dia" if apr2.has(1) else "cena"
+			var ate := world.day_index() + 1 if apr2.has(1) else -1
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts2: CharacterSheet = sim.c(tg).sheet
+				if apr2.has(4):
+					ts2.add_efeito("magia.resistencia_a_energia", "imune", 1, fim, tipo, ate)
+				elif apr2.has(3):
+					for t in SpellRules.TIPOS_ENERGIA:
+						ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, t, ate)
+				else:
+					ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, tipo, ate)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "resistencia_a_energia", "tipo": tipo, "tags": ["magia"]}, [id, tg]))
 		"curar_ferimentos":
 			var tgt: String = a.get("target", id)
 			var r := Dice.roll(sp.cura, world.rng, "combat")
@@ -808,6 +870,8 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		if T.sheet.dr.has(dtype):
 			dmg = maxi(0, dmg - int(T.sheet.dr[dtype]))
 			tags.append("reducao")
+		if T.sheet.efeito_bonus("imune", dtype) > 0:
+			dmg = 0   # imunidade a tipo de energia (Resistência a Energia, 4º aprimoramento)
 		if T.sheet.efeito_rd(dtype) > 0:
 			dmg = maxi(0, dmg - T.sheet.efeito_rd(dtype))   # Resistência a Energia (magia)
 			tags.append("reducao")

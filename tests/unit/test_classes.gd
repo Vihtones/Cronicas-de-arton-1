@@ -82,6 +82,7 @@ func test_clerigo_conjura_com_sabedoria_e_cura() -> void:
 	var sh := _build("clerigo")
 	check(sh.spells.has("curar_ferimentos"), "clérigo começa com Curar Ferimentos")
 	check(sh.spells.has("perdicao"), "clérigo começa com Perdição (magia completa)")
+	check(sh.spells.has("infligir_ferimentos") and sh.spells.size() == 3, "clérigo começa com 3 magias completas")
 	check(sh.caster_attr == "sab", "atributo de conjuração é a Sabedoria")
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -161,3 +162,66 @@ func test_perdicao_em_varios_inimigos_com_aprimoramento_e_sem_aliados() -> void:
 	check(sim.c("bandido_1").sheet.efeito_bonus("ataque") == -2, "primeiro inimigo recebe –2 (círculo 2 permite)")
 	check(sim.c("bandido_2").sheet.efeito_bonus("dano") == -2, "segundo inimigo recebe –2 no dano")
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "perdicao", "targets": ["player"]}).ok, "não aceita a si mesmo")
+
+
+func _cena_com(sp: String, nivel: int, pos_alvo: Vector2i = Vector2i(27, 57)) -> Array:
+	var sh := _build("clerigo")
+	sh.spells = PackedStringArray([sp])
+	sh.equipment["armor"] = ""
+	sh.level = nivel
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1"], true, false)
+	var sim: CombatSim = w.modules.combat.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = pos_alvo
+	return [w, w.modules.combat, sim, sh]
+
+
+func test_infligir_ferimentos_causa_dano_e_respeita_aprimoramento_de_circulo() -> void:
+	var r := RuleRegistry.load_default()
+	var m := _cena_com("infligir_ferimentos", 1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var pv0: int = sim.c("bandido_1").sheet.pv
+	var a := {"type": "cast", "spell": "infligir_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "infligir válido em alvo adjacente: %s" % str(v))
+	c._cast("player", a, v)
+	check(sim.c("bandido_1").sheet.pv < pv0, "infligir reduz os PV do alvo")
+	check(SpellRules.aprimoramentos_validos("infligir_ferimentos", [3], m[3], r), "alcance curto e vários alvos não exigem círculo (LB)")
+	check(SpellRules.multi_alvo("infligir_ferimentos", {}, [3]), "aprimoramento 3 permite vários alvos")
+	check(SpellRules.aprimoramentos_validos("infligir_ferimentos", [1], m[3], r), "+1d8 vale no 1º círculo")
+
+
+func test_resistencia_a_energia_reduz_dano_e_exclusivos_nao_combinam() -> void:
+	var r := RuleRegistry.load_default()
+	var m := _cena_com("resistencia_a_energia", 1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "resistencia_a_energia", "target": "bandido_1", "targets": ["bandido_1"], "tipo_energia": "frio"}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "resistência a energia válida em aliado adjacente: %s" % str(v))
+	c._cast("player", a, v)
+	check(sim.c("bandido_1").sheet.efeito_rd("frio") == 10, "RD 10 contra o tipo escolhido")
+	check(sim.c("bandido_1").sheet.efeito_rd("fogo") == 0, "RD não vale para outro tipo")
+	check(not SpellRules.aprimoramentos_validos("resistencia_a_energia", [3, 4], m[3], r), "imunidade e RD para todos não combinam")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "resistencia_a_energia", "target": "bandido_1", "targets": ["bandido_1"], "tipo_energia": "fogo_extra"}).ok, "tipo inexistente é recusado")
+
+
+func test_efeito_de_um_dia_expira_na_virada_do_dia() -> void:
+	var sh := _build("clerigo")
+	sh.add_efeito("magia.resistencia_a_energia", "rd", 10, "dia", "fogo", 3)
+	sh.limpar_dia(2)
+	check(sh.efeito_rd("fogo") == 10, "ainda vale antes do dia de término")
+	sh.limpar_dia(3)
+	check(sh.efeito_rd("fogo") == 0, "acaba quando o dia de término chega")
+
+
+func test_condicao_de_magia_acaba_com_a_cena() -> void:
+	var sh := _build("clerigo")
+	sh.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
+	sh.add_condition("fraco")
+	sh.limpar_efeitos("cena")
+	check(not sh.conditions.has("fraco"), "fraco some ao fim da cena")
