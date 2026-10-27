@@ -7530,6 +7530,1465 @@
    "pagina": 131,
    "pdf_page": 137,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.afinidade_com_a_tormenta",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +10 em testes de resistência contra efeitos da Tormenta, de suas criaturas e de devotos de Aharadak. Seu primeiro poder da Tormenta não conta para perda de Carisma",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Aharadak"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.almejar_o_impossivel",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Ao fazer um teste de perícia, um resultado de 19 ou mais no dado é sempre um sucesso, não importando o valor a ser alcançado",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Valkaria ou Thwor"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.anfibio",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode respirar debaixo d’água e adquire deslocamento de natação igual ao terrestre",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Oceano"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.apostar_com_o_trapaceiro",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Ao fazer um teste de perícia, pode gastar 1 PM para apostar com Hyninn: você e o mestre rolam 1d20, e você escolhe entre o seu resultado e o resultado oculto do mestre",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Hyninn"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armas_da_ambicao",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +1 em testes de ataque e na margem de ameaça com armas nas quais é proficiente",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Valkaria"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.arsenal_das_profundezas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 nas rolagens de dano com azagaias, lanças e tridentes, e seu multiplicador de crítico com essas armas aumenta em +1",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Oceano"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.astucia_da_serpente",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 em Enganação, Furtividade e Intuição",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Sszzaas"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ataque_piedoso",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode usar armas corpo a corpo para causar dano não letal sem sofrer a penalidade de –5 no teste de ataque",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lena ou Thyatis"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_de_medo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 2 PM para gerar uma aura de medo de 9m de raio e duração até o fim da cena. Inimigos que entrem na aura fazem Vontade (CD Car) ou ficam abalados até o fim da cena. Quem passar fica imune por um dia",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Kallyadranoch"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_de_paz",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 2 PM para gerar uma aura de paz de 9m de raio e duração de uma cena. Inimigos na aura que tentem uma ação hostil contra você fazem Vontade (CD Car) ou perdem a ação. Quem passar fica imune por um dia",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Marah"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aura_restauradora",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Efeitos de cura usados por você e seus aliados em raio de 9m recuperam +1 PV por dado",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lena"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.bencao_do_mana",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +1 PM a cada nível ímpar",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Wynna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.caricia_sombria",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 1 PM e uma ação padrão para tocar uma criatura em alcance corpo a corpo com energia negativa: ela sofre 2d6 de dano de trevas (Fortitude CD Sab reduz à metade) e você recupera PV iguais à metade do dano. Pode aprender Toque Vampírico como magia divina, com custo –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tenebra"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.centelha_magica",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Escolha uma magia arcana ou divina de 1º círculo. Você aprende e pode lançar essa magia",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Wynna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.compreender_os_ermos",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 em Sobrevivência e pode usar Sabedoria para Adestramento (em vez de Carisma)",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Allihanna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.conhecimento_enciclopedico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você se torna treinado em duas perícias baseadas em Inteligência à sua escolha",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tanna-Toh"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.conjurar_arma",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 1 PM para invocar uma arma corpo a corpo ou de arremesso com a qual seja proficiente. A arma fornece +1 em testes de ataque e rolagens de dano, é mágica e dura a cena. Não pode criar armas de disparo, mas pode criar 20 munições",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Arsenal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 132,
+   "pdf_page": 138,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.coragem_total",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você é imune a efeitos de medo, mágicos ou não. Não elimina fobias raciais",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Arsenal ou Khalmyr ou Lin-Wu ou Valkaria"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.cura_gentil",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você soma seu Carisma aos PV restaurados por seus efeitos mágicos de cura",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lena"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.curandeira_perfeita",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você sempre pode escolher 10 em testes de Cura e não sofre penalidade por usar a perícia sem maleta de medicamentos. Com a maleta, recebe +2 no teste (ou +5, se ela for aprimorada)",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lena"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dedo_verde",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você aprende e pode lançar Controlar Plantas. Se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Allihanna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.descanso_natural",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Para você, dormir ao relento conta como condição de descanso confortável",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Allihanna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dom_da_esperanca",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você soma sua Sabedoria aos PV em vez de Constituição e se torna imune às condições alquebrado, esmorecido e frustrado",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Marah"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dom_da_imortalidade",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você é imortal: sempre que morre, volta à vida após 3d6 dias. Não pode ter Dom da Ressurreição",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Thyatis; paladino"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dom_da_profecia",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode lançar Augúrio; se aprender novamente, o custo diminui em –1 PM. Pode gastar 2 PM para receber +2 em um teste",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Thyatis"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dom_da_ressurreicao",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação completa e todos os PM (mínimo 1) para ressuscitar uma criatura morta há menos de um ano: ela volta com 1 PV e 0 PM e perde 1 de Constituição permanentemente. Uma vez por criatura. Não pode ter Dom da Imortalidade",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Thyatis; clérigo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dom_da_verdade",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 2 PM para receber +5 em Intuição e em Percepção contra Enganação e Furtividade até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Khalmyr"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escamas_draconicas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 na Defesa e em Fortitude",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Kallyadranoch"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escudo_magico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Quando lança uma magia, recebe bônus na Defesa igual ao círculo da magia até o início do seu próximo turno",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Wynna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.espada_justiceira",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 1 PM para encantar sua espada (ou outra arma corpo a corpo de corte): o dano dela aumenta em um passo até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Khalmyr"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.espada_solar",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 1 PM para que uma arma corpo a corpo de corte causa +1d6 de dano de fogo até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Azgher"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.extase_da_loucura",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Cada vez que uma ou mais criaturas falham em um teste de Vontade contra suas habilidades mágicas, você recebe 1 PM temporário, até um máximo por cena igual à sua Sabedoria",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Aharadak ou Nimb"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.familiar_ofidico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe um familiar cobra (veja a página 38) que não conta no seu limite de parceiros",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Sszzaas"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.farsa_do_fingidor",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você aprende e pode lançar Criar Ilusão; se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Hyninn"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fe_guerreira",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode usar Sabedoria para Guerra (em vez de Inteligência). Em combate, pode gastar 2 PM para substituir um teste de perícia por um teste de Guerra (exceto ataques)",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Arsenal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 133,
+   "pdf_page": 139,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.forma_de_macaco",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação completa e 2 PM para se transformar em macaco: tamanho Minúsculo (+5 em Furtividade e –5 em manobras) e deslocamento de escalada 9m. Equipamento fica indisponível e a transformação termina ao atacar, lançar magia ou sofrer dano",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Hyninn"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fulgor_solar",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe redução de frio e trevas 5. Ao ser alvo de um ataque, pode gastar 1 PM para emitir um clarão que deixa o atacante ofuscado por uma rodada",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Azgher"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.furia_divina",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 2 PM para se tornar temível: até o fim da cena, +2 em testes de ataque e rolagens de dano corpo a corpo, mas não pode executar ações que exijam paciência ou concentração (como Furtividade ou lançar magias). Com a habilidade Fúria, dura uma cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Thwor"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.golpista_divino",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 em Enganação, Jogatina e Ladinagem",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Hyninn"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.habitante_do_deserto",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe redução de fogo 10 e pode gastar 1 PM para criar água pura e potável suficiente para um odre",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Azgher"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inimigo_de_tenebra",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Seus ataques e habilidades causam +1d6 de dano contra mortos-vivos. Efeitos que geram luz têm o alcance da iluminação dobrado",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Azgher"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.kiai_divino",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Uma vez por rodada, ao fazer um ataque corpo a corpo, pode pagar 3 PM. Se acertar, causa dano máximo sem rolar dados",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lin-Wu"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.liberdade_divina",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 2 PM para receber imunidade a efeitos de movimento por uma rodada",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Valkaria"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.manto_da_penumbra",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você aprende e pode lançar Escuridão; se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tenebra"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mente_analitica",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 em Intuição, Investigação e Vontade",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tanna-Toh"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mente_vazia",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 em Iniciativa, Percepção e Vontade",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lin-Wu"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mestre_dos_mares",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode falar com animais aquáticos e aprende e pode lançar Acalmar Animal, mas só contra criaturas aquáticas. Se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Oceano"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.olhar_amedrontador",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você aprende e pode lançar Amedrontar; se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Megalokk ou Thwor"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.palavras_de_bondade",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você aprende e pode lançar Enfeitiçar; se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Marah"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.percepcao_temporal",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 3 PM para somar sua Sabedoria (limitada pelo nível, não cumulativa com efeitos que somam este atributo) a seus ataques, Defesa e testes de Reflexos até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Aharadak"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pesquisa_abencoada",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Após uma hora pesquisando, pode rolar novamente um teste de perícia baseada em Inteligência ou Sabedoria feito desde a última cena. Com livros, recebe +2 (biblioteca pequena) ou +5 (biblioteca de templo ou universidade)",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tanna-Toh"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.poder_oculto",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação de movimento e 2 PM para rolar 1d6: 1 ou 2 dá +2 em Força; 3 ou 4 em Destreza; 5 ou 6 em Constituição, até o fim da cena. Bônus no mesmo atributo não são cumulativos",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Nimb"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 134,
+   "pdf_page": 140,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.presas_primordiais",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 1 PM para transformar seus dentes em presas até o fim da cena: arma natural de mordida (1d6, crítico x2, perfuração). Uma vez por rodada, ao usar agredir, pode gastar 1 PM para um ataque extra com a mordida; se já tiver mordida, o dano dela aumenta em dois passos",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Kallyadranoch ou Megalokk"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sopro_do_mar",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação padrão e 1 PM para soprar um cone de 6m: criaturas na área sofrem 2d6 de dano de frio (Reflexos CD Sab reduz à metade). Pode aprender Sopro das Uivantes como magia divina, com custo –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Oceano"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.presas_venenosas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação de movimento e 1 PM para envenenar uma arma corpo a corpo que esteja empunhando. Em acerto, a arma causa perda de 1d12 PV. O veneno dura até atingir uma criatura ou até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Sszzaas"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.rejeicao_divina",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe resistência a magia divina +5",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Aharadak"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.reparar_injustica",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Uma vez por rodada, quando um oponente em alcance curto acerta um ataque em você ou em um aliado, pode gastar 2 PM para fazê-lo repetir o ataque, escolhendo o pior entre os dois resultados",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Khalmyr"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sangue_de_ferro",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta 3 PM para receber +2 em rolagens de dano e redução de dano 5 até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Arsenal"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sangue_ofidico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe resistência a veneno +5 e a CD para resistir aos seus venenos aumenta em +2",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Sszzaas"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.servos_do_dragao",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação completa e 2 PM para invocar 2d4+1 kobolds capangas em espaços desocupados em alcance curto. Ação de movimento para andar (9m) ou ação padrão para causar 1d6–1 de dano de perfuração em adjacentes. Têm For –1, Des 1, Defesa 12 e 1 PV, falham em testes de resistência e desaparecem ao morrer ou no fim da cena. Só agem com ordem",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Kallyadranoch"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sorte_dos_loucos",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Ao fazer um teste, pode pagar 1 PM para rolá-lo novamente (quantas vezes quiser). Se ainda falhar, perde 1d6 PM para cada vez que usou o poder naquele teste",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Nimb"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.talento_artistico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você recebe +2 em Acrobacia, Atuação e Diplomacia",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Marah"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.teurgista_mistico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Até uma magia de cada círculo que aprender pode ser escolhida entre magias divinas (se for arcano) ou arcanas (se for divino)",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Wynna; habilidade de classe Magias"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.tradicao_de_lin_wu",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você considera a katana uma arma simples e, se for proficiente em armas marciais, recebe +1 na margem de ameaça com ela",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Lin-Wu"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.transmissao_da_loucura",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode lançar Sussurros Insanos (CD Car). Se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Nimb"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.tropas_duyshidakk",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação completa e 2 PM para invocar 1d4+1 goblinoides capangas em espaços desocupados em alcance curto. Ação de movimento para andá-los (9m) ou ação padrão para causarem 1d6+1 de corte a adjacentes. Têm For 1, Des 1, Defesa 15, 1 PV, falham em testes de resistência e desaparecem ao morrer ou no fim da cena. Só agem com ordem",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Thwor"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 135,
+   "pdf_page": 141,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.urro_divino",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Ao fazer um ataque ou lançar uma magia, pode pagar 1 PM para somar sua Constituição (mínimo +1) à rolagem de dano",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Megalokk"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.visao_nas_trevas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você enxerga perfeitamente no escuro, inclusive em magias de escuridão",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tenebra"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.voz_da_civilizacao",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você está sempre sob efeito de Compreensão",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tanna-Toh"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.voz_da_natureza",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você pode falar com animais e aprende e pode lançar Acalmar Animal, só contra animais. Se aprender novamente, o custo diminui em –1 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Allihanna"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.voz_dos_monstros",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Você conhece os idiomas dos monstros inteligentes e pode se comunicar com monstros não inteligentes (Int –4 ou menor), como sob efeito de Voz Divina",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Megalokk"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.zumbificar",
+   "valor": {
+    "classe": "geral",
+    "grupo": "devocao",
+    "efeito": "Gasta uma ação completa e 3 PM para reanimar o cadáver de uma criatura Pequena ou Média adjacente por um dia. Ele funciona como parceiro iniciante (combatente, fortão ou guardião). Ao sofrer dano, pode sacrificar o parceiro para sofrer apenas metade do dano",
+    "implementado": false,
+    "prereq": {
+     "texto": "devoto de Tenebra"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.anatomia_insana",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você tem 25% de chance de ignorar o dano adicional de um acerto crítico ou ataque furtivo. A chance aumenta em 25% para cada dois outros poderes da Tormenta que possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.antenas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe +1 em Iniciativa, Percepção e Vontade. O bônus aumenta em +1 para cada dois outros poderes da Tormenta que possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.armamento_aberrante",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Gasta uma ação de movimento e 1 PM para produzir uma versão orgânica de uma arma corpo a corpo ou de arremesso com a qual seja proficiente. O dano aumenta em um passo para cada dois outros poderes da Tormenta. Dura a cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "outro poder da Tormenta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.articulacoes_flexiveis",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe +1 em Acrobacia, Furtividade e Reflexos. O bônus aumenta em +1 para cada dois outros poderes da Tormenta que possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.asas_insetoides",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Gasta 1 PM para receber deslocamento de voo 9m até o fim do turno. Aumenta em +1,5m para cada outro poder da Tormenta que possui",
+    "implementado": false,
+    "prereq": {
+     "texto": "quatro outros poderes da Tormenta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.carapaca",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe +1 na Defesa. O bônus aumenta em +1 para cada dois outros poderes da Tormenta que possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.corpo_aberrante",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Seu dano desarmado aumenta em um passo, mais um passo para cada quatro outros poderes da Tormenta que possui",
+    "implementado": false,
+    "prereq": {
+     "texto": "outro poder da Tormenta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.cuspir_enxame",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Gasta uma ação completa e 2 PM para criar um enxame de insetos em alcance curto (duração sustentada, tamanho Médio). Move 9m com ação de movimento. No fim do seu turno causa 2d6 de dano de ácido a quem estiver no espaço dele. Para cada dois outros poderes da Tormenta, pode gastar +1 PM para +1d6 de dano",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 136,
+   "pdf_page": 142,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dentes_afiados",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe uma arma natural de mordida (1d4, crítico x2, corte). Uma vez por rodada, ao usar agredir, pode gastar 1 PM para um ataque extra com a mordida",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.desprezar_a_realidade",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Gasta 2 PM para ficar no limiar da realidade até o início do seu próximo turno: ignora terreno difícil e causa 20% de chance de falha em efeitos usados contra você. A chance aumenta em 5% para cada dois outros poderes da Tormenta (máximo 50%)",
+    "implementado": false,
+    "prereq": {
+     "texto": "quatro outros poderes da Tormenta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.empunhadura_rubra",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Gasta 1 PM para cobrir as mãos com uma carapaça rubra. Até o fim da cena, +1 em Luta, aumentando em +1 para cada dois outros poderes da Tormenta",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.fome_de_mana",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Ao passar em um teste de resistência contra habilidade mágica de um inimigo, recebe 1 PM temporário cumulativo, até um máximo por cena igual ao número de poderes da Tormenta que possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.larva_explosiva",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Se uma criatura que sofreu dano da sua mordida nesta cena for reduzida a 0 PV ou menos, ela explode em chuva cáustica causando 4d4 de dano de ácido em adjacentes. Aumenta em +2d4 para cada dois outros poderes da Tormenta. Você é imune a esse dano",
+    "implementado": false,
+    "prereq": {
+     "texto": "Dentes Afiados"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.legiao_aberrante",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Seu corpo vira massa de insetos: atravessa qualquer espaço por onde passe uma moeda (terreno difícil) e recebe +1 em testes contra manobras e em resistência contra efeitos que tenham você como alvo (não de área). Bônus aumenta em +1 para cada dois outros poderes da Tormenta",
+    "implementado": false,
+    "prereq": {
+     "texto": "Anatomia Insana e três outros poderes da Tormenta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.maos_membranosas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe +1 em Atletismo, Fortitude e testes de agarrar. O bônus aumenta em +1 para cada dois outros poderes da Tormenta que possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.membros_estendidos",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Seu alcance corpo a corpo aumenta em +1,5m. Para cada quatro outros poderes da Tormenta, aumenta em +1,5m",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.membros_extras",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Duas patas insetoides: uma vez por rodada, ao usar agredir, pode gastar 2 PM para um ataque extra com cada uma (1d4, crítico x2, corte). Com Ambidestria ou Estilo de Duas Armas, pode empunhar armas leves nelas (ainda gasta 2 PM e sofre –2 em todos os ataques)",
+    "implementado": false,
+    "prereq": {
+     "texto": "quatro outros poderes da Tormenta"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mente_aberrante",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe resistência a efeitos mentais +1. Sempre que faz teste de Vontade para resistir a uma habilidade, a criatura que a usou sofre 1d6 de dano psíquico. Para cada dois outros poderes da Tormenta, o bônus aumenta em +1 e o dano em +1d6",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.olhos_vermelhos",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe visão no escuro e +1 em Intimidação. O bônus aumenta em +1 para cada dois outros poderes da Tormenta",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pele_corrompida",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Você recebe redução de ácido, eletricidade, fogo, frio, luz e trevas 2. Aumenta em +2 para cada dois outros poderes da Tormenta",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sangue_acido",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Quando sofre dano de um ataque corpo a corpo, o atacante sofre 1 de dano de ácido por poder da Tormenta que você possui",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.visco_rubro",
+   "valor": {
+    "classe": "geral",
+    "grupo": "tormenta",
+    "efeito": "Gasta 1 PM para expelir líquido corrosivo. Até o fim da cena, +1 nas rolagens de dano corpo a corpo, aumentando em +1 para cada dois outros poderes da Tormenta",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 137,
+   "pdf_page": 143,
+   "status": "VERIFICADA"
   }
  ]
 }
