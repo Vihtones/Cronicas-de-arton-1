@@ -26,7 +26,24 @@ var contratos: Dictionary = {}    # id da instância -> {contrato, membros, fim_
 
 func module_id() -> String: return "party"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["RecruitCompanion", "SetOrder", "CreateGuild", "AcceptContract", "GuildDistribute"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["NPC_DIED", "TIME_ADVANCED"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["NPC_DIED", "TIME_ADVANCED", "COMPANION_STATE"])
+
+## Ficha de combate completa do companheiro, montada pelo construtor de personagens (raça, classe, atributos, equipamento).
+func ficha_de(id: String) -> CharacterSheet:
+	var d := world.db.npc_def(id)
+	var f: Dictionary = d.get("combate", {"raca": "humano", "classe": "guerreiro", "preset": 1})
+	var attrs: Dictionary = CharacterBuilder.presets(str(f.classe))[int(f.preset)]
+	var sh := CharacterBuilder.build(world.rules, str(f.raca), str(f.classe), attrs, ["for", "des", "con"], str(d.get("name", id)))
+	CharacterBuilder.apply_equipment(world.rules, sh)
+	return sh
+
+
+## Onde o companheiro está agora: o destino do contrato em curso, ou "" se não estiver em serviço.
+func destino_de(id: String) -> String:
+	for c in contratos.values():
+		if c.membros.has(id):
+			return str(_contrato_def(c.contrato).get("destino", ""))
+	return ""
 
 
 func _contrato_def(id: String) -> Dictionary:
@@ -110,7 +127,7 @@ func execute(cmd: GameCommand) -> Array:
 		"RecruitCompanion":
 			var id := str(cmd.payload.npc_id)
 			var pagou := int(cmd.payload.get("pay", 0))
-			members[id] = {"loyalty": 0.0, "order": "seguir"}
+			members[id] = {"loyalty": 0.0, "order": "seguir", "sheet": ficha_de(id).to_dict()}
 			var out: Array = [fact("PARTY_JOINED", {"npc": id}, [id])]
 			if pagou > 0:
 				out.append(fact("GOLD_CHANGED", {"delta": -pagou, "reason": "contrato de companheiro"}))
@@ -152,12 +169,25 @@ func on_event(e: GameEvent) -> Array:
 		if members.erase(id):
 			out.append(fact("PARTY_LOST", {"npc": id, "cause": "morte"}, [id]))
 		return out
+	if e.event_type == "COMPANION_STATE":
+		var id := str(e.payload.get("npc", ""))
+		if members.has(id):
+			members[id].sheet = e.payload.sheet
+		return []
 	if e.event_type == "TIME_ADVANCED" and world.day_index() != last_day:
 		last_day = world.day_index()
 		for id in members:
 			members[id].loyalty = minf(100.0, float(members[id].loyalty) + 1.0)
+			_descansa(id)
 		return _resolve_contracts()
 	return []
+
+
+## Um dia de descanso recupera um quarto dos PV máximos (companheiro ferido não entra em luta até se recuperar).
+func _descansa(id: String) -> void:
+	var sh := CharacterSheet.from_dict(members[id].sheet)
+	sh.pv = mini(sh.pv_max, sh.pv + maxi(1, sh.pv_max / 4))
+	members[id].sheet = sh.to_dict()
 
 
 ## Contratos que chegaram ao prazo: pagam ao caixa da guilda e dão lealdade aos que cumpriram.

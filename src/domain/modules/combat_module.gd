@@ -4,8 +4,6 @@ extends WorldModule
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
 const DETECT_AWAKE := 6
-## Classe de combate de cada profissão de companheiro: [classe, índice do preset] (Arton Viva, Fase 6).
-const PARTY_CLASS := {"guarda": ["guerreiro", 0], "capitã da guarda": ["guerreiro", 0], "ferreiro": ["guerreiro", 0], "caçador": ["ladino", 0], "mensageiro": ["ladino", 1]}
 const DETECT_ASLEEP := 3
 const SIGNAL_RADIUS := 12
 const FLEE_DISTANCE := 10
@@ -1006,14 +1004,10 @@ func _companheiros_em_luta() -> Array:
 	var ids: Array = party.members.keys()
 	ids.sort()
 	for id in ids:
-		if busy.has(id):
+		# ocupado em contrato, ou ainda se recuperando de uma luta anterior, não entra
+		if busy.has(id) or CharacterSheet.from_dict(party.members[id].sheet).pv <= 0:
 			continue
-		var d := world.db.npc_def(id)
-		var perfil: Array = PARTY_CLASS.get(str(d.get("profession", "")), ["guerreiro", 1])
-		var attrs: Dictionary = CharacterBuilder.presets(str(perfil[0]))[int(perfil[1])]
-		var sh := CharacterBuilder.build(world.rules, "humano", str(perfil[0]), attrs, ["for", "des", "con"], str(d.get("name", id)))
-		CharacterBuilder.apply_equipment(world.rules, sh)
-		out.append({"id": id, "order": str(party.members[id].order), "sheet": sh})
+		out.append({"id": id, "order": str(party.members[id].order), "sheet": CharacterSheet.from_dict(party.members[id].sheet)})
 	return out
 
 
@@ -1083,6 +1077,8 @@ func _end_combat(outcome: String) -> Array:
 			# companheiro: não é criatura; se morreu, sai como NPC_DIED (a party reage)
 			if x.sheet.is_dead():
 				out.append(fact("NPC_DIED", {"npc": id, "cause": "combate"}, [id]))
+			else:
+				out.append(fact("COMPANION_STATE", {"npc": id, "sheet": x.sheet.to_dict()}, [id]))
 			continue
 		creature_state[id].sheet = x.sheet.to_dict()
 		creature_state[id].tile = [x.tile.x, x.tile.y]

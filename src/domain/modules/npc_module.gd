@@ -67,6 +67,10 @@ func desired_location(id: String) -> String:
 		return s.location
 	if int(s.wounded_until) > world.clock.tick:
 		return d.home
+	# companheiro em contrato da guilda vai até o destino e fica lá até o prazo (Arton Viva, Fase 6)
+	var party = world.module("party")
+	if party != null and party.destino_de(id) != "":
+		return party.destino_de(id)
 	if int(s.get("age", 99)) < 6:
 		return d.home   # C7: crianças pequenas ficam em casa
 	# necessidades (Arton Viva, Fase 1): fome e cansaço viram objetivo e mudam o caminho

@@ -226,13 +226,15 @@
    "nome": "Escolta de carroça até Valkaria",
    "pagamento": 40,
    "dias": 2,
-   "membros_min": 2
+   "membros_min": 2,
+   "destino": "estrada_leste"
   },
   "patrulha_estrada": {
-   "nome": "Patrulha da estrada do sul",
+   "nome": "Patrulha da estrada leste",
    "pagamento": 25,
    "dias": 1,
-   "membros_min": 1
+   "membros_min": 1,
+   "destino": "estrada_leste"
   }
  }
 }

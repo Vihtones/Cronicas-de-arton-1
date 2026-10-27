@@ -15,7 +15,12 @@
     "teimoso"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "hilda",
@@ -32,7 +37,12 @@
     "aflita"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "tomas",
@@ -49,7 +59,12 @@
     "curioso"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "lisel",
@@ -64,7 +79,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "garrick",
@@ -81,7 +101,12 @@
     "desconfia_de_estrangeiros"
    ],
    "beliefs": {},
-   "gold": 30
+   "gold": 30,
+   "combate": {
+    "raca": "anao",
+    "classe": "guerreiro",
+    "preset": 0
+   }
   },
   {
    "id": "mara",
@@ -96,7 +121,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 40
+   "gold": 40,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "davi",
@@ -111,7 +141,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "rosana",
@@ -128,7 +163,12 @@
     "observadora"
    ],
    "beliefs": {},
-   "gold": 25
+   "gold": 25,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "bento",
@@ -143,7 +183,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "nina",
@@ -158,7 +203,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "joran",
@@ -173,7 +223,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "celia",
@@ -188,7 +243,12 @@
    "devotion": "Allihanna",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "pell",
@@ -203,7 +263,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "ivi",
@@ -218,7 +283,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "elsa",
@@ -245,6 +315,11 @@
      "luta",
      "intimidacao"
     ]
+   },
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 0
    }
   },
   {
@@ -267,6 +342,11 @@
      "percepcao",
      "luta"
     ]
+   },
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 0
    }
   },
   {
@@ -284,7 +364,12 @@
     "memoria_longa"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "ysolde",
@@ -299,7 +384,12 @@
    "devotion": "Lena",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "lucan",
@@ -314,7 +404,12 @@
    "devotion": "Lena",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "quill",
@@ -331,7 +426,12 @@
     "recluso"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "ladino",
+    "preset": 0
+   }
   },
   {
    "id": "tarso",
@@ -348,7 +448,12 @@
     "traz_noticias"
    ],
    "beliefs": {},
-   "gold": 30
+   "gold": 30,
+   "combate": {
+    "raca": "humano",
+    "classe": "ladino",
+    "preset": 1
+   }
   },
   {
    "id": "saria",
@@ -365,7 +470,12 @@
     "traz_noticias"
    ],
    "beliefs": {},
-   "gold": 60
+   "gold": 60,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "orin",
@@ -380,7 +490,12 @@
    "devotion": "Khalmyr",
    "traits": [],
    "beliefs": {},
-   "gold": 50
+   "gold": 50,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "tobias",
@@ -402,6 +517,11 @@
      "luta",
      "percepcao"
     ]
+   },
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 0
    }
   },
   {
@@ -417,7 +537,12 @@
    "devotion": "",
    "traits": [],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   },
   {
    "id": "dorn",
@@ -434,7 +559,12 @@
     "mentiroso"
    ],
    "beliefs": {},
-   "gold": 5
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
   }
  ],
  "schedule_templates": {

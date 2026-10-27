@@ -387,8 +387,8 @@ economy["construcoes"] = {
              "descricao": "posto de vigia: conta como mais um guarda"}}
 # Arton Viva, Fase 6: contratos que a guilda aceita para os membros; o pagamento vai ao caixa da guilda.
 economy["contratos_guilda"] = {
- "escolta_mercado": {"nome": "Escolta de carroça até Valkaria", "pagamento": 40, "dias": 2, "membros_min": 2},
- "patrulha_estrada": {"nome": "Patrulha da estrada do sul", "pagamento": 25, "dias": 1, "membros_min": 1}}
+ "escolta_mercado": {"nome": "Escolta de carroça até Valkaria", "pagamento": 40, "dias": 2, "membros_min": 2, "destino": "estrada_leste"},
+ "patrulha_estrada": {"nome": "Patrulha da estrada leste", "pagamento": 25, "dias": 1, "membros_min": 1, "destino": "estrada_leste"}}
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
 distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "events": [
@@ -486,6 +486,17 @@ mysteries_extra = {"mysteries": [{
                 "h_hienas": {"text": "As hienas do bosque atacam o rebanho por fome.", "supported_by": ["f_marcas_hiena", "f_toca_hienas"], "contradicted_by": []}},
  "start_facts": [], "factions_interested": [], "state_transitions": {"resolvido": {"requires": "matilha derrotada"}},
 }]}
+# Arton Viva, Fase 6: ficha de combate de cada profissão (montada pelo construtor de personagens, como a do jogador).
+FICHA_POR_PROFISSAO = {
+ "guarda": {"raca": "humano", "classe": "guerreiro", "preset": 0},
+ "capitã da guarda": {"raca": "humano", "classe": "guerreiro", "preset": 0},
+ "ferreiro": {"raca": "anao", "classe": "guerreiro", "preset": 0},
+ "caçador": {"raca": "humano", "classe": "ladino", "preset": 0},
+ "mensageiro": {"raca": "humano", "classe": "ladino", "preset": 1},
+}
+for _n in npcs:
+    _f = FICHA_POR_PROFISSAO.get(_n["profession"], {"raca": "humano", "classe": "guerreiro", "preset": 1})
+    _n["combate"] = _f
 files = {"mysteries_extra": mysteries_extra, "map": world, "npcs": {"npcs": npcs, "schedule_templates": SCHED, "families": families, "factions": factions, "creatures": creatures},
          "mystery": mystery, "items": items, "economy": economy, "laws": laws, "distant": distant}
 for k, v in files.items():
