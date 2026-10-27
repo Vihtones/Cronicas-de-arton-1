@@ -48,6 +48,13 @@ func occupant(t: Vector2i, except: String = "") -> String:
 	return ""
 
 
+func _link_de(target: String) -> String:
+	for e in c(target).sheet.efeitos:
+		if e.stat == "link":
+			return str(e.tipo)
+	return ""
+
+
 static func cheb(a: Vector2i, b: Vector2i) -> int:
 	return maxi(absi(a.x - b.x), absi(a.y - b.y))
 
@@ -253,6 +260,8 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if T.charge_turn >= 0 and T.charge_turn >= turn_counter - order.size():
 		defense += int(rules.value("acao.investida").penalidade_defesa)
 	var miss_chance := 0
+	if ranged and T.sheet.efeito_bonus("camuflagem") > 0:
+		miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)   # Escudo da Fé (camuflagem leve)
 	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
 	var sees_dark: bool = sheet.senses.has("visao_penumbra")
 	if (env.get("darkness", false) and not sees_dark) or env.get("fog", false):
@@ -296,6 +305,15 @@ static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
 func apply_damage(target: String, amount: int) -> Array:
 	var T := c(target)
 	var s: CharacterSheet = T.sheet
+	var link := _link_de(target)
+	if link != "" and c(link).has("sheet") and not c(link).sheet.is_dead():
+		# Escudo da Fé (4º aprimoramento): metade do dano vai para o conjurador, se ele estiver a até alcance curto
+		if cheb(T.tile, c(link).tile) <= int(rules.value("alcance.quadrados", {}).get("curto", 6)):
+			var metade := amount / 2
+			amount = amount - metade
+			apply_damage(link, metade)
+		else:
+			s.remove_efeito_link()
 	var was_down := s.is_down()
 	s.pv -= amount
 	T.damaged_round = round_no

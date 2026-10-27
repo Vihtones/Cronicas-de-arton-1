@@ -159,6 +159,11 @@ func has_efeito(id_efeito: String) -> bool:
 	return efeitos.any(func(e): return e.id == id_efeito)
 
 
+## Conexão de magia (Escudo da Fé, 4º aprimoramento) acaba quando o alvo se afasta.
+func remove_efeito_link() -> void:
+	efeitos = efeitos.filter(func(e): return e.stat != "link")
+
+
 ## Redução de dano concedida por magia contra um tipo de dano.
 func efeito_rd(tipo: String) -> int:
 	var total := 0

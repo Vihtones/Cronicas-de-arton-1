@@ -15,10 +15,10 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
-const POWER_POLICIES := {"golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
+const POWER_POLICIES := {"escudo_da_fe": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"]}
-const DEFAULT_POLICY := {"golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
+const DEFAULT_POLICY := {"escudo_da_fe": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
 	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
@@ -708,6 +708,10 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					ts.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
 					ts.add_condition("fraco")
 					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": "fraco", "tags": ["magia"]}, [id, tg]))
+		"escudo_da_fe":
+			# Escudo da Fé (divina 1), lançada no próprio turno (aprimoramento de execução padrão).
+			for tg in a.get("targets", [a.get("target", id)]):
+				_aplicar_escudo(id, tg, a.get("aprimoramentos", []), false, out)
 		"protecao_divina":
 			# Proteção Divina (divina 1): +2 em testes de resistência; aprimoramentos: +1, reação com +5 no próximo teste,
 			# esfera de 3m e imunidade a efeitos de medo.
@@ -842,10 +846,51 @@ func _policy_wanted(power: String, target: String, dmg: int, sheet: CharacterShe
 	return dmg >= maxi(4, sheet.pv_max / 4)
 
 
+## Escudo da Fé (divina 1): +2 na Defesa (+1 com o 2º aprimoramento). Reação: dura 1 turno do alvo;
+## execução padrão (aprimoramentos 0 e 3): dura a cena. 4º aprimoramento: um dia. Camuflagem (1º) e
+## conexão que divide o dano (4º) também saem daqui.
+func _aplicar_escudo(caster: String, tg: String, apr: Array, reacao: bool, out: Array) -> void:
+	var ts: CharacterSheet = sim.c(tg).sheet
+	var fim := "cena" if not reacao else "turno"
+	var ate := -1
+	if apr.has(4):
+		fim = "dia"
+		ate = world.day_index() + 1
+	ts.add_efeito("magia.escudo_da_fe", "defesa", 3 if apr.has(2) else 2, fim, "", ate)
+	if apr.has(1):
+		ts.add_efeito("magia.escudo_da_fe", "camuflagem", 1, fim, "", ate)
+	if apr.has(3):
+		ts.add_efeito("magia.escudo_da_fe", "link", 1, "cena", caster, -1)
+	out.append(fact("BUFF_APPLIED", {"actor": caster, "target": tg, "buff": "escudo_da_fe", "reacao": reacao, "tags": ["magia"]}, [caster, tg]))
+
+
+## Reação do Escudo da Fé: quando um aliado é atacado, o jogador pode lançá-lo (1 PM, uma vez por rodada),
+## por padrão automaticamente (política "escudo_da_fe"). Retorna a Defesa extra para esse ataque.
+func _reacao_escudo(attacker: String, target: String, out: Array) -> int:
+	if attacker == "player" or sim.is_enemy("player", target) or target == "player":
+		return 0
+	if str(power_policy.get("escudo_da_fe", "auto")) == "nunca":
+		return 0
+	var P := sim.c("player")
+	if P.is_empty() or not P.sheet.spells.has("escudo_da_fe") or P.sheet.pm < 1:
+		return 0
+	if sim.c(target).sheet.has_efeito("magia.escudo_da_fe") or P.flags.has("escudo_%d" % sim.round_no):
+		return 0
+	if sim.c(target).sheet.is_dead() or CombatSim.cheb(P.tile, sim.c(target).tile) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
+		return 0
+	var apr: Array = []   # reação padrão: sem aprimoramentos (o jogador pode ligar pela tecla B no próprio turno)
+	P.sheet.pm -= 1
+	P.flags.append("escudo_%d" % sim.round_no)
+	_aplicar_escudo("player", target, apr, true, out)
+	return 2
+
+
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
 	var A := sim.c(attacker)
 	var T := sim.c(target)
 	var atk: Dictionary = v.atk
+	var pre: Array = []
+	v.defense = int(v.defense) + _reacao_escudo(attacker, target, pre)   # reação de magia antes da rolagem
 	var d20: int = world.rng.roll("combat", 1, 20)[0]
 	var camo_roll := 0
 	var camo_miss := false
@@ -940,7 +985,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	_track_attack(attacker, target, v, special, hit, crit, dmg, tags)
 	log.append(out[0].payload)
 	if log.size() > 60: log.pop_front()
-	return out
+	return pre + out
 
 
 ## Trespassar (LB p.129): derrubou o alvo com ataque corpo a corpo -> 1 PM por um ataque adicional

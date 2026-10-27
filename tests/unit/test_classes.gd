@@ -149,7 +149,7 @@ func test_perdicao_em_varios_inimigos_com_aprimoramento_e_sem_aliados() -> void:
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
 	WorldHelpers.put(w, 25, 57)
-	w.modules.combat._start(["bandido_1", "bandido_2"], true, false)
+	w.modules.combat._start(["bandido_1", "bandido_2"], false, false)
 	var c: CombatModule = w.modules.combat
 	var sim: CombatSim = c.sim
 	sim.c("player").tile = Vector2i(26, 57)
@@ -241,3 +241,58 @@ func test_protecao_divina_base_esfera_e_medo() -> void:
 	sim.c("bandido_1").sheet.add_efeito("magia.protecao_divina", "imune", 1, "cena", "apavorado")
 	sim.c("bandido_1").sheet.add_condition("apavorado")
 	check(not sim.c("bandido_1").sheet.conditions.has("apavorado"), "imunidade bloqueia medo")
+
+
+func _duas_cenas(nivel: int) -> Array:
+	var sh := _build("clerigo")
+	sh.spells = PackedStringArray(["escudo_da_fe"])
+	sh.equipment["armor"] = ""
+	sh.level = nivel
+	var w := WorldHelpers.world(5)
+	w.player_sheet = sh
+	WorldHelpers.put(w, 25, 57)
+	w.modules.combat._start(["bandido_1", "bandido_2"], false, false)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("player").tile = Vector2i(26, 57)
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_2").tile = Vector2i(28, 57)
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]   # aliado atacado pelo bandido_2
+	return [w, c, sim, sh]
+
+
+func test_escudo_da_fe_reacao_ao_aliado_atacado_uma_vez_por_rodada() -> void:
+	var m := _duas_cenas(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet   # a simulação trabalha com cópia da ficha
+	var pm0 := sh.pm
+	var v := GhostPlanner.validate_action(sim, "bandido_2", {"type": "attack", "target": "bandido_1"})
+	check(v.ok, "ataque válido: %s" % str(v))
+	c._resolve_attack("bandido_2", "bandido_1", v, false)
+	check(sim.c("bandido_1").sheet.has_efeito("magia.escudo_da_fe"), "reação lança o escudo no aliado atacado")
+	check(sh.pm == pm0 - 1, "a reação custa 1 PM")
+	var pm1 := sh.pm
+	c._resolve_attack("bandido_2", "bandido_1", GhostPlanner.validate_action(sim, "bandido_2", {"type": "attack", "target": "bandido_1"}), false)
+	check(sh.pm == pm1, "a reação não se repete na mesma rodada")
+
+
+func test_escudo_da_fe_no_turno_exige_execucao_padrao_e_aprimoramento() -> void:
+	var m := _duas_cenas(1)
+	var sim: CombatSim = m[2]
+	var sem := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "escudo_da_fe", "target": "bandido_1", "targets": ["bandido_1"]})
+	check(not sem.ok, "reação não se lança no próprio turno sem aprimoramento de execução")
+	var com := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "escudo_da_fe", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]})
+	check(com.ok, "com o aprimoramento 0 é ação padrão no alcance de toque: %s" % str(com))
+
+
+func test_escudo_da_fe_conexao_divide_o_dano_com_o_conjurador() -> void:
+	var m := _duas_cenas(5)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.add_efeito("magia.escudo_da_fe", "link", 1, "cena", "player")
+	var pv_alvo: int = sim.c("bandido_1").sheet.pv
+	var eu: CharacterSheet = sim.c("player").sheet   # a simulação trabalha com cópia da ficha
+	var pv_meu: int = eu.pv
+	sim.apply_damage("bandido_1", 10)
+	check(sim.c("bandido_1").sheet.pv == pv_alvo - 5, "alvo sofre metade")
+	check(eu.pv == pv_meu - 5, "conjurador recebe a outra metade")

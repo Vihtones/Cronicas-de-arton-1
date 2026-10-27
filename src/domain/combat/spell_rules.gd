@@ -7,11 +7,16 @@ const COMPLETAS := {
 	"perdicao": {"aprimoramentos": [0]},
 	"infligir_ferimentos": {"aprimoramentos": [0, 1, 2, 3]},
 	"resistencia_a_energia": {"aprimoramentos": [0, 1, 2, 3, 4]},
+	"escudo_da_fe": {"aprimoramentos": [0, 1, 2, 3, 4]},
 }
+## Magias que são reação: o base só ocorre como reação (quando um aliado é atacado). Aprimoramentos
+## que mudam a execução para ação padrão permitem lançar no próprio turno.
+const REACAO := ["escudo_da_fe"]
+const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}}
+const ALCANCE_APR := {"infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
 const TIPOS_ENERGIA := ["acido", "eletricidade", "fogo", "frio", "luz", "trevas"]
@@ -87,6 +92,20 @@ static func custo_aprimoramentos(rules: RuleRegistry, sp_id: String, idx: Array)
 static func penalidade_perdicao(sheet: CharacterSheet, rules: RuleRegistry, idx: Array) -> int:
 	var p := 1 + (1 if idx.has(0) else 0)
 	return mini(p, circulo_maximo(sheet, rules))
+
+
+static func e_reacao(sp_id: String) -> bool:
+	return REACAO.has(sp_id)
+
+
+## Lançar manualmente (no próprio turno): magias de reação só com aprimoramento de execução padrão.
+static func pode_lancar_no_turno(sp_id: String, apr: Array) -> bool:
+	if not REACAO.has(sp_id):
+		return true
+	for i in EXECUCAO_PADRAO_APR.get(sp_id, []):
+		if apr.has(i):
+			return true
+	return false
 
 
 static func tipo_energia_valido(t: String) -> bool:

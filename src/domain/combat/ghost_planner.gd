@@ -95,6 +95,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
 			var apr: Array = a.get("aprimoramentos", [])
+			if not SpellRules.pode_lancar_no_turno(sp_id, apr):
+				return {"ok": false, "reason": "Escudo da Fé é reação: age quando um aliado é atacado (ou escolha execução padrão)"}
 			if not SpellRules.aprimoramentos_validos(sp_id, apr, A.sheet, sim.rules):
 				return {"ok": false, "reason": "aprimoramento não disponível para essa magia"}
 			if sp_id == "resistencia_a_energia" and not SpellRules.tipo_energia_valido(str(a.get("tipo_energia", "fogo"))):
