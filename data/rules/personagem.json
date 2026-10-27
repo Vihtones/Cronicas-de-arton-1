@@ -9555,6 +9555,149 @@
    "pagina": 95,
    "pdf_page": 101,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.duende",
+   "valor": {
+    "tipo": "espirito",
+    "criacao": "passos: natureza (animal, vegetal ou mineral), tamanho (Minúsculo, Pequeno, Médio ou Grande), dons (+1 em dois atributos diferentes), presentes de magia e de caos (três poderes; um presente por patamar pode substituir um poder de classe), limitações (aversão a ferro, aversão a sinos, tabu)",
+    "presentes": [
+     "afinidade_elemental",
+     "encantar_objetos",
+     "enfeiticar",
+     "invisibilidade",
+     "mais_la_do_que_aqui",
+     "lingua_da_natureza",
+     "maldicao",
+     "metamorfose_animal",
+     "sonhos_profeticos",
+     "velocidade_do_pensamento",
+     "visao_feerica",
+     "voo"
+    ],
+    "limitacoes": [
+     "aversao_a_ferro",
+     "aversao_a_sinos",
+     "tabu"
+    ],
+    "longevidade": "variável",
+    "devocao": [
+     "allihanna",
+     "hyninn",
+     "nimb",
+     "wynna"
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 8,
+   "pdf_page": 10,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.eiradaan",
+   "valor": {
+    "atributos": {
+     "sab": 2,
+     "car": 1,
+     "for": -1
+    },
+    "tipo": "espirito",
+    "habilidades": [
+     "essencia_feerica",
+     "magia_instintiva",
+     "sentidos_misticos",
+     "cancao_da_melancolia"
+    ],
+    "longevidade": "x5",
+    "devocao": [
+     "allihanna",
+     "lena",
+     "thyatis",
+     "wynna"
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 12,
+   "pdf_page": 14,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.galokk",
+   "valor": {
+    "atributos": {
+     "for": 1,
+     "con": 1,
+     "um_atributo_a_escolha": 1,
+     "car": -1
+    },
+    "tamanho": "Grande",
+    "habilidades": [
+     "forca_dos_titas",
+     "meio_gigante",
+     "infancia_entre_os_pequenos"
+    ],
+    "longevidade": "normal",
+    "devocao": [
+     "allihanna",
+     "arsenal",
+     "megalokk"
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 13,
+   "pdf_page": 15,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.meio_elfo",
+   "valor": {
+    "atributos": {
+     "int": 1,
+     "dois_atributos_exceto_con": 1
+    },
+    "habilidades": [
+     "ambicao_herdada",
+     "entre_dois_mundos",
+     "sangue_elfico"
+    ],
+    "longevidade": "x2",
+    "devocao": [
+     "qualquer"
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 14,
+   "pdf_page": 16,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "raca.satiro",
+   "valor": {
+    "atributos": {
+     "car": 2,
+     "des": 1,
+     "sab": -1
+    },
+    "tipo": "espirito",
+    "habilidades": [
+     "festeiro_feerico",
+     "instrumentista_magico",
+     "marrada",
+     "pernas_caprinas"
+    ],
+    "longevidade": "normal",
+    "devocao": [
+     "allihanna",
+     "hyninn",
+     "marah",
+     "nimb",
+     "wynna"
+    ]
+   },
+   "fonte": "T20 Heróis de Arton",
+   "pagina": 15,
+   "pdf_page": 17,
+   "status": "VERIFICADA"
   }
  ]
 }
