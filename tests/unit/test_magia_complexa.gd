@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2799,3 +2799,116 @@ func test_seta_infalivel_quantidade_e_lancas() -> void:
 	eq(hits.size(), 10, "dez lanças")
 	check(hits.all(func(f): return "essencia" in f.payload.tags and int(f.payload.damage) >= 2 and int(f.payload.damage) <= 9), "1d8+1 de essência cada")
 	check(not GhostPlanner.validate_action(_arcanista(1)[2], "player", {"type": "cast", "spell": "seta_infalivel", "targets": ["bandido_1"], "target": "bandido_1", "aprimoramentos": [2]}).ok, "cinco setas exigem 2º círculo")
+
+
+# --- Divinas de 2º círculo: Físico e Mente Divina, Oração, Purificação, Raio Solar, Silêncio ------
+func test_fisico_divino_sobe_o_atributo_e_volta_ao_fim() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	var f0 := int(sh.attrs["for"])
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "fisico_divino", "target": "player"}).ok, "precisa escolher o atributo")
+	_lanca(m, {"type": "cast", "spell": "fisico_divino", "target": "player", "atributo": "for"})
+	eq(int(sh.attrs["for"]), f0 + 2, "+2 em Força")
+	sh.limpar_efeitos("cena")
+	eq(int(sh.attrs["for"]), f0, "a cena acaba e a Força volta")
+	var m17 := _cena_grupo(17)
+	var s17: CharacterSheet = m17[2].c("player").sheet
+	var d0 := int(s17.attrs["des"])
+	_lanca(m17, {"type": "cast", "spell": "fisico_divino", "target": "player", "atributo": "for", "aprimoramentos": [3]})
+	eq(int(s17.attrs["des"]), d0 + 4, "+4 nos três físicos (5º círculo)")
+	var mm := _cena_grupo(5)
+	var smm: CharacterSheet = mm[2].c("player").sheet
+	var sab0 := int(smm.attrs["sab"])
+	_lanca(mm, {"type": "cast", "spell": "mente_divina", "target": "player", "atributo": "sab"})
+	eq(int(smm.attrs["sab"]), sab0 + 2, "Mente Divina: +2 em Sabedoria")
+
+
+func test_oracao_bonus_aliados_penalidade_inimigos_sustentada_e_oferenda() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var w = m[0]
+	w.player.gold = 100
+	sim.c("bandido_1").side = "player"
+	check(_lanca(m, {"type": "cast", "spell": "oracao", "target": "player"}).ok, "Oração")
+	eq(sim.c("bandido_1").sheet.efeito_bonus("testes"), 2, "aliado: +2 em testes")
+	eq(sim.c("bandido_2").sheet.efeito_bonus("dano"), -2, "inimigo no alcance: –2 no dano")
+	check(sim.sustentadas.get("player", "") == "oracao", "sustentada")
+	sim.c("bandido_2").tile = Vector2i(50, 57)
+	m[1]._refresh_bencaos()
+	eq(sim.c("bandido_2").sheet.efeito_bonus("dano"), 0, "fora do alcance, sem penalidade")
+
+
+func test_purificacao_remove_condicoes_e_veneno() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.add_condition("cego", m[3])
+	sh.add_condition("enjoado", m[3])
+	_lanca(m, {"type": "cast", "spell": "purificacao", "target": "player"})
+	check(not sh.conditions.has("cego") or not sh.conditions.has("enjoado"), "uma condição removida")
+	check(sh.conditions.has("cego") or sh.conditions.has("enjoado"), "só uma")
+	sim.budget.std = 1
+	sh.pv = 900
+	sh.pv_perdido_veneno = 30
+	_lanca(m, {"type": "cast", "spell": "purificacao", "target": "player", "aprimoramentos": [0, 1]})
+	check(not sh.conditions.has("cego") and not sh.conditions.has("enjoado"), "todas removidas")
+	eq(sh.pv, 930, "PV de veneno recuperados")
+
+
+func test_purificacao_dissipa_efeitos_prejudiciais() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.add_efeito("magia.perdicao", "ataque", -1, "cena")
+	_lanca(m, {"type": "cast", "spell": "purificacao", "target": "player", "aprimoramentos": [3]})
+	eq(sh.efeito_bonus("ataque"), 0, "Perdição (necromancia) dissipada")
+
+
+func test_raio_solar_linha_dano_mortos_vivos_cura_e_truque() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	var b2 := _bandido(m, "bandido_2", -50)
+	b2.creature_type = "morto-vivo"
+	_lanca(m, {"type": "cast", "spell": "raio_solar", "target": "bandido_2", "tile": Vector2i(32, 57)})
+	check(999 - b1.pv >= 4 and 999 - b1.pv <= 32, "4d8 de luz (%d)" % (999 - b1.pv))
+	check(999 - b2.pv >= 4 and 999 - b2.pv <= 48, "4d12 no morto-vivo (%d)" % (999 - b2.pv))
+	check(b1.conditions.has("ofuscado"), "ofuscado")
+	var m2 := _cena_grupo(5)
+	var s2: CombatSim = m2[2]
+	s2.c("bandido_1").side = "player"
+	s2.c("bandido_1").sheet.pv = 500
+	_lanca(m2, {"type": "cast", "spell": "raio_solar", "target": "bandido_2", "tile": Vector2i(32, 57), "aprimoramentos": [1]})
+	check(s2.c("bandido_1").sheet.pv > 500, "aliado na linha cura 4d8")
+	var m3 := _cena_grupo(5)
+	var v := GhostPlanner.validate_action(m3[2], "player", {"type": "cast", "spell": "raio_solar", "target": "player", "tile": Vector2i(32, 57), "truque": true})
+	check(v.ok and int(v.cost) == 0, "truque")
+	m3[1]._cast("player", {"type": "cast", "spell": "raio_solar", "target": "player", "tile": Vector2i(32, 57), "truque": true}, v)
+	check(m3[2].iluminado(Vector2i(30, 57)), "facho ilumina a linha")
+	var mv := GhostPlanner.validate_action(m3[2], "player", {"type": "mover_facho", "tile": Vector2i(26, 50)})
+	check(mv.ok and mv.kind == "livre", "mudar a direção é ação livre")
+
+
+func test_silencio_deixa_surdo_e_impede_magias_na_area() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var vs := _lanca(m, {"type": "cast", "spell": "silencio", "target": "bandido_2", "tile": Vector2i(32, 57)})
+	check(vs.ok, "Silêncio: %s" % str(vs.get("reason", "")))
+	check(sim.c("bandido_2").sheet.conditions.has("surdo"), "quem está dentro fica surdo")
+	sim.c("player").tile = Vector2i(31, 57)
+	sim.budget.std = 1
+	m[1]._refresh_bencaos()
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "bencao", "target": "player", "targets": ["player"]}).ok, "dentro do silêncio, não lança magia")
+	sim.c("player").tile = Vector2i(20, 57)
+	m[1]._refresh_bencaos()
+	check(not sim.c("player").sheet.conditions.has("surdo"), "saiu da área: ouve de novo")
+
+
+func test_silencio_fora_de_combate_abafa_o_barulho() -> void:
+	var w := _mundo_explorador(["silencio"])
+	w.player_sheet.level = 5
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "silencio", "aprimoramentos": [0, 1]}).accepted, "objeto silencioso pela cena")
+	check(w.module("magia").silencio_ativo(), "ativo")
+	var out: Array = w.module("combat").on_event(GameEvent.create("e", "OBJECT_DAMAGED", w.clock.tick, {"object": "porta_cela"}))
+	check(out.any(func(f): return f.type == "NOISE_UNHEARD"), "ninguém ouve")

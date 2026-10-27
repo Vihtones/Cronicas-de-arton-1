@@ -165,6 +165,20 @@ static func ataque_efetivo(rules: RuleRegistry, sheet: CharacterSheet, atk: Dict
 	return out
 
 
+## Silêncio (divina 2): nenhum som na área; quem está nela fica surdo e não lança magias (palavras mágicas). A versão
+## de cena (aprimoramento) só impede o som de sair: dentro, tudo normal.
+func silenciado(t: Vector2i) -> bool:
+	for z in zonas:
+		if z.tipo == "silencio" and not bool(z.get("dados", {}).get("so_contem", false)) and (z.tiles as Array).has(t):
+			return true
+	for id in combatants:
+		var sh: CharacterSheet = c(id).sheet
+		var raio := int(sh.efeito_bonus("fonte_silencio"))
+		if raio > 0 and sh.efeito_bonus("fonte_oculta") <= 0 and cheb(c(id).tile, t) <= raio:
+			return true
+	return false
+
+
 ## Luz (LB p.158 e p.318): quadrado iluminado por zona de luz ou por quem carrega luz (efeito "fonte_luz", raio em
 ## quadrados: tocha, chama de Criar Elementos). Na luz, a escuridão da noite não dá camuflagem.
 func iluminado(t: Vector2i) -> bool:

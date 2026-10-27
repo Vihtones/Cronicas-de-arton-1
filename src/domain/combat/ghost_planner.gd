@@ -122,6 +122,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				return {"ok": false, "reason": "Escudo da Fé é reação: age quando um aliado é atacado (ou escolha execução padrão)"}
 			if int(sp.get("circulo", 0)) > SpellRules.circulo_maximo(A.sheet, sim.rules):
 				return {"ok": false, "reason": "magia de %dº círculo acima do que você conjura" % int(sp.get("circulo", 0))}
+			if sim.silenciado(A.tile):
+				return {"ok": false, "reason": "no silêncio não há como pronunciar as palavras mágicas"}
 			if a.get("truque", false):
 				if not SpellRules.tem_truque(sim.rules, sp_id): return {"ok": false, "reason": "essa magia não tem truque"}
 				if not apr.is_empty() or a.get("pungente", false): return {"ok": false, "reason": "truques não se combinam com aprimoramentos"}
@@ -149,6 +151,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "fisico_divino" or sp_id == "mente_divina":
+				var grupo_v: Array = SpellRules.ATRIBUTOS_FISICOS if sp_id == "fisico_divino" else SpellRules.ATRIBUTOS_MENTAIS
+				if not apr.has(1) and not apr.has(3) and not grupo_v.has(str(a.get("atributo", ""))): return {"ok": false, "reason": "escolha o atributo: " + ", ".join(grupo_v)}
+			if sp_id == "silencio" and apr.has(0) and not sim.combatants.has(a.get("target", "")): return {"ok": false, "reason": "escolha quem carrega o objeto"}
+			if sp_id == "raio_solar":
+				targets = [actor]
+			if sp_id == "oracao":
+				targets = [actor]
 			if sp_id == "aviso":
 				if not ["alerta", "mensagem", "localizacao"].has(str(a.get("modo", "alerta"))): return {"ok": false, "reason": "escolha alerta, mensagem ou localização"}
 				if targets.size() > 1 + apr.count(3): return {"ok": false, "reason": "alvos demais"}
@@ -289,7 +299,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				return _validar_sopro(sim, actor, A, a, cost)
 			var alc := SpellRules.alcance_efetivo(sp_id, str(sp.alcance), apr)
 			if alc == "pessoal": targets = [actor]
-			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
+			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 100000 if alc == "ilimitado" else 1))  # LB p.143 (toque/pessoal = 1)
 			if sp_id == "aviso":
 				reach *= int(pow(10, apr.count(0)))   # Aviso: alcance x10 por aprimoramento
 			# Toque (LB p.225): o alvo precisa estar no alcance natural; o próprio conjurador está (pode tocar a si mesmo).
@@ -379,6 +389,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "detectar magia exige ação completa"}
 			if not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Misticismo é somente treinada"}
 			return {"ok": true, "kind": "completa"}
+		"mover_facho":
+			if (A.flags as Array).has("facho_%d" % sim.round_no): return {"ok": false, "reason": "o facho já mudou nesta rodada"}
+			if not sim.zonas.any(func(z): return str(z.id) == "facho_" + actor): return {"ok": false, "reason": "sem facho de luz"}
+			if not a.has("tile"): return {"ok": false, "reason": "escolha a direção"}
+			return {"ok": true, "kind": "livre"}
 		"mover_globos":
 			# Luz (globos): ação livre, uma vez por rodada, dentro do alcance longo.
 			if (A.flags as Array).has("globos_%d" % sim.round_no): return {"ok": false, "reason": "os globos já se moveram nesta rodada"}

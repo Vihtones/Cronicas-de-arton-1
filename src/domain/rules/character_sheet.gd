@@ -52,6 +52,7 @@ var aptidoes: Dictionary = {}    # "dominio.nome" -> {"pct": float, "pratica": i
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
 var aura_sagrada_ativa: bool = false  # Aura Sagrada (paladino, 3º nível): sustentada; termina com o combate
 var egide_ativa: bool = false         # Égide Sagrada (paladino, poder do 5º nível): até o fim da cena
+var pv_perdido_veneno: int = 0       # PV perdidos por veneno (Purificação os devolve)
 var pv_temp: int = 0                 # PV temporários (Heroísmo): absorvem dano antes dos PV; zeram ao fim do combate
 var manto_versao: String = "luz"       # Manto do Cruzado: versão escolhida ao aprender ("luz" | "trevas"); não muda depois
 var manto_cruzado: String = ""         # versão ativa do Manto do Cruzado na cena de combate ("" = inativo)
@@ -197,8 +198,33 @@ func add_condition(c: String, rules: RuleRegistry) -> void:
 
 ## Adiciona um efeito temporário (troca o anterior com o mesmo id).
 func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: String = "", ate: int = -1) -> void:
-	efeitos = efeitos.filter(func(e): return not (e.id == id_efeito and e.stat == stat and str(e.tipo) == tipo))
-	efeitos.append({"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo, "ate": ate})
+	_remover_onde(func(e): return e.id == id_efeito and e.stat == stat and str(e.tipo) == tipo)
+	var novo := {"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo, "ate": ate}
+	efeitos.append(novo)
+	_ao_entrar(novo)
+
+
+## Efeitos que mudam a ficha de verdade enquanto duram: "atributo" (tipo = atributo) soma ao atributo e sai quando o
+## efeito acaba (Físico Divino, Mente Divina). O aumento não dá PV, PM nem perícias novas.
+func _ao_entrar(e: Dictionary) -> void:
+	if e.stat == "atributo":
+		attrs[str(e.tipo)] = int(attrs.get(str(e.tipo), 0)) + int(e.bonus)
+
+
+func _ao_sair(e: Dictionary) -> void:
+	if e.stat == "atributo":
+		attrs[str(e.tipo)] = int(attrs.get(str(e.tipo), 0)) - int(e.bonus)
+
+
+## Remove os efeitos para os quais `pred` é verdadeiro, desfazendo o que eles mudaram.
+func _remover_onde(pred: Callable) -> void:
+	var ficam: Array = []
+	for e in efeitos:
+		if pred.call(e):
+			_ao_sair(e)
+		else:
+			ficam.append(e)
+	efeitos = ficam
 
 
 ## Recupera PV, respeitando o bloqueio de cura (Poeira da Podridão). Devolve os PV recuperados de fato.
@@ -223,11 +249,11 @@ func dano_por_tipo(tipo: String, dano: int) -> int:
 
 ## Remove os efeitos de um tipo de bônus (ex.: uso de Premonição gasto).
 func remove_efeito_stat(stat: String) -> void:
-	efeitos = efeitos.filter(func(e): return e.stat != stat)
+	_remover_onde(func(e): return e.stat == stat)
 
 
 func remove_efeito(id_efeito: String) -> void:
-	efeitos = efeitos.filter(func(e): return e.id != id_efeito)
+	_remover_onde(func(e): return e.id == id_efeito)
 
 
 ## Soma dos bônus de um efeito de um tipo específico (ex.: encanto de uma arma pelo id dela).
@@ -258,7 +284,7 @@ func anular_magia(id_efeito: String) -> void:
 
 ## Conexão de magia (Escudo da Fé, 4º aprimoramento) acaba quando o alvo se afasta.
 func remove_efeito_link() -> void:
-	efeitos = efeitos.filter(func(e): return e.stat != "link")
+	_remover_onde(func(e): return e.stat == "link")
 
 
 ## Redução de dano concedida por magia contra um tipo de dano.
@@ -287,12 +313,12 @@ func limpar_efeitos(fim: String) -> void:
 	for e in efeitos:
 		if e.fim == fim and e.stat == "condicao":
 			remove_condition(str(e.tipo))   # condição de magia (ex.: fraco pela cena) acaba junto
-	efeitos = efeitos.filter(func(e): return e.fim != fim)
+	_remover_onde(func(e): return e.fim == fim)
 
 
 ## Remove um efeito pelo id e pelo momento em que termina (ex.: o ritual de Lágrimas de Wynna, que tem fim "ritual").
 func remove_efeito_de(id_efeito: String, fim: String) -> void:
-	efeitos = efeitos.filter(func(e): return not (e.id == id_efeito and e.fim == fim))
+	_remover_onde(func(e): return e.id == id_efeito and e.fim == fim)
 
 
 ## Efeitos "por um dia" acabam quando o dia de término chega (ate = índice do dia em que acabam).
@@ -305,7 +331,7 @@ func limpar_dia(dia_atual: int) -> void:
 				pm = mini(pm, pm_max)   # PM temporário não gasto some
 			elif e.stat == "pv_temp_alimento":
 				pv_temp = 0
-	efeitos = efeitos.filter(func(e): return not (e.fim == "dia" and dia_atual >= int(e.ate)))
+	_remover_onde(func(e): return e.fim == "dia" and dia_atual >= int(e.ate))
 
 
 func training_bonus() -> int:
@@ -437,7 +463,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "aura_sagrada_ativa": aura_sagrada_ativa, "egide_ativa": egide_ativa, "pv_temp": pv_temp, "manto_versao": manto_versao, "arcana_perdida": arcana_perdida, "manto_cruzado": manto_cruzado, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
+		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "aura_sagrada_ativa": aura_sagrada_ativa, "egide_ativa": egide_ativa, "pv_temp": pv_temp, "pv_perdido_veneno": pv_perdido_veneno, "manto_versao": manto_versao, "arcana_perdida": arcana_perdida, "manto_cruzado": manto_cruzado, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -467,7 +493,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.afinidade = (d.get("afinidade", {}) as Dictionary).duplicate()
 	s.aptidoes = (d.get("aptidoes", {}) as Dictionary).duplicate(true)
 	s.oficio = str(d.get("oficio", ""))
-	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.aura_sagrada_ativa = bool(d.get("aura_sagrada_ativa", false)); s.egide_ativa = bool(d.get("egide_ativa", false)); s.pv_temp = int(d.get("pv_temp", 0)); s.manto_versao = str(d.get("manto_versao", "luz")); s.arcana_perdida = bool(d.get("arcana_perdida", false)); s.manto_cruzado = str(d.get("manto_cruzado", "")); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
+	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.aura_sagrada_ativa = bool(d.get("aura_sagrada_ativa", false)); s.egide_ativa = bool(d.get("egide_ativa", false)); s.pv_temp = int(d.get("pv_temp", 0)); s.pv_perdido_veneno = int(d.get("pv_perdido_veneno", 0)); s.manto_versao = str(d.get("manto_versao", "luz")); s.arcana_perdida = bool(d.get("arcana_perdida", false)); s.manto_cruzado = str(d.get("manto_cruzado", "")); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()
 	s.race_defense = int(d.get("race_defense", 0)); s.extra_armor_penalty = int(d.get("extra_armor_penalty", 0))

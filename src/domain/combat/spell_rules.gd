@@ -39,6 +39,12 @@ const COMPLETAS := {
 	"armadura_arcana": {"aprimoramentos": [0, 1, 2]},   # reação +5 contra um ataque; +1 (repetível); um dia
 	"toque_chocante": {"aprimoramentos": [0, 1, 2]},   # +1d8+1 (repetível); com ataque corpo a corpo; esfera de 6m
 	"seta_infalivel": {"aprimoramentos": [0, 1, 2, 3]},   # lanças 1d8+1; três, cinco ou dez setas
+	"fisico_divino": {"aprimoramentos": [0, 1, 2, 3]},   # curto e criaturas escolhidas; +2 nos três; +4; +4 nos três
+	"mente_divina": {"aprimoramentos": [0, 1, 2, 3]},
+	"oracao": {"aprimoramentos": [0, 1, 2, 3]},   # +1 bônus; –1 penalidade (repetíveis, até o círculo); médio; cena
+	"purificacao": {"aprimoramentos": [0, 1, 2, 3]},   # PV de veneno; todas as condições; soltar item amaldiçoado; dissipar
+	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
+	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -69,9 +75,9 @@ const REACAO_APR := {"armadura_arcana": [0], "protecao_divina": [1], "premonicao
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
 const ALVO_QUADRADO := ["criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
-const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1]}
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
@@ -134,7 +140,8 @@ static func alcance_efetivo(sp_id: String, base: String, apr: Array) -> String:
 	for i in ALCANCE_APR.get(sp_id, {}):
 		if apr.has(i):
 			return str(ALCANCE_APR[sp_id][i])
-	return base
+	var b := base.replace("é", "e").to_lower()   # o catálogo escreve "médio"; a tabela de alcance usa "medio"
+	return "ilimitado" if b.begins_with("ilimitado") else b
 
 
 static func aprimoramentos_disponiveis(sp_id: String) -> Array:
@@ -333,3 +340,28 @@ static func aura_por_circulo(circulo: int) -> String:
 	if circulo >= 3:
 		return "moderada"
 	return "tenue"
+
+
+const ATRIBUTOS_FISICOS := ["for", "des", "con"]
+const ATRIBUTOS_MENTAIS := ["int", "sab", "car"]
+## Purificação: condições que pode remover.
+const CONDICOES_PURIFICACAO := ["abalado", "apavorado", "alquebrado", "atordoado", "cego", "confuso", "debilitado", "enjoado", "envenenado",
+	"esmorecido", "exausto", "fascinado", "fatigado", "fraco", "frustrado", "lento", "ofuscado", "paralisado", "pasmo", "surdo"]
+
+
+## Físico Divino / Mente Divina: {atributo: bônus}. Normal: +2 no escolhido. "Em vez do normal": +2 nos três (3º),
+## +4 no escolhido (4º), +4 nos três (5º); vale o maior.
+static func bonus_atributos(sp_id: String, apr: Array, escolhido: String) -> Dictionary:
+	var grupo: Array = ATRIBUTOS_FISICOS if sp_id == "fisico_divino" else ATRIBUTOS_MENTAIS
+	var out := {}
+	if apr.has(3):
+		for a in grupo: out[a] = 4
+	elif apr.has(2):
+		out[escolhido] = 4
+		if apr.has(1):
+			for a in grupo: out[a] = maxi(int(out.get(a, 0)), 2)
+	elif apr.has(1):
+		for a in grupo: out[a] = 2
+	else:
+		out[escolhido] = 2
+	return out

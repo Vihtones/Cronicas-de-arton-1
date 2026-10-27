@@ -26,6 +26,7 @@ const FORA_DE_COMBATE := {
 	"aviso": [],   # aviso telepático a NPCs e companheiros, mesmo longe
 	"compreensao": [],   # NPC no mesmo lugar (toque ou curto)
 	"visao_mistica": [],
+	"silencio": [0, 1],   # fora de combate, o objeto que você carrega, pela cena: nenhum som sai (furtividade)
 	"escuridao": [],   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
@@ -39,6 +40,7 @@ const MINUTOS_DIA := 24 * 60
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
 var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
+var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de combate: {ate: tick}
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
 var luz_carregada: Dictionary = {}   # luz que o jogador carrega fora de combate: {raio: quadrados, ate: tick}
 var abencoados: Dictionary = {}  # item -> {n: porções abençoadas, ate: tick do fim da cena}
@@ -210,6 +212,10 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"silencio":
+			var combat_s = world.module("combat")
+			silencio_carregado = {"ate": world.clock.tick + (combat_s.TICKS_CENA if combat_s != null else 6)}
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "silencio", "tags": ["magia"]}, ["player"]))
 		"aviso":
 			var modo := str(cmd.payload.get("modo", "alerta"))
 			var party_av = world.module("party")
@@ -497,6 +503,10 @@ func luz_ativa() -> int:
 	return int(luz_carregada.raio)
 
 
+func silencio_ativo() -> bool:
+	return not silencio_carregado.is_empty() and int(silencio_carregado.ate) > world.clock.tick
+
+
 func escuridao_ativa() -> Dictionary:
 	if escuridao_carregada.is_empty() or int(escuridao_carregada.ate) <= world.clock.tick:
 		return {}
@@ -660,7 +670,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate()}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -672,3 +682,4 @@ func from_dict(d: Dictionary) -> void:
 	abencoados = (d.get("abencoados", {}) as Dictionary).duplicate(true)
 	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
+	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()

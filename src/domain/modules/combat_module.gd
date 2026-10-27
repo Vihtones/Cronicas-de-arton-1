@@ -160,6 +160,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["você não tem água benta"])
 				if act.get("type", "") == "cast" and act.get("spell", "") == "luz" and (act.get("aprimoramentos", []) as Array).has(2) and int(world.player.gold) < 50:
 					return PackedStringArray(["faltam T$ 50 de pó de rubi"])
+				if act.get("type", "") == "cast" and act.get("spell", "") == "oracao":
+					var custo_or := GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, "oracao"), act)
+					if int(world.player.gold) < 20 * custo_or:
+						return PackedStringArray(["faltam T$ %d em incensos e oferendas" % (20 * custo_or)])
 			var g := GhostPlanner.simulate(sim, "player", actions)
 			if not g.valid:
 				return PackedStringArray(["plano inválido: " + str(g.steps[-1].reason)])
@@ -290,6 +294,9 @@ func on_event(e: GameEvent) -> Array:
 				creature_state[id].present = false
 			return []
 		"OBJECT_DAMAGED":
+			var magia_sil = world.module("magia")
+			if magia_sil != null and magia_sil.silencio_ativo():
+				return [fact("NOISE_UNHEARD", {"location": world.db.location_at(world.db.world_to_tile(world.player.position)), "reason": "silencio"})]
 			if world.db.zone_at(world.db.world_to_tile(world.player.position)) == "cripta":
 				# Acordados ouvem sempre; dormindo: Percepção -10 contra CD 10 (ADAPTADA).
 				var heard: Array = []
@@ -537,6 +544,101 @@ const CONDICOES_AURA_DIVINA := ["esmorecido", "debilitado", "lento"]
 
 ## Recalcula os efeitos de Aura Sagrada (resistência) e Égide Sagrada (Defesa) conforme as posições atuais:
 ## cada paladino ativo dá o próprio Carisma aos aliados do mesmo lado que estão no alcance e consciências.
+## Oração: quem está no alcance de um orante recebe o bônus (aliados) ou a penalidade (inimigos) em testes e dano.
+func _refresh_oracao() -> void:
+	for cid in sim.combatants:
+		sim.c(cid).sheet.remove_efeito("magia.oracao")
+	for orante in sim.combatants:
+		var d: Dictionary = sim.c(orante).get("oracao", {})
+		if d.is_empty():
+			continue
+		for cid in sim.combatants:
+			if CombatSim.cheb(sim.c(orante).tile, sim.c(cid).tile) > int(d.alcance):
+				continue
+			var v := int(d.bonus) if not sim.is_enemy(orante, cid) else -int(d.penalidade)
+			var s: CharacterSheet = sim.c(cid).sheet
+			s.add_efeito("magia.oracao", "testes", v, "cena", "oracao_" + orante)
+			s.add_efeito("magia.oracao", "dano", v, "cena", "oracao_" + orante)
+
+
+## Silêncio: quem está na área (não a versão que só contém o som) fica surdo enquanto estiver lá.
+func _refresh_silencio() -> void:
+	for cid in sim.combatants:
+		var s: CharacterSheet = sim.c(cid).sheet
+		var dentro := sim.silenciado(sim.c(cid).tile)
+		if dentro and not s.conditions.has("surdo"):
+			s.add_condition("surdo", world.rules)
+			s.add_efeito("magia.silencio_surdo", "condicao", 1, "cena", "surdo")
+		elif not dentro and s.has_efeito("magia.silencio_surdo"):
+			s.anular_magia("magia.silencio_surdo")
+
+
+## Purificação (aprimoramento de 7 PM): dissipa os efeitos prejudiciais das escolas indicadas no alvo.
+func _dissipar_prejudiciais(alvo: String, escolas: Array, out: Array) -> void:
+	var s: CharacterSheet = sim.c(alvo).sheet
+	for e in s.efeitos.duplicate(true):
+		var eid := str(e.id)
+		if eid.begins_with("magia.") and escolas.has(_escola_de(eid.trim_prefix("magia."))) and (int(e.bonus) < 0 or ["condicao", "bloqueio_cura", "bloqueio_arcana", "ligacao"].has(str(e.stat))):
+			s.anular_magia(eid)
+			out.append(fact("SPELL_ENDED", {"spell": eid.trim_prefix("magia."), "target": alvo, "reason": "purificacao"}, [alvo]))
+	for m in sim.marcas.duplicate(true):
+		if m.alvo == alvo and escolas.has(_escola_de(str(m.fonte))) and m.tipo in ["condicao", "comando", "atitude"]:
+			if m.tipo == "condicao":
+				s.remove_condition(str(m.dados.get("condicao", "")))
+			sim.remove_marca(str(m.id), alvo)
+			out.append(fact("SPELL_ENDED", {"spell": str(m.fonte), "target": alvo, "reason": "purificacao"}, [alvo]))
+
+
+## Raio Solar (divina 2): linha de 30m a partir de você. 4d8 de luz (4d12 em mortos-vivos) e ofuscado por 1 rodada;
+## Reflexos: metade e sem ofuscar. Aprimoramentos: +1d8 (+1d12) no dano ou cura (repetível); vivos escolhidos curam
+## 4d8 em vez do dano; quem falha fica cego por 1d4 rodadas. Truque: facho de luz pela cena (ilumina a linha; a direção
+## muda com ação livre, uma vez por rodada).
+func _raio_solar(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var origem: Vector2i = sim.c(id).tile
+	var alvo_t: Vector2i = a.get("tile", sim.c(a.get("target", id)).tile) if sim.combatants.has(a.get("target", id)) else a.get("tile", origem)
+	var dir := Vector2i(signi(alvo_t.x - origem.x), signi(alvo_t.y - origem.y))
+	if dir == Vector2i.ZERO:
+		dir = Vector2i(1, 0)
+	var linha := Area.linha(origem, dir, Area.quadrados(30.0))
+	if a.get("truque", false):
+		sim.add_zona("facho_%s" % id, linha, "luz", -1, "raio_solar", {"conjurador": id, "magica": true, "facho": true})
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "facho_de_luz", "tags": ["magia", "luz"]}, [id]))
+		return out
+	var cd := spell_dc(sh, a)
+	var curados: Array = []
+	if apr.has(1):
+		curados = a.get("curar", sim.combatants.keys().filter(func(x): return not sim.is_enemy(id, x)))   # padrão: os aliados
+	for tg in _criaturas_vivas_em(linha):
+		if tg == id:
+			continue
+		var ts: CharacterSheet = sim.c(tg).sheet
+		var mv := ts.creature_type == "morto-vivo"
+		var faces := 12 if mv else 8
+		var expr := "%dd%d" % [4 + apr.count(0), faces]
+		if curados.has(tg) and not mv:
+			var cura := ts.curar(_dados_energia("%dd8" % (4 + apr.count(0)), "luz", sim.c(tg).tile))
+			out.append(fact("HEALED", {"actor": id, "target": tg, "amount": cura, "pv_after": ts.pv, "source": "raio_solar", "tags": ["magia", "cura"]}, [id, tg]))
+			continue
+		var passou := _resiste(tg, "reflexos", cd, out)
+		var dano := _dados_energia(expr, "luz", sim.c(tg).tile)
+		if passou:
+			dano /= 2
+		dano = _dano_por_tipo(ts, "luz", dano)
+		var tags: Array = ["magia", "luz"]
+		tags.append_array(sim.apply_damage(tg, dano))
+		if not passou:
+			sim.add_condicao(tg, "ofuscado", 1, "raio_solar")
+			if apr.has(2):
+				sim.add_condicao(tg, "cego", int(Dice.roll("1d4", world.rng, "combat").total), "raio_solar")
+		out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Raio Solar", "d20": 0, "mod": 0, "mods": [], "total": 0,
+			"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [], "pv_after": ts.pv, "special": false,
+			"ranged": true, "spell": true, "save": "reflexos", "saved": passou, "tags": tags}, [id, tg]))
+	return out
+
+
 func _refresh_bencaos() -> void:
 	for id_ae in sim.combatants:   # Arma Espiritual se dissipa se o conjurador morrer
 		var s_ae: CharacterSheet = sim.c(id_ae).sheet
@@ -545,6 +647,8 @@ func _refresh_bencaos() -> void:
 			sim.sustentadas.erase(id_ae)
 	_refresh_aura_divina()
 	_refresh_areas_sagradas()
+	_refresh_oracao()
+	_refresh_silencio()
 	for id in sim.combatants:
 		var sh: CharacterSheet = sim.c(id).sheet
 		sh.remove_efeito("aura_sagrada")
@@ -1948,6 +2052,12 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			s.manto_cruzado = ""
 		"arma_espiritual":
 			s.remove_efeito("magia.arma_espiritual")
+		"oracao":
+			sim.c(id).erase("oracao")
+		"silencio":
+			sim.remove_zona("silencio_%s" % id)
+			for cid in sim.combatants:
+				sim.c(cid).sheet.remove_efeito("magia.silencio")
 	_refresh_bencaos()
 	facts.append(fact("SPELL_ENDED", {"caster": id, "spell": sp_id, "reason": "sustentada"}, [id]))
 
@@ -2263,6 +2373,15 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var r_dm := Checks.skill(sim.c(id).sheet, "misticismo", 15, world.rules, world.rng, "combat")
 			var auras_dm: Array = auras_na_cena(sim.c(id).tile, ALCANCE_CURTO_QUADRADOS, false) if r_dm.get("success", false) else []
 			out.append(fact("MAGIC_DETECTED", {"actor": id, "check": r_dm, "auras": auras_dm}, [id]))
+		"mover_facho":
+			# Raio Solar (truque): uma vez por rodada, ação livre, o facho muda de direção.
+			(sim.c(id).flags as Array).append("facho_%d" % sim.round_no)
+			var alvo_f := Vector2i(int(a.tile[0]), int(a.tile[1])) if a.tile is Array else a.tile as Vector2i
+			var orig_f: Vector2i = sim.c(id).tile
+			var dir_f := Vector2i(signi(alvo_f.x - orig_f.x), signi(alvo_f.y - orig_f.y))
+			sim.add_zona("facho_%s" % id, Area.linha(orig_f, dir_f if dir_f != Vector2i.ZERO else Vector2i(1, 0), Area.quadrados(30.0)), "luz", -1, "raio_solar",
+				{"conjurador": id, "magica": true, "facho": true})
+			out.append(fact("LIGHT_MOVED", {"actor": id}, [id]))
 		"mover_globos":
 			# Luz (globos, aprimoramento arcano): uma vez por rodada, ação livre, os globos vão a outros quadrados.
 			(sim.c(id).flags as Array).append("globos_%d" % sim.round_no)
@@ -2452,6 +2571,71 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
 		"luz", "escuridao":
 			out.append_array(_luz_ou_escuridao(id, a))
+		"fisico_divino", "mente_divina":
+			# Físico Divino / Mente Divina (divinas 2): +2 no atributo escolhido pela cena (sem PV, PM ou perícias novas).
+			# Aprimoramentos: curto e criaturas escolhidas; +2 nos três (3º); +4 no escolhido (4º); +4 nos três (5º).
+			var bon_fd := SpellRules.bonus_atributos(str(a.spell), a.get("aprimoramentos", []), str(a.get("atributo", "")))
+			for tg_fd in a.get("targets", [a.get("target", id)]):
+				var ts_fd: CharacterSheet = sim.c(tg_fd).sheet
+				ts_fd.remove_efeito("magia." + str(a.spell))
+				for at_fd in bon_fd:
+					ts_fd.add_efeito("magia." + str(a.spell), "atributo", int(bon_fd[at_fd]), "cena", at_fd)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_fd, "buff": str(a.spell), "atributos": bon_fd, "tags": ["magia"]}, [id, tg_fd]))
+		"oracao":
+			# Oração (divina 2): sustentada (cena com aprimoramento de 4º). Você e aliados no alcance: +2 em testes de perícia e
+			# dano; inimigos: –2. Cumulativo. Material: T$ 20 por PM gasto. Aprimoramentos: +1 bônus e –1 penalidade
+			# (repetíveis, até o círculo máximo); alcance médio (3º). Ver _refresh_oracao.
+			var apr_or: Array = a.get("aprimoramentos", [])
+			var circ_or := SpellRules.circulo_maximo(sh, world.rules)
+			var dados_or := {"bonus": mini(2 + apr_or.count(0), maxi(2, circ_or)), "penalidade": mini(2 + apr_or.count(1), maxi(2, circ_or)),
+				"alcance": int(world.rules.value("alcance.quadrados", {}).get("medio" if apr_or.has(2) else "curto", 6))}
+			sim.c(id)["oracao"] = dados_or
+			if id == "player":
+				out.append(fact("GOLD_CHANGED", {"delta": -20 * int(v.get("cost", 0)), "reason": "oferendas da Oração"}))
+			if not apr_or.has(3):
+				_iniciar_sustentada(id, "oracao", out)
+			_refresh_oracao()
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "oracao", "tags": ["magia"]}, [id]))
+		"purificacao":
+			# Purificação (divina 2): toque; remove uma condição da lista (todas, com aprimoramento). Aprimoramentos: PV perdidos
+			# por veneno; soltar item amaldiçoado; dissipar efeitos prejudiciais de encantamento, necromancia e transmutação (3º).
+			var apr_pu: Array = a.get("aprimoramentos", [])
+			var tg_pu: String = a.get("target", id)
+			var ts_pu: CharacterSheet = sim.c(tg_pu).sheet
+			var removidas: Array = []
+			for cnd in SpellRules.CONDICOES_PURIFICACAO:
+				if ts_pu.conditions.has(cnd) and (apr_pu.has(1) or removidas.is_empty()) and (str(a.get("condicao", "")) == "" or str(a.condicao) == cnd or apr_pu.has(1)):
+					ts_pu.remove_condition(cnd)
+					for m_pu in sim.marcas.duplicate(true):
+						if m_pu.alvo == tg_pu and m_pu.tipo == "condicao" and str(m_pu.dados.get("condicao", "")) == cnd:
+							sim.remove_marca(str(m_pu.id), tg_pu)
+					removidas.append(cnd)
+			if apr_pu.has(0) and ts_pu.pv_perdido_veneno > 0:
+				ts_pu.pv = mini(ts_pu.pv_max, ts_pu.pv + ts_pu.pv_perdido_veneno)
+				ts_pu.pv_perdido_veneno = 0
+			if apr_pu.has(2):
+				out.append(fact("CURSED_ITEM_RELEASED", {"target": tg_pu}, [tg_pu]))   # pode soltar; a maldição do item fica
+			if apr_pu.has(3):
+				_dissipar_prejudiciais(tg_pu, ["encantamento", "necromancia", "transmutação"], out)
+			out.append(fact("CONDITIONS_REMOVED", {"actor": id, "target": tg_pu, "conditions": removidas}, [id, tg_pu]))
+		"raio_solar":
+			out.append_array(_raio_solar(id, a))
+		"silencio":
+			# Silêncio (divina 2): esfera de 6m em alcance médio, sustentada; quem está dentro fica surdo e não lança magias.
+			# Aprimoramentos: objeto que emana 3m (Vontade de involuntário); cena, e o som só não sai da área.
+			var apr_si2: Array = a.get("aprimoramentos", [])
+			if apr_si2.has(0):
+				var tg_s: String = a.get("target", id)
+				if sim.is_enemy(id, tg_s) and _resiste(tg_s, "vontade", spell_dc(sh, a), out):
+					return out
+				sim.c(tg_s).sheet.add_efeito("magia.silencio", "fonte_silencio", Area.quadrados(3.0), "cena" if apr_si2.has(1) else "sustentada", "so_contem" if apr_si2.has(1) else "")
+			else:
+				var centro_si: Vector2i = a.get("tile", sim.c(a.get("target", id)).tile)
+				sim.add_zona("silencio_%s" % id, Area.esfera(centro_si, Area.quadrados(6.0)), "silencio", -1, "silencio", {"conjurador": id, "so_contem": apr_si2.has(1)})
+			if not apr_si2.has(1):
+				_iniciar_sustentada(id, "silencio", out)
+			_refresh_silencio()
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "silencio", "tags": ["magia"]}, [id]))
 		"aviso":
 			# Aviso (universal 1): alcance longo (x10 por aprimoramento), sem precisar ver. Alerta: +5 no próximo teste de
 			# Iniciativa e de Percepção até o fim da próxima cena. Mensagem (25 palavras; resposta com aprimoramento) e

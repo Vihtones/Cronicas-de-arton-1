@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Físico Divino, Mente Divina, Oração, Purificação, Raio Solar e Silêncio (divinas, 2º círculo) completas: atributos que mudam de verdade e revertem, bênção de oração, purificação de condições, raio solar e área de silêncio que deixa surdo e impede magias. Correção: alcance "médio" do catálogo (com acento) agora é reconhecido.
+
 - Armadura Arcana, Toque Chocante e Seta Infalível de Talude (arcanas, 1º círculo) completas, com texto e aprimoramentos do livro no catálogo: Armadura em reação (+5 contra um ataque), +1 e um dia; Toque com +1d8+1, ataque corpo a corpo sem resistência e esfera de 6m; Seta com lanças de 1d8+1 e três, cinco ou dez setas. Os danos agora são de eletricidade e essência de verdade (antes contavam como impacto). Correção: área de alcance pessoal não afeta o conjurador (LB p.225), também no Despedaçar.
 
 - Aviso, Compreensão e Visão Mística (universais, 1º círculo) completas; com elas, todas as universais de 1º círculo. Aviso (ação de movimento, alcance longo x10): alerta (+5 no próximo teste de Iniciativa e de Percepção), mensagem com resposta, localização. Compreensão: ouvir os pensamentos de um NPC tocado revela um fato que ele sabe; vasculhar revela tudo; todos os idiomas. Visão Mística: auras mágicas em alcance médio com a magia e o lugar, análise de quem lança magias, visão no escuro, um dia, ver o invisível. Misticismo ganhou Detectar Magia (CD 15). A execução das magias passa a vir do catálogo (movimento, completa).

@@ -247,7 +247,9 @@ func disparar_armadilha(t: Dictionary) -> Array:
 			if regra.has("dano_extra"):
 				dano += s.dano_por_tipo(str(regra.tipo_extra), int(Dice.roll(str(regra.dano_extra), world.rng, "world").total))
 			if regra.has("perda_pv"):
-				dano += int(Dice.roll(str(regra.perda_pv), world.rng, "world").total)   # veneno: perda de PV
+				var veneno := int(Dice.roll(str(regra.perda_pv), world.rng, "world").total)   # veneno: perda de PV
+				dano += veneno
+				s.pv_perdido_veneno += veneno
 			s.pv -= dano
 			out.append(fact("TRAP_DAMAGE", {"trap": regra.get("nome", ""), "damage": dano, "pv_after": s.pv}, ["player"]))
 			if str(regra.efeito) == "queda":
