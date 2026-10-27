@@ -7105,6 +7105,431 @@
    "pagina": 126,
    "pdf_page": 132,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.acrobatico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas",
+    "implementado": false,
+    "prereq": {
+     "des": 2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.ao_sabor_do_destino",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Abre mão de usar itens mágicos e ganha benefícios por nível: 6º +2 em uma perícia; 7º +1 na Defesa; 8º +1 nas rolagens de dano; 9º +1 em um atributo; 11º +2 em uma perícia; 12º +2 na Defesa; 13º +2 nas rolagens de dano; 14º +1 em um atributo; 16º +2 em uma perícia; 17º +3 na Defesa; 18º +3 nas rolagens de dano; 19º +1 em um atributo. Usar voluntariamente item mágico (exceto poções) faz perder o benefício até o fim da aventura",
+    "implementado": false,
+    "prereq": {
+     "nivel": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 129,
+   "pdf_page": 135,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.aparencia_inofensiva",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer teste de Vontade (CD Car). Se falhar, perde sua ação. Só funciona uma vez por cena",
+    "implementado": false,
+    "prereq": {
+     "car": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.atletico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você recebe +2 em Atletismo e +3m em seu deslocamento",
+    "implementado": false,
+    "prereq": {
+     "for": 2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.atraente",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você recebe +2 em testes de perícias baseadas em Carisma contra criaturas que possam se sentir fisicamente atraídas por você",
+    "implementado": false,
+    "prereq": {
+     "car": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.comandar",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Gasta uma ação de movimento e 1 PM para dar ordens a aliados em alcance médio, que recebem +1 em testes de perícia até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "car": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.costas_largas",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Seu limite de carga aumenta em 5 espaços e você pode se beneficiar de um item vestido adicional",
+    "implementado": false,
+    "prereq": {
+     "con": 1,
+     "for": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.foco_em_pericia",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Escolha uma perícia. Ao fazer um teste dela, pode gastar 1 PM para rolar dois dados e usar o melhor resultado. Pode ser escolhido outras vezes para perícias diferentes. Não pode ser aplicado em Luta e Pontaria",
+    "implementado": false,
+    "prereq": {
+     "texto": "treinado na perícia escolhida"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.inventario_organizado",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você soma sua Inteligência no limite de espaços que pode carregar. Itens muito leves ou pequenos, que normalmente ocupam meio espaço, ocupam 1/4 de espaço",
+    "implementado": false,
+    "prereq": {
+     "int": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.investigador",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você recebe +2 em Investigação e soma sua Inteligência em Intuição",
+    "implementado": false,
+    "prereq": {
+     "int": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lobo_solitario",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você recebe +1 em testes de perícia e na Defesa se estiver sem nenhum aliado em alcance curto. Não sofre penalidade por usar Cura em si mesmo",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.medicina",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Gasta uma ação completa e faz teste de Cura (CD 15) em uma criatura. Se passar, ela recupera 1d6 PV, mais 1d6 para cada 5 pontos pelos quais o resultado exceder a CD. Só pode usar uma vez por dia na mesma criatura",
+    "implementado": false,
+    "prereq": {
+     "sab": 1,
+     "texto": "treinado em Cura"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.parceiro",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você possui um parceiro animal ou humanoide iniciante (veja a página 260) que o acompanha em aventuras. Se perder o parceiro, recebe outro no início da próxima aventura",
+    "implementado": false,
+    "prereq": {
+     "nivel": 5,
+     "texto": "treinado em Adestramento (parceiro animal) ou Diplomacia (parceiro humanoide)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sentidos_agucados",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você recebe +2 em Percepção e não fica desprevenido contra inimigos que não possa perceber. Sempre que erra um ataque por camuflagem, pode rolar mais uma vez o dado da chance de falha",
+    "implementado": false,
+    "prereq": {
+     "sab": 1,
+     "texto": "treinado em Percepção"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 130,
+   "pdf_page": 136,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sortudo",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Quando faz um teste, pode gastar 3 PM para rolá-lo novamente",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.surto_heroico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Uma vez por rodada, pode gastar 5 PM para realizar uma ação padrão ou de movimento adicional",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.torcida",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você recebe +2 em testes de perícia e na Defesa quando tem a torcida a seu favor: criaturas inteligentes em alcance médio que não estejam realizando nenhuma ação além de torcer por você",
+    "implementado": false,
+    "prereq": {
+     "car": 1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.treinamento_em_pericia",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você se torna treinado em uma perícia à sua escolha. Pode ser escolhido outras vezes para perícias diferentes",
+    "implementado": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.venefico",
+   "valor": {
+    "classe": "geral",
+    "grupo": "destino",
+    "efeito": "Você não corre risco de se envenenar acidentalmente com veneno. Além disso, a CD para resistir aos seus venenos aumenta em +2",
+    "implementado": false,
+    "prereq": {
+     "texto": "treinado em Ofício (alquimista)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.celebrar_ritual",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Lança magias como rituais: dobra seu limite de PM, mas a execução passa a ser 1 hora (ou o dobro, o que for maior) e exige gasto de T$ 10 por PM (incensos, oferendas...). Magias lançadas como rituais não podem ser armazenadas em itens",
+    "implementado": false,
+    "prereq": {
+     "nivel": 8,
+     "texto": "lançar magias; treinado em Misticismo ou Religião"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escrever_pergaminho",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Você pode usar Ofício (escriba) para fabricar pergaminhos com magias que conheça (veja a página 121 e as páginas 333 e 341)",
+    "implementado": false,
+    "prereq": {
+     "texto": "habilidade Magias; treinado em Ofício (escriba)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.preparar_pocao",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Você pode usar Ofício (alquimista) para fabricar poções com magias de 1º e 2º círculos que conheça (veja a página 121 e as páginas 333 e 341)",
+    "implementado": false,
+    "prereq": {
+     "texto": "habilidade Magias; treinado em Ofício (alquimista)"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.foco_em_magia",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Escolha uma magia que possa lançar. Seu custo diminui em –1 PM (cumulativo com outras reduções). Pode ser escolhido outras vezes para magias diferentes",
+    "implementado": false,
+    "prereq": {
+     "texto": "lançar magias"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_acelerada",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Aprimoramento (+4 PM): muda a execução da magia para ação livre. Só se aplica a magias de execução movimento, padrão ou completa, e só pode lançar uma magia como ação livre por rodada",
+    "implementado": false,
+    "prereq": {
+     "texto": "lançar magias de 2º círculo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_ampliada",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Aprimoramento (+2 PM): aumenta o alcance da magia em um passo (de curto para médio, de médio para longo) ou dobra a área de efeito",
+    "implementado": false,
+    "prereq": {
+     "texto": "lançar magias"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_discreta",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Aprimoramento (+2 PM): lança a magia sem gesticular e falar, usando apenas concentração; pode lançar magias arcanas usando armadura sem teste de Misticismo. Outros personagens só percebem com teste de Misticismo (CD 20)",
+    "implementado": false,
+    "prereq": {
+     "texto": "lançar magias"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.magia_ilimitada",
+   "valor": {
+    "classe": "geral",
+    "grupo": "magia",
+    "efeito": "Você soma seu atributo-chave ao limite de PM que pode gastar em cada magia",
+    "implementado": false,
+    "prereq": {
+     "texto": "lançar magias"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 131,
+   "pdf_page": 137,
+   "status": "VERIFICADA"
   }
  ]
 }
