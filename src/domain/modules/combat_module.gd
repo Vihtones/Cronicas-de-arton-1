@@ -527,7 +527,7 @@ func _zonas_e_marcas_inicio_de_turno(id: String, facts: Array) -> void:
 		if dados_m.has("cura_inicio_turno") and sim.conscious(id):
 			var s: CharacterSheet = x.sheet
 			var cura := int(Dice.roll(str(dados_m.cura_inicio_turno), world.rng, "combat").total)
-			s.pv = mini(s.pv_max, s.pv + cura)
+			cura = s.curar(cura)
 			facts.append(fact("HEALED", {"actor": conj, "target": id, "amount": cura, "pv_after": s.pv, "source": str(m.fonte), "tags": ["magia", "cura"]}, [conj, id]))
 
 
@@ -540,6 +540,38 @@ func _zona_afeta(z: Dictionary, id: String) -> bool:
 	if afeta == "inimigos":
 		return sim.c(id).side != lado
 	return sim.c(id).side == lado
+
+
+## Início do turno do conjurador: as nuvens dele afetam quem está dentro.
+func _nuvens_do_conjurador(id: String, facts: Array) -> void:
+	for z in sim.zonas.duplicate(true):
+		var dados: Dictionary = z.get("dados", {})
+		if dados.has("dano_turno") and str(dados.get("conjurador", "")) == id:
+			_aplicar_nuvem(z, facts)
+
+
+## Nuvem (Poeira da Podridão): cada criatura viva dentro faz Fortitude; sofre o dano de trevas (metade no teste)
+## e quem falha fica sem recuperar PV por uma rodada.
+func _aplicar_nuvem(z: Dictionary, facts: Array) -> void:
+	var dados: Dictionary = z.get("dados", {})
+	var conj := str(dados.get("conjurador", ""))
+	for tg in _criaturas_vivas_em(z.tiles):
+		var ts: CharacterSheet = sim.c(tg).sheet
+		var sv := Checks.skill(ts, "fortitude", int(dados.get("cd", 10)), world.rules, world.rng, "combat")
+		var passou: bool = sv.get("success", false)
+		var dano := int(Dice.roll(str(dados.get("dano_turno", "2d8+8")), world.rng, "combat").total)
+		if passou:
+			dano = dano / 2
+		dano = _dano_por_tipo(ts, "trevas", dano)
+		if not passou:
+			ts.add_efeito("magia.poeira_da_podridao", "bloqueio_cura", 1, "rodada")
+		var tags: Array = ["magia", "trevas"]
+		if passou:
+			tags.append("resistiu")
+		tags.append_array(sim.apply_damage(tg, dano))
+		facts.append(fact("ATTACK_RESOLVED", {"attacker": conj, "target": tg, "weapon": "Poeira da Podridão", "d20": 0, "mod": 0,
+			"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
+			"pv_after": ts.pv, "special": false, "ranged": true, "spell": true, "save": "fortitude", "saved": passou, "tags": tags}, [conj, tg]))
 
 
 ## Fim de turno: zonas com efeito "fim_turno" (Círculo da Restauração). Criaturas vivas recuperam PV e até 1 PM
@@ -563,7 +595,7 @@ func _zonas_fim_de_turno(id: String, facts: Array) -> void:
 				"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": n, "rolls": [],
 				"pv_after": s.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags_f}, [conj, id]))
 		else:
-			s.pv = mini(s.pv_max, s.pv + n)
+			n = s.curar(n)
 			facts.append(fact("HEALED", {"actor": conj, "target": id, "amount": n, "pv_after": s.pv, "source": str(z.fonte), "tags": ["magia", "cura"]}, [conj, id]))
 			var usados := s.efeito_bonus("usos_circulo_restauracao")
 			if usados < 5:
@@ -639,7 +671,7 @@ func _manto_inicio_de_turno(id: String, facts: Array) -> void:
 			if ax.side != x.side or not sim.conscious(a) or CombatSim.cheb(x.tile, ax.tile) > curto:
 				continue
 			var cura := int(Dice.roll("2d8", world.rng, "combat").total)
-			ax.sheet.pv = mini(ax.sheet.pv_max, ax.sheet.pv + cura)
+			cura = ax.sheet.curar(cura)
 			facts.append(fact("HEALED", {"actor": id, "target": a, "amount": cura, "pv_after": ax.sheet.pv, "source": "manto_do_cruzado", "tags": ["magia", "cura"]}, [id, a]))
 		return
 	var total := 0
@@ -655,8 +687,8 @@ func _manto_inicio_de_turno(id: String, facts: Array) -> void:
 			"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
 			"pv_after": ax.sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags_t}, [id, a]))
 	if total > 0:
-		s.pv = mini(s.pv_max, s.pv + total / 2)
-		facts.append(fact("HEALED", {"actor": id, "target": id, "amount": total / 2, "pv_after": s.pv, "source": "manto_do_cruzado", "tags": ["magia", "cura"]}, [id]))
+		var metade_m := s.curar(total / 2)
+		facts.append(fact("HEALED", {"actor": id, "target": id, "amount": metade_m, "pv_after": s.pv, "source": "manto_do_cruzado", "tags": ["magia", "cura"]}, [id]))
 
 
 func _begin_turn(id: String) -> Dictionary:
@@ -667,6 +699,7 @@ func _begin_turn(id: String) -> Dictionary:
 	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
 	s.limpar_efeitos("rodada")
 	_manto_inicio_de_turno(id, facts)
+	_nuvens_do_conjurador(id, facts)
 	_zonas_e_marcas_inicio_de_turno(id, facts)
 	if x.flags.has("fora") or s.is_dead():
 		return {"skip": true, "facts": facts}
@@ -783,7 +816,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "damage": dano_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id, alvo_m]))
 			else:
 				var cura_m := int(Dice.roll("%dd8+%d" % [dados_m, dados_m], world.rng, "combat").total)
-				ts_m.pv = mini(ts_m.pv_max, ts_m.pv + cura_m)
+				cura_m = ts_m.curar(cura_m)
 				if v.get("remover", false):
 					for cond in ["abalado", "apavorado", "atordoado", "cego", "doente", "exausto", "fatigado", "surdo"]:
 						if ts_m.conditions.has(cond):
@@ -812,9 +845,9 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 		"drink":
 			var heal := Dice.roll(str(world.rules.value("magia.curar_ferimentos").cura), world.rng, "combat")
 			var sh: CharacterSheet = sim.c(id).sheet
-			sh.pv = mini(sh.pv_max, sh.pv + int(heal.total))
+			var curado_i := sh.curar(int(heal.total))
 			out.append(fact("ITEM_LOST", {"item": a.item}, [id]))
-			out.append(fact("HEALED", {"actor": id, "target": id, "amount": heal.total, "pv_after": sh.pv, "source": a.item, "tags": ["cura"]}, [id]))
+			out.append(fact("HEALED", {"actor": id, "target": id, "amount": curado_i, "pv_after": sh.pv, "source": a.item, "tags": ["cura"]}, [id]))
 	return out
 
 
@@ -962,7 +995,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					var res := Checks.skill(ts, "fortitude", dc, world.rules, world.rng, "combat")
 					passou = res.get("success", false)
 				if ts.creature_type == "morto-vivo":
-					ts.pv = mini(ts.pv_max, ts.pv + total)
+					total = ts.curar(total)
 					out.append(fact("HEALED", {"actor": id, "target": tg, "amount": total, "pv_after": ts.pv, "source": a.spell, "tags": ["magia", "cura"]}, [id, tg]))
 					continue
 				if passou:
@@ -1045,6 +1078,16 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if apr_v.has(2):
 					tsv.add_efeito("magia.vestimenta_da_fe", "rd", 5, "dia", "*", ate_v)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "vestimenta_da_fe", "tags": ["magia"]}, [id, tg]))
+		"poeira_da_podridao":
+			# Poeira da Podridão (3º círculo): nuvem de 6m de raio no alvo, pela cena. Ao lançar e no início de cada turno do
+			# conjurador, quem está na nuvem faz Fortitude: 2d8+8 de trevas (metade no teste). Quem falha não recupera PV
+			# por uma rodada. Aprimoramento: +1d8+4 de dano (2 PM).
+			var apr_p: Array = a.get("aprimoramentos", [])
+			var dano_p := "3d8+12" if apr_p.has(0) else "2d8+8"
+			var centro_p: Vector2i = sim.c(a.get("target", id)).tile
+			sim.add_zona("poeira_da_podridao_%d" % sim.zonas.size(), Area.esfera(centro_p, Area.quadrados(6.0)), "poeira_da_podridao", -1, "poeira_da_podridao",
+				{"conjurador": id, "dano_turno": dano_p, "cd": spell_dc(sh, a), "afeta": "todos"})
+			_aplicar_nuvem(sim.zonas[sim.zonas.size() - 1], out)
 		"circulo_da_restauracao":
 			# Círculo da Restauração (4º círculo): esfera de 3m no alvo por 5 rodadas. Ao fim do turno de cada criatura
 			# dentro dele: 3d8+3 PV e 1 PM (4d8+4 PV com o aprimoramento). Mortos-vivos e criaturas vulneráveis à luz
@@ -1093,7 +1136,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					cura_s += int(Dice.roll("1d8+2", world.rng, "combat").total)
 				if apr_s.has(1) and ts_s.pv < 0:
 					ts_s.pv = 0
-				ts_s.pv = mini(ts_s.pv_max, ts_s.pv + cura_s)
+				cura_s = ts_s.curar(cura_s)
 				if apr_s.has(2):
 					for cond_s in SpellRules.SOPRO_CONDICOES:
 						ts_s.remove_condition(cond_s)
@@ -1123,7 +1166,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				var cura_c := int(Dice.roll(str(sp.cura), world.rng, "combat").total)
 				if apr_c.has(0):
 					cura_c += int(Dice.roll("1d8+1", world.rng, "combat").total)
-				ts.pv = mini(ts.pv_max, ts.pv + cura_c)
+				cura_c = ts.curar(cura_c)
 				ts.anular_magia("magia.infligir_ferimentos")   # Curar Ferimentos anula Infligir Ferimentos (LB p.189)
 				if apr_c.has(1):
 					for cans in ["exausto", "fatigado"]:   # uma condição de cansaço: a mais severa

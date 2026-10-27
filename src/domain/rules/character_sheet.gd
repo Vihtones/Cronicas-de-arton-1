@@ -198,6 +198,15 @@ func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: 
 	efeitos.append({"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo, "ate": ate})
 
 
+## Recupera PV, respeitando o bloqueio de cura (Poeira da Podridão). Devolve os PV recuperados de fato.
+func curar(n: int) -> int:
+	if n <= 0 or efeito_bonus("bloqueio_cura") > 0:
+		return 0
+	var antes := pv
+	pv = mini(pv_max, pv + n)
+	return pv - antes
+
+
 func remove_efeito(id_efeito: String) -> void:
 	efeitos = efeitos.filter(func(e): return e.id != id_efeito)
 

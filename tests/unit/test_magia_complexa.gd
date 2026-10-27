@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -429,3 +429,70 @@ func test_circulo_da_restauracao_faz_mortos_vivos_perderem_pv_e_pm_na_mesma_quan
 	c._zonas_fim_de_turno("bandido_1", [])
 	eq(pv_antes - ts.pv, 99 - ts.pm, "mortos-vivos perdem a mesma quantidade de PV e de PM")
 	check(ts.pv < pv_antes, "perdem PV")
+
+
+# --- Poeira da Podridão (3º círculo) ---------------------------------------------------------
+func test_poeira_da_podridao_cria_nuvem_de_6m_pela_cena() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "poeira_da_podridao", "target": "bandido_1", "targets": ["bandido_1"]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "poeira é válida contra bandido_1 (alcance médio)")
+	c._cast("player", a, v)
+	eq(sim.zonas.size(), 1, "uma nuvem criada")
+	eq(sim.zonas[0].rodadas, -1, "dura a cena (sem contagem de rodadas)")
+	eq((sim.zonas[0].tiles as Array).size(), Area.esfera(Vector2i(27, 57), Area.quadrados(6.0)).size(), "área é a nuvem de 6m de raio")
+
+
+func test_poeira_da_podridao_fere_quem_esta_na_nuvem_e_nao_quem_esta_fora() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").tile = Vector2i(40, 57)          # fora dos 6m
+	var a := {"type": "cast", "spell": "poeira_da_podridao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(sim.c("bandido_1").sheet.pv < 999, "criatura na nuvem sofre dano")
+	eq(sim.c("bandido_2").sheet.pv, 999, "criatura fora da nuvem fica intocada")
+
+
+func test_poeira_da_podridao_falha_no_teste_bloqueia_a_cura_por_uma_rodada() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var ts: CharacterSheet = sim.c("bandido_1").sheet
+	ts.add_efeito("teste_fraco", "resistencia", -50, "cena")   # Fortitude sempre falha
+	var a := {"type": "cast", "spell": "poeira_da_podridao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(ts.efeito_bonus("bloqueio_cura") > 0, "quem falhou fica com bloqueio de cura")
+	eq(ts.curar(10), 0, "sem recuperar PV enquanto o bloqueio dura")
+	c._begin_turn("bandido_1")
+	eq(ts.efeito_bonus("bloqueio_cura"), 0, "o bloqueio acaba no início do próprio turno")
+
+
+func test_poeira_da_podridao_atinge_de_novo_no_inicio_do_turno_do_conjurador() -> void:
+	var m := _cena_grupo(9)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "poeira_da_podridao", "target": "bandido_1", "targets": ["bandido_1"]}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	var antes: int = sim.c("bandido_1").sheet.pv
+	c._nuvens_do_conjurador("player", [])
+	check(sim.c("bandido_1").sheet.pv < antes, "dano de novo no início do turno do conjurador")
+
+
+func test_poeira_da_podridao_aprimoramento_custa_2_pm() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var base := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "poeira_da_podridao", "target": "bandido_1", "targets": ["bandido_1"]})
+	var com := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "poeira_da_podridao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]})
+	eq(com.cost, base.cost + 2, "+1d8+4 de dano custa 2 PM")
+
+
+func test_curar_respeita_o_limite_da_ficha_e_devolve_o_que_foi_recuperado() -> void:
+	var m := _cena_grupo(9)
+	var ts: CharacterSheet = m[2].c("bandido_1").sheet
+	ts.pv_max = 20
+	ts.pv = 15
+	eq(ts.curar(10), 5, "cura até o máximo e devolve só o que foi recuperado")
+	eq(ts.pv, 20, "não passa do máximo")
