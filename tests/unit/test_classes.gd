@@ -387,3 +387,23 @@ func test_curar_ferimentos_truque_contra_morto_vivo_causa_dano() -> void:
 	check(v.ok, "truque válido contra morto-vivo adjacente: %s" % str(v))
 	c._cast("player", a, v)
 	check(alvo.pv < 10, "contra morto-vivo causa dano, não cura (PV %d)" % alvo.pv)
+
+
+func test_vestimenta_da_fe_defesa_resistencia_e_reducao() -> void:
+	var m := _cena_com("vestimenta_da_fe", 13)   # 4º círculo do clérigo (requerido pelo aprimoramento 2)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	sim.c("player").sheet.pm = 30
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	var def_antes := alvo.defense(sim.rules)
+	var res_antes := alvo.skill_value("fortitude", sim.rules)
+	var a := {"type": "cast", "spell": "vestimenta_da_fe", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0, 1, 2]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "todos os aprimoramentos válidos com nível 9: %s" % str(v))
+	c._cast("player", a, v)
+	eq(alvo.defense(sim.rules) - def_antes, 3, "+2 da base e +1 do aprimoramento na Defesa")
+	eq(Checks.skill(alvo, "fortitude", 10, sim.rules, RngStreams.new(2), "combat").mod - res_antes, 3, "+2 e +1 em resistências")
+	eq(alvo.efeito_rd("fogo"), 5, "redução de dano 5 contra todos os tipos")
+	alvo.limpar_dia(999)
+	eq(alvo.efeito_bonus("defesa"), 0, "o efeito acaba no dia seguinte")

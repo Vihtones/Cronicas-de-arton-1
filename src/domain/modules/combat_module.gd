@@ -758,6 +758,24 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, tipo, ate)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "resistencia_a_energia", "tipo": tipo, "tags": ["magia"]}, [id, tg]))
+		"vestimenta_da_fe":
+			# Vestimenta da Fé (LB p.216): +2 na Defesa por um dia (bônus de encanto). Aplicada ao alvo,
+			# já que o jogo não tem itens encantados por instância. Aprimoramentos: +2 em resistências,
+			# +1 no bônus e redução de dano 5 contra todos os tipos.
+			var apr_v: Array = a.get("aprimoramentos", [])
+			var ate_v := world.day_index() + 1
+			for tg in a.get("targets", [a.get("target", id)]):
+				var tsv: CharacterSheet = sim.c(tg).sheet
+				tsv.add_efeito("magia.vestimenta_da_fe", "defesa", 2, "dia", "encanto", ate_v)
+				if apr_v.has(0):
+					tsv.add_efeito("magia.vestimenta_da_fe", "resistencia", 2, "dia", "encanto", ate_v)
+				if apr_v.has(1):
+					tsv.add_efeito("magia.vestimenta_da_fe", "defesa", 1, "dia", "encanto_extra", ate_v)
+					if apr_v.has(0):
+						tsv.add_efeito("magia.vestimenta_da_fe", "resistencia", 1, "dia", "encanto_extra", ate_v)
+				if apr_v.has(2):
+					tsv.add_efeito("magia.vestimenta_da_fe", "rd", 5, "dia", "*", ate_v)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "vestimenta_da_fe", "tags": ["magia"]}, [id, tg]))
 		"curar_ferimentos":
 			var apr_c: Array = a.get("aprimoramentos", [])
 			for tgt in a.get("targets", [a.get("target", id)]):

@@ -200,7 +200,7 @@ func remove_efeito_link() -> void:
 func efeito_rd(tipo: String) -> int:
 	var total := 0
 	for e in efeitos:
-		if e.stat == "rd" and str(e.tipo) == tipo:
+		if e.stat == "rd" and (str(e.tipo) == tipo or str(e.tipo) == "*"):   # "*" = todos os tipos
 			total += int(e.bonus)
 	return total
 
