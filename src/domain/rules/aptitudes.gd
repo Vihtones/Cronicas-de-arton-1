@@ -34,10 +34,48 @@ const DOMINIO_DE_PERICIA := {
 }
 
 
-## Chave da aptidão ligada a uma perícia ("dominio.pericia"), ou "" se a perícia não tem domínio.
-static func chave_de_pericia(pericia: String) -> String:
+## Subdomínios: a parte específica de um domínio (ex.: fazer → cozinhar, forjar). "geral" é o padrão.
+const SUBDOMINIOS := {
+	"fazer": ["geral", "cozinhar", "forjar", "pescar", "construir", "costurar", "destrancar"],
+	"lutar": ["geral", "combate_corpo", "combate_distancia", "tatica", "forca"],
+	"criar": ["geral", "arte", "escrita", "musica"],
+	"cuidar": ["geral", "curar", "resistir", "domar", "rezar"],
+	"conhecer": ["geral", "saber", "magia", "investigar", "perceber"],
+	"comunicar": ["geral", "persuadir", "enganar", "intimidar", "ler_pessoas", "protocolo", "apostar"],
+	"sobreviver": ["geral", "acrobatismo", "cavalgar", "furtar", "reagir", "sobrevivencia", "pilotar"],
+}
+## Subdomínio de cada perícia. A perícia "oficio" usa o ofício escolhido pelo jogador (ver chave_de_pericia).
+const SUBDOMINIO_DE_PERICIA := {
+	"acrobacia": "acrobatismo", "adestramento": "domar", "atletismo": "forca", "atuacao": "arte",
+	"cavalgar": "cavalgar", "conhecimento": "saber", "cura": "curar", "diplomacia": "persuadir",
+	"enganacao": "enganar", "fortitude": "resistir", "furtividade": "furtar", "guerra": "tatica",
+	"iniciativa": "reagir", "intimidacao": "intimidar", "intuicao": "ler_pessoas", "investigacao": "investigar",
+	"jogatina": "apostar", "ladinagem": "destrancar", "luta": "combate_corpo", "misticismo": "magia",
+	"nobreza": "protocolo", "percepcao": "perceber", "pilotagem": "pilotar", "pontaria": "combate_distancia",
+	"reflexos": "reagir", "religiao": "rezar", "sobrevivencia": "sobrevivencia", "vontade": "resistir",
+}
+
+
+static func subdominio_valido(dominio: String, subdominio: String) -> bool:
+	return SUBDOMINIOS.has(dominio) and (subdominio as String) in SUBDOMINIOS[dominio]
+
+
+## Chave da aptidão ligada a uma perícia: "dominio.subdominio", ou "" se a perícia não tem domínio.
+## Oficio usa o ofício escolhido (ex.: "cozinhar" → fazer.cozinhar); sem ofício válido, fazer.geral.
+static func chave_de_pericia(pericia: String, oficio: String = "") -> String:
 	var dom: String = DOMINIO_DE_PERICIA.get(pericia, "")
-	return dom + "." + pericia if dom != "" else ""
+	if dom == "":
+		return ""
+	var sub: String = SUBDOMINIO_DE_PERICIA.get(pericia, "geral")
+	if pericia == "oficio":
+		sub = oficio if subdominio_valido(dom, oficio) else "geral"
+	return dom + "." + sub
+
+
+## Balanceamento com o Tormenta 20 (docs/BALANCEAMENTO_APTIDOES.md): o bônus de uma aptidão não passa do
+## que um personagem treinado tem na T20 no mesmo nível (metade do nível + 2 do treinamento).
+static func teto_balanceado(bonus_bruto: int, nivel: int) -> int:
+	return mini(bonus_bruto, nivel / 2 + 2)
 
 
 ## Passos entre dois domínios (busca em largura). -1 se algum não existir.

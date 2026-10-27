@@ -45,6 +45,7 @@ var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37
 var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
 var sorte_usada: bool = false        # Sorte Salvadora (hynne): uma vez por rodada; zera ao começar a rodada
 var olhar_usado: bool = false          # Olhar Atordoante (medusa): uma vez por cena; zera no fim do combate
+var oficio: String = ""          # subdomínio de fazer escolhido para a perícia Ofício (ex.: cozinhar)
 var afinidade: Dictionary = {}   # aptidões no estilo Nen: domínio -> % (soma 100), ver aptitudes.gd
 var aptidoes: Dictionary = {}    # "dominio.nome" -> {"pct": float, "pratica": int, "marco": bool}
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
@@ -316,7 +317,7 @@ func praticar_aptidao(chave: String, sucesso: bool) -> void:
 ## Bônus de teste da aptidão (+1 a cada 10%); 0 se a ficha não tem a aptidão.
 func bonus_aptidao(chave: String) -> int:
 	var estado: Dictionary = aptidoes.get(chave, {})
-	return Apt.bonus(float(estado.get("pct", 0.0)))
+	return Apt.teto_balanceado(Apt.bonus(float(estado.get("pct", 0.0))), level)
 
 
 ## Penalidade de condições em um teste de perícia ou resistência: soma os campos
@@ -366,7 +367,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"efeitos": efeitos.duplicate(true), "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
+		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -395,6 +396,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.efeitos = Array(d.get("efeitos", [])).duplicate(true)
 	s.afinidade = (d.get("afinidade", {}) as Dictionary).duplicate()
 	s.aptidoes = (d.get("aptidoes", {}) as Dictionary).duplicate(true)
+	s.oficio = str(d.get("oficio", ""))
 	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()

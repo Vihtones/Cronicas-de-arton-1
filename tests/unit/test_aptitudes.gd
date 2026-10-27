@@ -90,10 +90,10 @@ func test_pericia_com_afinidade_usa_e_treina_a_aptidao() -> void:
 	var base := s.skill_value("luta", r)
 	var primeiro := Checks.skill(s, "luta", 1, r, rng)
 	eq(primeiro.mod, base, "sem progresso ainda: só o valor da perícia")
-	check(s.aptidoes.has("lutar.luta"), "o sucesso cria a aptidão da perícia")
+	check(s.aptidoes.has("lutar.combate_corpo"), "o sucesso cria a aptidão da perícia")
 	for i in 300:
 		Checks.skill(s, "luta", 1, r, rng)
-	var b := s.bonus_aptidao("lutar.luta")
+	var b := s.bonus_aptidao("lutar.combate_corpo")
 	check(b > 0, "depois de treinar, o bônus da aptidão é positivo (%d)" % b)
 	eq(Checks.skill(s, "luta", 1, r, rng).mod, base + b, "o bônus entra no teste")
 
@@ -106,3 +106,34 @@ func test_pericia_sem_afinidade_nao_muda() -> void:
 	for i in 50:
 		eq(Checks.skill(s, "luta", 1, r, rng).mod, base, "sem afinidade o teste é o de antes")
 	eq(s.aptidoes.size(), 0, "nenhuma aptidão criada")
+
+
+func test_todo_pericia_tem_subdominio_valido() -> void:
+	for p in Apt.DOMINIO_DE_PERICIA:
+		if p == "oficio":
+			continue
+		var dom: String = Apt.DOMINIO_DE_PERICIA[p]
+		check(Apt.SUBDOMINIO_DE_PERICIA.has(p), "perícia com subdomínio: " + p)
+		check(Apt.subdominio_valido(dom, Apt.SUBDOMINIO_DE_PERICIA.get(p, "")), "subdomínio de %s existe em %s" % [p, dom])
+
+
+func test_oficio_usa_o_subdominio_escolhido() -> void:
+	eq(Apt.chave_de_pericia("oficio", "cozinhar"), "fazer.cozinhar", "ofício escolhido vira o subdomínio")
+	eq(Apt.chave_de_pericia("oficio", ""), "fazer.geral", "sem ofício, geral")
+	eq(Apt.chave_de_pericia("oficio", "magia"), "fazer.geral", "subdomínio de outro domínio é ignorado")
+	eq(Apt.chave_de_pericia("luta"), "lutar.combate_corpo", "perícia de combate")
+	eq(Apt.chave_de_pericia("nao_existe"), "", "perícia desconhecida não tem chave")
+
+
+func test_teto_balanceado_segue_o_treinamento_da_t20() -> void:
+	eq(Apt.teto_balanceado(10, 1), 2, "nível 1: no máximo +2 (treinado)")
+	eq(Apt.teto_balanceado(10, 10), 7, "nível 10: no máximo +7 (metade + 2)")
+	eq(Apt.teto_balanceado(3, 20), 3, "bônus abaixo do teto não muda")
+	var r := RuleRegistry.load_default()
+	var s := CharacterSheet.premade_warrior(r)
+	s.afinidade = {"lutar": 100}
+	s.aptidoes["lutar.combate_corpo"] = {"pct": 100.0, "pratica": 999, "marco": true}
+	eq(s.bonus_aptidao("lutar.combate_corpo"), 2, "100% no nível 1 ainda dá no máximo +2")
+	s.oficio = "cozinhar"
+	var volta := CharacterSheet.from_dict(s.to_dict())
+	eq(volta.oficio, "cozinhar", "ofício sobrevive ao save")

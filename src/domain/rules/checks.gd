@@ -11,7 +11,7 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 	if not sheet.can_use_skill(skill_name, rules):
 		return {"allowed": false, "reason": "perícia somente treinada: " + skill_name}
 	# Aptidões (Nen, fase 2): só fichas com afinidade definida usam a porcentagem da aptidão da perícia
-	var chave_apt := Apt.chave_de_pericia(skill_name) if not sheet.afinidade.is_empty() else ""
+	var chave_apt := Apt.chave_de_pericia(skill_name, sheet.oficio) if not sheet.afinidade.is_empty() else ""
 	var mod := sheet.skill_value(skill_name, rules) + extra_mod + sheet.condition_skill_mod(rules, skill_name) + ClassFeatures.instinto_pericia(sheet, skill_name)
 	if chave_apt != "":
 		mod += sheet.bonus_aptidao(chave_apt)

@@ -64,3 +64,11 @@ Ainda não feito (próximas fases):
 - Mais de uma aptidão por perícia (subdomínios, como cozinhar e forjar).
 - Interface para ver e escolher aptidões; NPCs com afinidade.
 - Integração com a árvore de poderes do Livro Básico (fonte de aptidões de combate).
+
+Fase 3 (subdomínios e balanceamento): cada perícia tem um subdomínio (`SUBDOMINIO_DE_PERICIA`,
+chave "dominio.subdominio"). Perícia Ofício usa o ofício escolhido (`CharacterSheet.oficio`).
+O bônus de aptidão é limitado a metade do nível + 2 (`Apt.teto_balanceado`), o mesmo que a
+T20 dá a um treinado. Divergências do Tormenta 20 e limites em `docs/BALANCEAMENTO_APTIDOES.md`.
+
+Pendente: calibrar o ganho por uso com jogo real, ligar o marco (100%) a um evento de jogo e
+escolher a afinidade natural de cada origem.
