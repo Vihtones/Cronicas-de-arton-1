@@ -230,7 +230,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3212,3 +3212,48 @@ func test_doencas_progressao_e_cura() -> void:
 	check(sh.doencas.has("maldicao_pegajosa"), "Maldição Pegajosa pede três sucessos")
 	Doencas.teste_diario(sh, r, rng, "world", 5)
 	check(not sh.doencas.has("maldicao_pegajosa"), "curado")
+
+
+## Cena de grupo ao ar livre (a cripta é interna): jogador em (38, 20), bandidos em (39, 20) e (44, 20).
+func _cena_aberta(nivel: int) -> Array:
+	var m := _cena_grupo(nivel)
+	m[2].c("player").tile = Vector2i(38, 20)
+	m[2].c("bandido_1").tile = Vector2i(39, 20)
+	m[2].c("bandido_2").tile = Vector2i(44, 20)
+	return m
+
+
+func test_tempestade_divina_vendaval_clima_e_raios() -> void:
+	var m := _cena_aberta(5)
+	var sim: CombatSim = m[2]
+	var centro := Vector2i(42, 20)
+	check(sim.ao_ar_livre(centro), "ao ar livre")
+	check(not GhostPlanner.validate_action(_cena_grupo(5)[2], "player", {"type": "cast", "spell": "tempestade_divina", "tile": Vector2i(30, 57), "clima": ""}).ok, "não em lugar fechado")
+	sim.add_zona("chama_x", [Vector2i(41, 20)], "luz", -1, "criar_elementos", {"chama": true, "centro": [41, 20]})
+	check(not _lanca(m, {"type": "cast", "spell": "tempestade_divina", "tile": centro, "clima": "neve", "aprimoramentos": [3]}).ok, "granizo forte só com granizo")
+	check(_lanca(m, {"type": "cast", "spell": "tempestade_divina", "tile": centro, "clima": "granizo", "aprimoramentos": [0, 1, 3]}).ok, "Tempestade Divina")
+	eq(sim.chama_em(Vector2i(41, 20)), "", "o vendaval apaga as chamas")
+	eq(sim.c("bandido_1").sheet.efeito_bonus("pericia_percepcao"), -5, "chuva: –5 em Percepção")
+	var b1 := _bandido(m, "bandido_1", -50)
+	m[1]._zonas_e_marcas_inicio_de_turno("bandido_1", [])
+	check(b1.pv < 999, "granizo no início do turno")
+	sim.budget.std = 1
+	var vr := GhostPlanner.validate_action(sim, "player", {"type": "raio_tempestade", "target": "bandido_2"})
+	check(vr.ok, "raio: ação padrão")
+	var b2 := _bandido(m, "bandido_2", -50)
+	m[1]._execute_action("player", {"type": "raio_tempestade", "target": "bandido_2"}, vr)
+	var d := 999 - b2.pv
+	check(d >= 4 and d <= 32, "4d8 de eletricidade (%d)" % d)
+	sim.budget.std = 1
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "raio_tempestade", "target": "bandido_2"}).ok, "um raio por rodada")
+	sim.c("player").sheet.attacks.append({"nome": "Arco", "dano": "1d6", "distancia": true, "alcance_q": 20, "margem": 20, "mult": 3, "skill": "pontaria"})
+	var prof := sim.attack_profile("player", "bandido_2", sim.c("player").sheet.attacks.size() - 1, false, false)
+	check((prof.get("mods", []) as Array).any(func(mm): return mm[0] == "vendaval"), "ataques à distância: –5 (%s)" % str(prof.get("reason", "")))
+	m[1]._encerrar_sustentada("player", [])
+	eq(sim.c("bandido_1").sheet.efeito_bonus("pericia_percepcao"), 0, "fim da tempestade")
+	var m2 := _cena_aberta(5)
+	_lanca(m2, {"type": "cast", "spell": "tempestade_divina", "tile": centro, "clima": "chuva", "aprimoramentos": [2]})
+	check(m2[2].c("bandido_1").sheet.conditions.has("lento"), "chuva grossa: Médios ficam lentos")
+	var m3 := _cena_aberta(5)
+	_lanca(m3, {"type": "cast", "spell": "tempestade_divina", "tile": centro, "clima": "neve"})
+	check(m3[2].zona_em(centro, "terreno_dificil"), "neve: terreno difícil")

@@ -431,6 +431,11 @@ func tile_da_chama(ref: String) -> Variant:
 	return null
 
 
+## Ambiente aberto (Tempestade Divina): fora de locais internos e da cripta.
+func ao_ar_livre(t: Vector2i) -> bool:
+	return not bool(db.location(db.location_at(t)).get("indoor", false)) and db.zone_at(t) != "cripta"
+
+
 ## Alcance natural corpo a corpo em quadrados (1 = adjacente); efeitos "alcance_corpo" somam (Soco de Arsenal).
 func alcance_corpo(id: String) -> int:
 	return 1 + int(c(id).sheet.efeito_bonus("alcance_corpo"))
@@ -495,6 +500,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if not ranged and sheet.has_effective_condition(rules, "caido"): mods.append(["atacante caído", -5])
 	if not ranged and flanking(attacker, target): mods.append(["flanqueando", int(rules.value("situacao.flanquear").bonus_ataque)])
 	if charge: mods.append(["investida", int(rules.value("acao.investida").bonus_ataque)])
+	if ranged and (zona_em(A.tile, "tempestade") or zona_em(T.tile, "tempestade")): mods.append(["vendaval", -5])   # Tempestade Divina
 	if special: mods.append(["ataque especial", int(rules.value("classe.guerreiro").ataque_especial.bonus) * special_tier(sheet)])
 	if sheet.has_power("valentao") and (T.sheet.has_effective_condition(rules, "caido") or T.sheet.has_effective_condition(rules, "desprevenido") \
 			or T.sheet.has_effective_condition(rules, "indefeso") or (not ranged and flanking(attacker, target))):

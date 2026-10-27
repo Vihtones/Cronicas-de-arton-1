@@ -664,6 +664,7 @@ func _refresh_bencaos() -> void:
 	_refresh_oracao()
 	_refresh_silencio()
 	_refresh_justica()
+	_refresh_tempestade()
 	for id in sim.combatants:
 		var sh: CharacterSheet = sim.c(id).sheet
 		sh.remove_efeito("aura_sagrada")
@@ -1710,6 +1711,82 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Tempestade Divina (divina 2): cilindro de 15m de raio em alcance longo, sustentado, só ao ar livre. Vendaval:
+## ataques à distância de dentro ou contra quem está dentro sofrem –5, chamas se apagam e névoas se dissipam. Clima
+## opcional: chuva (–5 em Percepção), neve (chuva e terreno difícil), granizo (chuva e 1 de impacto no início dos turnos).
+## Aprimoramentos: raios (ação padrão, uma vez por rodada, 3d8 de eletricidade, Reflexos metade); +1d8 nos raios
+## (repetível); chuva grossa (Médios ou menores ficam lentos; voadores fazem Atletismo por rodada ou caem); granizo
+## 2d6; neve com 2d6 de frio no início dos turnos; cilindro de 90m.
+const TAMANHOS_LENTOS_CHUVA := ["minusculo", "pequeno", "medio"]
+
+
+func _tempestade(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var clima := str(a.get("clima", ""))
+	var area := Area.esfera(a.get("tile", sim.c(id).tile), Area.quadrados(90.0 if apr.has(5) else 15.0))
+	var dados := {"conjurador": id, "clima": clima, "cd": spell_dc(sh, a), "raios": (3 + apr.count(1)) if apr.has(0) else 0, "grossa": apr.has(2)}
+	if clima == "granizo":
+		dados["dano_inicio_turno"] = "2d6" if apr.has(3) else "1"
+		dados["tipo_dano"] = "impacto"
+	elif clima == "neve" and apr.has(4):
+		dados["dano_inicio_turno"] = "2d6"
+		dados["tipo_dano"] = "frio"
+	sim.add_zona("tempestade_" + id, area, "tempestade", -1, "tempestade_divina", dados)
+	if clima == "neve":
+		sim.add_zona("tempestade_neve_" + id, area, "terreno_dificil", -1, "tempestade_divina", {"conjurador": id})
+	for z in sim.zonas.duplicate(true):   # o vendaval dissipa as névoas
+		if str(z.fonte) == "nevoa" and _alguma_em(z.tiles, area):
+			sim.remove_zona(str(z.id))
+			out.append(fact("SPELL_ENDED", {"spell": "nevoa", "reason": "vendaval"}, []))
+	_iniciar_sustentada(id, "tempestade_divina", out)
+	_refresh_tempestade()
+	out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "tempestade_divina", "clima": clima, "tags": ["magia", "area"]}, [id]))
+	return out
+
+
+## Tempestade: apaga as chamas na área e aplica chuva (–5 em Percepção) e chuva grossa (lentos) a quem está nela.
+func _refresh_tempestade() -> void:
+	for cid in sim.combatants:
+		sim.c(cid).sheet.anular_magia("magia.tempestade_area")
+	for z in sim.zonas.duplicate(true):
+		if str(z.tipo) != "tempestade":
+			continue
+		for zz in sim.zonas.duplicate(true):
+			var cz: Array = zz.get("dados", {}).get("centro", [])
+			if bool(zz.get("dados", {}).get("chama", false)) and cz.size() == 2 and (z.tiles as Array).has(Vector2i(int(cz[0]), int(cz[1]))):
+				sim.remove_zona(str(zz.id))
+		for cid in sim.ids_em(z.tiles):
+			var s: CharacterSheet = sim.c(cid).sheet
+			var ref := sim.chama_em(sim.c(cid).tile)
+			if ref.begins_with("portador:") or ref.begins_with("em_chamas:"):
+				_apagar_chama(ref)
+			if str(z.dados.clima) != "":
+				s.add_efeito("magia.tempestade_area", "pericia_percepcao", -5, "cena")
+			if bool(z.dados.grossa) and TAMANHOS_LENTOS_CHUVA.has(s.size) and not s.conditions.has("lento"):
+				s.add_condition("lento", world.rules)
+				s.add_efeito("magia.tempestade_area", "condicao", 1, "cena", "lento")
+
+
+## Chuva grossa: no início do turno de quem voa na tempestade, Atletismo (CD da magia) ou cai ao solo (1d6 de impacto
+## da queda; Acrobacia CD 15 evita o dano) e fica caído.
+func _voo_na_tempestade(id: String, facts: Array) -> void:
+	var x: Dictionary = sim.c(id)
+	if not x.sheet.can_fly() or x.sheet.is_down():
+		return
+	for z in sim.zonas:
+		if str(z.tipo) == "tempestade" and bool(z.dados.grossa) and (z.tiles as Array).has(x.tile):
+			if _resiste(id, "atletismo", int(z.dados.cd), facts):
+				return
+			var dano := 0 if _resiste(id, "acrobacia", 15, facts) else int(Dice.roll("1d6", world.rng, "combat").total)
+			var tags: Array = ["queda"]
+			tags.append_array(sim.apply_damage(id, dano))
+			x.sheet.add_condition("caido", world.rules)
+			facts.append(fact("HAZARD", {"actor": id, "hazard": "queda_tempestade", "damage": dano, "pv_after": x.sheet.pv, "tags": tags}, [id]))
+			return
+
+
 ## Rogar Maldição (divina 2): 1 criatura em alcance curto, sustentada; Fortitude anula. Efeitos à escolha (+1 por
 ## aprimoramento de 3 PM): debilidade (esmorecido; não se comunica nem lança magias), doença (instantânea: contrai e já
 ## sofre o primeiro efeito, ver doencas.gd), fraqueza (debilitado e lento), isolamento (perde um sentido: visão, cego;
@@ -1953,16 +2030,21 @@ func _mover_chama(id: String, para: Vector2i) -> Array:
 
 ## Dano de fogo de magia num alvo; com `pericia`, o teste reduz à metade.
 func _dano_de_fogo(id: String, tg: String, dados: String, cd: int, pericia: String, nome: String) -> Array:
+	return _dano_de_energia(id, tg, dados, cd, pericia, "fogo", nome)
+
+
+## Dano de magia de um tipo num alvo; com `pericia`, o teste reduz à metade.
+func _dano_de_energia(id: String, tg: String, dados: String, cd: int, pericia: String, tipo: String, nome: String) -> Array:
 	var out: Array = []
 	var T: CharacterSheet = sim.c(tg).sheet
-	var dano := int(Dice.roll(dados, world.rng, "combat").total)
+	var dano := _dados_energia(dados, tipo, sim.c(tg).tile)
 	var passou := false
 	if pericia != "":
 		passou = _resiste(tg, pericia, cd, out)
 		if passou:
 			dano = dano / 2
-	dano = _dano_por_tipo(T, "fogo", dano)
-	var tags: Array = ["magia", "fogo"]
+	dano = _dano_por_tipo(T, tipo, dano)
+	var tags: Array = ["magia", tipo]
 	if passou: tags.append("resistiu")
 	tags.append_array(sim.apply_damage(tg, dano))
 	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": nome, "d20": 0, "mod": 0, "mods": [], "total": 0,
@@ -2386,6 +2468,10 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 		"rogar_maldicao":
 			for cid in sim.combatants:
 				sim.c(cid).sheet.anular_magia("magia.rogar_maldicao_" + id)
+		"tempestade_divina":
+			sim.remove_zona("tempestade_" + id)
+			sim.remove_zona("tempestade_neve_" + id)
+			_refresh_tempestade()
 		"enxame_de_pestes":
 			for z in sim.zonas.duplicate(true):
 				if str(z.fonte) == "enxame_de_pestes" and str(z.dados.conjurador) == id:
@@ -2521,6 +2607,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
+	_voo_na_tempestade(id, facts)
 	_perigos_inicio_de_turno(id, facts)
 	_luz_solar(id, facts)
 	_resolver_conjuracao(id, facts)
@@ -2713,6 +2800,10 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var r_dm := Checks.skill(sim.c(id).sheet, "misticismo", 15, world.rules, world.rng, "combat")
 			var auras_dm: Array = auras_na_cena(sim.c(id).tile, ALCANCE_CURTO_QUADRADOS, false) if r_dm.get("success", false) else []
 			out.append(fact("MAGIC_DETECTED", {"actor": id, "check": r_dm, "auras": auras_dm}, [id]))
+		"raio_tempestade":
+			(sim.c(id).flags as Array).append("raio_tempestade_%d" % sim.round_no)
+			var zt: Dictionary = sim.zonas.filter(func(z): return str(z.id) == "tempestade_" + id)[0]
+			out.append_array(_dano_de_energia(id, str(a.target), "%dd8" % int(zt.dados.raios), int(zt.dados.cd), "reflexos", "eletricidade", "Tempestade Divina"))
 		"mover_enxame":
 			var para_e: Vector2i = a.tile
 			var zid_e := "enxame_%s_%d" % [id, int(a.get("enxame", 0))]
@@ -2988,6 +3079,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_enxame(id, a))
 		"rogar_maldicao":
 			out.append_array(_rogar_maldicao(id, a))
+		"tempestade_divina":
+			out.append_array(_tempestade(id, a))
 		"augurio":
 			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
 			var magia_au = world.module("magia")

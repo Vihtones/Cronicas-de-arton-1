@@ -165,6 +165,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]
+			if sp_id == "tempestade_divina":
+				var tt: Vector2i = a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, tt) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
+				if not sim.ao_ar_livre(tt): return {"ok": false, "reason": "só em ambientes abertos"}
+				var clima := str(a.get("clima", ""))
+				if not SpellRules.CLIMAS_TEMPESTADE.has(clima): return {"ok": false, "reason": "clima: chuva, neve ou granizo"}
+				if (apr.has(2) and clima != "chuva") or (apr.has(3) and clima != "granizo") or (apr.has(4) and clima != "neve"): return {"ok": false, "reason": "esse aprimoramento é de outro clima"}
+				if apr.has(1) and not apr.has(0): return {"ok": false, "reason": "o aumento é do dano dos raios"}
+				targets = [actor]
 			if sp_id == "rogar_maldicao":
 				var efs: Array = a.get("efeitos", [])
 				if efs.is_empty() or efs.size() > 1 + apr.count(0): return {"ok": false, "reason": "escolha %d efeito(s) da maldição" % (1 + apr.count(0))}
@@ -459,6 +468,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "detectar magia exige ação completa"}
 			if not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Misticismo é somente treinada"}
 			return {"ok": true, "kind": "completa"}
+		"raio_tempestade":
+			# Tempestade Divina (aprimoramento): uma vez por rodada, ação padrão, raio num alvo dentro da área.
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "sem ação padrão"}
+			if (A.flags as Array).has("raio_tempestade_%d" % sim.round_no): return {"ok": false, "reason": "um raio por rodada"}
+			var zt: Array = sim.zonas.filter(func(z): return str(z.id) == "tempestade_" + actor and int(z.dados.get("raios", 0)) > 0)
+			if zt.is_empty(): return {"ok": false, "reason": "sem tempestade com raios"}
+			var TR := sim.c(a.get("target", ""))
+			if TR.is_empty() or TR.sheet.is_dead() or not (zt[0].tiles as Array).has(TR.tile): return {"ok": false, "reason": "alvo fora da tempestade"}
+			return {"ok": true, "kind": "padrao"}
 		"mover_enxame":
 			# Enxame de Pestes: ação de movimento, o enxame vai até 12m; não pode ocupar o quadrado de outro enxame seu.
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
