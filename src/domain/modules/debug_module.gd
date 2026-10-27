@@ -3,7 +3,7 @@ extends WorldModule
 ## Menu de debug (desenvolvimento): teleporte e ajuste de variáveis do mundo. Não é conteúdo do jogo.
 ## Tudo passa por comando validado, como o resto do jogo: o menu só envia comandos. Sem estado próprio.
 
-const VARS := ["gold", "hour", "treasury", "npc_gold", "npc_hunger", "npc_tired", "npc_location", "stock", "weather"]
+const VARS := ["xp", "gold", "hour", "treasury", "npc_gold", "npc_hunger", "npc_tired", "npc_location", "stock", "weather"]
 
 
 func module_id() -> String: return "debug"
@@ -66,6 +66,9 @@ func _teleport(p: Dictionary) -> Array:
 func _ajustar(key: String, p: Dictionary) -> Array:
 	var v: Variant = p.get("value")
 	match key:
+		"xp":
+			# ganha XP pelo caminho normal (XP_GAINED e LEVEL_UP saem para a interface)
+			return world.modules.progression.ganha_xp(int(v), "debug")
 		"gold":
 			world.player.gold = int(v)
 		"treasury":

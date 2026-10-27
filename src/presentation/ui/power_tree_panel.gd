@@ -143,7 +143,7 @@ func _draw_tree() -> void:
 		var txt: String = NAMES.get(id, id)
 		var tc := Color(0.95, 0.9, 0.82) if d.state != "nao_implementado" and d.state != "bloqueado" else Color(0.55, 0.52, 0.5)
 		canvas.draw_string(font, r.position + Vector2(7, 10), txt, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 10, 8, tc)
-		var sub: String = d.prereq if d.state != "possui" else "✓"
+		var sub: String = (d.falta if d.state == "bloqueado" and str(d.get("falta", "")) != "" else d.prereq) if d.state != "possui" else "✓"
 		if int(d.cost) > 0: sub += " · %d PM" % int(d.cost)
 		canvas.draw_string(font, r.position + Vector2(7, r.size.y - 3), sub, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 10, 6, Color(sc, 0.9))
 
@@ -180,6 +180,7 @@ func _show_info(id: String) -> void:
 		info.text = "Passe o mouse sobre um poder. Verde = disponível · dourado = já possui · cinza = pré-requisito faltando · escuro = ainda não implementado."
 		return
 	var d: Dictionary = _nodes[id].data
-	info.text = "%s — %s. Pré-requisito: %s.%s Estado: %s.%s" % [NAMES.get(id, id), d.effect, d.prereq,
+	var falta: String = (" Falta: %s." % d.falta) if str(d.get("falta", "")) != "" else ""
+	info.text = "%s — %s. Pré-requisito: %s.%s%s Estado: %s.%s" % [NAMES.get(id, id), d.effect, d.prereq, falta,
 		(" Custo: %d PM." % int(d.cost)) if int(d.cost) > 0 else "", STATE_TXT.get(d.state, d.state),
 		(" (LB p.%d)" % int(d.page)) if int(d.page) > 0 else ""]

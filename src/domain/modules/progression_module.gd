@@ -61,8 +61,40 @@ func xp_for(nd: float, result: String = "vitoria", party: int = 1) -> int:
 
 
 func xp_to_next() -> int:
+	return xp_do_nivel(world.player_sheet.level + 1)
+
+
+## XP total para alcançar o nível n. A tabela do LB vai até o 10; depois a curva continua (extensão ORIGINAL),
+## a mesma que gera a tabela inteira: 500 × n × (n−1). Sem teto: o personagem pode subir sem limite.
+func xp_do_nivel(n: int) -> int:
 	var t: Dictionary = world.rules.value("progressao.xp_por_nivel")
-	return int(t.get(str(world.player_sheet.level + 1), 999999))
+	if t.has(str(n)):
+		return int(t[str(n)])
+	return 500 * n * (n - 1)
+
+
+## O que falta para o poder ficar disponível: atributo, perícia ou poder exigido. Vazio se nada falta.
+func falta_texto(p: String) -> String:
+	var s := world.player_sheet
+	var pre: Dictionary = world.rules.value("poder." + p, {}).get("prereq", {})
+	var falta: Array = []
+	for k in pre:
+		if k == "treinado":
+			if not s.trained.has(str(pre[k])):
+				falta.append("treinar " + str(pre[k]).capitalize())
+		elif k == "poder":
+			if not s.has_power(str(pre[k])):
+				falta.append("poder " + str(pre[k]).replace("_", " ").capitalize())
+		elif int(s.attrs.get(k, 0)) < int(pre[k]):
+			falta.append("%s %d (tem %d)" % [str(k).to_upper(), int(pre[k]), int(s.attrs.get(k, 0))])
+	return ", ".join(falta)
+
+
+## Detalhes de um poder para a interface: efeito, pré-requisito, o que falta, custo e página do livro.
+func power_info(p: String) -> Dictionary:
+	var r: Dictionary = world.rules.value("poder." + p, {})
+	return {"id": p, "efeito": efeito_texto(r), "pre": prereq_texto(r.get("prereq", {})), "falta": falta_texto(p),
+		"pagina": int(world.rules.entry("poder." + p).get("pagina", 0)), "custo": int(r.get("custo_pm", 0))}
 
 
 ## Multiplicador dinâmico a partir das estatísticas do combate. Retorna {mult, breakdown}.
@@ -185,6 +217,11 @@ func _combat_xp(p: Dictionary) -> Array:
 		{"combat": true, "outcome": outcome, "base": int(round(base)), "mult": cm.mult})
 
 
+## Entrada pública para ganhar XP fora de combate (ex.: debug, recompensas). Mesmo caminho do combate.
+func ganha_xp(amount: int, reason: String) -> Array:
+	return _award(amount, reason, [])
+
+
 func _award(amount: int, reason: String, breakdown: Array, extra: Dictionary = {}) -> Array:
 	if amount <= 0:
 		return []
@@ -219,7 +256,14 @@ func _level_up() -> Dictionary:
 		s.powers["durao"] = true  # habilidade de classe no 3º nível (LB p.66)
 	s.pending_powers += 1
 	return fact("LEVEL_UP", {"level": s.level, "pv_gain": pv_gain, "pm_gain": pm_gain, "pending_powers": s.pending_powers,
-		"options": available_powers()}, ["player"])
+		"options": available_powers(), "opcoes": _opcoes_info()}, ["player"])
+
+
+func _opcoes_info() -> Array:
+	var out: Array = []
+	for p in available_powers():
+		out.append(power_info(p))
+	return out
 
 
 ## Árvore de poderes para a interface: nós com estado (possui / disponível / bloqueado / não implementado),
@@ -240,12 +284,12 @@ func power_tree() -> Dictionary:
 			if owned and (p == "aumento_atributo" or p == "especializacao_arma") and avail.has(p):
 				state = "possui_repetivel"
 			nodes.append({"id": p, "branch": br, "group": str(r.get("grupo", "classe")), "state": state, "parent": str(r.get("prereq", {}).get("poder", "")),
-				"prereq": _prereq_text(r.get("prereq", {})), "effect": _effect_text(r), "page": int(meta.get("pagina", 0)),
-				"cost": int(r.get("custo_pm", 0))})
+				"prereq": prereq_texto(r.get("prereq", {})), "effect": efeito_texto(r), "page": int(meta.get("pagina", 0)),
+				"cost": int(r.get("custo_pm", 0)), "falta": falta_texto(p) if state == "bloqueado" else ""})
 	return {"nodes": nodes, "pending": s.pending_powers, "class": cls}
 
 
-func _prereq_text(pre: Dictionary) -> String:
+static func prereq_texto(pre: Dictionary) -> String:
 	var parts: Array = []
 	for k in pre:
 		match k:
@@ -255,7 +299,7 @@ func _prereq_text(pre: Dictionary) -> String:
 	return ", ".join(parts) if not parts.is_empty() else "—"
 
 
-func _effect_text(r: Dictionary) -> String:
+static func efeito_texto(r: Dictionary) -> String:
 	if r.has("efeito"): return str(r.efeito)
 	var parts: Array = []
 	for k in ["defesa", "reflexos", "fortitude", "vontade", "iniciativa", "furtividade"]:

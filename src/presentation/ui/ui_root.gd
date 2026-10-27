@@ -59,6 +59,7 @@ func _ready() -> void:
 	_build_hub(root)
 	_build_debug(root)
 	_build_tree(root)
+	_build_subida(root)
 	Game.event_published.connect(_on_event)
 	Game.mode_changed.connect(func(_m): _refresh_mode())
 	_refresh_mode()
@@ -182,6 +183,7 @@ var belt: PanelContainer
 var _belt_slots: Dictionary = {}
 var _belt_key := ""
 var panel_tree: PowerTreePanel
+var panel_subida: PanelContainer
 var lbl_clock: Label
 var lbl_place: Label
 
@@ -1204,6 +1206,12 @@ func _refresh_creation() -> void:
 		v.add_child(_label("Sem escolha, usa as perícias sugeridas.", 7))
 	elif not errs.is_empty():
 		v.add_child(_label("✘ " + "; ".join(errs), 8))
+	# poderes da classe (LB cap. 1) com o efeito de cada um; os gerais vêm ao subir de nível (LB p.124)
+	v.add_child(_h("Poderes da classe — %s" % _creation["class"].capitalize()))
+	for p in ProgressionModule.POWERS.get(_creation["class"], []):
+		var efeito := ProgressionModule.efeito_texto(Game.rules.value("poder." + p, {}))
+		v.add_child(_label("• %s%s" % [PowerTreePanel.NAMES.get(p, p), (" — " + efeito) if efeito != "" else ""], 8))
+	v.add_child(_label("Poderes gerais (ex.: Ataque Poderoso, Esquiva) são escolhidos ao subir de nível.", 7))
 	if _creation["class"] == "arcanista" and _creation.path == "mago":
 		v.add_child(_label("O Mago começa com 4 magias (LB p.37); só 3 estão implementadas — a 4ª fica pendente.", 7))
 	v.add_child(_label("Aparência das raças é provisória (tinta e escala). Outras classes: ver ROADMAP.", 7))
@@ -1394,6 +1402,63 @@ func _build_tree(root: Control) -> void:
 		panel_tree.refresh())
 
 
+## Subida de nível (Arton Viva, Fase 6 / progressão dinâmica): painel com o ganho de PV e PM e as opções
+## atuais, cada uma com seu efeito. Some quando não há mais poder pendente.
+func _build_subida(root: Control) -> void:
+	panel_subida = PanelContainer.new()
+	panel_subida.custom_minimum_size = Vector2(360, 0)
+	root.add_child(panel_subida)
+	panel_subida.position = Vector2(20, 22)
+	panel_subida.visible = false
+
+
+func _abre_subida() -> void:
+	if Game.world == null or Game.world.player_sheet.pending_powers <= 0:
+		return
+	panel_subida.visible = true
+	_refresh_subida()
+
+
+func _refresh_subida() -> void:
+	for c in panel_subida.get_children():
+		c.queue_free()
+	var s: CharacterSheet = Game.world.player_sheet
+	var prog: ProgressionModule = Game.world.modules.progression
+	if s.pending_powers <= 0:
+		panel_subida.visible = false
+		return
+	var sc := ScrollContainer.new()
+	sc.custom_minimum_size = Vector2(360, 240)
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel_subida.add_child(sc)
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(v)
+	v.add_child(_h("Nível %d — escolha um poder (%d pendente%s)" % [s.level, s.pending_powers, "s" if s.pending_powers > 1 else ""]))
+	v.add_child(_label("PV máx. %d · PM máx. %d · próximo nível em %d XP" % [s.pv_max, s.pm_max, prog.xp_to_next()], 8))
+	for info in prog.available_powers().map(func(p): return prog.power_info(p)):
+		var nome: String = PowerTreePanel.NAMES.get(info.id, info.id)
+		var txt := "%s — %s" % [nome, info.efeito] if info.efeito != "" else nome
+		if info.id == "aumento_atributo":
+			v.add_child(_label("Aumento de atributo (+1 em um atributo):", 8))
+			var linha := HFlowContainer.new()
+			for a in ["for", "des", "con", "int", "sab", "car"]:
+				linha.add_child(_button("%s (%d)" % [a.to_upper(), int(s.attrs[a])], func(): _escolhe_poder(info.id, a)))
+			v.add_child(linha)
+			continue
+		var b := _button(txt, func(): _escolhe_poder(info.id, ""))
+		b.add_theme_font_size_override("font_size", 8)
+		v.add_child(b)
+	v.add_child(_button("Escolher depois", func(): panel_subida.visible = false))
+
+
+func _escolhe_poder(poder: String, opcao: String) -> void:
+	var r = Game.send("ChoosePower", {"power": poder, "option": opcao})
+	if not r.accepted:
+		log_msg("✘ " + "; ".join(r.errors))
+	_refresh_subida()
+
+
 func toggle_tree() -> void:
 	panel_tree.visible = not panel_tree.visible
 	if panel_tree.visible:
@@ -1419,7 +1484,8 @@ func _on_event(e: GameEvent) -> void:
 			if Game.db.zone_at(Game.player_tile()) != "cripta" and e.payload.get("to", "") in ["chuva", "tempestade", "neblina"]:
 				show_toast({"chuva": "A chuva chega", "tempestade": "Tempestade!", "neblina": "A neblina sobe"}.get(e.payload.to, ""))
 		"LEVEL_UP":
-			show_toast("Nível %d! [K] escolha um poder" % int(e.payload.get("level", 0)))
+			show_toast("Nível %d! Escolha um poder" % int(e.payload.get("level", 0)))
+			_abre_subida()
 		"OPEN_SHOP":
 			var npc: String = Game.world.modules.dialogue.session.get("npc", "")
 			if npc != "": open_shop(npc)
