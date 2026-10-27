@@ -226,6 +226,10 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "" or not gs.is_enemy("player", target):
 				return []
 			return [{"type": "olhar_atordoante", "target": target}]
+		"arma":
+			if target == "" or not gs.is_enemy("player", target):
+				return []
+			return [{"type": "arma_espiritual", "target": target}]
 		"magia":
 			var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 			if str(sp.get("alcance", "")) == "pessoal":
@@ -376,7 +380,8 @@ func extra_attack() -> void:
 func set_mode(m: String) -> void:
 	mode = m
 	var dicas := {"cura": "Cura pelas Mãos: clique em você ou num aliado adjacente (N: passo extra, H: remover condição).",
-		"olhar": "Olhar atordoante: clique num inimigo em alcance curto."}
+		"olhar": "Olhar atordoante: clique num inimigo em alcance curto.",
+		"arma": "Arma Espiritual (ação livre): clique num inimigo adjacente. Shift+W: sustentar ou soltar a magia sustentada."}
 	message.emit(dicas.get(m, "Modo: " + m))
 	_update_preview()
 
@@ -484,6 +489,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_N: cycle_cura_passos()
 			KEY_H: toggle_cura_remover()
 			KEY_O: set_mode("olhar")
+			KEY_W:
+				if event.shift_pressed: cycle_policy("sustentar")
+				else: set_mode("arma")
 			KEY_Y: use_allihanna()
 			KEY_S: use_aura()
 			KEY_E: use_egide()
@@ -791,8 +799,8 @@ func _float_text(at: Vector2, txt: String, col: Color) -> void:
 
 ## Ataque Poderoso / Combate Defensivo (LB p.124-125): alterna a política do poder opcional.
 func cycle_policy(power: String) -> void:
-	var de_classe := power.begins_with("golpe_divino")   # Golpe Divino é do paladino, não um poder comprado
-	if not de_classe and not Game.world.player_sheet.has_power(power):
+	var de_classe := power.begins_with("golpe_divino") or power == "sustentar"   # não são poderes comprados
+	if not de_classe and not Game.world.player_sheet.has_power(power) and not Game.world.player_sheet.spells.has(power):
 		return
 	var opts: Array = CombatModule.POWER_POLICIES[power]
 	var cur: String = Game.world.modules.combat.power_policy.get(power, opts[0])

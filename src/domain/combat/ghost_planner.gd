@@ -133,6 +133,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "arma_espiritual":
+				if SpellRules.arma_espiritual_tipo(sim.rules, str(A.sheet.devotion), str(a.get("tipo_dano", ""))) == "":
+					return {"ok": false, "reason": "sua divindade não tem arma preferida (Nimb: escolha corte, impacto ou perfuração)"}
+				if apr.has(1) and not apr.has(0):
+					return {"ok": false, "reason": "o aumento na Defesa exige o aprimoramento de Defesa"}
 			if sp_id == "despedacar" and not a.has("objeto") and not apr.has(5) and [1, 2, 3, 4].any(func(i): return apr.has(i)):
 				return {"ok": false, "reason": "os aprimoramentos de tamanho são para objetos"}
 			if sp_id == "despedacar" and a.has("objeto") and not apr.has(5):
@@ -227,6 +232,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if T.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, T.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
 			return {"ok": true, "kind": "movimento", "cost": 1}
+		"arma_espiritual":
+			# Arma Espiritual (aprimoramento sustentado): ação livre; a arma acerta automaticamente um alvo adjacente.
+			if A.sheet.efeito_bonus("arma_espiritual_ataque") <= 0: return {"ok": false, "reason": "sem Arma Espiritual que ataca"}
+			var TA := sim.c(a.get("target", ""))
+			if TA.is_empty() or not sim.is_enemy(actor, a.target) or TA.sheet.is_dead(): return {"ok": false, "reason": "alvo inválido"}
+			if CombatSim.cheb(A.tile, TA.tile) != 1: return {"ok": false, "reason": "alvo não adjacente"}
+			if sim.arma_espiritual_livre(actor) < 0: return {"ok": false, "reason": "a arma já agiu nesta rodada"}
+			return {"ok": true, "kind": "livre", "cost": 0}
 		"aura_sagrada":
 			# Aura Sagrada (LB p.84): ligar custa 1 PM; desligar é livre. Tipo de ação: padrão (o texto extraído do livro não traz o tipo; segue a Ladainha de combate, que é ação padrão).
 			if not A.sheet.pode_aura_sagrada(): return {"ok": false, "reason": "Aura Sagrada é do paladino a partir do 3º nível"}

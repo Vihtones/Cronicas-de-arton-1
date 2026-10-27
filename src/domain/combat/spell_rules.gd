@@ -19,6 +19,7 @@ const COMPLETAS := {
 	"consagrar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, luz maximizada; –2 a mortos-vivos (+1, repetível); permanente
 	"profanar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, trevas maximizadas; +2 a mortos-vivos (+1, repetível); permanente
 	"despedacar": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1d8+2 (repetível); objeto Médio/Grande/Enorme/Colossal; esfera de 6m
+	"arma_espiritual": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1 Defesa (+1 repetível); sustentada com ataque livre; essência; +1d6; duas armas
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -208,3 +209,15 @@ static func despedacar_dano(apr: Array) -> String:
 
 static func tamanho_indice(nome: String) -> int:
 	return TAMANHOS.find(nome)
+
+
+## Arma Espiritual: tipo de dano da arma preferida da divindade ("" se a divindade não tem arma preferida).
+## Nimb: qualquer arma; o jogador escolhe o tipo (corte, impacto ou perfuração).
+static func arma_espiritual_tipo(rules: RuleRegistry, devocao: String, escolha: String) -> String:
+	var tab: Dictionary = rules.value("panteao.arma_preferida", {})
+	var v = tab.get(devocao, null)
+	if v == null:
+		return ""
+	if v is String and str(v) == "qualquer":
+		return escolha if ["corte", "impacto", "perfuracao"].has(escolha) else ""
+	return str((v as Dictionary).get("dano", ""))

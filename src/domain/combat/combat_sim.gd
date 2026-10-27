@@ -25,6 +25,7 @@ var marcas: Array = []
 var expiradas: Array = []
 var rng: RngStreams                 # null em simulações do fantasma: sem rolagens
 var conjurando: Dictionary = {}     # conjurador -> {alvo, cd, apr, rodadas}: magia de execução longa (Banimento); 0 rodadas = pronta
+var sustentadas: Dictionary = {}    # conjurador -> id da magia sustentada (uma por vez, LB p.227)
 var pendencias: Array = []          # efeitos de ligação ocorridos, drenados pelo módulo para o registro
 
 
@@ -44,6 +45,7 @@ func clone() -> CombatSim:
 	c.marcas = marcas.duplicate(true)
 	c.expiradas = expiradas.duplicate()
 	c.conjurando = conjurando.duplicate(true)
+	c.sustentadas = sustentadas.duplicate(true)
 	return c
 
 
@@ -126,6 +128,16 @@ func step_cost(from: Vector2i, to: Vector2i) -> int:
 	var base := 2 if (from.x != to.x and from.y != to.y) else 1
 	if db.is_difficult(to) or zona_em(to, "terreno_dificil"): base *= 2
 	return base
+
+
+## Arma Espiritual: índice de uma arma livre para contra-atacar ou atacar nesta rodada, ou -1. Cada arma age uma vez
+## por rodada; a que atacou (ação livre do aprimoramento) não contra-ataca até o próximo turno do conjurador.
+func arma_espiritual_livre(id: String) -> int:
+	var x := c(id)
+	for i in int(x.sheet.efeito_bonus("arma_espiritual")):
+		if not (x.flags as Array).has("ae_atk_%d" % i) and not (x.flags as Array).has("ae_r%d_%d" % [round_no, i]):
+			return i
+	return -1
 
 
 ## Custo de um passo em meios-quadrados de deslocamento. Na Névoa espessa (1º círculo, aprimoramento de 5 PM) quem

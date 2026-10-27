@@ -20,9 +20,10 @@ var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict),
 const POWER_POLICIES := {"premonicao_reacao": ["auto", "nunca"], "escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"],
-	"golpe_divino": ["auto", "nunca"], "golpe_divino_extra": ["nunca", "auto"]}
+	"golpe_divino": ["auto", "nunca"], "golpe_divino_extra": ["nunca", "auto"], "arma_espiritual": ["auto", "nunca"], "sustentar": ["auto", "nunca"]}
 const DEFAULT_POLICY := {"premonicao_reacao": "auto", "escudo_da_fe": "auto", "protecao_divina": "auto", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
-	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto", "golpe_divino": "auto", "golpe_divino_extra": "nunca"}
+	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto", "golpe_divino": "auto", "golpe_divino_extra": "nunca",
+	"arma_espiritual": "auto", "sustentar": "auto"}
 var power_policy := DEFAULT_POLICY.duplicate()
 var _cur_action: Dictionary = {}
 var stance_sneak := false
@@ -466,6 +467,11 @@ const CONDICOES_AURA_DIVINA := ["esmorecido", "debilitado", "lento"]
 ## Recalcula os efeitos de Aura Sagrada (resistência) e Égide Sagrada (Defesa) conforme as posições atuais:
 ## cada paladino ativo dá o próprio Carisma aos aliados do mesmo lado que estão no alcance e consciências.
 func _refresh_bencaos() -> void:
+	for id_ae in sim.combatants:   # Arma Espiritual se dissipa se o conjurador morrer
+		var s_ae: CharacterSheet = sim.c(id_ae).sheet
+		if s_ae.is_dead() and s_ae.has_efeito("magia.arma_espiritual"):
+			s_ae.remove_efeito("magia.arma_espiritual")
+			sim.sustentadas.erase(id_ae)
 	_refresh_aura_divina()
 	_refresh_areas_sagradas()
 	for id in sim.combatants:
@@ -977,6 +983,41 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
 
 
+## Arma Espiritual: 2d6 (+1d6 por aprimoramento) do tipo da arma, automaticamente, em `alvo`.
+func _golpe_arma_espiritual(dono: String, alvo: String, out: Array) -> void:
+	var s: CharacterSheet = sim.c(dono).sheet
+	var tipo := ""
+	for e in s.efeitos:
+		if e.stat == "arma_espiritual":
+			tipo = str(e.tipo)
+	var ts: CharacterSheet = sim.c(alvo).sheet
+	var dano := int(Dice.roll("%dd6" % int(s.efeito_bonus("arma_espiritual_dados")), world.rng, "combat").total)
+	dano = _dano_por_tipo(ts, tipo, dano)
+	var tags: Array = ["magia", tipo]
+	tags.append_array(sim.apply_damage(alvo, dano))
+	out.append(fact("ATTACK_RESOLVED", {"attacker": dono, "target": alvo, "weapon": "Arma Espiritual", "d20": 0, "mod": 0,
+		"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
+		"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [dono, alvo]))
+
+
+## Reação da Arma Espiritual: o alvo de um ataque corpo a corpo contra-ataca com uma arma livre (política
+## "arma_espiritual", automática para o jogador).
+func _reacao_arma_espiritual(atacante: String, alvo: String, ranged: bool, out: Array) -> void:
+	if ranged or sim.c(alvo).is_empty() or sim.c(alvo).sheet.efeito_bonus("arma_espiritual") <= 0:
+		return
+	if not sim.is_enemy(atacante, alvo) or sim.c(alvo).sheet.is_dead() or sim.c(atacante).sheet.is_dead():
+		return
+	if not CondicoesCombate.pode_reagir(sim.c(alvo).sheet, world.rules):
+		return
+	if alvo == "player" and str(power_policy.get("arma_espiritual", "auto")) == "nunca":
+		return
+	var i := sim.arma_espiritual_livre(alvo)
+	if i < 0:
+		return
+	(sim.c(alvo).flags as Array).append("ae_r%d_%d" % [sim.round_no, i])
+	_golpe_arma_espiritual(alvo, atacante, out)
+
+
 ## Despedaçar numa criatura (ver _cast).
 func _despedacar_criatura(id: String, tg: String, expr: String, cd: int, out: Array) -> void:
 	var T: Dictionary = sim.c(tg)
@@ -1020,6 +1061,44 @@ func _objetos_quebraveis_em(tiles: Array, tam_max: int) -> Array:
 		if tiles.has(t) and tam >= 0 and tam <= tam_max:
 			out.append(str(o.id))
 	return out
+
+
+## Duração sustentada (LB p.227): 1 PM como ação livre no início de cada turno do conjurador; se não pagar (sem PM,
+## sem poder agir ou por escolha, política "sustentar" = "nunca"), a magia termina. Uma magia sustentada por vez.
+func _sustentar(id: String, facts: Array) -> void:
+	if not sim.sustentadas.has(id):
+		return
+	var x: Dictionary = sim.c(id)
+	var s: CharacterSheet = x.sheet
+	var pode: bool = not s.is_down() and not x.flags.has("fora") and not x.surprised and CondicoesCombate.bloqueio_de_acoes(s, world.rules) == ""
+	var quer: bool = id != "player" or str(power_policy.get("sustentar", "auto")) != "nunca"
+	if pode and quer and s.pm >= 1:
+		s.pm -= 1
+		facts.append(fact("SPELL_SUSTAINED", {"caster": id, "spell": str(sim.sustentadas[id]), "pm_after": s.pm}, [id]))
+		return
+	_encerrar_sustentada(id, facts)
+
+
+## Começa uma magia sustentada; a anterior do mesmo conjurador termina.
+func _iniciar_sustentada(id: String, sp_id: String, facts: Array) -> void:
+	if sim.sustentadas.has(id) and str(sim.sustentadas[id]) != sp_id:
+		_encerrar_sustentada(id, facts)
+	sim.sustentadas[id] = sp_id
+
+
+func _encerrar_sustentada(id: String, facts: Array) -> void:
+	if not sim.sustentadas.has(id):
+		return
+	var sp_id := str(sim.sustentadas[id])
+	sim.sustentadas.erase(id)
+	var s: CharacterSheet = sim.c(id).sheet
+	match sp_id:
+		"manto_do_cruzado":
+			s.manto_cruzado = ""
+		"arma_espiritual":
+			s.remove_efeito("magia.arma_espiritual")
+	_refresh_bencaos()
+	facts.append(fact("SPELL_ENDED", {"caster": id, "spell": sp_id, "reason": "sustentada"}, [id]))
 
 
 ## Consagrar e Profanar (SpellsModule): na área consagrada, dados de luz (cura e dano) saem no máximo; na
@@ -1129,6 +1208,10 @@ func _begin_turn_base(id: String) -> Dictionary:
 	var facts: Array = []
 	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
 	s.limpar_efeitos("rodada")
+	_sustentar(id, facts)
+	for f_ae in (x.flags as Array).duplicate():
+		if str(f_ae).begins_with("ae_atk_"):
+			(x.flags as Array).erase(f_ae)   # Arma Espiritual: a arma que atacou volta a poder contra-atacar
 	_manto_inicio_de_turno(id, facts)
 	_nuvens_do_conjurador(id, facts)
 	if s.has_efeito("magia.premonicao"):
@@ -1284,6 +1367,11 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 							break
 				out.append(fact("HEALED", {"actor": id, "target": alvo_m, "amount": cura_m, "pv_after": ts_m.pv, "source": "cura_pelas_maos", "tags": ["classe", "cura"]}, [id, alvo_m]))
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id]))
+		"arma_espiritual":
+			var i_ae := sim.arma_espiritual_livre(id)
+			(sim.c(id).flags as Array).append("ae_atk_%d" % i_ae)
+			(sim.c(id).flags as Array).append("ae_r%d_%d" % [sim.round_no, i_ae])
+			_golpe_arma_espiritual(id, str(a.target), out)
 		"aura_sagrada":
 			var sh_p: CharacterSheet = sim.c(id).sheet
 			if v.ligar:
@@ -1420,6 +1508,27 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"arma_espiritual":
+			# Arma Espiritual (divina 1): a arma preferida da divindade flutua ao lado do conjurador pela cena. Uma vez por
+			# rodada, como reação a um ataque corpo a corpo sofrido, causa 2d6 do tipo da arma no atacante
+			# (_reacao_arma_espiritual). Some se o conjurador morrer. Aprimoramentos: +1 na Defesa (1 PM), +1 a mais
+			# (2 PM, repetível); sustentada com ataque livre a um alvo adjacente (2 PM, 2º círculo); dano de essência
+			# (2 PM, 2º círculo); +1d6 (2 PM, até o círculo máximo); duas armas (5 PM, 3º círculo).
+			var apr_ae: Array = a.get("aprimoramentos", [])
+			var tipo_ae := "essencia" if apr_ae.has(3) else SpellRules.arma_espiritual_tipo(world.rules, str(sh.devotion), str(a.get("tipo_dano", "")))
+			var dur_ae := "sustentada" if apr_ae.has(2) else "cena"
+			sh.remove_efeito("magia.arma_espiritual")
+			sh.add_efeito("magia.arma_espiritual", "arma_espiritual", 2 if apr_ae.has(5) else 1, dur_ae, tipo_ae)
+			sh.add_efeito("magia.arma_espiritual", "arma_espiritual_dados", 2 + mini(apr_ae.count(4), SpellRules.circulo_maximo(sh, world.rules)), dur_ae)
+			if apr_ae.has(0):
+				sh.add_efeito("magia.arma_espiritual", "defesa", 1 + apr_ae.count(1), dur_ae)
+			if apr_ae.has(2):
+				sh.add_efeito("magia.arma_espiritual", "arma_espiritual_ataque", 1, dur_ae)
+				_iniciar_sustentada(id, "arma_espiritual", out)
+			for f_ae in (sim.c(id).flags as Array).duplicate():
+				if str(f_ae).begins_with("ae_"):
+					(sim.c(id).flags as Array).erase(f_ae)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "arma_espiritual", "tipo": tipo_ae, "tags": ["magia"]}, [id]))
 		"despedacar":
 			# Despedaçar (divina 1): som agudo. Criatura: 1d8+2 de impacto e atordoada por uma rodada (uma vez por cena);
 			# Fortitude reduz à metade e evita o atordoamento. Construto ou objeto mundano: o dobro, ignorando RD.
@@ -1574,7 +1683,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, tipo, ate)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "resistencia_a_energia", "tipo": tipo, "tags": ["magia"]}, [id, tg]))
 		"manto_do_cruzado":
-			# Manto do Cruzado (4º círculo): sustentada até o fim do combate; a versão é a escolhida ao aprender.
+			# Manto do Cruzado (4º círculo): sustentada (1 PM por turno, _sustentar); a versão é a escolhida ao aprender.
+			_iniciar_sustentada(id, "manto_do_cruzado", out)
 			sh.manto_cruzado = sh.manto_versao
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "manto_do_cruzado", "versao": sh.manto_cruzado, "tags": ["magia"]}, [id]))
 			_refresh_bencaos()
@@ -2166,6 +2276,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	if v.mods.any(func(m): return m[0] == "combate defensivo") and not A.flags.has("defensivo"):
 		A.flags.append("defensivo")
 	_track_attack(attacker, target, v, special, hit, crit, dmg, tags)
+	_reacao_arma_espiritual(attacker, target, bool(v.get("ranged", false)), out)   # contra-ataque ao sofrer ataque corpo a corpo
 	log.append(out[0].payload)
 	if log.size() > 60: log.pop_front()
 	return pre + out
@@ -2431,6 +2542,7 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet.remove_condition("surpreendido")
 	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
 	world.player_sheet.limpar_efeitos("cena")
+	world.player_sheet.limpar_efeitos("sustentada")   # sustentadas não passam do combate
 	world.player_sheet.limpar_efeitos("rodada")
 	world.player_sheet.limpar_efeitos("rodada_orientacao")
 	world.player_sheet.limpar_efeitos("turno")
@@ -2527,7 +2639,8 @@ func to_dict() -> Dictionary:
 				"damaged_round": x.damaged_round, "surprised": x.surprised, "flags": x.flags.duplicate()}
 		d["sim"] = {"combatants": cs, "order": sim.order.duplicate(), "initiative": sim.initiative.duplicate(), "turn_idx": sim.turn_idx,
 			"round_no": sim.round_no, "turn_counter": sim.turn_counter, "budget": sim.budget.duplicate(),
-			"zonas": sim.zonas.duplicate(true), "marcas": sim.marcas.duplicate(true), "conjurando": sim.conjurando.duplicate(true)}
+			"zonas": sim.zonas.duplicate(true), "marcas": sim.marcas.duplicate(true), "conjurando": sim.conjurando.duplicate(true),
+			"sustentadas": sim.sustentadas.duplicate(true)}
 	return d
 
 
@@ -2557,5 +2670,6 @@ func from_dict(d: Dictionary) -> void:
 		sim.zonas = (s.get("zonas", []) as Array).duplicate(true)
 		sim.marcas = (s.get("marcas", []) as Array).duplicate(true)
 		sim.conjurando = (s.get("conjurando", {}) as Dictionary).duplicate(true)
+		sim.sustentadas = (s.get("sustentadas", {}) as Dictionary).duplicate(true)
 	else:
 		active = false

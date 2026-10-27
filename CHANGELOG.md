@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Arma Espiritual (divina, 1º círculo) completa: a arma preferida da divindade (tabela nova para os 20 deuses; Lena e Marah não têm, Nimb escolhe o tipo) contra-ataca com 2d6 do tipo da arma uma vez por rodada quando o conjurador sofre ataque corpo a corpo; some se ele morrer. Aprimoramentos: +1 na Defesa e +1 a mais, versão sustentada com ataque livre a alvo adjacente (tecla W), dano de essência, +1d6 até o círculo máximo e duas armas.
+- Duração sustentada (LB p.227): 1 PM como ação livre no início de cada turno, uma magia sustentada por vez; o jogador pode soltar (Shift+W). Correção: o Manto do Cruzado agora cobra a manutenção.
+
 - Despedaçar (divina, 1º círculo) completa: 1d8+2 de impacto e atordoado por uma rodada (uma vez por cena), Fortitude reduz à metade e evita o atordoamento; o dobro e sem RD em construtos e objetos mundanos; +1d8+2 por aprimoramento; objetos Médios a Colossais pelos aprimoramentos de tamanho (as portas são Grandes, Tabela 5-4); esfera de 6m que atinge todos na área, incluindo o conjurador. Fora de combate, contra objetos.
 
 - Consagrar e Profanar (divinas, 1º círculo) completas: esfera de 9m por 1 dia, em combate ou fora dele; na área consagrada, cura e dano de luz saem no máximo (Curar Ferimentos cura 18), na profanada, os de trevas; uma anula a outra; mortos-vivos sofrem –2 ou recebem +2 em Defesa e todos os testes (+1 por aprimoramento, até o círculo máximo); versão permanente com 1 hora e T$ 1.000; recusadas perto de símbolo de outra divindade (o Templo de Lena tem o de Lena). Novo efeito de magia em todos os testes (`testes`) e `Dice.maximo`.

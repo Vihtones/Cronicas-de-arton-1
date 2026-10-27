@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1712,3 +1712,120 @@ func test_despedacar_objeto_em_combate() -> void:
 	check(_lanca(m, a).ok, "objeto Grande em combate")
 	check(int(w.module("objects").obj("porta_taverna").pv) < 20, "a porta sofre dano")
 	eq(sim.c("player").sheet.pv, 999, "ninguém mais é atingido")
+
+
+# --- Arma Espiritual (divina, 1º círculo) e duração sustentada ----------------------------------
+func _ataque_de(m: Array, atacante: String, alvo: String) -> Array:
+	var sim: CombatSim = m[2]
+	return m[1]._resolve_attack(atacante, alvo, sim.attack_profile(atacante, alvo, 0, false, false), false)
+
+
+func _danos_da_arma(facts: Array) -> Array:
+	return facts.filter(func(f): return f.type == "ATTACK_RESOLVED" and str(f.payload.weapon) == "Arma Espiritual")
+
+
+func test_arma_espiritual_exige_divindade_com_arma_preferida() -> void:
+	var m := _cena_grupo(1)
+	var sh: CharacterSheet = m[2].c("player").sheet
+	var a := {"type": "cast", "spell": "arma_espiritual", "target": "player"}
+	sh.devotion = ""
+	check(not GhostPlanner.validate_action(m[2], "player", a).ok, "sem divindade, não")
+	sh.devotion = "Lena"
+	check(not GhostPlanner.validate_action(m[2], "player", a).ok, "Lena não tem arma preferida")
+	sh.devotion = "Nimb"
+	check(not GhostPlanner.validate_action(m[2], "player", a).ok, "Nimb: precisa escolher o tipo")
+	check(GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "arma_espiritual", "target": "player", "tipo_dano": "impacto"}).ok, "Nimb com tipo escolhido")
+	sh.devotion = "Khalmyr"
+	check(_lanca(m, a).ok, "Khalmyr: espada longa")
+	var tipo := ""
+	for e in sh.efeitos:
+		if e.stat == "arma_espiritual": tipo = str(e.tipo)
+	eq(tipo, "corte", "espada longa causa corte")
+
+
+func test_arma_espiritual_contra_ataca_uma_vez_por_rodada() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.devotion = "Khalmyr"
+	_lanca(m, {"type": "cast", "spell": "arma_espiritual", "target": "player"})
+	var f1 := _danos_da_arma(_ataque_de(m, "bandido_1", "player"))
+	eq(f1.size(), 1, "contra-ataque ao sofrer ataque corpo a corpo")
+	var perdeu: int = 999 - sim.c("bandido_1").sheet.pv
+	check(perdeu >= 2 and perdeu <= 12, "2d6 (%d)" % perdeu)
+	eq(_danos_da_arma(_ataque_de(m, "bandido_1", "player")).size(), 0, "só uma vez por rodada")
+	sim.round_no += 1
+	eq(_danos_da_arma(_ataque_de(m, "bandido_1", "player")).size(), 1, "na rodada seguinte, de novo")
+
+
+func test_arma_espiritual_defesa_e_dados_limitados_pelo_circulo() -> void:
+	var m := _cena_grupo(1)
+	var sh: CharacterSheet = m[2].c("player").sheet
+	sh.devotion = "Khalmyr"
+	var d0 := sh.defense(m[3], true)
+	check(not GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "arma_espiritual", "target": "player", "aprimoramentos": [1]}).ok, "+1 a mais exige o +1 base")
+	_lanca(m, {"type": "cast", "spell": "arma_espiritual", "target": "player", "aprimoramentos": [0, 1, 1, 4, 4]})
+	eq(sh.defense(m[3], true), d0 + 3, "+3 na Defesa")
+	eq(sh.efeito_bonus("arma_espiritual_dados"), 3, "nível 1: só +1d6 (círculo máximo 1)")
+
+
+func test_arma_espiritual_sustentada_ataca_livre_e_custa_1_pm_por_turno() -> void:
+	var m := _cena_grupo(5)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.devotion = "Khalmyr"
+	_lanca(m, {"type": "cast", "spell": "arma_espiritual", "target": "player", "aprimoramentos": [2, 3]})
+	check(sim.sustentadas.has("player"), "sustentada")
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "arma_espiritual", "target": "bandido_1"})
+	check(v.ok and v.kind == "livre", "ataque livre a alvo adjacente")
+	var out := c._execute_action("player", {"type": "arma_espiritual", "target": "bandido_1"}, v)
+	eq(_danos_da_arma(out).size(), 1, "a arma acerta automaticamente")
+	check("essencia" in _danos_da_arma(out)[0].payload.tags, "dano de essência")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "arma_espiritual", "target": "bandido_1"}).ok, "uma vez por rodada")
+	eq(_danos_da_arma(_ataque_de(m, "bandido_1", "player")).size(), 0, "a arma que atacou não contra-ataca")
+	var pm0 := sh.pm
+	c._begin_turn_base("player")
+	eq(sh.pm, pm0 - 1, "1 PM no início do turno para sustentar")
+	sh.pm = 0
+	c._begin_turn_base("player")
+	check(not sim.sustentadas.has("player"), "sem PM, a magia termina")
+	eq(sh.efeito_bonus("arma_espiritual"), 0, "a arma some")
+
+
+func test_arma_espiritual_duas_armas_contra_atacam_duas_vezes() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.devotion = "Khalmyr"
+	sim.c("bandido_2").tile = Vector2i(26, 58)
+	_lanca(m, {"type": "cast", "spell": "arma_espiritual", "target": "player", "aprimoramentos": [5]})
+	eq(_danos_da_arma(_ataque_de(m, "bandido_1", "player")).size(), 1, "primeira arma")
+	eq(_danos_da_arma(_ataque_de(m, "bandido_2", "player")).size(), 1, "segunda arma")
+	eq(_danos_da_arma(_ataque_de(m, "bandido_1", "player")).size(), 0, "só duas por rodada")
+
+
+func test_arma_espiritual_some_se_o_conjurador_morrer() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.devotion = "Khalmyr"
+	_lanca(m, {"type": "cast", "spell": "arma_espiritual", "target": "player"})
+	sh.pv = -999
+	m[1]._refresh_bencaos()
+	eq(sh.efeito_bonus("arma_espiritual"), 0, "dissipada")
+
+
+func test_sustentada_uma_por_vez_e_manto_custa_pm() -> void:
+	var m := _cena_grupo(13)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var sh: CharacterSheet = sim.c("player").sheet
+	sh.devotion = "Khalmyr"
+	_lanca(m, {"type": "cast", "spell": "manto_do_cruzado", "target": "player"})
+	eq(str(sim.sustentadas.get("player", "")), "manto_do_cruzado", "Manto do Cruzado é sustentado")
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "arma_espiritual", "target": "player", "aprimoramentos": [2]})
+	eq(str(sim.sustentadas.get("player", "")), "arma_espiritual", "a nova sustentada substitui a anterior")
+	eq(sh.manto_cruzado, "", "o manto terminou")
+	c.power_policy["sustentar"] = "nunca"
+	c._begin_turn_base("player")
+	check(not sim.sustentadas.has("player"), "o jogador pode deixar de sustentar")

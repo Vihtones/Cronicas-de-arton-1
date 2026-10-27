@@ -69,6 +69,87 @@
    "pagina": 97,
    "pdf_page": 103,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "panteao.arma_preferida",
+   "valor": {
+    "Aharadak": {
+     "arma": "corrente de espinhos",
+     "dano": "corte"
+    },
+    "Allihanna": {
+     "arma": "bordão",
+     "dano": "impacto"
+    },
+    "Arsenal": {
+     "arma": "martelo de guerra",
+     "dano": "impacto"
+    },
+    "Azgher": {
+     "arma": "cimitarra",
+     "dano": "corte"
+    },
+    "Hyninn": {
+     "arma": "adaga",
+     "dano": "perfuracao"
+    },
+    "Kallyadranoch": {
+     "arma": "lança",
+     "dano": "perfuracao"
+    },
+    "Khalmyr": {
+     "arma": "espada longa",
+     "dano": "corte"
+    },
+    "Lena": null,
+    "Lin-Wu": {
+     "arma": "katana",
+     "dano": "corte"
+    },
+    "Marah": null,
+    "Megalokk": {
+     "arma": "maça",
+     "dano": "impacto"
+    },
+    "Nimb": "qualquer",
+    "Oceano": {
+     "arma": "tridente",
+     "dano": "perfuracao"
+    },
+    "Sszzaas": {
+     "arma": "adaga",
+     "dano": "perfuracao"
+    },
+    "Tanna-Toh": {
+     "arma": "bordão",
+     "dano": "impacto"
+    },
+    "Tenebra": {
+     "arma": "adaga",
+     "dano": "perfuracao"
+    },
+    "Thwor": {
+     "arma": "machado de guerra",
+     "dano": "corte"
+    },
+    "Thyatis": {
+     "arma": "espada longa",
+     "dano": "corte"
+    },
+    "Valkaria": {
+     "arma": "mangual",
+     "dano": "impacto"
+    },
+    "Wynna": {
+     "arma": "adaga",
+     "dano": "perfuracao"
+    }
+   },
+   "nota": "Arma Preferida de cada deus (cap. 1, Deuses); Lena e Marah não têm; Nimb: qualquer arma. Tipo de dano da Tabela 3-5 (Armas).",
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 96,
+   "pdf_page": 102,
+   "status": "VERIFICADA"
   }
  ]
 }
