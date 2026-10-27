@@ -13,6 +13,7 @@ const COMPLETAS := {
 	"vestimenta_da_fe": {"aprimoramentos": [0, 1, 2]},
 	"manto_do_cruzado": {"aprimoramentos": []},   # sem aprimoramentos; versão luz ou trevas escolhida ao aprender
 	"coluna_de_chamas": {"aprimoramentos": [0, 1]},   # cilindro de 3m de raio em volta do alvo; +1 PM por +1d6 de fogo ou de luz
+	"invulnerabilidade": {"aprimoramentos": [0]},   # proteção mental ou física (escolha) até o fim da cena
 	"poeira_da_podridao": {"aprimoramentos": [0]},   # nuvem de 6m; dano de trevas no início do turno do conjurador; bloqueia cura
 	"circulo_da_restauracao": {"aprimoramentos": [0]},   # esfera de 3m por 5 rodadas; cura no fim do turno de quem está dentro
 	"sopro_da_salvacao": {"aprimoramentos": [0, 1, 2]},   # cone de 9m orientado para o alvo; cura aliados e remove condições
@@ -22,6 +23,10 @@ const SOPRO_CONDICOES := ["abalado", "atordoado", "apavorado", "alquebrado", "ce
 	"esmorecido", "exausto", "fascinado", "fatigado", "fraco", "frustrado", "lento", "paralisado", "pasmo", "surdo"]
 ## Magias que são reação: o base só ocorre como reação (quando um aliado é atacado). Aprimoramentos
 ## que mudam a execução para ação padrão permitem lançar no próprio turno.
+## Invulnerabilidade (LB p.195): condições de cada proteção. A física inclui doenças (condição "doente"); acertos críticos e
+## ataques furtivos entram à parte, como tipos de imunidade.
+const INVULN_MENTAL := ["abalado", "alquebrado", "apavorado", "atordoado", "confuso", "esmorecido", "fascinado", "frustrado", "pasmo"]
+const INVULN_FISICA := ["atordoado", "cego", "debilitado", "doente", "enjoado", "envenenado", "exausto", "fatigado", "fraco", "lento", "ofuscado", "paralisado"]
 const REACAO := ["escudo_da_fe"]
 const EXECUCAO_PADRAO_APR := {"escudo_da_fe": [0, 3]}
 ## Aprimoramentos que trocam a execução para reação mesmo sem a magia ser reação no base (Proteção Divina +2 PM).
@@ -29,7 +34,7 @@ const REACAO_APR := {"protecao_divina": [1]}
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
-const ALCANCE_APR := {"infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
+const ALCANCE_APR := {"invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}

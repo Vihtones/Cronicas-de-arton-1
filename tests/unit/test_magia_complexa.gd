@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -496,3 +496,51 @@ func test_curar_respeita_o_limite_da_ficha_e_devolve_o_que_foi_recuperado() -> v
 	ts.pv = 15
 	eq(ts.curar(10), 5, "cura até o máximo e devolve só o que foi recuperado")
 	eq(ts.pv, 20, "não passa do máximo")
+
+
+# --- Invulnerabilidade (5º círculo) ---------------------------------------------------------
+func test_invulnerabilidade_exige_circulo_5_e_nivel_17() -> void:
+	var m16 := _cena_grupo(16)
+	check(not GhostPlanner.validate_action(m16[2], "player", {"type": "cast", "spell": "invulnerabilidade"}).ok, "clérigo de nível 16 não lança magia de 5º círculo")
+	var m17 := _cena_grupo(17)
+	check(GhostPlanner.validate_action(m17[2], "player", {"type": "cast", "spell": "invulnerabilidade"}).ok, "clérigo de nível 17 lança a Invulnerabilidade")
+
+
+func test_invulnerabilidade_mental_bloqueia_so_condicoes_mentais() -> void:
+	var m := _cena_grupo(17)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var r: RuleRegistry = m[3]
+	var ts: CharacterSheet = sim.c("player").sheet
+	c._cast("player", {"type": "cast", "spell": "invulnerabilidade", "modo": "mental"}, {"ok": true, "cost": 0})
+	ts.add_condition("fascinado", r)
+	check(not ts.conditions.has("fascinado"), "bloqueia condição mental (fascinado)")
+	ts.add_condition("cego", r)
+	check(ts.conditions.has("cego"), "a proteção mental não bloqueia condição física (cego)")
+	eq(ts.efeito_bonus("imune", "critico"), 0, "a proteção mental não dá imunidade a acertos críticos")
+
+
+func test_invulnerabilidade_fisica_bloqueia_condicoes_doencas_criticos_e_furtivos() -> void:
+	var m := _cena_grupo(17)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var r: RuleRegistry = m[3]
+	var ts: CharacterSheet = sim.c("player").sheet
+	c._cast("player", {"type": "cast", "spell": "invulnerabilidade", "modo": "fisica"}, {"ok": true, "cost": 0})
+	ts.add_condition("envenenado", r)
+	check(not ts.conditions.has("envenenado"), "bloqueia condição física (envenenado)")
+	ts.add_condition("doente", r)
+	check(not ts.conditions.has("doente"), "bloqueia doenças (condição doente)")
+	ts.add_condition("confuso", r)
+	check(ts.conditions.has("confuso"), "a proteção física não bloqueia condição mental (confuso)")
+	check(ts.efeito_bonus("imune", "critico") > 0, "imune a acertos críticos")
+	check(ts.efeito_bonus("imune", "furtivo") > 0, "imune a ataques furtivos")
+
+
+func test_invulnerabilidade_aprimoramento_aceita_outro_alvo_a_curto_alcance() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_2").tile = Vector2i(40, 57)   # 14 quadrados: fora do curto (6)
+	check(GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "invulnerabilidade", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]}).ok, "com o aprimoramento, a magia vai para outra criatura a curto alcance")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "invulnerabilidade", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [0]}).ok, "fora do alcance curto, é recusada")

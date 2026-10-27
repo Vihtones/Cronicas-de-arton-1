@@ -1088,6 +1088,19 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.add_zona("poeira_da_podridao_%d" % sim.zonas.size(), Area.esfera(centro_p, Area.quadrados(6.0)), "poeira_da_podridao", -1, "poeira_da_podridao",
 				{"conjurador": id, "dano_turno": dano_p, "cd": spell_dc(sh, a), "afeta": "todos"})
 			_aplicar_nuvem(sim.zonas[sim.zonas.size() - 1], out)
+		"invulnerabilidade":
+			# Invulnerabilidade (5º círculo): até o fim da cena, imune à proteção escolhida: mental (condições mentais, e os
+			# efeitos de encantamento e ilusão, que chegam ao jogo como essas condições) ou física (condições físicas, doenças,
+			# acertos críticos e ataques furtivos). Aprimoramento: alcance curto e outra criatura como alvo.
+			var alvo_i: String = a.get("target", id)
+			var modo_i := str(a.get("modo", "mental"))
+			var ts_i: CharacterSheet = sim.c(alvo_i).sheet
+			for cond_i in (SpellRules.INVULN_FISICA if modo_i == "fisica" else SpellRules.INVULN_MENTAL):
+				ts_i.add_efeito("magia.invulnerabilidade", "imune", 1, "cena", str(cond_i))
+			if modo_i == "fisica":
+				ts_i.add_efeito("magia.invulnerabilidade", "imune", 1, "cena", "critico")
+				ts_i.add_efeito("magia.invulnerabilidade", "imune", 1, "cena", "furtivo")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_i, "buff": "invulnerabilidade", "tags": ["magia"]}, [id, alvo_i]))
 		"circulo_da_restauracao":
 			# Círculo da Restauração (4º círculo): esfera de 3m no alvo por 5 rodadas. Ao fim do turno de cada criatura
 			# dentro dele: 3d8+3 PV e 1 PM (4d8+4 PV com o aprimoramento). Mortos-vivos e criaturas vulneráveis à luz
@@ -1343,7 +1356,8 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		camo_miss = camo_roll <= int(v.miss_chance) / 10
 	var total := d20 + int(v.mod)
 	var hit := total >= int(v.defense) and not camo_miss
-	var crit := hit and d20 >= int(atk.margem)
+	var imune_critico: bool = int(T.sheet.efeito_bonus("imune", "critico")) > 0   # Invulnerabilidade (física)
+	var crit: bool = hit and d20 >= int(atk.margem) and not imune_critico
 	var dmg := 0
 	var rolls: Array = []
 	var tags: Array = ["ataque"]
@@ -1372,7 +1386,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		rolls = r.rolls
 		# Ataque Furtivo (LB p.73): 1/rodada, alvo desprevenido ou flanqueado; dados extras não multiplicam.
 		var sa_key := "furtivo_%d" % sim.round_no
-		if A.sheet.class_id == "ladino" and not A.flags.has(sa_key) and \
+		if A.sheet.class_id == "ladino" and not A.flags.has(sa_key) and int(T.sheet.efeito_bonus("imune", "furtivo")) <= 0 and \
 				(T.sheet.has_effective_condition(world.rules, "desprevenido") or (not v.ranged and sim.flanking(attacker, target))):
 			var n_dice: int = 1 + (int(A.sheet.level) - 1) / 2
 			var sa := Dice.roll("%dd6" % n_dice, world.rng, "combat")
