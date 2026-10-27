@@ -133,6 +133,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "bencao":
+				for tg in targets:
+					if not sim.combatants.has(tg):
+						return {"ok": false, "reason": "alvo inválido"}
+					if apr.has(0):
+						if apr.has(1): return {"ok": false, "reason": "a Bênção sobre cadáver não recebe bônus"}
+						if targets.size() != 1 or not sim.c(tg).sheet.is_dead(): return {"ok": false, "reason": "escolha um cadáver"}
+					elif sim.is_enemy(actor, tg) or sim.c(tg).sheet.is_dead():
+						return {"ok": false, "reason": "Bênção só abençoa aliados"}
 			if sp_id == "nevoa" and apr.has(4) and not apr.has(3):
 				return {"ok": false, "reason": "o aprimoramento de +2d4 exige a névoa cáustica"}
 			if sp_id == "orientacao":

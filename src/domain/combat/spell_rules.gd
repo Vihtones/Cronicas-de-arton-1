@@ -15,6 +15,7 @@ const COMPLETAS := {
 	"coluna_de_chamas": {"aprimoramentos": [0, 1]},   # cilindro de 3m de raio em volta do alvo; +1 PM por +1d6 de fogo ou de luz
 	"arma_magica": {"aprimoramentos": [0, 1, 2]},   # +1/+2 em ataque e dano; atributo-chave; dano elemental 1d6 / 2d6
 	"orientacao": {"aprimoramentos": [0, 1, 2]},   # vantagem em perícia (2 dados); por atributo; por grupo; alvos escolhidos
+	"bencao": {"aprimoramentos": [0, 1]},   # 1 cadáver por 1 semana (também fora de combate); +1 de bônus, repetível
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -139,8 +140,12 @@ static func custo_aprimoramentos(rules: RuleRegistry, sp_id: String, idx: Array)
 
 ## Perdição (divina 1): –1 em ataques e dano; +2 PM: –1 a mais (limite = círculo máximo do conjurador).
 static func penalidade_perdicao(sheet: CharacterSheet, rules: RuleRegistry, idx: Array) -> int:
-	var p := 1 + (1 if idx.has(0) else 0)
-	return mini(p, circulo_maximo(sheet, rules))
+	return mini(1 + idx.count(0), circulo_maximo(sheet, rules))
+
+
+## Bênção (divina 1): +1 em ataques e dano; +2 PM: +1 a mais, repetível (limite = círculo máximo do conjurador).
+static func bonus_bencao(sheet: CharacterSheet, rules: RuleRegistry, idx: Array) -> int:
+	return mini(1 + idx.count(1), circulo_maximo(sheet, rules))
 
 
 static func e_reacao(sp_id: String) -> bool:

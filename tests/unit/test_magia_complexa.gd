@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1445,3 +1445,82 @@ func test_nevoa_espessa_reduz_deslocamento_e_penaliza_ataque() -> void:
 	check(int(dois.cost) <= sim.speed_squares("bandido_1"), "2 quadrados (3m) cabem")
 	var prof := sim.attack_profile("bandido_1", "player", 0, false, false)
 	check((prof.mods as Array).any(func(x): return x[0] == "névoa espessa" and int(x[1]) == -2), "–2 no ataque dentro da névoa espessa")
+
+
+# --- Bênção (divina, 1º círculo) ------------------------------------------------------------------
+func _lanca(m: Array, a: Dictionary) -> Dictionary:
+	var v := GhostPlanner.validate_action(m[2], "player", a)
+	if v.ok:
+		m[1]._cast("player", a, v)
+	return v
+
+
+func test_bencao_da_mais_1_em_ataque_e_dano_aos_aliados_escolhidos() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	check(_lanca(m, {"type": "cast", "spell": "bencao", "targets": ["player", "bandido_1"]}).ok, "Bênção válida em aliados")
+	eq(sim.c("player").sheet.efeito_bonus("ataque"), 1, "+1 no ataque")
+	eq(sim.c("bandido_1").sheet.efeito_bonus("dano"), 1, "+1 no dano do aliado")
+	check(not _lanca(m, {"type": "cast", "spell": "bencao", "targets": ["bandido_2"]}).ok, "inimigo não é abençoado")
+
+
+func test_bencao_aumenta_o_bonus_ate_o_circulo_maximo() -> void:
+	var m5 := _cena_grupo(5)
+	_lanca(m5, {"type": "cast", "spell": "bencao", "targets": ["player"], "aprimoramentos": [1, 1]})
+	eq(m5[2].c("player").sheet.efeito_bonus("ataque"), 2, "nível 5 (2º círculo): bônus limitado a +2")
+	var m9 := _cena_grupo(9)
+	_lanca(m9, {"type": "cast", "spell": "bencao", "targets": ["player"], "aprimoramentos": [1, 1]})
+	eq(m9[2].c("player").sheet.efeito_bonus("ataque"), 3, "nível 9 (3º círculo): +3")
+
+
+func test_perdicao_repetida_aumenta_a_penalidade_ate_o_circulo() -> void:
+	var m9 := _cena_grupo(9)
+	_lanca(m9, {"type": "cast", "spell": "perdicao", "targets": ["bandido_1"], "aprimoramentos": [0, 0]})
+	eq(m9[2].c("bandido_1").sheet.efeito_bonus("ataque"), -3, "dois aprimoramentos: –3")
+
+
+func test_bencao_e_perdicao_se_anulam() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	sim.c("bandido_1").sheet.add_efeito("magia.perdicao", "ataque", -1, "cena")
+	_lanca(m, {"type": "cast", "spell": "bencao", "targets": ["bandido_1"]})
+	eq(sim.c("bandido_1").sheet.efeito_bonus("ataque"), 1, "Bênção anula Perdição")
+	sim.c("bandido_1").side = "inimigo"
+	_lanca(m, {"type": "cast", "spell": "perdicao", "targets": ["bandido_1"]})
+	eq(sim.c("bandido_1").sheet.efeito_bonus("ataque"), -1, "Perdição anula Bênção")
+
+
+func test_bencao_em_cadaver_no_combate_preserva_por_uma_semana() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var w = m[0]
+	check(not _lanca(m, {"type": "cast", "spell": "bencao", "targets": ["bandido_1"], "aprimoramentos": [0]}).ok, "vivo não é cadáver")
+	sim.c("bandido_1").sheet.pv = -999
+	check(_lanca(m, {"type": "cast", "spell": "bencao", "targets": ["bandido_1"], "target": "bandido_1", "aprimoramentos": [0]}).ok, "cadáver é alvo")
+	check(w.module("magia").cadaver_preservado("bandido_1"), "cadáver preservado")
+	WorldHelpers.advance_hours(w, 24 * 7)
+	check(not w.module("magia").cadaver_preservado("bandido_1"), "depois de uma semana, não mais")
+
+
+func test_bencao_em_cadaver_fora_de_combate() -> void:
+	var w := WorldHelpers.world(5)
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.spells = PackedStringArray(["bencao"])
+	sh.pm = 10
+	w.player_sheet = sh
+	var combat = w.module("combat")
+	var t: Array = combat.creature_state["bandido_1"].tile
+	WorldHelpers.put(w, int(t[0]) + 1, int(t[1]))
+	var payload := {"spell": "bencao", "target": "bandido_1", "aprimoramentos": [0]}
+	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "vivo não é cadáver")
+	combat.creature_state["bandido_1"].alive = false
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "bencao", "target": "bandido_1"}).accepted, "a Bênção comum só é lançada em combate")
+	var res := WorldHelpers.cmd(w, "CastSpell", payload)
+	check(res.accepted, "Bênção no cadáver aceita")
+	eq(sh.pm, 8, "custou 1 PM + 1 PM do aprimoramento")
+	check(w.module("magia").cadaver_preservado("bandido_1"), "cadáver preservado")
+	WorldHelpers.put(w, int(t[0]) + 20, int(t[1]))
+	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "fora do alcance curto")

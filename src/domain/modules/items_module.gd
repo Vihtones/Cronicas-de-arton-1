@@ -10,7 +10,7 @@ const EQUIPPABLE := {
 
 
 func module_id() -> String: return "items"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["Equip", "UseItem", "CastSpell"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["Equip", "UseItem"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -32,13 +32,6 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var it: String = cmd.payload.get("item", "")
 			if not st.has_item(it): return PackedStringArray(["você não tem " + it])
 			if it != "pocao_cura": return PackedStringArray(["não é usável"])
-		"CastSpell":
-			var sp: String = cmd.payload.get("spell", "")
-			if not world.player_sheet.spells.has(sp): return PackedStringArray(["magia não conhecida"])
-			var rule: Dictionary = world.rules.value("magia." + sp, {})
-			if not rule.has("cura"): return PackedStringArray(["só magias de cura fora de combate neste protótipo"])
-			var cost := int(world.rules.value("magia.custo_por_circulo")[str(int(rule.circulo))])
-			if world.player_sheet.pm < cost: return PackedStringArray(["PM insuficiente"])
 	return PackedStringArray()
 
 
@@ -61,12 +54,4 @@ func execute(cmd: GameCommand) -> Array:
 			s.pv = mini(s.pv_max, s.pv + int(r.total))
 			return [fact("ITEM_LOST", {"item": cmd.payload.item}, ["player"]),
 				fact("HEALED", {"actor": "player", "target": "player", "amount": r.total, "pv_after": s.pv, "source": cmd.payload.item}, ["player"])]
-		"CastSpell":
-			var rule: Dictionary = world.rules.value("magia." + str(cmd.payload.spell))
-			var cost := int(world.rules.value("magia.custo_por_circulo")[str(int(rule.circulo))])
-			s.pm -= cost
-			var r := Dice.roll(str(rule.cura), world.rng, "world")
-			s.pv = mini(s.pv_max, s.pv + int(r.total))
-			return [fact("SPELL_CAST", {"caster": "player", "spell": cmd.payload.spell, "pm_cost": cost, "pm_after": s.pm}, ["player"]),
-				fact("HEALED", {"actor": "player", "target": "player", "amount": r.total, "pv_after": s.pv, "source": cmd.payload.spell}, ["player"])]
 	return []

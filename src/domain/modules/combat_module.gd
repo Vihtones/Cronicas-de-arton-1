@@ -1351,11 +1351,33 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"bencao":
+			# Bênção (divina 1): aliados escolhidos em alcance curto recebem +1 em ataques e dano pela cena (+1 por
+			# aprimoramento de 2 PM, até o círculo máximo). Anula Perdição. Aprimoramento de 1 PM: 1 cadáver por 1 semana
+			# (não se decompõe nem vira morto-vivo; ver SpellsModule).
+			var apr_b: Array = a.get("aprimoramentos", [])
+			if apr_b.has(0):
+				var corpo: String = a.get("target", "")
+				var magia_m = world.module("magia")
+				if magia_m != null:
+					magia_m.preservar_cadaver(corpo, 7)
+				out.append(fact("CORPSE_PRESERVED", {"caster": id, "target": corpo}, [id]))
+			else:
+				var bon: int = SpellRules.bonus_bencao(sh, world.rules, apr_b)
+				for tg_b in a.get("targets", [a.get("target", id)]):
+					var ts_b: CharacterSheet = sim.c(tg_b).sheet
+					if ts_b.has_efeito("magia.perdicao"):
+						ts_b.remove_efeito("magia.perdicao")   # Bênção anula Perdição
+					ts_b.add_efeito("magia.bencao", "ataque", bon, "cena")
+					ts_b.add_efeito("magia.bencao", "dano", bon, "cena")
+					out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_b, "buff": "bencao", "bonus": bon, "tags": ["magia"]}, [id, tg_b]))
 		"perdicao":
 			# Perdição (divina 1): alvos inimigos recebem penalidade em ataques e dano pela cena.
 			var pen: int = SpellRules.penalidade_perdicao(sh, world.rules, a.get("aprimoramentos", []))
 			for tg in a.get("targets", [a.get("target", id)]):
 				var ts: CharacterSheet = sim.c(tg).sheet
+				if ts.has_efeito("magia.bencao"):
+					ts.remove_efeito("magia.bencao")   # Perdição anula Bênção
 				ts.add_efeito("magia.perdicao", "ataque", -pen, "cena")
 				ts.add_efeito("magia.perdicao", "dano", -pen, "cena")
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "perdicao", "penalidade": -pen, "tags": ["magia"]}, [id, tg]))

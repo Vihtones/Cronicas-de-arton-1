@@ -7,6 +7,9 @@ const OPTIONAL := ["weather", "memory", "factions", "crime", "economy", "region_
 	"progression", "items", "travel", "domain", "lineage", "adventurers", "fauna", "pacing", "npc_needs", "relations", "prologue", "cities", "party", "tormenta", "homebrew", "chronicle"]
 
 
+const SpellsModule := preload("res://src/domain/modules/spells_module.gd")
+
+
 static func create(p_seed: int = 20261023, disabled: Array = [], rules: RuleRegistry = null, db: ContentDB = null) -> WorldState:
 	var r := rules if rules != null else RuleRegistry.load_default()
 	var d := db if db != null else ContentDB.load_default()
@@ -17,7 +20,7 @@ static func create(p_seed: int = 20261023, disabled: Array = [], rules: RuleRegi
 	for m in [StateModule.new(), ObjectsModule.new(), TownEventsModule.new(), CartsModule.new(), NpcLifeModule.new(), NpcNeedsModule.new(), NpcModule.new(), WeatherModule.new(), ExplorationModule.new(),
 			MemoryModule.new(), RelationsModule.new(), PrologueModule.new(), PartyModule.new(), FactionModule.new(), CombatModule.new(), DialogueModule.new(), CrimeModule.new(),
 			EconomyModule.new(), CitiesModule.new(), TormentaModule.new(), HomebrewModule.new(), ChronicleModule.new(), RegionSimModule.new(), ReligionModule.new(), ProgressionModule.new(), ItemsModule.new(),
-			TravelModule.new(), DomainModule.new(), LineageModule.new(), AdventurersModule.new(), FaunaModule.new(), PacingModule.new(), DebugModule.new()]:
+			TravelModule.new(), DomainModule.new(), LineageModule.new(), AdventurersModule.new(), FaunaModule.new(), PacingModule.new(), SpellsModule.new(), DebugModule.new()]:
 		w.register(m)
 	for id in disabled:
 		if OPTIONAL.has(id):
