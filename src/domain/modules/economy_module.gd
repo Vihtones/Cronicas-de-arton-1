@@ -23,7 +23,7 @@ func _ensure() -> void:
 	if regions.is_empty():
 		regions = world.db.economy.get("regions", {}).duplicate(true)
 	if routes.is_empty():
-		routes = world.db.economy.get("routes", {"valkaria_vila": {"from": "valkaria", "to": "vila", "open": true}}).duplicate(true)
+		routes = world.db.economy.get("routes", {"valkaria_vila": {"nome": "estrada de Valkaria", "from": "valkaria", "to": "vila", "open": true}}).duplicate(true)
 
 
 func price(item_id: String, region: String = "vila", seller: String = "") -> int:

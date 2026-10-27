@@ -46,7 +46,7 @@ func _confere(nome: String, ok: bool) -> void:
 
 
 ## avança um dia de jogo e devolve as entregas de carga que aconteceram nele
-func _dia(G) -> Array:
+func _dia(G: Node) -> Array:
 	var entregas: Array = []
 	for i in 6:
 		var r = G.send("AdvanceTime", {"ticks": 24})
@@ -81,8 +81,20 @@ func _run() -> void:
 			carga += int(p.goods[g])
 	_confere("o mensageiro de Sambúrdia entrega em seis dias", de_tarso.size() >= 1)
 	_confere("a carga de Sambúrdia tem mercadoria (%d unidades)" % carga, carga > 0)
+	var na_cronica := false
+	for e in G.world.modules.chronicle.entries:
+		if str(e.text).contains("trouxe mercadoria de fora"):
+			na_cronica = true
+	_confere("a crônica registra a entrega de fora", na_cronica)
 	await _frames(5)
 	await _shot("r2_entrega_samburdia")
+	main.ui.toggle_journal()
+	await _frames(5)
+	for sc in main.ui.panel_journal.find_children("*", "ScrollContainer", true, false):
+		sc.scroll_vertical = 100000
+	await _shot("r3_cronica")
+	main.ui.toggle_journal()
+	await _frames(3)
 
 	# estrada bloqueada: a rota fecha e o mensageiro chega sem carga
 	eco.routes.samburdia_vila.open = false

@@ -68,3 +68,22 @@ func test_rota_fechada_sobrevive_a_salvar_e_carregar() -> void:
 	var eco2: EconomyModule = w2.modules.economy
 	eco2.from_dict(d)
 	eq(eco2.routes.samburdia_vila.open, false, "estado da rota persiste no save")
+
+
+func test_cronica_registra_rota_com_nome_e_entrega() -> void:
+	var w := _world()
+	var r := _sambur(w)
+	var eco: EconomyModule = w.modules.economy
+	var cronica: ChronicleModule = w.modules.chronicle
+	for f in eco.on_event(GameEvent.create("fecha_cronica", "DISTANT_EVENT", w.clock.tick,
+			{"region": "samburdia", "event": "estrada", "effect": {"route": {"id": "samburdia_vila", "open": false}}, "news": ""})):
+		cronica.on_event(GameEvent.create("f_%s" % f.type, f.type, w.clock.tick, f.payload))
+	var textos: Array = cronica.entries.map(func(e): return e.text)
+	check(textos.any(func(t): return str(t).contains("estrada de Sambúrdia foi fechada")), "a crônica diz o nome da estrada fechada")
+	eco.regions.vila.stock.comida = 0
+	_rota(w, "samburdia_vila", true)
+	var fato: Array = eco.on_event(_chegada(w, r.id, r.courier))
+	for f in fato:
+		cronica.on_event(GameEvent.create("f_%s" % f.type, f.type, w.clock.tick, f.payload))
+	var textos2: Array = cronica.entries.map(func(e): return e.text)
+	check(textos2.any(func(t): return str(t).contains("Tarso Pedrada trouxe mercadoria de fora")), "a crônica registra a entrega do mensageiro")

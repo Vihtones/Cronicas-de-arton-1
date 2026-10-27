@@ -15,7 +15,7 @@ func module_id() -> String: return "chronicle"
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["LEADERSHIP_CHANGED", "CITY_STATUS_CHANGED", "TORMENTA_STAGE_CHANGED", "ROUTE_CHANGED",
 		"GUILD_CREATED", "PARTY_LOST", "NPC_DIED",
-		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED", "SHORTAGE_STARTED", "SHORTAGE_ENDED"])
+		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED", "SHORTAGE_STARTED", "SHORTAGE_ENDED", "TRADE_DELIVERED"])
 
 
 func on_event(e: GameEvent) -> Array:
@@ -39,7 +39,7 @@ func on_event(e: GameEvent) -> Array:
 			text = "O estoque de %s na vila voltou ao normal." % _bem(str(e.payload.good))
 		"ROUTE_CHANGED":
 			cat = "economia"
-			text = "A rota %s foi reaberta." % e.payload.route if bool(e.payload.open) else "A rota %s foi fechada." % e.payload.route
+			text = "A %s foi reaberta." % _rota(str(e.payload.route)) if bool(e.payload.open) else "A %s foi fechada." % _rota(str(e.payload.route))
 		"GUILD_CREATED":
 			cat = "guildas"
 			text = "A guilda %s foi registrada." % e.payload.name
@@ -58,6 +58,12 @@ func on_event(e: GameEvent) -> Array:
 		"STOLEN_GOODS_RECOVERED":
 			cat = "economia"
 			text = "Mercadoria roubada foi recuperada e voltou ao estoque."
+		"TRADE_DELIVERED":
+			cat = "economia"
+			var partes := PackedStringArray()
+			for g in e.payload.goods:
+				partes.append("%d de %s" % [int(e.payload.goods[g]), _bem(str(g))])
+			text = "%s trouxe mercadoria de fora: %s." % [_nome(str(e.payload.by)), ", ".join(partes)]
 	if cat == "":
 		return []
 	_seq += 1
@@ -65,6 +71,10 @@ func on_event(e: GameEvent) -> Array:
 	if entries.size() > CAP:
 		entries = entries.slice(entries.size() - CAP)
 	return []
+
+
+func _rota(id: String) -> String:
+	return str(world.db.economy.get("routes", {}).get(id, {}).get("nome", id))
 
 
 func _bem(good: String) -> String:

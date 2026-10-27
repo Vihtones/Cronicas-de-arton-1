@@ -365,8 +365,8 @@ economy["regions"]["samburdia"] = {
  "target": {"comida": 800, "bebida": 300, "ferramentas": 300, "remedio": 400}}
 # Rotas comerciais entre regiões (cada uma com a região de origem, destino e se está aberta).
 economy["routes"] = {
- "valkaria_vila": {"from": "valkaria", "to": "vila", "open": True},
- "samburdia_vila": {"from": "samburdia", "to": "vila", "open": True}}
+ "valkaria_vila": {"nome": "estrada de Valkaria", "from": "valkaria", "to": "vila", "open": True},
+ "samburdia_vila": {"nome": "estrada de Sambúrdia", "from": "samburdia", "to": "vila", "open": True}}
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
 distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "events": [

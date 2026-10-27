@@ -16,6 +16,7 @@
 - Fase 4 (economia): crise de escassez explícita por bem da vila, com histerese (`SHORTAGE_STARTED`, `SHORTAGE_ENDED`), recuperação pela produção e registro no diário. O diário (J) ganha a seção "Crônica da vila", que antes não aparecia na interface.
 - Fase 4: na falta de comida, a refeição na taverna custa o dobro. Quem não pode pagar o novo preço continua com fome.
 - Fase 4: segunda rota comercial, de Sambúrdia (remédio em excesso, mensageiro Tarso Pedrada). As rotas agora vêm de `economy.json`. Eventos de estrada podem fechá-la e reabri-la. Verificação: `tools/playtest_rota.gd`.
+- Crônica da vila registra entregas de mercadoria de outras regiões (`TRADE_DELIVERED`) e mostra as rotas pelo nome ("estrada de Sambúrdia"), no lugar do id técnico.
 - Geração de dados: `tools/build_content.py` agora gera também a produção do trabalho, a ferramenta de ofício (loja da Mara), o item `ferramenta_oficio` e Sambúrdia. Antes estavam só editados à mão e se perderiam ao regenerar. Voz do mensageiro em `tools/build_voices.py`.
 - Menu de debug (F2): teleporte para qualquer local ou morador, e ajuste de hora, ouro, tesouro, estoque da vila, clima e de ouro, fome e cansaço de cada morador. Tudo passa por comandos validados (`DebugModule`). `DebugMenu.ENABLED` esconde o menu em builds de jogador.
 - Carroças de entrega: `CartsModule` (domínio). Nascem de dia, levam a mercadoria que falta na vila, descarregam no mercado (estoque sobe) e voltam. A apresentação só desenha a posição. Salvam e carregam.

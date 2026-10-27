@@ -163,11 +163,13 @@
  },
  "routes": {
   "valkaria_vila": {
+   "nome": "estrada de Valkaria",
    "from": "valkaria",
    "to": "vila",
    "open": true
   },
   "samburdia_vila": {
+   "nome": "estrada de Sambúrdia",
    "from": "samburdia",
    "to": "vila",
    "open": true
