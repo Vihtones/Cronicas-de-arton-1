@@ -283,6 +283,15 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		mods.append(["combate defensivo", -2])
 	if not ranged and ClassFeatures.furia_bonus(sheet) > 0: mods.append(["fúria", ClassFeatures.furia_bonus(sheet)])   # Fúria do bárbaro
 	if sheet.efeito_bonus("ataque") != 0: mods.append(["magia", sheet.efeito_bonus("ataque")])
+	# Arma Mágica (1º círculo): encanto da arma empunhada; quem a empunha usa o atributo-chave de magia no ataque.
+	var arma_empunhada := str(sheet.equipment.get("weapon", ""))
+	if arma_empunhada != "" and sheet.efeito_bonus_tipo("encanto_arma", arma_empunhada) != 0:
+		mods.append(["arma mágica", sheet.efeito_bonus_tipo("encanto_arma", arma_empunhada)])
+		var attr_chave := str(sheet.caster_attr)
+		if attr_chave != "" and sheet.efeito_tipo_existe("atributo_arma", arma_empunhada):
+			var attr_pericia := str(rules.value("pericia.tabela", {}).get(atk.get("skill", "luta"), {}).get("atributo", "")).to_lower()
+			if attr_pericia != "" and attr_pericia != attr_chave:
+				mods.append(["atributo-chave de magia", int(sheet.attrs.get(attr_chave, 0)) - int(sheet.attrs.get(attr_pericia, 0))])
 	if ranged and dist > reach: mods.append(["dobro do alcance", -5])
 	if ranged and engaged_in_melee(target): mods.append(["alvo em corpo a corpo", -5])
 	var total_mod := 0

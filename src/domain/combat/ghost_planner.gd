@@ -125,6 +125,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				for tg in targets:
 					if tg == actor or not sim.is_enemy(actor, tg):
 						return {"ok": false, "reason": "Perdição só afeta inimigos"}
+			if sp_id == "arma_magica":
+				var alvo_am: String = a.get("target", actor)
+				if not sim.combatants.has(alvo_am) or str(sim.c(alvo_am).sheet.equipment.get("weapon", "")) == "":
+					return {"ok": false, "reason": "Arma Mágica precisa de uma arma empunhada"}
+				if apr.has(1) and not ["acido", "eletricidade", "fogo", "frio"].has(str(a.get("elemento", ""))):
+					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
+				if apr.has(2) and not apr.has(1):
+					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
 			if sp_id == "orientacao":
 				if apr.has(0) and apr.has(1):
 					return {"ok": false, "reason": "a Orientação de atributo e a de grupo de atributos não se combinam"}
@@ -155,7 +163,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var reach := int(sim.rules.value("alcance.quadrados", {}).get(alc, 1))  # LB p.143 (toque/pessoal = 1)
 			if alc == "toque":
 				for tg in targets:
-					if tg == actor: return {"ok": false, "reason": "escolha um alvo adjacente"}
+					if tg == actor and sp_id != "arma_magica": return {"ok": false, "reason": "escolha um alvo adjacente"}   # Arma Mágica: a própria arma empunhada
 			for tg in targets:
 				var T := sim.c(tg)
 				if T.is_empty(): return {"ok": false, "reason": "alvo inválido"}

@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1237,3 +1237,80 @@ func test_orientacao_valida_os_aprimoramentos() -> void:
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "orientacao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0]}).ok, "aprimoramento de atributo exige um atributo")
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "orientacao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [1]}).ok, "aprimoramento de grupo exige o grupo")
 	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "orientacao", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0, 1], "atributo": "int", "grupo": "mentais"}).ok, "os dois aprimoramentos de atributo não se combinam")
+
+
+# --- Arma Mágica (1º círculo): encanto da arma empunhada -----------------------------------------
+## Toque exige alvo adjacente: o aliado é o bandido_1 (do lado do jogador), empunhando uma espada longa.
+func _arma_magica(m: Array, apr: Array = [], extra: Dictionary = {}) -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_1").sheet.equipment["weapon"] = "espada_longa"
+	sim.c("bandido_2").tile = Vector2i(45, 57)   # longe: sem concentração por inimigo adjacente
+	var a := {"type": "cast", "spell": "arma_magica", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": apr}
+	for k in extra:
+		a[k] = extra[k]
+	var vv := GhostPlanner.validate_action(sim, "player", a)
+	check(vv.ok, "a conjuração é válida: " + str(vv.get("reason", "")))
+	c._cast("player", a, vv)
+
+
+func test_arma_magica_da_mais_1_limitado_pelo_circulo() -> void:
+	var m := _cena_grupo(1)
+	_arma_magica(m)
+	eq(m[2].c("bandido_1").sheet.efeito_bonus_tipo("encanto_arma", "espada_longa"), 1, "+1 no 1º círculo")
+
+
+func test_arma_magica_aprimoramento_chega_a_mais_2_com_circulo_2() -> void:
+	var m := _cena_grupo(5)
+	_arma_magica(m, [0])
+	eq(m[2].c("bandido_1").sheet.efeito_bonus_tipo("encanto_arma", "espada_longa"), 2, "+2 com o aprimoramento, circulo 2 permite")
+	var m1 := _cena_grupo(1)
+	_arma_magica(m1, [0])
+	eq(m1[2].c("bandido_1").sheet.efeito_bonus_tipo("encanto_arma", "espada_longa"), 1, "o bônus não passa do círculo máximo")
+
+
+func test_arma_magica_entra_no_perfil_de_ataque() -> void:
+	var m := _cena_grupo(1)
+	_arma_magica(m)
+	m[2].c("bandido_2").tile = Vector2i(28, 57)   # adjacente ao aliado encantado
+	var p: Dictionary = m[2].attack_profile("bandido_1", "bandido_2", 0, false, false)
+	check(p.ok and (p.mods as Array).any(func(x): return x[0] == "arma mágica"), "o encanto aparece nos modificadores do ataque")
+
+
+func test_arma_magica_dano_elemental_com_aprimoramento() -> void:
+	var m := _cena_grupo(9)
+	_arma_magica(m, [0, 1], {"elemento": "fogo"})
+	var sh: CharacterSheet = m[2].c("bandido_1").sheet
+	eq(m[1]._dano_elemental_arma(sh).get("tipo", ""), "fogo", "o dano elemental é do tipo escolhido")
+	eq(m[1]._dano_elemental_arma(sh).get("dados", 0), 1, "1d6 no 1º aprimoramento")
+
+
+func test_arma_magica_segundo_aprimoramento_faz_2d6() -> void:
+	var m := _cena_grupo(9)
+	_arma_magica(m, [0, 1, 2], {"elemento": "frio"})
+	eq(m[1]._dano_elemental_arma(m[2].c("bandido_1").sheet).get("dados", 0), 2, "2d6 com o 2º aprimoramento")
+
+
+func test_arma_magica_valida_elemento_e_ordem_dos_aprimoramentos() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").side = "player"
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	sim.c("bandido_1").sheet.equipment["weapon"] = "espada_longa"
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "arma_magica", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [0, 1]}).ok, "o aprimoramento elemental exige o tipo de dano")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "arma_magica", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [2], "elemento": "fogo"}).ok, "o aprimoramento de 2d6 exige o de 1d6")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "arma_magica", "target": "bandido_2", "targets": ["bandido_2"]}).ok, "sem arma empunhada, não há o que encantar")
+
+
+func test_arma_magica_em_si_mesmo_troca_o_atributo_do_ataque() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.equipment["weapon"] = "espada_longa"
+	var a := {"type": "cast", "spell": "arma_magica", "target": "player", "targets": ["player"]}
+	var vv := GhostPlanner.validate_action(sim, "player", a)
+	check(vv.ok, "a conjuração em si mesmo é válida: " + str(vv.get("reason", "")))
+	m[1]._cast("player", a, vv)
+	var p: Dictionary = sim.attack_profile("player", "bandido_1", 0, false, false)
+	check(p.ok and (p.mods as Array).any(func(x): return x[0] == "atributo-chave de magia"), "quem empunha a arma usa o atributo-chave de magia no ataque")

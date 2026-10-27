@@ -226,6 +226,15 @@ func remove_efeito(id_efeito: String) -> void:
 	efeitos = efeitos.filter(func(e): return e.id != id_efeito)
 
 
+## Soma dos bônus de um efeito de um tipo específico (ex.: encanto de uma arma pelo id dela).
+func efeito_bonus_tipo(stat: String, tipo: String) -> int:
+	var total := 0
+	for e in efeitos:
+		if e.stat == stat and str(e.tipo) == tipo:
+			total += int(e.bonus)
+	return total
+
+
 ## Há um efeito deste tipo de bônus com este tipo (ex.: vantagem em testes de um atributo).
 func efeito_tipo_existe(stat: String, tipo: String) -> bool:
 	return efeitos.any(func(e): return e.stat == stat and str(e.tipo) == tipo)

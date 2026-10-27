@@ -1479,6 +1479,25 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.c(guardiao).flags.append("incorporeo")
 			sim.c(guardiao).sheet.add_efeito("magia.guardiao_divino", "luz", LUZ_GUARDIAO, "cena")
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": guardiao, "buff": "guardiao_divino", "luz": LUZ_GUARDIAO, "tags": ["magia"]}, [id, guardiao]))
+		"arma_magica":
+			# Arma Mágica (1º círculo): a arma empunhada do alvo recebe +1 em ataque e dano (+2 com o 1º aprimoramento,
+			# limitado pelo círculo máximo que você lança). Quem a empunha e é o conjurador usa o atributo-chave de magia
+			# no ataque. Aprimoramento 1 (2 PM): dano extra de 1d6 do tipo escolhido; 2 (3 PM): 2d6. Não empilha.
+			var alvo_am: String = str(a.get("target", id))
+			var sh_am: CharacterSheet = sim.c(alvo_am).sheet
+			var arma_am := str(sh_am.equipment.get("weapon", ""))
+			var apr_am: Array = a.get("aprimoramentos", [])
+			sh_am.remove_efeito_stat("encanto_arma")
+			sh_am.remove_efeito_stat("atributo_arma")
+			sh_am.remove_efeito_stat("dano_elemental")
+			var bonus_am := mini(2 if apr_am.has(0) else 1, SpellRules.circulo_maximo(sh, world.rules))
+			sh_am.add_efeito("magia.arma_magica", "encanto_arma", bonus_am, "cena", arma_am)
+			if alvo_am == id:
+				sh_am.add_efeito("magia.arma_magica", "atributo_arma", 1, "cena", arma_am)
+			if apr_am.has(1):
+				var dados_am := 2 if apr_am.has(2) else 1
+				sh_am.add_efeito("magia.arma_magica", "dano_elemental", dados_am, "cena", arma_am + "|" + str(a.get("elemento", "fogo")))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_am, "buff": "arma_magica", "arma": arma_am, "bonus": bonus_am, "tags": ["magia"]}, [id, alvo_am]))
 		"orientacao":
 			# Orientação (1º círculo): próximo teste de perícia com dois dados (melhor). Aprimoramento 0 (2 PM): dura a
 			# cena e vale para as perícias de um atributo. Aprimoramento 1 (5 PM): o mesmo para um grupo de atributos
@@ -1838,6 +1857,15 @@ func _reacao_protecao(atacante: String, alvo: String, out: Array) -> void:
 	out.append(fact("BUFF_APPLIED", {"actor": "player", "target": alvo, "buff": "protecao_divina", "tags": ["magia", "reacao"]}, ["player", alvo]))
 
 
+## Dano elemental da Arma Mágica (aprimoramento): dados de 1d6 (2d6 com o 2º aprimoramento) do tipo escolhido.
+func _dano_elemental_arma(sh: CharacterSheet) -> Dictionary:
+	var arma := str(sh.equipment.get("weapon", ""))
+	for e in sh.efeitos:
+		if e.stat == "dano_elemental" and str(e.tipo).begins_with(arma + "|"):
+			return {"tipo": str(e.tipo).get_slice("|", 1), "dados": int(e.bonus)}
+	return {}
+
+
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
 	var A := sim.c(attacker)
 	var T := sim.c(target)
@@ -1873,6 +1901,12 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			extra += 2
 		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
 		dmg = maxi(1, int(r.total))
+		var elem := _dano_elemental_arma(A.sheet)
+		if not elem.is_empty():
+			var rd := Dice.roll("%dd6" % int(elem.dados), world.rng, "combat", int(atk.mult) if crit else 1)
+			var dano_el: int = T.sheet.dano_por_tipo(str(elem.tipo), int(rd.total))
+			dmg += dano_el
+			tags.append(str(elem.tipo))
 		var golpe_n := int(v.get("golpe_dados", 0))
 		if golpe_n > 0:
 			dmg += int(Dice.roll("%dd8" % golpe_n, world.rng, "combat", int(atk.mult) if crit else 1).total)   # Golpe Divino
