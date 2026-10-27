@@ -133,6 +133,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "nevoa" and apr.has(4) and not apr.has(3):
+				return {"ok": false, "reason": "o aprimoramento de +2d4 exige a névoa cáustica"}
 			if sp_id == "orientacao":
 				if apr.has(0) and apr.has(1):
 					return {"ok": false, "reason": "a Orientação de atributo e a de grupo de atributos não se combinam"}

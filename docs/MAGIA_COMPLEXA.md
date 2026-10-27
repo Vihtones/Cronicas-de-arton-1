@@ -65,7 +65,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
   servo_divino, viagem_arborea.
 - Divinas de 4º círculo (4): conceder_milagre, controlar_o_clima, cupula_de_repulsao, terremoto.
 - Divinas de 5º círculo (4): furia_do_panteao, intervencao_divina, reanimacao_impura, segunda_chance.
-- Universais de 1º círculo (6): aviso, compreensao, escuridao, luz, nevoa, visao_mistica.
+- Universais de 1º círculo (5): aviso, compreensao, escuridao, luz, visao_mistica. (Névoa feita, com terreno de água.)
 - Universais de 2º círculo (4): conjurar_mortos_vivos, dissipar_magia, marca_da_obediencia, runa_de_protecao.
 - Universais de 3º círculo (7): imobilizar, lendas_e_historias, manto_de_sombras, pele_de_pedra, selo_de_mana,
   servo_morto_vivo, videncia.

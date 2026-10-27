@@ -767,9 +767,17 @@ func _zonas_e_marcas_inicio_de_turno(id: String, facts: Array) -> void:
 		return
 	for z in sim.zonas.duplicate(true):
 		var dados: Dictionary = z.get("dados", {})
-		if not (z.tiles as Array).has(x.tile) or not dados.has("dano_inicio_turno") or not _zona_afeta(z, id):
+		if bool(dados.get("cheiro", false)) and sim.conscious(id) and _sente_cheiro(id, z):
+			# Névoa (aprimoramento de 2 PM): quem está dentro, ou tem faro em alcance curto, faz Fortitude ou fica enjoado.
+			var cd_ch := int(dados.get("cd", 10))
+			var sv_ch := Checks.skill(x.sheet, "fortitude", cd_ch, world.rules, world.rng, "combat")
+			sv_ch = _pos_teste(id, sv_ch, cd_ch, facts)
+			if not sv_ch.get("success", false) and sim.add_condicao(id, "enjoado", 1, str(z.fonte)):
+				facts.append(fact("BUFF_APPLIED", {"actor": str(dados.get("conjurador", id)), "target": id, "buff": "enjoado", "tags": ["magia", "condicao"]},
+					[str(dados.get("conjurador", id)), id]))
+		if not (z.tiles as Array).has(x.tile) or not dados.has("dano_inicio_turno") or not _zona_afeta(z, id) or not sim.conscious(id):
 			continue
-		_efeito_magico_no_turno(id, str(dados.dano_inicio_turno), str(dados.get("conjurador", id)), str(z.fonte), facts)
+		_efeito_magico_no_turno(id, str(dados.dano_inicio_turno), str(dados.get("conjurador", id)), str(z.fonte), facts, str(dados.get("tipo_dano", "")))
 	for m in sim.marcas.duplicate(true):
 		if m.alvo != id or not sim.conscious(id):
 			continue
@@ -782,6 +790,29 @@ func _zonas_e_marcas_inicio_de_turno(id: String, facts: Array) -> void:
 			var cura := int(Dice.roll(str(dados_m.cura_inicio_turno), world.rng, "combat").total)
 			cura = s.curar(cura)
 			facts.append(fact("HEALED", {"actor": conj, "target": id, "amount": cura, "pv_after": s.pv, "source": str(m.fonte), "tags": ["magia", "cura"]}, [conj, id]))
+
+
+## Cheiro da Névoa: dentro da nuvem, ou com faro a até alcance curto de algum quadrado dela.
+func _sente_cheiro(id: String, z: Dictionary) -> bool:
+	var t: Vector2i = sim.c(id).tile
+	if (z.tiles as Array).has(t):
+		return true
+	if not sim.c(id).sheet.senses.has("faro"):
+		return false
+	for zt in z.tiles:
+		if CombatSim.cheb(t, zt) <= ALCANCE_CURTO_QUADRADOS:
+			return true
+	return false
+
+
+## Vento no local do combate (LB, clima): chuva traz vento forte e tempestade, vendaval. "" sem vento.
+func _vento() -> String:
+	if not world.modules.has("weather") or not world.modules.weather.enabled:
+		return ""
+	match str(world.modules.weather.region.condition):
+		"chuva": return "forte"
+		"tempestade": return "vendaval"
+	return ""
 
 
 func _zona_afeta(z: Dictionary, id: String) -> bool:
@@ -933,9 +964,12 @@ func _sofre_luz(s: CharacterSheet) -> bool:
 
 
 ## Dano mágico por dados (zona ou marca): aplica e registra no mesmo formato de um ataque de magia.
-func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: String, facts: Array) -> void:
+func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: String, facts: Array, tipo: String = "") -> void:
 	var dano := int(Dice.roll(dados, world.rng, "combat").total)
 	var tags: Array = ["magia"]
+	if tipo != "":
+		dano = _dano_por_tipo(sim.c(id).sheet, tipo, dano)
+		tags.append(tipo)
 	tags.append_array(sim.apply_damage(id, dano))
 	facts.append(fact("ATTACK_RESOLVED", {"attacker": conj, "target": id, "weapon": origem, "d20": 0, "mod": 0,
 		"mods": [], "total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
@@ -1578,6 +1612,37 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if a.get("aprimoramentos", []).has(0):
 					sh.add_efeito("magia.ligacao_sombria", "ligacao_perene", 1, "dia")
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_ls, "buff": "ligacao_sombria", "tags": ["magia"]}, [id, alvo_ls]))
+		"nevoa":
+			# Névoa (universal, 1º círculo): nuvem de 6m de raio no ponto escolhido, pela cena; obscurece a visão
+			# (CombatSim.falha_nevoa). Vento forte a dispersa em 4 rodadas, vendaval em 1. Não se forma sob a água.
+			# Aprimoramentos: 0 funciona sob a água (1 PM); 1 criaturas escolhidas enxergam através (2 PM, 2º círculo);
+			# 2 cheiro, Fortitude ou enjoado (2 PM); 3 ácido 2d4 no início dos turnos (2 PM); 4 +2d4 de ácido (3 PM);
+			# 5 espessa: deslocamento 3m e –2 em ataque e dano (5 PM).
+			var apr_nv: Array = a.get("aprimoramentos", [])
+			var centro_nv: Vector2i = a.get("tile", sim.c(a.get("target", id)).tile)
+			var tiles_nv: Array = []
+			for t_nv in Area.esfera(centro_nv, Area.quadrados(6.0)):
+				if apr_nv.has(0) or not world.db.is_water(t_nv):
+					tiles_nv.append(t_nv)
+			var vento_nv := _vento()
+			var rodadas_nv := 4 if vento_nv == "forte" else (1 if vento_nv == "vendaval" else -1)
+			var dados_nv := {"conjurador": id, "cd": spell_dc(sh, a), "afeta": "todos", "lado": sim.c(id).side}
+			if apr_nv.has(1):
+				var esc: Array = a.get("enxergam", [])
+				if esc.is_empty():
+					for e_id in sim.combatants:
+						if not sim.is_enemy(id, e_id) and CombatSim.cheb(sim.c(id).tile, sim.c(e_id).tile) <= ALCANCE_CURTO_QUADRADOS:
+							esc.append(e_id)
+				dados_nv["enxergam"] = esc
+			if apr_nv.has(2):
+				dados_nv["cheiro"] = true
+			if apr_nv.has(3):
+				dados_nv["dano_inicio_turno"] = "4d4" if apr_nv.has(4) else "2d4"
+				dados_nv["tipo_dano"] = "acido"
+			if apr_nv.has(5):
+				dados_nv["espessa"] = true
+			sim.add_zona("nevoa_%d" % sim.zonas.size(), tiles_nv, "nevoa", rodadas_nv, "nevoa", dados_nv)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "nevoa", "tags": ["magia", "zona"]}, [id]))
 		"poeira_da_podridao":
 			# Poeira da Podridão (3º círculo): nuvem de 6m de raio no alvo, pela cena. Ao lançar e no início de cada turno do
 			# conjurador, quem está na nuvem faz Fortitude: 2d8+8 de trevas (metade no teste). Quem falha não recupera PV
@@ -1891,6 +1956,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		var extra := int(A.sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0
 		if bully: extra += 2
 		if v.mods.any(func(m): return m[0] == "ataque poderoso"): extra += 5   # Ataque Poderoso (LB p.124)
+		if v.mods.any(func(m): return m[0] == "névoa espessa"): extra -= 2   # Névoa espessa: –2 no dano
 		extra += CombatSim.archer_bonus(A.sheet, bool(v.get("ranged", false)))   # Arqueiro (LB p.65)
 		extra += A.sheet.efeito_bonus("dano")   # efeitos de magia (Bênção, Perdição)
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2

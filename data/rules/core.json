@@ -419,6 +419,17 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "situacao.camuflagem_total",
+   "valor": {
+    "falha_pct": 50,
+    "rolagem": "1d10: 1-5 erra"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 238,
+   "pdf_page": 244,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "situacao.camuflagem_leve",
    "valor": {
     "falha_pct": 20,

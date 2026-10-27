@@ -128,6 +128,72 @@ func step_cost(from: Vector2i, to: Vector2i) -> int:
 	return base
 
 
+## Custo de um passo em meios-quadrados de deslocamento. Na Névoa espessa (1º círculo, aprimoramento de 5 PM) quem
+## está dentro tem deslocamento 3m, seja qual for o normal: cada quadrado ali vale metade do deslocamento da criatura.
+func custo_meio(mover: String, from: Vector2i, to: Vector2i) -> int:
+	if nevoa_espessa_em(from) or nevoa_espessa_em(to):
+		return step_cost(from, to) * maxi(1, speed_squares(mover))
+	return step_cost(from, to) * 2
+
+
+func nevoa_espessa_em(t: Vector2i) -> bool:
+	for z in zonas:
+		if z.tipo == "nevoa" and bool(z.get("dados", {}).get("espessa", false)) and (z.tiles as Array).has(t):
+			return true
+	return false
+
+
+## Névoa (1º círculo): a nuvem obscurece a visão. Se o atacante, o alvo ou algum quadrado entre eles está nela, a até
+## 1,5m há camuflagem leve e a partir de 3m, total. Quem foi escolhido no aprimoramento de 2 PM enxerga através dela.
+## Faro (LB, habilidades de criaturas): contra alvo em alcance curto, a camuflagem total causa só 20% de chance de falha.
+func falha_nevoa(attacker: String, target: String) -> int:
+	var a_tile: Vector2i = c(attacker).tile
+	var t_tile: Vector2i = c(target).tile
+	var linha := tiles_entre(a_tile, t_tile)
+	var obscurece := false
+	for z in zonas:
+		if z.tipo != "nevoa" or (z.get("dados", {}).get("enxergam", []) as Array).has(attacker):
+			continue
+		for t in linha:
+			if (z.tiles as Array).has(t):
+				obscurece = true
+				break
+		if obscurece:
+			break
+	if not obscurece:
+		return 0
+	var leve := int(rules.value("situacao.camuflagem_leve").falha_pct)
+	var dist := cheb(a_tile, t_tile)
+	if dist <= 1:
+		return leve
+	if c(attacker).sheet.senses.has("faro") and dist <= int(rules.value("alcance.quadrados", {}).get("curto", 6)):
+		return leve
+	return int(rules.value("situacao.camuflagem_total").falha_pct)
+
+
+## Quadrados de a até b, inclusive (Bresenham).
+static func tiles_entre(a: Vector2i, b: Vector2i) -> Array:
+	var out: Array = []
+	var dx := absi(b.x - a.x)
+	var dy := -absi(b.y - a.y)
+	var sx := 1 if a.x < b.x else -1
+	var sy := 1 if a.y < b.y else -1
+	var err := dx + dy
+	var p := a
+	while true:
+		out.append(p)
+		if p == b:
+			break
+		var e2 := 2 * err
+		if e2 >= dy:
+			err += dy
+			p.x += sx
+		if e2 <= dx:
+			err += dx
+			p.y += sy
+	return out
+
+
 func passable(t: Vector2i, mover: String) -> bool:
 	if not walk_fn.call(t) and not _swims_into(t, mover) and not _flies_over(t, mover):
 		return false
@@ -157,8 +223,9 @@ func path_cost(mover: String, path: Array) -> Dictionary:
 			return {"ok": false, "reason": "caminho descontínuo"}
 		if not passable(t, mover):
 			return {"ok": false, "reason": "caminho bloqueado"}
-		total += step_cost(pos, t)
+		total += custo_meio(mover, pos, t)
 		pos = t
+	total = (total + 1) / 2
 	if occupant(pos, mover) != "":
 		return {"ok": false, "reason": "não pode terminar num espaço ocupado"}
 	return {"ok": true, "cost": total, "end": pos}
@@ -184,8 +251,8 @@ func find_path(mover: String, goal: Vector2i, adjacent_ok: bool = true, max_cost
 				if dx == 0 and dy == 0: continue
 				var n := t + Vector2i(dx, dy)
 				if not passable(n, mover): continue
-				var nd: int = dist[t] + step_cost(t, n)
-				if nd > max_cost: continue
+				var nd: int = dist[t] + custo_meio(mover, t, n)
+				if nd > max_cost * 2: continue
 				if not dist.has(n) or nd < dist[n]:
 					dist[n] = nd
 					prev[n] = t
@@ -208,8 +275,8 @@ func trim_path(mover: String, path: Array, budget_sq: int) -> Array:
 	var spent := 0
 	var out: Array = []
 	for t in path:
-		var cst := step_cost(pos, t)
-		if spent + cst > budget_sq: break
+		var cst := custo_meio(mover, pos, t)
+		if (spent + cst + 1) / 2 > budget_sq: break
 		spent += cst
 		out.append(t)
 		pos = t
@@ -292,6 +359,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 			var attr_pericia := str(rules.value("pericia.tabela", {}).get(atk.get("skill", "luta"), {}).get("atributo", "")).to_lower()
 			if attr_pericia != "" and attr_pericia != attr_chave:
 				mods.append(["atributo-chave de magia", int(sheet.attrs.get(attr_chave, 0)) - int(sheet.attrs.get(attr_pericia, 0))])
+	if nevoa_espessa_em(A.tile): mods.append(["névoa espessa", -2])   # Névoa (aprimoramento de 5 PM): –2 no ataque e no dano
 	if ranged and dist > reach: mods.append(["dobro do alcance", -5])
 	if ranged and engaged_in_melee(target): mods.append(["alvo em corpo a corpo", -5])
 	var total_mod := 0
@@ -308,8 +376,10 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if (env.get("darkness", false) and not sees_dark) or env.get("fog", false):
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
+	miss_chance = maxi(miss_chance, falha_nevoa(attacker, target))
 	var avg := Dice.average(atk.dano) + (int(sheet.attrs["for"]) if atk.get("for_no_dano", false) else 0) + archer_bonus(sheet, ranged)
 	if mods.any(func(m): return m[0] == "ataque poderoso"): avg += 5
+	if mods.any(func(m): return m[0] == "névoa espessa"): avg -= 2
 	avg += Dice.average("%dd8" % golpe_dados) if golpe_dados > 0 else 0.0
 	var hit_p := Checks.chance(total_mod, defense) * (1.0 - miss_chance / 100.0)
 	var crit_p := clampf((21 - int(atk.margem)) / 20.0, 0.0, 1.0)

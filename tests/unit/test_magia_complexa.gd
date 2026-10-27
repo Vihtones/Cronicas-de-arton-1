@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1314,3 +1314,134 @@ func test_arma_magica_em_si_mesmo_troca_o_atributo_do_ataque() -> void:
 	m[1]._cast("player", a, vv)
 	var p: Dictionary = sim.attack_profile("player", "bandido_1", 0, false, false)
 	check(p.ok and (p.mods as Array).any(func(x): return x[0] == "atributo-chave de magia"), "quem empunha a arma usa o atributo-chave de magia no ataque")
+
+
+# --- Névoa (universal, 1º círculo) ---------------------------------------------------------------
+func _nevoa(m: Array, apr: Array, extra: Dictionary = {}) -> void:
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var a := {"type": "cast", "spell": "nevoa", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": apr}
+	a.merge(extra, true)
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "névoa válida: %s" % str(v.get("reason", "")))
+	c._cast("player", a, v)
+
+
+func test_nevoa_cria_nuvem_de_6m_pela_cena_e_o_vento_a_dispersa() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_nevoa(m, [])
+	eq(sim.zonas.size(), 1, "uma nuvem")
+	eq(sim.zonas[0].rodadas, -1, "dura a cena")
+	var m2 := _cena_grupo(1)
+	m2[0].modules.weather.enabled = true
+	m2[0].modules.weather.region.condition = "chuva"
+	_nevoa(m2, [])
+	eq(m2[2].zonas[0].rodadas, 4, "vento forte (chuva) dispersa em 4 rodadas")
+	var m3 := _cena_grupo(1)
+	m3[0].modules.weather.enabled = true
+	m3[0].modules.weather.region.condition = "tempestade"
+	_nevoa(m3, [])
+	eq(m3[2].zonas[0].rodadas, 1, "vendaval (tempestade) dispersa em 1 rodada")
+
+
+func test_nevoa_da_camuflagem_leve_adjacente_e_total_a_distancia() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	eq(sim.falha_nevoa("player", "bandido_2"), 0, "sem névoa, sem falha")
+	_nevoa(m, [])
+	eq(sim.falha_nevoa("player", "bandido_1"), 20, "a 1,5m: camuflagem leve (20%)")
+	eq(sim.falha_nevoa("player", "bandido_2"), 50, "a partir de 3m: camuflagem total (50%)")
+	eq(int(sim.attack_profile("bandido_1", "player", 0, false, false).get("miss_chance", 0)), 20, "o perfil de ataque usa a falha da névoa")
+
+
+func test_nevoa_faro_reduz_a_camuflagem_total_em_alcance_curto() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_nevoa(m, [])
+	sim.c("bandido_2").sheet.senses.append("faro")
+	eq(sim.falha_nevoa("bandido_2", "player"), 20, "faro: só 20% de falha em alcance curto")
+	sim.c("bandido_2").tile = Vector2i(40, 57)
+	eq(sim.falha_nevoa("bandido_2", "player"), 50, "além do alcance curto, total")
+
+
+func test_nevoa_criaturas_escolhidas_enxergam_atraves_e_exige_2o_circulo() -> void:
+	var baixo := _cena_grupo(1)
+	var a := {"type": "cast", "spell": "nevoa", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [1]}
+	check(not GhostPlanner.validate_action(baixo[2], "player", a).ok, "o aprimoramento de quem enxerga requer 2º círculo")
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	_nevoa(m, [1], {"enxergam": ["player"]})
+	eq(sim.falha_nevoa("player", "bandido_2"), 0, "o escolhido enxerga através")
+	eq(sim.falha_nevoa("bandido_2", "player"), 50, "quem não foi escolhido não enxerga")
+
+
+func test_nevoa_nao_se_forma_sob_a_agua_sem_o_aprimoramento() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var agua := Vector2i(-1, -1)
+	for y in sim.db.size.y:
+		for x in sim.db.size.x:
+			if agua == Vector2i(-1, -1) and sim.db.is_water(Vector2i(x, y)):
+				agua = Vector2i(x, y)
+	check(agua != Vector2i(-1, -1), "mapa tem água")
+	var a := {"type": "cast", "spell": "nevoa", "target": "bandido_1", "targets": ["bandido_1"], "tile": agua}
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not (sim.zonas[0].tiles as Array).has(agua), "sem o aprimoramento, não há névoa na água")
+	var a2 := {"type": "cast", "spell": "nevoa", "target": "bandido_1", "targets": ["bandido_1"], "tile": agua, "aprimoramentos": [0]}
+	c._cast("player", a2, GhostPlanner.validate_action(sim, "player", a2))
+	check((sim.zonas[1].tiles as Array).has(agua), "com o aprimoramento, nuvem de tinta sob a água")
+
+
+func test_nevoa_com_cheiro_deixa_enjoado_quem_falha_na_fortitude() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_nevoa(m, [2])
+	sim.c("bandido_1").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	sim.c("bandido_2").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	sim.c("bandido_2").tile = Vector2i(40, 57)
+	var facts: Array = []
+	c._zonas_e_marcas_inicio_de_turno("bandido_1", facts)
+	c._zonas_e_marcas_inicio_de_turno("bandido_2", facts)
+	check(sim.c("bandido_1").sheet.conditions.has("enjoado"), "dentro da nuvem: enjoado")
+	check(not sim.c("bandido_2").sheet.conditions.has("enjoado"), "fora e sem faro: nada")
+	sim.c("bandido_2").tile = Vector2i(36, 57)
+	sim.c("bandido_2").sheet.senses.append("faro")
+	c._zonas_e_marcas_inicio_de_turno("bandido_2", facts)
+	check(sim.c("bandido_2").sheet.conditions.has("enjoado"), "com faro em alcance curto da nuvem: enjoado")
+
+
+func test_nevoa_caustica_causa_acido_no_inicio_do_turno() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	_nevoa(m, [3])
+	var facts: Array = []
+	c._zonas_e_marcas_inicio_de_turno("bandido_1", facts)
+	var perdeu: int = 999 - sim.c("bandido_1").sheet.pv
+	check(perdeu >= 2 and perdeu <= 8, "2d4 de ácido (%d)" % perdeu)
+	var m2 := _cena_grupo(1)
+	_nevoa(m2, [3, 4])
+	m2[1]._zonas_e_marcas_inicio_de_turno("bandido_1", facts)
+	var perdeu2: int = 999 - m2[2].c("bandido_1").sheet.pv
+	check(perdeu2 >= 4 and perdeu2 <= 16, "4d4 de ácido com o aprimoramento (%d)" % perdeu2)
+	var so4 := {"type": "cast", "spell": "nevoa", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [4]}
+	check(not GhostPlanner.validate_action(m2[2], "player", so4).ok, "+2d4 exige a névoa cáustica")
+
+
+func test_nevoa_espessa_reduz_deslocamento_e_penaliza_ataque() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").tile = Vector2i(27, 60)
+	var livre := sim.path_cost("bandido_1", [Vector2i(27, 61), Vector2i(27, 62), Vector2i(27, 63)])
+	check(livre.ok and int(livre.cost) <= sim.speed_squares("bandido_1"), "sem névoa, 3 quadrados cabem")
+	sim.c("bandido_1").tile = Vector2i(27, 57)
+	_nevoa(m, [5])
+	var dentro := sim.path_cost("bandido_1", [Vector2i(27, 58), Vector2i(27, 59), Vector2i(27, 60)])
+	check(int(dentro.cost) > sim.speed_squares("bandido_1"), "na névoa espessa, 3 quadrados não cabem (3m)")
+	var dois := sim.path_cost("bandido_1", [Vector2i(27, 58), Vector2i(27, 59)])
+	check(int(dois.cost) <= sim.speed_squares("bandido_1"), "2 quadrados (3m) cabem")
+	var prof := sim.attack_profile("bandido_1", "player", 0, false, false)
+	check((prof.mods as Array).any(func(x): return x[0] == "névoa espessa" and int(x[1]) == -2), "–2 no ataque dentro da névoa espessa")
