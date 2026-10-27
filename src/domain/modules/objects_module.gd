@@ -169,6 +169,29 @@ func _break(id: String, d: Dictionary, s: Dictionary, loc: String) -> Array:
 	return out
 
 
+## Dano direto num objeto (magias como Despedaçar). `ignora_rd`: o dano não é reduzido pela RD do objeto.
+func danificar(id: String, dano: int, ignora_rd: bool, fonte: String) -> Array:
+	_ensure()
+	var d := world.db.object_def(id)
+	if d.is_empty() or not d.has("break") or not state.has(id) or state[id].broken:
+		return []
+	var s: Dictionary = state[id]
+	var final := dano if ignora_rd else maxi(0, dano - int(d["break"].rd))
+	s.pv = int(s.pv) - final
+	var loc := world.db.location_at(Vector2i(int(d.tile[0]), int(d.tile[1])))
+	var out: Array = [fact("OBJECT_DAMAGED", {"object": id, "hit": true, "damage": final, "pv": s.pv, "noise": true, "location": loc, "source": fonte}, ["player"])]
+	if int(s.pv) <= 0:
+		s.broken = true
+		s.locked = false
+		out.append(fact("OBJECT_BROKEN", {"object": id, "location": loc, "owner_location": loc}, ["player"]))
+	return out
+
+
+## Categoria de tamanho do objeto quebrável ("" se não é quebrável).
+func tamanho(id: String) -> String:
+	return str(world.db.object_def(id).get("break", {}).get("tamanho", ""))
+
+
 func to_dict() -> Dictionary:
 	_ensure()
 	return {"state": state.duplicate(true)}

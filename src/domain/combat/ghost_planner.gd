@@ -133,6 +133,18 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "despedacar" and not a.has("objeto") and not apr.has(5) and [1, 2, 3, 4].any(func(i): return apr.has(i)):
+				return {"ok": false, "reason": "os aprimoramentos de tamanho são para objetos"}
+			if sp_id == "despedacar" and a.has("objeto") and not apr.has(5):
+				var od := sim.db.object_def(str(a.objeto))
+				if od.is_empty() or not od.has("break"):
+					return {"ok": false, "reason": "escolha um objeto mundano"}
+				var tam_o := SpellRules.tamanho_indice(str(od["break"].get("tamanho", "")))
+				if tam_o < 0 or tam_o > SpellRules.despedacar_tamanho_max(apr):
+					return {"ok": false, "reason": "objeto grande demais para o Despedaçar escolhido"}
+				if CombatSim.cheb(A.tile, Vector2i(int(od.tile[0]), int(od.tile[1]))) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)):
+					return {"ok": false, "reason": "objeto fora do alcance"}
+				targets = a.get("targets", [])
 			if sp_id == "consagrar" or sp_id == "profanar":
 				if apr.has(2): return {"ok": false, "reason": "a versão permanente leva 1 hora: só fora de combate"}
 				if SpellRules.simbolo_impede(sim.db, A.tile, Area.quadrados(9.0), str(A.sheet.devotion)):

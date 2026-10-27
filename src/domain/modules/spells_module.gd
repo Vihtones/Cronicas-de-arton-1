@@ -13,6 +13,7 @@ const FORA_DE_COMBATE := {
 	"bencao": [0],   # 1 cadáver por 1 semana
 	"consagrar": [],
 	"profanar": [],
+	"despedacar": [],   # contra um objeto mundano
 }
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
@@ -60,6 +61,21 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	match sp_id:
 		"bencao":
 			return _valida_cadaver(str(cmd.payload.get("target", "")), str(sp.get("alcance", "curto")))
+		"despedacar":
+			if apr.has(5):
+				return PackedStringArray(["a versão em área só é lançada em combate"])
+			var od := world.db.object_def(str(cmd.payload.get("objeto", "")))
+			if od.is_empty() or not od.has("break"):
+				return PackedStringArray(["escolha um objeto mundano"])
+			var objs = world.module("objects")
+			if objs != null and bool(objs.obj(str(od.id)).get("broken", false)):
+				return PackedStringArray(["o objeto já está destruído"])
+			var tam := SpellRules.tamanho_indice(str(od["break"].get("tamanho", "")))
+			if tam < 0 or tam > SpellRules.despedacar_tamanho_max(apr):
+				return PackedStringArray(["objeto grande demais para o Despedaçar escolhido"])
+			var p := _tile_jogador()
+			if maxi(absi(p.x - int(od.tile[0])), absi(p.y - int(od.tile[1]))) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
+				return PackedStringArray(["objeto fora do alcance"])
 		"consagrar", "profanar":
 			if SpellRules.simbolo_impede(world.db, _tile_jogador(), Area.quadrados(9.0), str(sh.devotion)):
 				return PackedStringArray(["há um símbolo de outra divindade na área"])
@@ -85,6 +101,10 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"despedacar":
+			var objs_m = world.module("objects")
+			var dano := 2 * int(Dice.roll(SpellRules.despedacar_dano(cmd.payload.get("aprimoramentos", [])), world.rng, "world").total)
+			out.append_array(objs_m.danificar(str(cmd.payload.objeto), dano, true, "despedacar"))
 		"consagrar", "profanar":
 			var apr_a: Array = cmd.payload.get("aprimoramentos", [])
 			if apr_a.has(2):

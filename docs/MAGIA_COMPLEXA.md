@@ -50,6 +50,9 @@ Resolvido nesta fase: execução longa (`CombatSim.conjurando`, Banimento), conc
 execução, ritual de um dia (`CombatModule.processar_rituais_do_dia`, Lágrimas de Wynna), registro de magias
 ativas por escola (dissipar), reação após teste (Premonição) e condições com efeito no combate.
 
+Objetos: as portas têm tamanho (`break.tamanho`, Tabela 5-4) e `ObjectsModule.danificar` aplica dano de magia.
+Transmutar Objetos (que Despedaçar anula) não está no catálogo.
+
 ## Escopo decidido
 
 O objetivo é implementar todas as magias do catálogo (divinas e universais de 1º ao 5º círculo, e as arcanas). A água entra no escopo: aprimoramentos 'sob a água' e similares devem ser implementados sobre o terreno aquático do combate, e nenhuma magia entra em `SpellRules.COMPLETAS` sem todos os aprimoramentos.
@@ -59,8 +62,8 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (13): abencoar_alimentos, acalmar_animal, arma_espiritual, armamento_da_natureza,
-  caminhos_da_natureza, comando, controlar_plantas, criar_elementos, despedacar,
+- Divinas de 1º círculo (12): abencoar_alimentos, acalmar_animal, arma_espiritual, armamento_da_natureza,
+  caminhos_da_natureza, comando, controlar_plantas, criar_elementos,
   detectar_ameacas, santuario, suporte_ambiental, tranquilidade.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
   controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
@@ -77,7 +80,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação, Bênção, Consagrar e Profanar (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar e Despedaçar (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

@@ -977,6 +977,51 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 		"pv_after": sim.c(id).sheet.pv, "special": false, "ranged": false, "spell": true, "save": "", "saved": false, "tags": tags}, [conj, id]))
 
 
+## Despedaçar numa criatura (ver _cast).
+func _despedacar_criatura(id: String, tg: String, expr: String, cd: int, out: Array) -> void:
+	var T: Dictionary = sim.c(tg)
+	var ts: CharacterSheet = T.sheet
+	var construto := ts.creature_type == "construto"
+	var sv := Checks.skill(ts, "fortitude", cd, world.rules, world.rng, "combat")
+	sv = _pos_teste(tg, sv, cd, out)
+	var passou: bool = sv.get("success", false)
+	var dano := int(Dice.roll(expr, world.rng, "combat").total)
+	if construto:
+		dano *= 2
+	if passou:
+		dano /= 2
+	if construto:
+		dano = 0 if ts.efeito_bonus("imune", "impacto") > 0 else dano   # ignora RD
+	else:
+		dano = _dano_por_tipo(ts, "impacto", dano)
+	var tags: Array = ["magia", "impacto"]
+	if passou:
+		tags.append("resistiu")
+	tags.append_array(sim.apply_damage(tg, dano))
+	if not passou and not (T.flags as Array).has("despedacar_atordoado") and sim.add_condicao(tg, "atordoado", 1, "despedacar"):
+		(T.flags as Array).append("despedacar_atordoado")   # apenas uma vez por cena
+		tags.append("atordoado")
+	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Despedaçar", "d20": int(sv.get("d20", 0)), "mod": int(sv.get("mod", 0)),
+		"mods": [], "total": int(sv.get("total", 0)), "defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [],
+		"pv_after": ts.pv, "special": false, "ranged": true, "spell": true, "save": "fortitude", "saved": passou, "tags": tags}, [id, tg]))
+
+
+## Objetos quebráveis (não destruídos) com quadrado em `tiles` e tamanho até o índice `tam_max` de SpellRules.TAMANHOS.
+func _objetos_quebraveis_em(tiles: Array, tam_max: int) -> Array:
+	var out: Array = []
+	var objs_m = world.module("objects")
+	if objs_m == null:
+		return out
+	for o in world.db.all_objects():
+		if not o.has("break") or bool(objs_m.obj(str(o.id)).get("broken", false)):
+			continue
+		var t := Vector2i(int(o.tile[0]), int(o.tile[1]))
+		var tam := SpellRules.tamanho_indice(str(o["break"].get("tamanho", "")))
+		if tiles.has(t) and tam >= 0 and tam <= tam_max:
+			out.append(str(o.id))
+	return out
+
+
 ## Consagrar e Profanar (SpellsModule): na área consagrada, dados de luz (cura e dano) saem no máximo; na
 ## profanada, os de trevas. Fora delas, rolagem normal. `mult` multiplica os dados (crítico).
 func _dados_energia(expr: String, tipo: String, tile: Vector2i, mult: int = 1) -> int:
@@ -1375,6 +1420,30 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"despedacar":
+			# Despedaçar (divina 1): som agudo. Criatura: 1d8+2 de impacto e atordoada por uma rodada (uma vez por cena);
+			# Fortitude reduz à metade e evita o atordoamento. Construto ou objeto mundano: o dobro, ignorando RD.
+			# Aprimoramentos: +1d8+2 (2 PM, repetível); objeto Médio, Grande, Enorme ou Colossal; alcance pessoal com
+			# esfera de 6m (todas as criaturas, incluindo você, e objetos mundanos na área).
+			var apr_d: Array = a.get("aprimoramentos", [])
+			var expr_d := SpellRules.despedacar_dano(apr_d)
+			var cd_d := spell_dc(sh, a)
+			var criaturas_d: Array = []
+			var objetos_d: Array = []
+			if apr_d.has(5):
+				var area_d := Area.esfera(sim.c(id).tile, Area.quadrados(6.0))
+				criaturas_d = _criaturas_vivas_em(area_d)
+				objetos_d = _objetos_quebraveis_em(area_d, SpellRules.despedacar_tamanho_max(apr_d))
+			else:
+				criaturas_d = a.get("targets", []) if a.has("objeto") else a.get("targets", [a.get("target", id)])
+				if a.has("objeto"):
+					objetos_d = [str(a.objeto)]
+			for tg_d in criaturas_d:
+				_despedacar_criatura(id, tg_d, expr_d, cd_d, out)
+			var objs_m = world.module("objects")
+			for ob_d in objetos_d:
+				if objs_m != null:
+					out.append_array(objs_m.danificar(ob_d, 2 * int(Dice.roll(expr_d, world.rng, "combat").total), true, "despedacar"))
 		"consagrar", "profanar":
 			# Consagrar / Profanar (divina 1): esfera de 9m de raio em volta do conjurador por 1 dia (SpellsModule).
 			var magia_c = world.module("magia")

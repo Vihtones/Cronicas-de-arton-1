@@ -18,6 +18,7 @@ const COMPLETAS := {
 	"bencao": {"aprimoramentos": [0, 1]},   # 1 cadáver por 1 semana (também fora de combate); +1 de bônus, repetível
 	"consagrar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, luz maximizada; –2 a mortos-vivos (+1, repetível); permanente
 	"profanar": {"aprimoramentos": [0, 1, 2]},   # esfera de 9m, trevas maximizadas; +2 a mortos-vivos (+1, repetível); permanente
+	"despedacar": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # +1d8+2 (repetível); objeto Médio/Grande/Enorme/Colossal; esfera de 6m
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -184,3 +185,26 @@ static func simbolo_impede(db: ContentDB, centro: Vector2i, raio_q: int, devocao
 		if maxi(absi(px - centro.x), absi(py - centro.y)) <= raio_q:
 			return true
 	return false
+
+
+const TAMANHOS := ["Minúsculo", "Pequeno", "Médio", "Grande", "Enorme", "Colossal"]
+const DESPEDACAR_TAMANHO := {1: 2, 2: 3, 3: 4, 4: 5}   # aprimoramento -> índice em TAMANHOS
+
+
+## Despedaçar: maior categoria de objeto mundano que a magia atinge (Pequeno sem aprimoramento de tamanho).
+static func despedacar_tamanho_max(apr: Array) -> int:
+	var t := 1
+	for i in DESPEDACAR_TAMANHO:
+		if apr.has(i):
+			t = maxi(t, int(DESPEDACAR_TAMANHO[i]))
+	return t
+
+
+## Despedaçar: 1d8+2 de impacto, +1d8+2 por aprimoramento de 2 PM (repetível).
+static func despedacar_dano(apr: Array) -> String:
+	var n := 1 + apr.count(0)
+	return "%dd8+%d" % [n, 2 * n]
+
+
+static func tamanho_indice(nome: String) -> int:
+	return TAMANHOS.find(nome)

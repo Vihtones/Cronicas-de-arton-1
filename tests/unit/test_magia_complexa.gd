@@ -227,7 +227,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -1634,3 +1634,81 @@ func test_consagrar_permanente_exige_4o_circulo_ouro_e_uma_hora() -> void:
 	check(w.module("magia").maximiza("luz", Vector2i(50, 40)), "permanente")
 	var m := _cena_grupo(13)
 	check(not GhostPlanner.validate_action(m[2], "player", {"type": "cast", "spell": "consagrar", "target": "player", "aprimoramentos": [2]}).ok, "em combate, não")
+
+
+# --- Despedaçar (divina, 1º círculo) --------------------------------------------------------------
+func test_despedacar_fere_e_atordoa_uma_vez_por_cena() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").sheet.add_efeito("teste", "resistencia", -50, "cena")
+	_lanca(m, {"type": "cast", "spell": "despedacar", "target": "bandido_2", "targets": ["bandido_2"]})
+	var perdeu: int = 999 - sim.c("bandido_2").sheet.pv
+	check(perdeu >= 3 and perdeu <= 10, "1d8+2 de impacto (%d)" % perdeu)
+	check(sim.c("bandido_2").sheet.conditions.has("atordoado"), "atordoado ao falhar")
+	sim.c("bandido_2").sheet.remove_condition("atordoado")
+	sim.budget.std = 1
+	_lanca(m, {"type": "cast", "spell": "despedacar", "target": "bandido_2", "targets": ["bandido_2"]})
+	check(not sim.c("bandido_2").sheet.conditions.has("atordoado"), "só uma vez por cena")
+
+
+func test_despedacar_resistido_reduz_a_metade_e_nao_atordoa() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_2").sheet.add_efeito("teste", "resistencia", 99, "cena")
+	_lanca(m, {"type": "cast", "spell": "despedacar", "target": "bandido_2", "targets": ["bandido_2"], "aprimoramentos": [0]})
+	var perdeu: int = 999 - sim.c("bandido_2").sheet.pv
+	check(perdeu >= 3 and perdeu <= 10, "2d8+4 pela metade (%d)" % perdeu)
+	check(not sim.c("bandido_2").sheet.conditions.has("atordoado"), "não atordoa")
+
+
+func test_despedacar_dobra_e_ignora_rd_em_construto() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var ts: CharacterSheet = sim.c("bandido_2").sheet
+	ts.creature_type = "construto"
+	ts.dr["impacto"] = 50
+	ts.add_efeito("teste", "resistencia", -50, "cena")
+	_lanca(m, {"type": "cast", "spell": "despedacar", "target": "bandido_2", "targets": ["bandido_2"]})
+	var perdeu: int = 999 - ts.pv
+	check(perdeu >= 6 and perdeu <= 20 and perdeu % 2 == 0, "o dobro, sem RD (%d)" % perdeu)
+
+
+func test_despedacar_area_atinge_todos_incluindo_o_conjurador() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	check(_lanca(m, {"type": "cast", "spell": "despedacar", "target": "player", "aprimoramentos": [5]}).ok, "versão em área")
+	check(sim.c("player").sheet.pv < 999, "o conjurador está na área")
+	check(sim.c("bandido_1").sheet.pv < 999, "adjacente atingido")
+	eq(sim.c("bandido_2").sheet.pv, 999, "a 9m (6 quadrados), fora da esfera de 6m")
+
+
+func test_despedacar_objetos_por_tamanho_fora_de_combate() -> void:
+	var w := WorldHelpers.world(5)
+	var sh := CharacterBuilder.build(w.rules, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.spells = PackedStringArray(["despedacar"])
+	sh.pm = 40
+	w.player_sheet = sh
+	var porta := w.db.object_def("porta_taverna")
+	WorldHelpers.put(w, int(porta.tile[0]), int(porta.tile[1]) + 1)
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "despedacar", "objeto": "porta_taverna"}).accepted, "porta é Grande: Pequeno não basta")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "despedacar", "objeto": "porta_taverna", "aprimoramentos": [2]}).accepted, "Grande requer 3º círculo")
+	sh.level = 9
+	var pv0: int = w.module("objects").obj("porta_taverna").pv
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "despedacar", "objeto": "porta_taverna", "aprimoramentos": [2]}).accepted, "nível 9 quebra porta Grande")
+	var perdeu: int = pv0 - int(w.module("objects").obj("porta_taverna").pv)
+	check(perdeu >= 6 and perdeu <= 20, "o dobro, ignorando RD 5 (%d)" % perdeu)
+	for i in 4:
+		WorldHelpers.cmd(w, "CastSpell", {"spell": "despedacar", "objeto": "porta_taverna", "aprimoramentos": [2]})
+	check(w.module("objects").obj("porta_taverna").broken, "a porta acaba destruída")
+
+
+func test_despedacar_objeto_em_combate() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var w = m[0]
+	var porta: Dictionary = w.db.object_def("porta_taverna")
+	sim.c("player").tile = Vector2i(int(porta.tile[0]), int(porta.tile[1]) + 2)
+	var a := {"type": "cast", "spell": "despedacar", "objeto": "porta_taverna", "aprimoramentos": [2]}
+	check(_lanca(m, a).ok, "objeto Grande em combate")
+	check(int(w.module("objects").obj("porta_taverna").pv) < 20, "a porta sofre dano")
+	eq(sim.c("player").sheet.pv, 999, "ninguém mais é atingido")
