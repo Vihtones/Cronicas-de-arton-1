@@ -25,6 +25,7 @@ const POWERS := {
 	"guerreiro": ["especializacao_arma", "valentao", "golpe_raspao", "ataque_reflexo", "impeto", "arqueiro", "aumento_atributo"],
 	"ladino": ["gatuno", "truque_magico", "emboscar", "velocidade_ladina", "rolamento_defensivo", "sombra", "aumento_atributo"],
 	"arcanista": ["arcano_de_batalha", "magia_pungente", "poder_magico", "raio_arcano", "aumento_atributo"],
+	"paladino": ["egide_sagrada", "aumento_atributo"],   # Bênção da Justiça (5º nível): égide ou montaria (exclusivos)
 }
 ## Poderes gerais (LB p.124: um poder de classe pode ser trocado por um geral). Só os implementados
 ## entram como opção; a árvore também mostra os ainda não implementados (marcados).
@@ -39,6 +40,7 @@ const GENERAL_TREE_ONLY := ["quebrar_aprimorado", "derrubar_aprimorado", "desarm
 const CLASS_TREE_ONLY := {
 	"guerreiro": ["ambidestria", "esgrimista", "especializacao_armadura", "golpe_pessoal", "bater_e_correr", "golpe_demolidor", "destruidor", "mestre_em_arma", "planejamento_marcial", "romper_resistencias", "solidez", "tornado_de_dor"],
 	"ladino": ["assassinar", "contatos_no_submundo", "escapista", "fuga_formidavel", "ladrao_arcano", "mao_na_boca", "maos_rapidas", "mente_criminosa", "oportunismo", "roubo_de_mana", "saqueador_de_tumbas", "veneno_persistente", "veneno_potente"],
+	"paladino": ["montaria_sagrada"],
 	"arcanista": ["caldeirao_do_bruxo", "conhecimento_magico", "contramagica_aprimorada", "envolto_em_misterio", "escriba_arcano", "especialista_em_escola", "familiar", "fluxo_de_mana", "foco_vital", "fortalecimento_arcano", "heranca_aprimorada", "heranca_superior", "mestre_em_escola", "raio_elemental", "raio_poderoso", "tinta_do_mago"],
 }
 
@@ -349,6 +351,8 @@ func prereq_ok(s: CharacterSheet, p: String) -> bool:
 			if not s.trained.has(str(pre[k])): return false
 		elif k == "poder":
 			if not s.has_power(str(pre[k])): return false
+		elif k == "exclusivo":
+			if s.has_power(str(pre[k])): return false   # Bênção da Justiça: égide ou montaria, não as duas
 		elif k == "nivel":
 			if s.level < int(pre[k]): return false
 		elif k == "texto":

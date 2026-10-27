@@ -164,6 +164,20 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if T.is_empty() or not sim.is_enemy(actor, a.target) or not sim.conscious(a.target): return {"ok": false, "reason": "alvo inválido"}
 			if CombatSim.cheb(A.tile, T.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
 			return {"ok": true, "kind": "movimento", "cost": 1}
+		"aura_sagrada":
+			# Aura Sagrada (LB p.84): ligar custa 1 PM; desligar é livre. Tipo de ação: padrão (o texto extraído do livro não traz o tipo; segue a Ladainha de combate, que é ação padrão).
+			if not A.sheet.pode_aura_sagrada(): return {"ok": false, "reason": "Aura Sagrada é do paladino a partir do 3º nível"}
+			if A.sheet.aura_sagrada_ativa: return {"ok": true, "kind": "livre", "cost": 0, "ligar": false}
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "sem ação padrão disponível"}
+			if A.sheet.pm < 1: return {"ok": false, "reason": "PM insuficiente (1)"}
+			return {"ok": true, "kind": "padrao", "cost": 1, "ligar": true}
+		"egide":
+			# Égide Sagrada (LB p.84): ação de movimento e 2 PM; dura até o fim da cena.
+			if not A.sheet.pode_egide_sagrada(): return {"ok": false, "reason": "Égide Sagrada exige a Bênção da Justiça (5º nível)"}
+			if A.sheet.egide_ativa: return {"ok": false, "reason": "já ativa nesta cena"}
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
+			if A.sheet.pm < 2: return {"ok": false, "reason": "PM insuficiente (2)"}
+			return {"ok": true, "kind": "movimento", "cost": 2}
 		"allihanna":
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
 			if A.sheet.race_id != "dahllan": return {"ok": false, "reason": "só dahllan tem Armadura de Allihanna"}
@@ -253,6 +267,12 @@ static func simulate(sim: CombatSim, actor: String, actions: Array) -> Dictionar
 				step["to"] = v.end
 				step["hit_chance"] = v.hit_chance; step["crit_chance"] = v.crit_chance; step["avg_damage"] = v.avg_damage; step["mods"] = v.mods
 			"cura_maos":
+				g.c(actor).sheet.pm -= int(v.cost)
+			"aura_sagrada":
+				g.c(actor).sheet.aura_sagrada_ativa = bool(v.ligar)
+				g.c(actor).sheet.pm -= int(v.cost)
+			"egide":
+				g.c(actor).sheet.egide_ativa = true
 				g.c(actor).sheet.pm -= int(v.cost)
 			"cast":
 				step["hit_chance"] = 1.0; step["crit_chance"] = 0.0; step["avg_damage"] = v.avg_damage; step["mods"] = []; step["pm_cost"] = v.cost

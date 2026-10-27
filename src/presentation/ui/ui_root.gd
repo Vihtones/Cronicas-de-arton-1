@@ -829,6 +829,8 @@ func _build_combat_bar(root: Control) -> void:
 			["golpe_extra", "Z", "Golpe Divino: dados extras (+1 PM cada; auto/nunca)", func(): _cycle_policy("golpe_divino_extra"), "@paladino"],
 			["olhar", "O", "Olhar atordoante (medusa)", func(): combat_view.set_mode("olhar"), "@medusa"],
 			["allihanna", "Y", "Armadura de Allihanna (1 PM)", func(): combat_view.use_allihanna(), "@dahllan"],
+			["aura", "S", "Aura Sagrada (1 PM ao ligar; liga/desliga)", func(): combat_view.use_aura(), "@paladino"],
+			["egide", "E", "Égide Sagrada (2 PM, até o fim da cena)", func(): combat_view.use_egide(), "egide_sagrada"],
 			["desfazer", "⌫", "Desfazer", func(): combat_view.undo(), ""], ["confirmar", "↵", "Confirmar plano", func(): combat_view.confirm(), ""], ["fim", "␣", "Fim do turno", func(): combat_view.end_turn(), ""]]:
 		var b := HotSlot.new().setup(spec[0], spec[1], spec[2], spec[3])
 		b.set_meta("needs", spec[4])
@@ -879,7 +881,11 @@ func update_combat_bar() -> void:
 			b.badge = str(combat_view.cura_passos)
 		elif ic in ["cura", "olhar"]:
 			b.active = combat_view.mode == ic
-		b.cost = {"especial": 1, "impeto": 1, "velocidade": 2, "emboscar": 2, "pungente": 1, "raspao": 2, "cura": 1, "olhar": 1, "allihanna": 1}.get(ic, 0)
+		elif ic == "aura":
+			b.active = sh.aura_sagrada_ativa
+		elif ic == "egide":
+			b.active = sh.egide_ativa
+		b.cost = {"especial": 1, "impeto": 1, "velocidade": 2, "emboscar": 2, "pungente": 1, "raspao": 2, "cura": 1, "olhar": 1, "allihanna": 1, "aura": 1, "egide": 2}.get(ic, 0)
 		var st := "%s|%s|%s|%d" % [b.visible, b.active, b.badge, b.cost]
 		if st != str(b.get_meta("st", "")):
 			b.set_meta("st", st)

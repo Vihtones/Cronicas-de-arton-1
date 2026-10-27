@@ -49,6 +49,8 @@ var oficio: String = ""          # subdomínio de fazer escolhido para a períci
 var afinidade: Dictionary = {}   # aptidões no estilo Nen: domínio -> % (soma 100), ver aptitudes.gd
 var aptidoes: Dictionary = {}    # "dominio.nome" -> {"pct": float, "pratica": int, "marco": bool}
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
+var aura_sagrada_ativa: bool = false  # Aura Sagrada (paladino, 3º nível): sustentada; termina com o combate
+var egide_ativa: bool = false         # Égide Sagrada (paladino, poder do 5º nível): até o fim da cena
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
 ## Efeitos temporários de magias e habilidades: {id, stat, bonus, fim, tipo}. stat: ataque | dano | defesa |
 ## resistencia | proxima_resistencia | rd (tipo de dano) | imune (condição). fim: rodada | turno | cena | proxima_resistencia.
@@ -93,6 +95,20 @@ func armor_penalty(rules: RuleRegistry) -> int:
 
 func has_power(p: String) -> bool:
 	return powers.has(p)
+
+
+## Aura Sagrada (LB p.84): paladino a partir do 3º nível.
+func pode_aura_sagrada() -> bool:
+	return class_id == "paladino" and level >= 3
+
+
+## Égide Sagrada (LB p.84): poder escolhido no 5º nível (Bênção da Justiça).
+func pode_egide_sagrada() -> bool:
+	return has_power("egide_sagrada")
+
+
+func carisma() -> int:
+	return int(attrs.get("car", 0))
 
 
 func can_swim() -> bool:
@@ -367,7 +383,7 @@ func to_dict() -> Dictionary:
 		"is_important": is_important, "devotion": devotion, "faction": faction, "source_rule": source_rule,
 		"class_id": class_id, "race_id": race_id, "xp": xp, "spells": Array(spells), "equipment": equipment.duplicate(),
 		"pending_powers": pending_powers, "caster_attr": caster_attr, "powers": powers.duplicate(true),
-		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
+		"efeitos": efeitos.duplicate(true), "oficio": oficio, "afinidade": afinidade.duplicate(), "aptidoes": aptidoes.duplicate(true), "arcane_path": arcane_path, "scene_defense": scene_defense, "allihanna_ativa": allihanna_ativa, "aura_sagrada_ativa": aura_sagrada_ativa, "egide_ativa": egide_ativa, "olhar_usado": olhar_usado, "sorte_usada": sorte_usada, "size": size, "creature_type": creature_type,
 		"dr": dr.duplicate(), "vuln": vuln.duplicate(), "race_skills": race_skills.duplicate(), "race_defense": race_defense,
 		"extra_armor_penalty": extra_armor_penalty,
 	}
@@ -397,7 +413,7 @@ static func from_dict(d: Dictionary) -> CharacterSheet:
 	s.afinidade = (d.get("afinidade", {}) as Dictionary).duplicate()
 	s.aptidoes = (d.get("aptidoes", {}) as Dictionary).duplicate(true)
 	s.oficio = str(d.get("oficio", ""))
-	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
+	s.arcane_path = str(d.get("arcane_path", "")); s.scene_defense = int(d.get("scene_defense", 0)); s.allihanna_ativa = bool(d.get("allihanna_ativa", false)); s.aura_sagrada_ativa = bool(d.get("aura_sagrada_ativa", false)); s.egide_ativa = bool(d.get("egide_ativa", false)); s.sorte_usada = bool(d.get("sorte_usada", false)); s.olhar_usado = bool(d.get("olhar_usado", false))
 	s.size = str(d.get("size", "medio")); s.creature_type = str(d.get("creature_type", "humanoide"))
 	s.dr = d.get("dr", {}).duplicate(); s.vuln = d.get("vuln", {}).duplicate(); s.race_skills = d.get("race_skills", {}).duplicate()
 	s.race_defense = int(d.get("race_defense", 0)); s.extra_armor_penalty = int(d.get("extra_armor_penalty", 0))

@@ -398,6 +398,26 @@ func toggle_cura_remover() -> void:
 
 
 ## Armadura de Allihanna (dahllan): ação de movimento, 1 PM, +Defesa até o fim da cena.
+## Aura Sagrada (paladino): liga ou desliga (1 PM ao ligar; desligar é livre).
+func use_aura() -> void:
+	if Game.world.player_sheet.class_id != "paladino":
+		message.emit("Só paladinos têm Aura Sagrada.")
+		return
+	plan.append({"type": "aura_sagrada"})
+	message.emit("Planejado: Aura Sagrada (liga/desliga)")
+	_update_preview()
+
+
+## Égide Sagrada (poder do 5º nível): ação de movimento e 2 PM, até o fim da cena.
+func use_egide() -> void:
+	if not Game.world.player_sheet.pode_egide_sagrada():
+		message.emit("Égide Sagrada: escolha o poder no 5º nível (Bênção da Justiça).")
+		return
+	plan.append({"type": "egide"})
+	message.emit("Planejado: Égide Sagrada (2 PM)")
+	_update_preview()
+
+
 func use_allihanna() -> void:
 	if Game.world.player_sheet.race_id != "dahllan":
 		message.emit("Só dahllans têm a Armadura de Allihanna.")
@@ -465,6 +485,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_H: toggle_cura_remover()
 			KEY_O: set_mode("olhar")
 			KEY_Y: use_allihanna()
+			KEY_S: use_aura()
+			KEY_E: use_egide()
 			KEY_F: cycle_policy("golpe_divino")
 			KEY_Z: cycle_policy("golpe_divino_extra")
 			KEY_X: extra_attack()

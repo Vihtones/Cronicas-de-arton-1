@@ -495,3 +495,98 @@ func test_cura_pelas_maos_cura_custa_pm_e_remove_condicao() -> void:
 	check(not GhostPlanner.validate_action(sim, "player", longe).ok, "alvo ausente não é válido")
 	P.level = 1
 	check(not GhostPlanner.validate_action(sim, "player", a).ok, "não existe antes do 2º nível")
+
+
+func test_aura_sagrada_so_a_partir_do_3_nivel_e_custa_1_pm() -> void:
+	var w := _cena_paladino(2)
+	var sim: CombatSim = w.modules.combat.sim
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "aura_sagrada"}).ok, "negada no 2º nível")
+	w = _cena_paladino(3)
+	var c: CombatModule = w.modules.combat
+	sim = c.sim
+	var P: CharacterSheet = sim.c("player").sheet
+	P.pm = 5
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "aura_sagrada"})
+	check(v.ok and v.kind == "padrao" and v.cost == 1, "válida no 3º nível, ação padrão e 1 PM: %s" % str(v))
+	c._try("player", {"type": "aura_sagrada"})
+	check(P.aura_sagrada_ativa, "aura ligada")
+	eq(P.pm, 4, "ligar cobra 1 PM")
+	c._try("player", {"type": "aura_sagrada"})
+	check(not P.aura_sagrada_ativa, "de novo desliga")
+	eq(P.pm, 4, "desligar é livre")
+
+
+func test_aura_sagrada_da_carisma_em_resistencia_so_no_raio_de_9m() -> void:
+	var w := _cena_paladino(3)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	var P: CharacterSheet = sim.c("player").sheet
+	var ally: CharacterSheet = sim.c("bandido_1").sheet
+	var car := P.carisma()
+	P.pm = 5
+	c._try("player", {"type": "aura_sagrada"})
+	eq(ally.efeito_bonus("resistencia"), car, "aliado adjacente soma o Carisma em resistência")
+	eq(P.efeito_bonus("resistencia"), car, "o paladino também soma")
+	sim.c("bandido_1").tile = Vector2i(32, 57)   # 6 quadrados = 9m, ainda dentro
+	c._refresh_bencaos()
+	eq(ally.efeito_bonus("resistencia"), car, "a 9m (6 quadrados) ainda entra")
+	sim.c("bandido_1").tile = Vector2i(33, 57)   # 7 quadrados, fora
+	c._refresh_bencaos()
+	eq(ally.efeito_bonus("resistencia"), 0, "fora do raio não recebe")
+	check(not c.sim.c("bandido_1").sheet.has_efeito("aura_sagrada"), "efeito removido quando sai do raio")
+
+
+func test_aura_sagrada_nao_da_bonus_a_inimigo() -> void:
+	var w := _cena_paladino(3)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	var P: CharacterSheet = sim.c("player").sheet
+	P.pm = 5
+	c._try("player", {"type": "aura_sagrada"})
+	eq(sim.c("bandido_1").sheet.efeito_bonus("resistencia"), 0, "bandido (adversário) não recebe a aura")
+
+
+func test_egide_sagrada_so_com_o_poder_e_da_defesa_a_adjacentes() -> void:
+	var w := _cena_paladino(5)
+	var c: CombatModule = w.modules.combat
+	var sim: CombatSim = c.sim
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	var P: CharacterSheet = sim.c("player").sheet
+	var ally: CharacterSheet = sim.c("bandido_1").sheet
+	var car := P.carisma()
+	P.pm = 10
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "egide"}).ok, "negada sem o poder")
+	P.powers["egide_sagrada"] = true
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "egide"})
+	check(v.ok and v.kind == "movimento" and v.cost == 2, "com o poder: movimento e 2 PM: %s" % str(v))
+	c._try("player", {"type": "egide"})
+	check(P.egide_ativa, "égide ligada")
+	eq(P.pm, 8, "custa 2 PM")
+	eq(P.efeito_bonus("defesa"), car, "o paladino soma o Carisma na Defesa")
+	eq(ally.efeito_bonus("defesa"), car, "aliado adjacente soma o Carisma na Defesa")
+	sim.c("bandido_1").tile = Vector2i(28, 57)   # 2 quadrados: fora da égide
+	c._refresh_bencaos()
+	eq(ally.efeito_bonus("defesa"), 0, "aliado a 2 quadrados não recebe")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "egide"}).ok, "não liga duas vezes na cena")
+
+
+func test_bencao_da_justica_egide_ou_montaria_e_exclusiva() -> void:
+	# A égide é oferecida no 5º nível; a montaria ainda não tem sistema de parceiros, então não é oferecida.
+	check(ProgressionModule.POWERS["paladino"].has("egide_sagrada"), "égide entra nas opções do paladino")
+	check(not ProgressionModule.POWERS["paladino"].has("montaria_sagrada"), "montaria ainda não é opção (sem parceiros)")
+	var r := RuleRegistry.load_default()
+	check(not bool(r.value("poder.montaria_sagrada", {}).get("implementado", true)), "montaria marcada como não implementada")
+	var pre: Dictionary = r.value("poder.egide_sagrada", {}).get("prereq", {})
+	eq(int(pre.get("nivel", 0)), 5, "égide exige 5º nível")
+	eq(str(pre.get("exclusivo", "")), "montaria_sagrada", "égide é exclusiva da montaria")
+
+
+func test_aura_e_egide_salvam_e_carregam() -> void:
+	var P := _build("paladino")
+	P.level = 5
+	P.aura_sagrada_ativa = true
+	P.egide_ativa = true
+	var volta := CharacterSheet.from_dict(P.to_dict())
+	check(volta.aura_sagrada_ativa and volta.egide_ativa, "flags de aura e égide sobrevivem ao save")
+	check(volta.pode_aura_sagrada(), "paladino de 5º nível pode a aura")

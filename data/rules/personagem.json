@@ -3476,6 +3476,54 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "poder.egide_sagrada",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Bênção da Justiça (5º nível). Ação de movimento e 2 PM: até o fim da cena, você e os aliados adjacentes somam seu Carisma na Defesa (cumulativo com outros efeitos)",
+    "implementado": true,
+    "prereq": {
+     "nivel": 5,
+     "exclusivo": "montaria_sagrada"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 84,
+   "pdf_page": 90,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.egide_sagrada_11",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Égide Sagrada, a partir do 11º nível: ao fazer teste de resistência contra magia lançada contra você, pode gastar 5 PM para rolá-lo de novo; se passar e a magia tiver você como único alvo, ela é revertida ao conjurador",
+    "implementado": false,
+    "prereq": {
+     "nivel": 11,
+     "poder": "egide_sagrada"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 84,
+   "pdf_page": 90,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.montaria_sagrada",
+   "valor": {
+    "classe": "paladino",
+    "efeito": "Bênção da Justiça (5º nível). Ação de movimento e 2 PM para invocar uma montaria sagrada (cavalo de guerra ou pônei), que atua como parceiro de batalha",
+    "implementado": false,
+    "prereq": {
+     "nivel": 5,
+     "exclusivo": "egide_sagrada"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 84,
+   "pdf_page": 90,
+   "status": "VERIFICADA"
+  },
+  {
    "id": "poder.aura_de_invencibilidade",
    "valor": {
     "classe": "paladino",

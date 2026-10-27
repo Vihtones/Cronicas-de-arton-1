@@ -170,6 +170,7 @@ func execute(cmd: GameCommand) -> Array:
 					out.append(fact("PLAN_INTERRUPTED", {"index": i, "reason": v.reason, "remaining": actions.size() - i}, ["player"]))
 					break
 				out.append_array(_execute_action("player", a, v))
+				_refresh_bencaos()
 				var end := _check_end()
 				if not end.is_empty():
 					out.append_array(end)
@@ -440,7 +441,36 @@ func _run_until_player() -> Array:
 	return out
 
 
+## Raio da Aura Sagrada: 9m (LB p.84), com 1 quadrado = 1,5m.
+const RAIO_AURA_QUADRADOS := 6
+
+
+## Recalcula os efeitos de Aura Sagrada (resistência) e Égide Sagrada (Defesa) conforme as posições atuais:
+## cada paladino ativo dá o próprio Carisma aos aliados do mesmo lado que estão no alcance e consciências.
+func _refresh_bencaos() -> void:
+	for id in sim.combatants:
+		var sh: CharacterSheet = sim.c(id).sheet
+		sh.remove_efeito("aura_sagrada")
+		sh.remove_efeito("egide_sagrada")
+	for h in sim.combatants:
+		var hx: Dictionary = sim.c(h)
+		var hs: CharacterSheet = hx.sheet
+		if not (hs.aura_sagrada_ativa or hs.egide_ativa) or not sim.conscious(h):
+			continue
+		var car := hs.carisma()
+		for a in sim.combatants:
+			var ax: Dictionary = sim.c(a)
+			if ax.side != hx.side or not sim.conscious(a):
+				continue
+			var d := CombatSim.cheb(hx.tile, ax.tile)
+			if hs.aura_sagrada_ativa and d <= RAIO_AURA_QUADRADOS:
+				ax.sheet.add_efeito("aura_sagrada", "resistencia", car, "cena")
+			if hs.egide_ativa and d <= 1:
+				ax.sheet.add_efeito("egide_sagrada", "defesa", car, "cena")
+
+
 func _begin_turn(id: String) -> Dictionary:
+	_refresh_bencaos()
 	var x := sim.c(id)
 	var s: CharacterSheet = x.sheet
 	var facts: Array = []
@@ -569,6 +599,19 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 							break
 				out.append(fact("HEALED", {"actor": id, "target": alvo_m, "amount": cura_m, "pv_after": ts_m.pv, "source": "cura_pelas_maos", "tags": ["classe", "cura"]}, [id, alvo_m]))
 				out.append(fact("POWER_USED", {"actor": id, "power": "cura_pelas_maos", "target": alvo_m, "pm_cost": v.cost, "pm_after": sh_m.pm}, [id]))
+		"aura_sagrada":
+			var sh_p: CharacterSheet = sim.c(id).sheet
+			if v.ligar:
+				sh_p.pm -= int(v.cost)
+			sh_p.aura_sagrada_ativa = bool(v.ligar)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "aura_sagrada", "ligada": sh_p.aura_sagrada_ativa, "pm_after": sh_p.pm, "tags": ["classe"]}, [id]))
+			_refresh_bencaos()
+		"egide":
+			var sh_e: CharacterSheet = sim.c(id).sheet
+			sh_e.pm -= int(v.cost)
+			sh_e.egide_ativa = true
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "egide_sagrada", "pm_after": sh_e.pm, "tags": ["classe"]}, [id]))
+			_refresh_bencaos()
 		"allihanna":
 			var sh_a: CharacterSheet = sim.c(id).sheet
 			sh_a.pm -= 1
@@ -1285,7 +1328,9 @@ func _try(id: String, a: Dictionary) -> Array:
 	var v := GhostPlanner.validate_action(sim, id, a)
 	if not v.ok:
 		return []
-	return _execute_action(id, a, v)
+	var out := _execute_action(id, a, v)
+	_refresh_bencaos()
+	return out
 
 
 func _fled() -> bool:
@@ -1328,6 +1373,12 @@ func _end_combat(outcome: String) -> Array:
 	world.player_sheet.limpar_efeitos("rodada")
 	world.player_sheet.limpar_efeitos("turno")
 	world.player_sheet.allihanna_ativa = false
+	for id in sim.combatants:   # Aura Sagrada é sustentada até o fim do combate; Égide, até o fim da cena
+		var sh_f: CharacterSheet = sim.c(id).sheet
+		sh_f.aura_sagrada_ativa = false
+		sh_f.egide_ativa = false
+		sh_f.remove_efeito("aura_sagrada")
+		sh_f.remove_efeito("egide_sagrada")
 	world.player_sheet.olhar_usado = false
 	world.player.position = world.db.tile_to_world(P.tile)
 	for id in sim.combatants:
