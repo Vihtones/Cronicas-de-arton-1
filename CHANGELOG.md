@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Armadilhas (LB p.316): as doze armadilhas do livro entram como regras; a laje do corredor da cripta é um virote de verdade (Reflexos CD 20 evita, 1d10+2), que dispara uma vez em quem não a conhece e pode ser desarmada com Ladinagem (falhar por 5 a ativa).
+- Detectar Ameaças (divina, 1º círculo) completa: pela cena, até descarregar; armadilha ou criatura hostil a até 18m pede Percepção (sabe origem, direção e distância, ou só que há perigo). Aprimoramentos: espécie e aura da criatura; não ser surpreendido pelo que detectou e +5 contra armadilhas.
+
 - Atitudes (LB p.259): criaturas têm atitude (hostil a prestativo); só as hostis atacam; quando não restam hostis a luta termina pacificada. Mudar Atitude com Diplomacia (ação completa com –10 em combate, um minuto fora; oposto pela Vontade; uma vez por dia) e Acalmar Animal com Adestramento (CD 25). Teclas K e Shift+K.
 - Acalmar Animal e Tranquilidade (divinas, 1º círculo) completas, em combate e fora dele: Acalmar deixa o animal prestativo (+5 na resistência se hostil ou em combate) e dá +10 em Adestramento e Diplomacia contra ele; Tranquilidade deixa indiferente (quem resiste sofre –2 nos ataques). Ação hostil desfaz. Todos os aprimoramentos (alcance médio, outros tipos de alvo, mais alvos).
 

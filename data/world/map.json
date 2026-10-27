@@ -944,8 +944,20 @@
      "flag": "armadilha_corredor_vista",
      "ok": "Há um mecanismo sob a laje: uma armadilha de dardos. Você pode contorná-la.",
      "fail": "Parece só uma laje gasta."
+    },
+    "desarmar": {
+     "skill": "ladinagem",
+     "cd": 20,
+     "reveals": [],
+     "flag": "armadilha_corredor_desarmada",
+     "ok": "Você trava o mecanismo sob a laje. Os dardos não disparam mais.",
+     "fail": "O mecanismo resiste."
     }
-   }
+   },
+   "armadilha": "virote",
+   "armadilha_vista": "armadilha_corredor_vista",
+   "armadilha_desarmada": "armadilha_corredor_desarmada",
+   "armadilha_disparada": "armadilha_corredor_disparada"
   },
   {
    "id": "bau_tomas",

@@ -830,6 +830,270 @@
    "pdf_page": 129,
    "status": "VERIFICADA",
    "nota": "Sobrevivência, Rastrear"
+  },
+  {
+   "id": "armadilha.agulha_envenenada",
+   "valor": {
+    "nome": "Agulha Envenenada",
+    "efeito": "dano",
+    "dano": "1",
+    "tipo": "perfuracao",
+    "perda_pv": "1d12",
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 25,
+    "ladinagem": 20,
+    "nd": 0.25
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.arame_farpado",
+   "valor": {
+    "nome": "Arame Farpado",
+    "efeito": "dano",
+    "dano": "1d6+2",
+    "tipo": "corte",
+    "terreno_dificil": true,
+    "investigacao": 10,
+    "ladinagem": 20,
+    "nd": 0.25
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.fosso_camuflado",
+   "valor": {
+    "nome": "Fosso Camuflado",
+    "efeito": "queda",
+    "queda_m": 3,
+    "dano": "2d6",
+    "tipo": "impacto",
+    "escalar_cd": 20,
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 20,
+    "ladinagem": 20,
+    "nd": 0.25
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.rede",
+   "valor": {
+    "nome": "Rede",
+    "efeito": "condicao",
+    "condicao": "agarrado",
+    "escapar": {
+     "pericia": "acrobacia",
+     "cd": 20,
+     "acao": "completa"
+    },
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 20,
+    "ladinagem": 20,
+    "nd": 0.25
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.virote",
+   "valor": {
+    "nome": "Virote",
+    "efeito": "dano",
+    "dano": "1d10+2",
+    "tipo": "perfuracao",
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 25,
+    "ladinagem": 20,
+    "nd": 0.25
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.fosso_profundo",
+   "valor": {
+    "nome": "Fosso Profundo",
+    "efeito": "queda",
+    "queda_m": 6,
+    "dano": "4d6",
+    "tipo": "impacto",
+    "escalar_cd": 20,
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 20,
+    "ladinagem": 20,
+    "nd": 0.5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.lamina_na_parede",
+   "valor": {
+    "nome": "Lâmina na Parede",
+    "efeito": "dano",
+    "dano": "2d6+5",
+    "tipo": "corte",
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 25,
+    "ladinagem": 20,
+    "nd": 0.5
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.bloco_de_pedra",
+   "valor": {
+    "nome": "Bloco de Pedra",
+    "efeito": "dano",
+    "dano": "6d6",
+    "tipo": "impacto",
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 20,
+    "ladinagem": 20,
+    "nd": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.pendulo_de_teto",
+   "valor": {
+    "nome": "Pêndulo de Teto",
+    "efeito": "dano",
+    "dano": "1d12+10",
+    "tipo": "corte",
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 25,
+     "sucesso": "evita"
+    },
+    "investigacao": 25,
+    "ladinagem": 20,
+    "nd": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.fosso_com_estacas",
+   "valor": {
+    "nome": "Fosso com Estacas",
+    "efeito": "queda",
+    "queda_m": 9,
+    "dano": "6d6",
+    "tipo": "impacto",
+    "dano_extra": "2d4+5",
+    "tipo_extra": "perfuracao",
+    "escalar_cd": 20,
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 20,
+    "ladinagem": 20,
+    "nd": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.runa_de_protecao",
+   "valor": {
+    "nome": "Runa de Proteção",
+    "efeito": "area",
+    "raio_m": 3,
+    "dano": "6d6",
+    "tipo": "fogo",
+    "resistencia": {
+     "pericia": "reflexos",
+     "cd": 20,
+     "sucesso": "metade",
+     "ativador_sem_teste": true
+    },
+    "investigacao": 25,
+    "ladinagem": 25,
+    "nd": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadilha.simbolo_do_medo",
+   "valor": {
+    "nome": "Símbolo do Medo",
+    "efeito": "condicao_area",
+    "condicao": "abalado",
+    "duracao": "cena",
+    "alcance": "curto",
+    "resistencia": {
+     "pericia": "vontade",
+     "cd": 20,
+     "sucesso": "evita"
+    },
+    "investigacao": 25,
+    "ladinagem": 25,
+    "nd": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 316,
+   "pdf_page": 322,
+   "status": "VERIFICADA"
   }
  ]
 }

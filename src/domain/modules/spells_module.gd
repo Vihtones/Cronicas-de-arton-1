@@ -18,7 +18,9 @@ const FORA_DE_COMBATE := {
 	"controlar_plantas": [],   # poda, falar com plantas e truque (enredar só tem efeito numa cena de combate)
 	"acalmar_animal": [],   # criaturas por perto, antes da luta
 	"tranquilidade": [],
+	"detectar_ameacas": [],
 }
+const RAIO_DETECTAR := 12   # esfera de 18m
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
 const TOTAL_PERMANENTE := 1000   # T$ de incenso e óleos da versão permanente
@@ -26,6 +28,8 @@ const DIAS_SEMANA := 7
 const MINUTOS_DIA := 24 * 60
 
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
+var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
+var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
 var podas: Dictionary = {}       # "x,y" -> true: vegetação podada por Controlar Plantas (instantânea, fica)
 var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim (-1 permanente), mod_mv:int, conjurador}
 
@@ -138,6 +142,9 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"detectar_ameacas":
+			ativar_detectar(cmd.payload.get("aprimoramentos", []))
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "detectar_ameacas", "tags": ["magia"]}, ["player"]))
 		"acalmar_animal", "tranquilidade":
 			var combat_e = world.module("combat")
 			var acalmar: bool = sp_id == "acalmar_animal"
@@ -286,6 +293,36 @@ func falar_com_plantas(p: Vector2i) -> Dictionary:
 	return fact("PLANTS_TALKED", {"caster": "player", "criaturas_perto": perto.size(), "atitude": "prestativa"}, ["player"])
 
 
+## Detectar Ameaças (divina 1): pessoal, esfera de 18m, pela cena (TICKS_CENA) ou até ser descarregada.
+## Aprimoramentos: raça e aura da criatura (1 PM); não ser surpreendido pelo que detectou e +5 contra armadilhas
+## (2 PM, 2º círculo).
+func ativar_detectar(apr: Array) -> void:
+	var combat = world.module("combat")
+	detectar = {"ate": world.clock.tick + (combat.TICKS_CENA if combat != null else 6), "apr": apr.duplicate()}
+
+
+func detectar_ativo() -> Dictionary:
+	if detectar.is_empty() or int(detectar.ate) <= world.clock.tick:
+		return {}
+	return detectar
+
+
+func descarregar_detectar() -> void:
+	var apr: Array = detectar.get("apr", [])
+	detectar = {}
+	if apr.has(1):
+		# o bônus contra armadilhas e a proteção contra surpresa valem pela cena, depois de descarregada
+		protecao_detectar = {"ate": world.clock.tick + 6}
+
+
+
+func bonus_contra_armadilhas() -> int:
+	var ativo := detectar_ativo()
+	if (not ativo.is_empty() and (ativo.apr as Array).has(1)) or (not protecao_detectar.is_empty() and int(protecao_detectar.ate) > world.clock.tick):
+		return 5
+	return 0
+
+
 ## Consultado pelas magias que criam mortos-vivos.
 func cadaver_preservado(id: String) -> bool:
 	return cadaveres.has(id) and int(cadaveres[id]) >= world.day_index()
@@ -307,10 +344,13 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 
 func to_dict() -> Dictionary:
-	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate()}
+	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
+		"protecao_detectar": protecao_detectar.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
 	cadaveres = (d.get("cadaveres", {}) as Dictionary).duplicate()
 	areas = (d.get("areas", []) as Array).duplicate(true)
 	podas = (d.get("podas", {}) as Dictionary).duplicate()
+	detectar = (d.get("detectar", {}) as Dictionary).duplicate(true)
+	protecao_detectar = (d.get("protecao_detectar", {}) as Dictionary).duplicate()

@@ -330,7 +330,7 @@ func _group_with(ids: Array) -> Array:
 func _check_encounter() -> Array:
 	var p := world.db.world_to_tile(world.player.position)
 	var zone := world.db.zone_at(p)
-	var out: Array = []
+	var out: Array = _detectar_criaturas(p, zone)
 	for id in creature_state:
 		if not is_active_creature(id) or world.db.zone_at(creature_tile(id)) != zone:
 			approach_rolled.erase(id); undetected_by.erase(id)
@@ -398,6 +398,8 @@ func _sim_env(t: Vector2i) -> Dictionary:
 
 func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -> Array:
 	var pre: Array = []
+	if player_surprised and enemy_ids.any(func(e): return int(creature_state.get(e, {}).get("detectado_ate", -1)) > world.clock.tick):
+		player_surprised = false   # Detectar Ameaças (aprimoramento): não é surpreendido por quem detectou
 	var dlg = world.module("dialogue")
 	if dlg != null and not dlg.session.is_empty():
 		pre.append(fact("DIALOGUE_ENDED", {"npc": dlg.session.npc, "reason": "combate"}))
@@ -1130,6 +1132,37 @@ func _turno_comando(id: String, ordem: String, conj: String) -> Array:
 		out.append_array(_try(id, {"type": "move", "path": trecho.map(func(t): return [t.x, t.y])}))
 	sim.budget.std = 0   # usa todas as ações
 	return out
+
+
+## Detectar Ameaças (SpellsModule): criatura hostil a até 18m faz o jogador testar Percepção (CD 10 + Furtividade
+## dela). Passou: sabe origem, direção e distância (e raça e aura, com o aprimoramento); falhou: só que há perigo.
+## A magia se descarrega. Com o aprimoramento de 2 PM, quem foi detectado não o surpreende.
+func _detectar_criaturas(p: Vector2i, zone: String) -> Array:
+	var magia = world.module("magia")
+	if magia == null or magia.detectar_ativo().is_empty():
+		return []
+	var apr: Array = magia.detectar_ativo().apr
+	for id in creature_state:
+		if not is_active_creature(id) or world.db.zone_at(creature_tile(id)) != zone or not Atitudes.agressiva(atitude_fora(id)):
+			continue
+		var t := creature_tile(id)
+		var d := CombatSim.cheb(p, t)
+		if d > int(magia.RAIO_DETECTAR):
+			continue
+		var csh := CharacterSheet.from_dict(creature_state[id].sheet)
+		var r := Checks.skill(world.player_sheet, "percepcao", 10 + csh.skill_value("furtividade", world.rules), world.rules, world.rng, "world")
+		magia.descarregar_detectar()
+		if not r.get("success", false):
+			return [fact("THREAT_SENSED", {"kind": "criatura", "check": r}, ["player"])]
+		var info := {"kind": "criatura", "creature": id, "distance": d, "direction": [signi(t.x - p.x), signi(t.y - p.y)], "check": r}
+		if apr.has(0):
+			var regra: Dictionary = world.rules.value(csh.source_rule, {})
+			info["especie"] = str(regra.get("nome", csh.name))
+			info["aura"] = SpellRules.aura_por_nd(str(regra.get("nd", "1")))
+		if apr.has(1):
+			creature_state[id].detectado_ate = world.clock.tick + TICKS_CENA
+		return [fact("THREAT_DETECTED", info, ["player"])]
+	return []
 
 
 ## --- Atitudes (LB p.259) --------------------------------------------------------------------------
@@ -1988,6 +2021,12 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"detectar_ameacas":
+			# Detectar Ameaças (divina 1): pessoal, pela cena ou até descarregar (SpellsModule; vale ao explorar).
+			var magia_d = world.module("magia")
+			if magia_d != null:
+				magia_d.ativar_detectar(a.get("aprimoramentos", []))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "detectar_ameacas", "tags": ["magia"]}, [id]))
 		"acalmar_animal", "tranquilidade":
 			# Acalmar Animal (divina 1): Vontade anula (+5 se hostil ou em combate); o alvo fica prestativo pela cena e o
 			# conjurador recebe +10 em Adestramento e Diplomacia contra ele. Tranquilidade (divina 1): Vontade parcial;

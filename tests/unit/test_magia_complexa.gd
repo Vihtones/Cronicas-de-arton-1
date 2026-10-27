@@ -2330,3 +2330,83 @@ func test_acalmar_e_mudar_atitude_fora_de_combate() -> void:
 	eq(combat.atitude_fora("bandido_1"), "hostil", "a cena acaba e ele volta a ser hostil")
 	check(WorldHelpers.cmd(w, "ChangeAttitude", {"target": "bandido_1"}).accepted, "Diplomacia fora de combate")
 	check(not WorldHelpers.cmd(w, "ChangeAttitude", {"target": "bandido_1"}).accepted, "uma vez por dia")
+
+
+# --- Armadilhas (LB p.316) e Detectar Ameaças (divina, 1º círculo) ------------------------------
+func _mundo_explorador(spells: Array) -> WorldState:
+	var w := WorldHelpers.world(5)
+	var sh := CharacterBuilder.build(w.rules, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.level = 5
+	sh.spells = PackedStringArray(spells)
+	sh.pm = 20
+	sh.pv_max = 200
+	sh.pv = 200
+	w.player_sheet = sh
+	return w
+
+
+func _anda(w: WorldState, t: Vector2i) -> GameCommand.Result:
+	return WorldHelpers.cmd(w, "MovePlayer", {"to": w.db.tile_to_world(t)})
+
+
+func _tipos(r: GameCommand.Result) -> Array:
+	return r.emitted_events.map(func(e): return e.event_type)
+
+
+func test_armadilha_dispara_uma_vez_em_quem_nao_a_conhece() -> void:
+	var w := _mundo_explorador([])
+	w.player_sheet.add_efeito("teste", "resistencia", -50, "cena")
+	WorldHelpers.put(w, 15, 56)
+	var r := _anda(w, Vector2i(16, 56))
+	check(_tipos(r).has("TRAP_TRIGGERED"), "a laje dispara o virote")
+	check(w.player_sheet.pv < 200 and w.player_sheet.pv >= 188, "1d10+2 de perfuração (PV %d)" % w.player_sheet.pv)
+	_anda(w, Vector2i(15, 56))
+	check(not _tipos(_anda(w, Vector2i(16, 56))).has("TRAP_TRIGGERED"), "já disparou")
+
+
+func test_armadilha_conhecida_ou_desarmada_nao_dispara() -> void:
+	var w := _mundo_explorador([])
+	w.module("state").flags["armadilha_corredor_vista"] = true
+	WorldHelpers.put(w, 15, 56)
+	check(not _tipos(_anda(w, Vector2i(16, 56))).has("TRAP_TRIGGERED"), "quem sabe dela, contorna")
+	var w2 := _mundo_explorador([])
+	w2.player_sheet.trained.append("ladinagem")
+	w2.player_sheet.flat_skills["ladinagem"] = 99
+	WorldHelpers.put(w2, 15, 56)
+	var d := WorldHelpers.cmd(w2, "InspectTarget", {"target_id": "placa_pressao", "approach": "desarmar"})
+	check(d.accepted, "desarmar com Ladinagem: %s" % str(d.errors))
+	check(not _tipos(_anda(w2, Vector2i(16, 56))).has("TRAP_TRIGGERED"), "desarmada")
+
+
+func test_detectar_ameacas_revela_a_armadilha_e_descarrega() -> void:
+	var w := _mundo_explorador(["detectar_ameacas"])
+	w.player_sheet.flat_skills["percepcao"] = 99
+	WorldHelpers.put(w, 8, 56)
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "detectar_ameacas"}).accepted, "lançada")
+	var r := _anda(w, Vector2i(9, 56))
+	check(_tipos(r).has("THREAT_DETECTED"), "a armadilha a até 18m é detectada")
+	check(w.module("state").has_flag("armadilha_corredor_vista"), "sabe onde ela está")
+	check(w.module("magia").detectar_ativo().is_empty(), "a magia se descarrega")
+
+
+func test_detectar_ameacas_aprimoramento_protege_contra_armadilhas() -> void:
+	var w := _mundo_explorador(["detectar_ameacas"])
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "detectar_ameacas", "aprimoramentos": [1]})
+	eq(w.module("magia").bonus_contra_armadilhas(), 5, "+5 contra armadilhas")
+	eq(SpellRules.aura_por_nd("1/4"), "tenue", "ND 1/4: aura tênue")
+	eq(SpellRules.aura_por_nd("15"), "poderosa", "ND 15: poderosa")
+
+
+func test_detectar_ameacas_percebe_criatura_hostil() -> void:
+	var w := _mundo_explorador(["detectar_ameacas"])
+	w.player_sheet.flat_skills["percepcao"] = 99
+	var combat = w.module("combat")
+	var t: Array = combat.creature_state["bandido_1"].tile
+	WorldHelpers.put(w, int(t[0]) + 11, int(t[1]))
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "detectar_ameacas", "aprimoramentos": [0, 1]})
+	var out: Array = combat._check_encounter()
+	var det: Array = out.filter(func(f): return f.type == "THREAT_DETECTED")
+	check(not det.is_empty(), "criatura hostil detectada")
+	if not det.is_empty():
+		check(det[0].payload.has("aura"), "com aura e espécie")
+		check(int(combat.creature_state[str(det[0].payload.creature)].get("detectado_ate", -1)) > w.clock.tick, "não vai surpreender")

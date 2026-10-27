@@ -112,6 +112,9 @@ func execute(cmd: GameCommand) -> Array:
 			record_attempt("alvo:" + t.id, a.skill, r.success)
 			var out: Array = [fact("TARGET_INSPECTED", {"target": t.id, "approach": cmd.payload.approach, "check": r,
 				"text": a.ok if r.success else a.fail}, ["player"])]
+			# Ladinagem (LB p.120): falhar por 5 ou mais ao desarmar ativa a armadilha.
+			if t.has("armadilha") and cmd.payload.approach == "desarmar" and int(r.get("margin", 0)) <= -5:
+				out.append_array(disparar_armadilha(t))
 			if r.success:
 				for f in a.get("reveals", []):
 					out.append(fact("FACT_REVEALED", {"fact": f, "source": "alvo:" + t.id}, ["player"]))
@@ -156,6 +159,9 @@ func on_event(e: GameEvent) -> Array:
 				notes.append({"tick": e.world_tick, "text": "A cripta está vazia. Quem estava aqui partiu, e levou o que tinha.", "fact": ""})
 				return [fact("MYSTERY_LOST", {"mystery": world.db.mystery.truth_id})]
 		"PLAYER_MOVED", "PLAYER_TELEPORTED":
+			var arm := _armadilhas_ao_mover()
+			if not arm.is_empty():
+				return arm
 			var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
 			var npcs = world.module("npcs")
 			if loc == "cripta_cela" and npcs != null and npcs.npc("tomas").get("captive", false) and not knows("f_tomas_na_masmorra"):
@@ -171,6 +177,97 @@ func on_event(e: GameEvent) -> Array:
 			if e.payload.item == "dizimo_lena" and not knows("f_dizimo_roubado"):
 				return [fact("FACT_REVEALED", {"fact": "f_dizimo_roubado", "source": "bau"})]
 	return []
+
+
+## --- Armadilhas (LB p.316) ---------------------------------------------------------------------------
+## Alvos do mapa com "armadilha" (id em armadilha.*). Armada se não foi desarmada nem disparada. Quem sabe onde ela
+## está (flag de vista) a contorna. Detectar Ameaças avisa quando uma armadilha armada fica a até 18m.
+func _flag(f: String) -> bool:
+	var st = world.module("state")
+	return f != "" and st != null and st.has_flag(f)
+
+
+func armada(t: Dictionary) -> bool:
+	return t.has("armadilha") and not _flag(str(t.get("armadilha_desarmada", ""))) and not _flag(str(t.get("armadilha_disparada", "")))
+
+
+func _armadilhas_ao_mover() -> Array:
+	var p := world.db.world_to_tile(world.player.position)
+	var out: Array = []
+	var magia = world.module("magia")
+	for t in world.db.all_targets():
+		if not armada(t):
+			continue
+		var tt := Vector2i(int(t.tile[0]), int(t.tile[1]))
+		var conhecida := _flag(str(t.get("armadilha_vista", "")))
+		if not conhecida and magia != null and not magia.detectar_ativo().is_empty() and maxi(absi(tt.x - p.x), absi(tt.y - p.y)) <= magia.RAIO_DETECTAR:
+			out.append_array(_detectar_armadilha(t))
+			conhecida = _flag(str(t.get("armadilha_vista", ""))) or out.any(func(f): return f.type == "FLAG_SET")
+		if tt == p and not conhecida:
+			out.append_array(disparar_armadilha(t))
+	return out
+
+
+## Detectar Ameaças: Percepção contra a CD de Investigação da armadilha. Passou: sabe onde está (fica conhecida).
+## Falhou: sabe só que há perigo. A magia se descarrega.
+func _detectar_armadilha(t: Dictionary) -> Array:
+	var regra: Dictionary = world.rules.value("armadilha." + str(t.armadilha), {})
+	var r := Checks.skill(world.player_sheet, "percepcao", int(regra.get("investigacao", 20)), world.rules, world.rng, "world")
+	world.module("magia").descarregar_detectar()
+	var p := world.db.world_to_tile(world.player.position)
+	if not r.get("success", false):
+		return [fact("THREAT_SENSED", {"kind": "armadilha", "check": r}, ["player"])]
+	return [fact("THREAT_DETECTED", {"kind": "armadilha", "target": t.id, "trap": regra.get("nome", ""), "distance": maxi(absi(int(t.tile[0]) - p.x), absi(int(t.tile[1]) - p.y)),
+		"direction": [signi(int(t.tile[0]) - p.x), signi(int(t.tile[1]) - p.y)], "check": r}, ["player"]), fact("FLAG_SET", {"flag": str(t.get("armadilha_vista", ""))})]
+
+
+## A armadilha dispara sobre o jogador. Efeitos da Tabela de Perigos (LB p.316).
+func disparar_armadilha(t: Dictionary) -> Array:
+	var regra: Dictionary = world.rules.value("armadilha." + str(t.armadilha), {})
+	var s := world.player_sheet
+	var out: Array = [fact("TRAP_TRIGGERED", {"target": t.id, "trap": regra.get("nome", "")}, ["player"])]
+	if str(t.get("armadilha_disparada", "")) != "":
+		out.append(fact("FLAG_SET", {"flag": str(t.armadilha_disparada)}))
+	var res: Dictionary = regra.get("resistencia", {})
+	var passou := false
+	if not res.is_empty() and not bool(res.get("ativador_sem_teste", false)):
+		var magia = world.module("magia")
+		var bonus: int = magia.bonus_contra_armadilhas() if magia != null else 0   # Detectar Ameaças (aprimoramento)
+		var sv := Checks.skill(s, str(res.pericia), int(res.cd), world.rules, world.rng, "world", bonus)
+		passou = sv.get("success", false)
+		out.append(fact("TRAP_SAVE", {"skill": res.pericia, "check": sv}, ["player"]))
+	if passou and str(res.get("sucesso", "evita")) == "evita":
+		return out
+	match str(regra.efeito):
+		"dano", "queda", "area":
+			var dano := int(Dice.roll(str(regra.dano), world.rng, "world").total)
+			if passou:
+				dano /= 2
+			dano = s.dano_por_tipo(str(regra.tipo), dano)
+			if regra.has("dano_extra"):
+				dano += s.dano_por_tipo(str(regra.tipo_extra), int(Dice.roll(str(regra.dano_extra), world.rng, "world").total))
+			if regra.has("perda_pv"):
+				dano += int(Dice.roll(str(regra.perda_pv), world.rng, "world").total)   # veneno: perda de PV
+			s.pv -= dano
+			out.append(fact("TRAP_DAMAGE", {"trap": regra.get("nome", ""), "damage": dano, "pv_after": s.pv}, ["player"]))
+			if str(regra.efeito) == "queda":
+				# Escalar de volta (Atletismo); fora de combate, tenta até conseguir, um minuto por tentativa.
+				var tentativas := 1
+				while not Checks.skill(s, "atletismo", int(regra.escalar_cd), world.rules, world.rng, "world").get("success", false) and tentativas < 20:
+					tentativas += 1
+				out.append(fact("CLIMBED_OUT", {"attempts": tentativas}, ["player"]))
+		"condicao":
+			# Rede: agarrado até escapar (ação completa e Acrobacia); fora de combate, tenta até conseguir.
+			var esc: Dictionary = regra.escapar
+			var tentativas := 1
+			while not Checks.skill(s, str(esc.pericia), int(esc.cd), world.rules, world.rng, "world").get("success", false) and tentativas < 20:
+				tentativas += 1
+			out.append(fact("TRAP_ESCAPED", {"condition": regra.condicao, "attempts": tentativas}, ["player"]))
+		"condicao_area":
+			s.add_condition(str(regra.condicao), world.rules)
+			s.add_efeito("armadilha." + str(t.armadilha), "condicao_cena", 1, "cena", str(regra.condicao))
+			out.append(fact("CONDITION_APPLIED", {"condition": regra.condicao, "source": regra.get("nome", "")}, ["player"]))
+	return out
 
 
 ## Avaliação das hipóteses só com o que o jogador sabe (nunca revela a verdade).

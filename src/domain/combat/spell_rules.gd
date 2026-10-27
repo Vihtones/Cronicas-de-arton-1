@@ -27,6 +27,7 @@ const COMPLETAS := {
 	"comando": {"aprimoramentos": [0, 1]},   # qualquer criatura; +1 alvo (repetível); ordens fuja, largue, pare, senta, venha
 	"acalmar_animal": {"aprimoramentos": [0, 1, 2, 3]},   # médio; monstro/espírito Int –5/–4; +1 alvo; qualquer monstro/espírito
 	"tranquilidade": {"aprimoramentos": [0, 1, 2]},   # qualquer criatura; +1 alvo; médio e criaturas escolhidas
+	"detectar_ameacas": {"aprimoramentos": [0, 1]},   # raça e aura; não surpreendido e +5 contra armadilhas
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -278,3 +279,15 @@ static func alvo_social_valido(sp_id: String, apr: Array, alvo: CharacterSheet) 
 	if apr.has(0) or apr.has(2):
 		return true
 	return tipo == "animal" or tipo == "humanoide"
+
+
+## Detectar Ameaças: aura pelo nível ou ND (1-6 tênue, 7-12 moderada, 13-20 poderosa, acima avassaladora).
+static func aura_por_nd(nd: String) -> String:
+	var v := float(nd.get_slice("/", 0)) / float(nd.get_slice("/", 1)) if nd.contains("/") else float(nd)
+	if v > 20.0:
+		return "avassaladora"
+	if v >= 13.0:
+		return "poderosa"
+	if v >= 7.0:
+		return "moderada"
+	return "tenue"
