@@ -21,6 +21,7 @@ const FORA_DE_COMBATE := {
 	"detectar_ameacas": [],
 	"suporte_ambiental": [],   # você (e, com o aprimoramento, os companheiros presentes)
 	"abencoar_alimentos": [],
+	"criar_elementos": [],   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
 const RAIO_DETECTAR := 12   # esfera de 18m
@@ -33,6 +34,7 @@ const MINUTOS_DIA := 24 * 60
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
 var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
+var luz_carregada: Dictionary = {}   # luz que o jogador carrega fora de combate: {raio: quadrados, ate: tick}
 var abencoados: Dictionary = {}  # item -> {n: porções abençoadas, ate: tick do fim da cena}
 var podas: Dictionary = {}       # "x,y" -> true: vegetação podada por Controlar Plantas (instantânea, fica)
 var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim (-1 permanente), mod_mv:int, conjurador}
@@ -96,6 +98,11 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 				return PackedStringArray(["objeto fora do alcance"])
 		"abencoar_alimentos":
 			return _valida_abencoar(cmd.payload, apr)
+		"criar_elementos":
+			if not SpellRules.ELEMENTOS.has(str(cmd.payload.get("elemento", ""))):
+				return PackedStringArray(["escolha o elemento: água, ar, fogo ou terra"])
+			if apr.has(1) or apr.has(2):
+				return PackedStringArray(["arremessar e queimar são em combate"])
 		"acalmar_animal", "tranquilidade":
 			var combat_v = world.module("combat")
 			var alvos_v: Array = cmd.payload.get("targets", [])
@@ -148,6 +155,15 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"criar_elementos":
+			match str(cmd.payload.elemento):
+				"agua":
+					out.append(fact("ITEM_GAINED", {"item": "frasco_agua", "from": "criar_elementos"}, ["player"]))
+				"fogo":
+					carregar_luz(Area.quadrados(9.0))   # chama na palma, como uma tocha
+					out.append(fact("LIGHT_LIT", {"item": "criar_elementos"}, ["player"]))
+				_:
+					out.append(fact("ELEMENT_CREATED", {"caster": "player", "elemento": str(cmd.payload.elemento)}, ["player"]))
 		"abencoar_alimentos":
 			out.append_array(abencoar(cmd.payload))
 		"suporte_ambiental":
@@ -352,6 +368,18 @@ func abencoar(payload: Dictionary) -> Array:
 	return out + [fact("FOOD_BLESSED", {"item": item, "portions": n}, ["player"])]
 
 
+## Luz carregada (tocha acesa, chama na palma): dura a cena; entra no combate como efeito "fonte_luz".
+func carregar_luz(raio_q: int) -> void:
+	var combat = world.module("combat")
+	luz_carregada = {"raio": maxi(raio_q, int(luz_carregada.get("raio", 0)) if luz_ativa() > 0 else 0), "ate": world.clock.tick + (combat.TICKS_CENA if combat != null else 6)}
+
+
+func luz_ativa() -> int:
+	if luz_carregada.is_empty() or int(luz_carregada.ate) <= world.clock.tick:
+		return 0
+	return int(luz_carregada.raio)
+
+
 ## Consome uma porção abençoada do item, se houver uma valendo. Chamado ao comer.
 func consumir_abencoado(item: String) -> bool:
 	var a: Dictionary = abencoados.get(item, {})
@@ -415,7 +443,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -425,3 +453,4 @@ func from_dict(d: Dictionary) -> void:
 	detectar = (d.get("detectar", {}) as Dictionary).duplicate(true)
 	protecao_detectar = (d.get("protecao_detectar", {}) as Dictionary).duplicate()
 	abencoados = (d.get("abencoados", {}) as Dictionary).duplicate(true)
+	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()

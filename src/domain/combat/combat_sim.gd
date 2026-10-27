@@ -165,6 +165,18 @@ static func ataque_efetivo(rules: RuleRegistry, sheet: CharacterSheet, atk: Dict
 	return out
 
 
+## Luz (LB p.158 e p.318): quadrado iluminado por zona de luz ou por quem carrega luz (efeito "fonte_luz", raio em
+## quadrados: tocha, chama de Criar Elementos). Na luz, a escuridão da noite não dá camuflagem.
+func iluminado(t: Vector2i) -> bool:
+	if zona_em(t, "luz"):
+		return true
+	for id in combatants:
+		var raio := int(c(id).sheet.efeito_bonus("fonte_luz"))
+		if raio > 0 and cheb(c(id).tile, t) <= raio:
+			return true
+	return false
+
+
 ## Arma Espiritual: índice de uma arma livre para contra-atacar ou atacar nesta rodada, ou -1. Cada arma age uma vez
 ## por rodada; a que atacou (ação livre do aprimoramento) não contra-ataca até o próximo turno do conjurador.
 func arma_espiritual_livre(id: String) -> int:
@@ -202,7 +214,7 @@ func falha_nevoa(attacker: String, target: String) -> int:
 		if z.tipo != "nevoa" or (z.get("dados", {}).get("enxergam", []) as Array).has(attacker):
 			continue
 		for t in linha:
-			if (z.tiles as Array).has(t):
+			if (z.tiles as Array).has(t) and not zona_em(t, "vento"):   # vento (Criar Elementos) afasta a névoa por uma rodada
 				obscurece = true
 				break
 		if obscurece:
@@ -422,7 +434,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 		miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)   # Escudo da Fé (camuflagem leve)
 	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
 	var sees_dark: bool = sheet.senses.has("visao_penumbra")
-	if (env.get("darkness", false) and not sees_dark) or env.get("fog", false):
+	if (env.get("darkness", false) and not sees_dark and not iluminado(T.tile)) or env.get("fog", false):
 		if dist > 1 or env.get("fog", false):
 			miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)
 	miss_chance = maxi(miss_chance, falha_nevoa(attacker, target))

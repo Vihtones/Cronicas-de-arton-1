@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Criar Elementos (divina, 1º círculo) completa: água enche um recipiente, ar tira fumaça e afasta a névoa por uma rodada, fogo ilumina como tocha (na palma ou num quadrado, onde queima com 1d6 e pode deixar em chamas), terra cria um cubo; aprimoramentos de quantidade, arremesso de água ou terra (2d4 +1 passo por tamanho) e +1d6 de fogo. Com ela, todas as divinas de 1º círculo estão completas.
+- Luz (LB p.158): tochas acendem pelo diário (9m, uma cena) e quem carrega luz ou está numa área iluminada não tem a camuflagem da noite. No combate, magias de quadrado aceitam clique em quadrado vazio, e as magias pessoais passam a levar aprimoramentos e truque; T escolhe o elemento.
+
 - Abençoar Alimentos (divina, 1º círculo) completa: porções de comida ou bebida do inventário, consumidas na cena, dão 5 PV ou 1 PM temporários (um bônus de alimentação por dia); +1 porção por aprimoramento; água benta de um frasco com água e T$ 5 de pó de prata; truque que só purifica comida estragada ou envenenada. Comer e beber pelo diário. Água benta (LB p.160) no combate: 2d10 de luz em morto-vivo ou abissal, Reflexos reduz (Shift+5).
 - O diário ganhou botões para lançar fora de combate as magias que funcionam no mundo (Consagrar, Caminhos, Detectar Ameaças, Despedaçar em objetos, Bênção em cadáver, Controlar Plantas, Acalmar Animal, Tranquilidade...).
 

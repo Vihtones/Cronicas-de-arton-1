@@ -1571,6 +1571,9 @@ func _botoes_magia_fora(w: WorldState, s: CharacterSheet, row: HFlowContainer) -
 			continue
 		var nome := str(w.rules.value("magia." + sp, {}).get("nome", sp))
 		match sp:
+			"criar_elementos":
+				row.add_child(_button("Criar água", func(): _cmd_log("CastSpell", {"spell": sp, "elemento": "agua"}); refresh_journal()))
+				row.add_child(_button("Chama na palma", func(): _cmd_log("CastSpell", {"spell": sp, "elemento": "fogo"}); refresh_journal()))
 			"consagrar", "profanar", "caminhos_da_natureza", "detectar_ameacas", "suporte_ambiental":
 				row.add_child(_button("Lançar " + nome, func(): _cmd_log("CastSpell", {"spell": sp}); refresh_journal()))
 			"abencoar_alimentos":

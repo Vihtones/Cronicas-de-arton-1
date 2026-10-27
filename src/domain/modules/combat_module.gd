@@ -408,6 +408,8 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	sim = _new_sim()
 	sim.dia = world.day_index()
 	var magia_p = world.module("magia")
+	if magia_p != null and magia_p.luz_ativa() > 0:
+		world.player_sheet.add_efeito("luz_carregada", "fonte_luz", magia_p.luz_ativa(), "cena")   # tocha acesa ou chama
 	if magia_p != null and not magia_p.podas.is_empty():
 		sim.add_zona("poda_mundo", magia_p.tiles_podados(), "poda", -1, "controlar_plantas")   # vegetação podada antes
 	active = true
@@ -1450,6 +1452,80 @@ func _reacao_arma_espiritual(atacante: String, alvo: String, ranged: bool, out: 
 	_golpe_arma_espiritual(alvo, atacante, out)
 
 
+func _criar_elementos(id: String, a: Dictionary) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = sim.c(id).sheet
+	var apr: Array = a.get("aprimoramentos", [])
+	var el := str(a.get("elemento", "fogo"))
+	var tiles: Array = []
+	for q in a.get("tiles", []):
+		tiles.append(Vector2i(int(q[0]), int(q[1])) if q is Array else q as Vector2i)
+	var cd := spell_dc(sh, a)
+	if apr.has(1):
+		# arremesso: 2d4 de impacto, um passo a mais por categoria de tamanho acima de Minúsculo
+		var dano_expr := CombatSim.dano_em_passos(world.rules, "2d4", apr.count(0))
+		for tg in a.get("targets", [a.get("target", "")]):
+			if not sim.combatants.has(tg):
+				continue
+			var ts: CharacterSheet = sim.c(tg).sheet
+			var sv := Checks.skill(ts, "reflexos", cd, world.rules, world.rng, "combat")
+			sv = _pos_teste(tg, sv, cd, out)
+			var dano := int(Dice.roll(dano_expr, world.rng, "combat").total)
+			if sv.get("success", false):
+				dano /= 2
+			dano = _dano_por_tipo(ts, "impacto", dano)
+			var tags: Array = ["magia", "impacto"]
+			tags.append_array(sim.apply_damage(tg, dano))
+			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Criar Elementos", "d20": 0, "mod": 0, "mods": [], "total": 0,
+				"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [], "pv_after": ts.pv, "special": false,
+				"ranged": true, "spell": true, "save": "reflexos", "saved": sv.get("success", false), "tags": tags}, [id, tg]))
+		if a.has("objeto"):
+			var objs = world.module("objects")
+			if objs != null:
+				out.append_array(objs.danificar(str(a.objeto), int(Dice.roll(dano_expr, world.rng, "combat").total), false, "criar_elementos"))
+		return out
+	match el:
+		"agua":
+			out.append(fact("ITEM_GAINED", {"item": "frasco_agua", "from": "criar_elementos"}, [id]))
+		"terra":
+			out.append(fact("ELEMENT_CREATED", {"caster": id, "elemento": "terra"}, [id]))
+		"ar":
+			for t in tiles:
+				for z in sim.zonas:
+					if str(z.tipo) == "fumaca":
+						z.tiles = (z.tiles as Array).filter(func(x): return x != t)   # o vento purifica gás e fumaça
+			sim.add_zona("vento_%d" % sim.zonas.size(), tiles, "vento", 1, "criar_elementos")
+			out.append(fact("ELEMENT_CREATED", {"caster": id, "elemento": "ar", "tiles": tiles.size()}, [id]))
+		"fogo":
+			if tiles.is_empty():
+				sh.add_efeito("magia.criar_elementos", "fonte_luz", Area.quadrados(9.0), "cena")   # chama na palma: como uma tocha
+				out.append(fact("ELEMENT_CREATED", {"caster": id, "elemento": "fogo", "mao": true}, [id]))
+				return out
+			var dados := "%dd6" % (1 + apr.count(2))
+			for t in tiles:
+				sim.add_zona("chama_%d" % sim.zonas.size(), Area.esfera(t, Area.quadrados(9.0)), "luz", -1, "criar_elementos")
+				var tg := sim.occupant(t)
+				if tg != "":
+					var ts: CharacterSheet = sim.c(tg).sheet
+					var dano := _dano_por_tipo(ts, "fogo", int(Dice.roll(dados, world.rng, "combat").total))
+					var sv := Checks.skill(ts, "reflexos", cd, world.rules, world.rng, "combat")
+					sv = _pos_teste(tg, sv, cd, out)
+					var tags: Array = ["magia", "fogo"]
+					tags.append_array(sim.apply_damage(tg, dano))
+					if not sv.get("success", false):
+						sim.add_condicao(tg, "em_chamas", 0, "criar_elementos")
+						tags.append("em_chamas")
+					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Criar Elementos", "d20": 0, "mod": 0, "mods": [], "total": 0,
+						"defense": cd, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": [], "pv_after": ts.pv, "special": false,
+						"ranged": true, "spell": true, "save": "reflexos", "saved": sv.get("success", false), "tags": tags}, [id, tg]))
+				var obj := world.db.object_at(t)
+				if obj != "":
+					var objs_f = world.module("objects")
+					if objs_f != null:
+						out.append_array(objs_f.danificar(obj, int(Dice.roll(dados, world.rng, "combat").total), false, "criar_elementos"))
+	return out
+
+
 ## Despedaçar numa criatura (ver _cast).
 func _despedacar_criatura(id: String, tg: String, expr: String, cd: int, out: Array) -> void:
 	var T: Dictionary = sim.c(tg)
@@ -2083,6 +2159,14 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"criar_elementos":
+			# Criar Elementos (divina 1): porção real de um elemento (LB p.187). Água: enche um recipiente (item frasco com
+			# água). Ar: vento num quadrado: tira fumaça e afasta a névoa por uma rodada. Fogo: chama que ilumina como uma
+			# tocha, na palma ("mao") ou num quadrado (1d6 de fogo em quem estiver nele; Reflexos ou em chamas). Terra: cubo
+			# ou objeto simples. Aprimoramentos: +1 passo de quantidade (+1 quadrado para ar e fogo); arremesso de água ou
+			# terra em 1 criatura ou objeto (2d4 de impacto, +1 passo por categoria acima de Minúsculo; Reflexos reduz à
+			# metade); +1d6 no dano de cada chama.
+			out.append_array(_criar_elementos(id, a))
 		"abencoar_alimentos":
 			# Abençoar Alimentos (divina 1): age sobre o inventário (SpellsModule.abencoar).
 			var magia_ab = world.module("magia")

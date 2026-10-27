@@ -1,5 +1,6 @@
 class_name ItemsModule
 extends WorldModule
+const Area := preload("res://src/domain/combat/area.gd")
 ## Equipamento e consumíveis (protótipo). Equipar recalcula Defesa e ataques pelas
 ## regras de arma/armadura; poção replica Curar Ferimentos; magia fora de combate.
 
@@ -31,7 +32,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		"UseItem":
 			var it: String = cmd.payload.get("item", "")
 			if not st.has_item(it): return PackedStringArray(["você não tem " + it])
-			if it != "pocao_cura" and not bool(world.db.items.get(it, {}).get("alimento", false)): return PackedStringArray(["não é usável"])
+			var d_it: Dictionary = world.db.items.get(it, {})
+			if it != "pocao_cura" and not bool(d_it.get("alimento", false)) and not bool(d_it.get("fonte_luz", false)): return PackedStringArray(["não é usável"])
 	return PackedStringArray()
 
 
@@ -52,6 +54,12 @@ func execute(cmd: GameCommand) -> Array:
 		"UseItem":
 			if bool(world.db.items.get(str(cmd.payload.item), {}).get("alimento", false)):
 				return _comer(str(cmd.payload.item), str(cmd.payload.get("bonus", "pv")))
+			if bool(world.db.items.get(str(cmd.payload.item), {}).get("fonte_luz", false)):
+				# Tocha (LB p.158): acender é ação padrão; ilumina 9m e dura uma cena.
+				var magia = world.module("magia")
+				if magia != null:
+					magia.carregar_luz(Area.quadrados(float(world.rules.value("luz.tocha").raio_m)))
+				return [fact("ITEM_LOST", {"item": cmd.payload.item}, ["player"]), fact("LIGHT_LIT", {"item": cmd.payload.item}, ["player"])]
 			var r := Dice.roll(str(world.rules.value("magia.curar_ferimentos").cura), world.rng, "world")
 			s.pv = mini(s.pv_max, s.pv + int(r.total))
 			return [fact("ITEM_LOST", {"item": cmd.payload.item}, ["player"]),

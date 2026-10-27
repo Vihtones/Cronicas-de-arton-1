@@ -28,7 +28,8 @@
  "tocha": {
   "name": "Tocha",
   "price": 1,
-  "good": "ferramentas"
+  "good": "ferramentas",
+  "fonte_luz": true
  },
  "pocao_cura": {
   "name": "Poção de Curar Ferimentos",

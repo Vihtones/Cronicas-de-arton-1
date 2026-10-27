@@ -1094,6 +1094,28 @@
    "pagina": 316,
    "pdf_page": 322,
    "status": "VERIFICADA"
+  },
+  {
+   "id": "luz.tocha",
+   "valor": {
+    "raio_m": 9,
+    "duracao": "cena",
+    "acender": "padrao"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 158,
+   "pdf_page": 164,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "situacao.camuflagem_total_escuridao",
+   "valor": {
+    "nota": "Escuridão total: camuflagem total; leve: camuflagem leve (LB p.318)"
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 318,
+   "pdf_page": 324,
+   "status": "VERIFICADA"
   }
  ]
 }

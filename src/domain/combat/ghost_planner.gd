@@ -143,6 +143,18 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 					return {"ok": false, "reason": "escolha o tipo de dano: acido, eletricidade, fogo ou frio"}
 				if apr.has(2) and not apr.has(1):
 					return {"ok": false, "reason": "o aprimoramento de 2d6 exige o de 1d6"}
+			if sp_id == "criar_elementos":
+				var el := str(a.get("elemento", ""))
+				if not SpellRules.ELEMENTOS.has(el): return {"ok": false, "reason": "escolha o elemento: água, ar, fogo ou terra"}
+				if apr.has(1) and not ["agua", "terra"].has(el): return {"ok": false, "reason": "só se arremessa água ou terra"}
+				if apr.has(2) and el != "fogo": return {"ok": false, "reason": "o dano extra é do fogo"}
+				var quads: Array = a.get("tiles", [])
+				if quads.size() > 1 + apr.count(0): return {"ok": false, "reason": "quadrados demais"}
+				for q in quads:
+					var tq := Vector2i(int(q[0]), int(q[1])) if q is Array else q as Vector2i
+					if CombatSim.cheb(A.tile, tq) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
+				if not apr.has(1):
+					targets = [actor]
 			if sp_id == "acalmar_animal" or sp_id == "tranquilidade":
 				var lim := 1 + apr.count(2 if sp_id == "acalmar_animal" else 1)
 				if sp_id == "tranquilidade" and apr.has(2):

@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2532,3 +2532,52 @@ func test_agua_benta_fere_morto_vivo_e_nao_os_vivos() -> void:
 	var a2 := {"type": "agua_benta", "target": "bandido_1"}
 	c._execute_action("player", a2, GhostPlanner.validate_action(sim, "player", a2))
 	eq(sim.c("bandido_1").sheet.pv, 999, "inofensiva contra os vivos")
+
+
+# --- Criar Elementos (divina, 1º círculo) e luz -----------------------------------------------------
+func test_criar_elementos_fogo_no_quadrado_queima_e_ilumina() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_2", -50)
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "criar_elementos", "target": "player"}).ok, "precisa do elemento")
+	check(_lanca(m, {"type": "cast", "spell": "criar_elementos", "target": "player", "elemento": "fogo", "tiles": [[32, 57]], "aprimoramentos": [2]}).ok, "chama no quadrado")
+	check(999 - b.pv >= 2 and 999 - b.pv <= 12, "2d6 de fogo (%d)" % (999 - b.pv))
+	check(b.conditions.has("em_chamas"), "falhou em Reflexos: em chamas")
+	check(sim.iluminado(Vector2i(33, 57)), "a chama ilumina como uma tocha")
+
+
+func test_criar_elementos_chama_na_palma_e_tocha() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	_lanca(m, {"type": "cast", "spell": "criar_elementos", "target": "player", "elemento": "fogo"})
+	check(sim.iluminado(Vector2i(30, 57)), "chama na palma: luz em volta do conjurador")
+	var w := _mundo_explorador([])
+	w.module("state").inventory["tocha"] = 1
+	check(WorldHelpers.cmd(w, "UseItem", {"item": "tocha"}).accepted, "acende a tocha")
+	eq(w.module("magia").luz_ativa(), 6, "tocha: 9m de raio")
+	WorldHelpers.advance_hours(w, 2)
+	eq(w.module("magia").luz_ativa(), 0, "dura uma cena")
+
+
+func test_criar_elementos_ar_tira_fumaca_e_afasta_nevoa() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	sim.add_zona("fumaca_t", [Vector2i(27, 57), Vector2i(28, 57)], "fumaca", -1, "teste")
+	sim.add_zona("nevoa_t", [Vector2i(27, 57)], "nevoa", -1, "nevoa", {})
+	check(sim.falha_nevoa("player", "bandido_1") > 0, "a névoa atrapalha")
+	_lanca(m, {"type": "cast", "spell": "criar_elementos", "target": "player", "elemento": "ar", "tiles": [[27, 57]]})
+	check(not sim.zona_em(Vector2i(27, 57), "fumaca"), "a fumaça saiu do quadrado")
+	check(sim.zona_em(Vector2i(28, 57), "fumaca"), "só do quadrado do vento")
+	eq(sim.falha_nevoa("player", "bandido_1"), 0, "o vento afasta a névoa por uma rodada")
+
+
+func test_criar_elementos_arremesso_e_agua() -> void:
+	var m := _cena_grupo(1)
+	var sim: CombatSim = m[2]
+	var b := _bandido(m, "bandido_2", -50)
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "criar_elementos", "target": "bandido_2", "targets": ["bandido_2"], "elemento": "fogo", "aprimoramentos": [1]}).ok, "fogo não se arremessa")
+	_lanca(m, {"type": "cast", "spell": "criar_elementos", "target": "bandido_2", "targets": ["bandido_2"], "elemento": "terra", "aprimoramentos": [0, 1]})
+	check(999 - b.pv >= 1 and 999 - b.pv <= 10, "cubo Pequeno: 2d4 +1 passo = 1d10 (%d)" % (999 - b.pv))
+	var w := _mundo_explorador(["criar_elementos"])
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "criar_elementos", "elemento": "agua"}).accepted, "água fora de combate")
+	eq(w.module("state").item_count("frasco_agua"), 1, "recipiente cheio de água potável")

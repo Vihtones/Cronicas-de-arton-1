@@ -24,6 +24,7 @@ var apr_cursor := 0           # aprimoramento em foco (tecla G avança)
 var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla T)
 var truque := false          # truque da magia em foco (tecla T): 0 PM, sem aprimoramentos
 var comando_ordem := "pare"   # ordem do Comando (tecla T)
+var elemento := "fogo"         # elemento de Criar Elementos (tecla T)
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var cura_passos := 0        # Cura pelas Mãos: passos extras (+1 PM cada, a cada 4 níveis) no próximo toque (tecla N)
 var cura_remover := false   # Cura pelas Mãos: remove uma condição da lista (+1 PM, 6º nível; tecla H)
@@ -243,11 +244,17 @@ func candidate_actions(t: Vector2i) -> Array:
 			return [{"type": "diplomacia" if mode == "conversar" else "adestrar", "target": target}]
 		"magia":
 			var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
-			if str(sp.get("alcance", "")) == "pessoal":
-				return [{"type": "cast", "spell": spell, "targets": ["player"], "pungente": pungente}]
-			if target == "" or not gs.is_enemy("player", target):
+			var base := {"type": "cast", "spell": spell, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo,
+				"truque": truque, "ordem": comando_ordem, "elemento": elemento, "tile": t, "tiles": [] if t == me else [[t.x, t.y]]}
+			if str(sp.get("alcance", "")) == "pessoal" or (target == "" and SpellRules.ALVO_QUADRADO.has(spell)):
+				base["targets"] = ["player"]
+				base["target"] = "player"
+				return [base]
+			if target == "":
 				return []
-			return [{"type": "cast", "spell": spell, "targets": [target], "target": target, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo, "truque": truque, "ordem": comando_ordem}]
+			base["targets"] = [target]
+			base["target"] = target
+			return [base]
 	return []
 
 
@@ -315,6 +322,11 @@ func cycle_aprimoramento() -> void:
 
 
 func cycle_energia() -> void:
+	if spell == "criar_elementos":
+		var els: Array = SpellRules.ELEMENTOS
+		elemento = els[(els.find(elemento) + 1) % els.size()]
+		message.emit("Criar Elementos: %s (T troca; clique em você para a chama na palma)." % elemento)
+		return
 	if spell == "comando":
 		var ordens: Array = SpellRules.ORDENS_COMANDO
 		comando_ordem = ordens[(ordens.find(comando_ordem) + 1) % ordens.size()]
