@@ -3005,3 +3005,38 @@ func test_circulo_da_justica_penaliza_e_impede_mentir() -> void:
 	var m2 := _cena_grupo(5)
 	check(_lanca(m2, {"type": "cast", "spell": "circulo_da_justica", "aprimoramentos": [0]}).ok, "versão pessoal")
 	check(m2[2].c("player").sheet.efeito_bonus("ve_invisivel") > 0, "vê o invisível")
+
+
+func _clerigo_mundo(spells: Array) -> Array:
+	var w := WorldHelpers.world(5)
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.level = 13
+	sh.spells = PackedStringArray(spells)
+	sh.pm = 60
+	w.player_sheet = sh
+	return [w, sh]
+
+
+func test_augurio_presagio_do_lugar_e_consultas() -> void:
+	var m := _clerigo_mundo(["augurio"])
+	var w = m[0]
+	var magia = w.module("magia")
+	var combat = w.module("combat")
+	var loc: String = w.db.location_at(combat.creature_tile("bandido_1"))
+	combat.creature_state["bandido_1"]["atitude"] = "hostil"
+	check(magia._presagio(loc).miseria, "criatura hostil no lugar: miséria")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "local": "lugar_nenhum"}).accepted, "precisa de um lugar")
+	var res := WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "local": loc})
+	check(res.accepted, "Augúrio aceito")
+	var primeira: String = magia.augurios[loc]
+	check(["miseria", "felicidade_e_miseria", "nada"].has(primeira), "resposta coerente (%s)" % primeira)
+	for cid in combat.creature_state:
+		if w.db.location_at(combat.creature_tile(cid)) == loc:
+			combat.creature_state[cid]["alive"] = false
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "local": loc})
+	eq(magia.augurios[loc], primeira, "mesmo assunto: sempre a primeira resposta")
+	check(not magia._ha_ameaca(loc), "sem as criaturas, sem ameaça")
+	var q := WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "aprimoramentos": [1], "perguntas": [{"tipo": "ameaca", "local": loc}]})
+	check(q.accepted, "perguntas de sim ou não (4º círculo)")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "augurio", "aprimoramentos": [1], "perguntas": []}).accepted, "precisa de pergunta")

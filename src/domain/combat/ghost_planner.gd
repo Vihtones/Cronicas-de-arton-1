@@ -164,6 +164,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var tj: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tj) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]
+			if sp_id == "augurio" and (apr.has(0) or apr.has(1)): return {"ok": false, "reason": "a consulta à divindade leva minutos: fora de combate"}
 			if sp_id == "condicao" and targets.size() > 5 + apr.count(0): return {"ok": false, "reason": "alvos demais"}
 			if sp_id == "voz_divina":
 				if apr.has(0):

@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Augúrio (divina, 2º círculo) completa: sobre entrar e explorar um lugar do mapa, responde felicidade (baú com algo ou pista não descoberta), miséria (criatura hostil ou armadilha armada), ambos ou nada; falha secreta em 1 no 1d6 (1d12, 1d20); o mesmo assunto repete a primeira resposta. Consulta à divindade (uma pista e um fato do lugar) e perguntas de sim, não ou não sei, fora de combate.
+
 - Círculo da Justiça (divina, 2º círculo) completa: esfera de 9m por um dia; quem está dentro sofre –10 em Acrobacia, Enganação, Furtividade e Ladinagem e não mente (Vontade, uma vez por círculo: –5 e pode mentir); –10/–20; permanente com balança de prata (T$ 5.000); versão pessoal que vê o invisível. Fora de combate, NPCs mentirosos no lugar do círculo não distorcem os boatos.
 
 - Condição (divina, 2º círculo) completa: até 5 criaturas (+1 por aprimoramento), pela cena ou um dia; o conjurador sabe posição, PV, condições e magias ativas delas a qualquer distância, até morrerem. Fora de combate, nos companheiros e NPCs presentes. Correção: Soco de Arsenal não é magia de vários alvos.

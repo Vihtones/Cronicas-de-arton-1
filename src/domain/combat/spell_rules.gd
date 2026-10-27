@@ -46,6 +46,7 @@ const COMPLETAS := {
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
 	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
 	"circulo_da_justica": {"aprimoramentos": [0, 1, 2]},   # pessoal: ver o invisível em alcance curto; –10/–20; permanente
+	"augurio": {"aprimoramentos": [0, 1, 2, 3]},   # consultar a divindade (pista); perguntas de sim ou não; falha só em 1 no 1d12 / 1d20
 	"condicao": {"aprimoramentos": [0, 1]},   # +1 alvo (repetível); um dia
 	"voz_divina": {"aprimoramentos": [0, 1]},   # interrogar um cadáver (uma vez por corpo); falar com plantas e rochas
 	"soco_de_arsenal": {"aprimoramentos": [0, 1, 2, 3]},   # alcance natural +3m (cena); +1d6 (repetível); +3m de empurrão (repetível); essência

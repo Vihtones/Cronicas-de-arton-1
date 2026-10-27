@@ -2682,6 +2682,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_raio_solar(id, a))
 		"soco_de_arsenal":
 			out.append_array(_soco_de_arsenal(id, a))
+		"augurio":
+			# Augúrio (divina 2): ação completa; o presságio sobre entrar num lugar (SpellsModule.augurio).
+			var magia_au = world.module("magia")
+			if magia_au != null and magia_au.validar_augurio(a) == "":
+				out.append_array(magia_au.augurio(a))
 		"circulo_da_justica":
 			# Círculo da Justiça (divina 2): esfera de 9m num ponto em alcance curto, por um dia (SpellsModule). Quem está
 			# dentro sofre –10 em Acrobacia, Enganação, Furtividade e Ladinagem e não mente; Vontade: –5 e pode mentir.

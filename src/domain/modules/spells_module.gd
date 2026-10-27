@@ -6,6 +6,7 @@ extends WorldModule
 
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const Area := preload("res://src/domain/combat/area.gd")
+const Atitudes := preload("res://src/domain/rules/atitudes.gd")
 
 ## Magias e aprimoramentos que funcionam fora de combate: spell -> aprimoramentos que tornam isso possível
 ## ([] = a versão básica já funciona fora de combate).
@@ -30,6 +31,7 @@ const FORA_DE_COMBATE := {
 	"escuridao": [],
 	"voz_divina": [],
 	"condicao": [],
+	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
 	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
@@ -42,6 +44,7 @@ const BALANCA_DE_PRATA := 5000   # T$ da versão permanente do Círculo da Justi
 const PERICIAS_JUSTICA := ["acrobacia", "enganacao", "furtividade", "ladinagem"]
 const MINUTOS_DIA := 24 * 60
 
+var augurios: Dictionary = {}   # Augúrio: assunto -> primeira resposta (lançar de novo sobre o mesmo assunto a repete)
 var justicas: Array = []   # Círculo da Justiça: {centro:[x,y], raio, ate (minuto, -1 permanente), cd, forte, resistiu:{id: bool}}
 var interrogados: Dictionary = {}   # Voz Divina: cadáveres que já responderam (um corpo só uma vez)
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
@@ -173,6 +176,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["fora do alcance"])
 				if not SpellRules.alvo_social_valido(sp_id, apr, CharacterSheet.from_dict(combat_v.creature_state[tg].sheet)):
 					return PackedStringArray(["tipo de criatura que a magia não afeta"])
+		"augurio":
+			var err_au := validar_augurio(cmd.payload)
+			if err_au != "":
+				return PackedStringArray([err_au])
 		"circulo_da_justica":
 			if apr.has(2) and int(world.player.gold) < BALANCA_DE_PRATA:
 				return PackedStringArray(["falta a balança de prata (T$ %d)" % BALANCA_DE_PRATA])
@@ -354,6 +361,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, ["player"]))
 			else:
 				out.append(falar_com_plantas(p_cp))
+		"augurio":
+			out.append_array(augurio(cmd.payload))
 		"circulo_da_justica":
 			var apr_cj: Array = cmd.payload.get("aprimoramentos", [])
 			if apr_cj.has(0):
@@ -436,6 +445,132 @@ func criar_area(tipo: String, centro: Vector2i, apr: Array, sh: CharacterSheet, 
 			mod = -mod
 	areas.append({"tipo": tipo, "centro": [centro.x, centro.y], "raio": raio, "ate": -1 if apr.has(2) else world.clock.total_minutes() + MINUTOS_DIA,
 		"mod_mv": mod, "conjurador": conj})
+
+
+## Augúrio (divina 2): o assunto é um lugar do mapa ("local") — a ação de entrar nele e explorá-lo em breve.
+## Com o aprimoramento de 7 PM (4º), "perguntas": lista de {tipo: ameaca|tesouro|armadilha, local} de sim ou não.
+func validar_augurio(payload: Dictionary) -> String:
+	var apr: Array = payload.get("aprimoramentos", [])
+	if apr.has(0) and apr.has(1):
+		return "escolha uma forma de consulta"
+	if apr.has(1):
+		var perguntas: Array = payload.get("perguntas", [])
+		if perguntas.is_empty() or perguntas.size() > 10:
+			return "de 1 a 10 perguntas (uma por rodada, por 1 minuto)"
+		for q in perguntas:
+			if not ["ameaca", "tesouro", "armadilha"].has(str(q.get("tipo", ""))) or not _local_existe(str(q.get("local", ""))):
+				return "pergunta inválida"
+		return ""
+	if not _local_existe(str(payload.get("local", ""))):
+		return "escolha o lugar da ação"
+	return ""
+
+
+func _local_existe(loc: String) -> bool:
+	return world.db.all_locations().any(func(l): return str(l.id) == loc)
+
+
+## Chance de falha do Augúrio: 1 em 1d6 (1d12 e 1d20 com aprimoramentos). O resultado do dado é secreto.
+func _augurio_funciona(apr: Array) -> bool:
+	var dado := "1d20" if apr.has(3) else ("1d12" if apr.has(2) else "1d6")
+	return int(Dice.roll(dado, world.rng, "world").total) > 1
+
+
+## O que aguarda quem entra no lugar: miséria (criatura hostil ativa ou armadilha armada), felicidade (baú com
+## conteúdo ainda fechado ou pista ainda não descoberta).
+func _presagio(loc: String) -> Dictionary:
+	return {"miseria": _ha_ameaca(loc) or _ha_armadilha(loc), "felicidade": _ha_tesouro(loc)}
+
+
+func _ha_ameaca(loc: String) -> bool:
+	var combat = world.module("combat")
+	if combat == null:
+		return false
+	for id in combat.creature_state:
+		if combat.is_active_creature(id) and world.db.location_at(combat.creature_tile(id)) == loc and Atitudes.agressiva(combat.atitude_fora(id)):
+			return true
+	return false
+
+
+func _ha_armadilha(loc: String) -> bool:
+	var ex = world.module("exploration")
+	for t in world.db.all_targets():
+		var tl: Array = t.get("tile", [0, 0])
+		if ex != null and ex.armada(t) and world.db.location_at(Vector2i(int(tl[0]), int(tl[1]))) == loc:
+			return true
+	return false
+
+
+func _ha_tesouro(loc: String) -> bool:
+	var objs = world.module("objects")
+	var ex = world.module("exploration")
+	for o in world.db.all_objects():
+		var ot: Array = o.get("tile", [0, 0])
+		if str(o.type) == "chest" and world.db.location_at(Vector2i(int(ot[0]), int(ot[1]))) == loc and objs != null and not (objs.obj(str(o.id)).get("contents", []) as Array).is_empty():
+			return true
+	for t in world.db.all_targets():
+		var tl: Array = t.get("tile", [0, 0])
+		if world.db.location_at(Vector2i(int(tl[0]), int(tl[1]))) != loc:
+			continue
+		for act in (t.get("actions", {}) as Dictionary).values():
+			for f in act.get("reveals", []):
+				if ex == null or not ex.knows(str(f)):
+					return true
+	return false
+
+
+func augurio(payload: Dictionary) -> Array:
+	var out: Array = []
+	var apr: Array = payload.get("aprimoramentos", [])
+	if apr.has(1):
+		# Consulta de sim ou não (10 minutos de execução): cada pergunta tem a chance de falha; falhou, "não sei".
+		out.append_array(world.advance_ticks(maxi(1, 10 / world.clock.tick_minutes)))
+		var respostas: Array = []
+		for q in payload.get("perguntas", []):
+			var r := "nao_sei"
+			if _augurio_funciona(apr):
+				var loc_q := str(q.local)
+				var sim_q: bool = _ha_ameaca(loc_q) if q.tipo == "ameaca" else (_ha_tesouro(loc_q) if q.tipo == "tesouro" else _ha_armadilha(loc_q))
+				r = "sim" if sim_q else "nao"
+			respostas.append({"tipo": q.tipo, "local": q.local, "resposta": r})
+		out.append(fact("DIVINE_ANSWERS", {"caster": "player", "respostas": respostas}, ["player"]))
+		return out
+	var loc := str(payload.local)
+	if apr.has(0):
+		# Consulta a uma divindade (1 minuto): sobre o que acontecerá no lugar até um dia; a resposta é uma pista.
+		out.append_array(world.advance_ticks(1))
+		if not _augurio_funciona(apr):
+			out.append(fact("DIVINE_ANSWERS", {"caster": "player", "local": loc, "pista": ""}, ["player"]))
+			return out
+		out.append(fact("DIVINE_ANSWERS", {"caster": "player", "local": loc, "pista": _pista(loc)}, ["player"]))
+		var ex = world.module("exploration")
+		for t in world.db.all_targets():
+			var tl: Array = t.get("tile", [0, 0])
+			if world.db.location_at(Vector2i(int(tl[0]), int(tl[1]))) == loc:
+				for act in (t.get("actions", {}) as Dictionary).values():
+					for f in act.get("reveals", []):
+						if ex == null or not ex.knows(str(f)):
+							out.append(fact("FACT_REVEALED", {"fact": str(f), "source": "augurio"}, ["player"]))
+							return out
+		return out
+	if not augurios.has(loc):
+		var r := "nada"
+		if _augurio_funciona(apr):
+			var p := _presagio(loc)
+			r = "felicidade_e_miseria" if p.felicidade and p.miseria else ("felicidade" if p.felicidade else ("miseria" if p.miseria else "nada"))
+		augurios[loc] = r
+	out.append(fact("AUGURY", {"caster": "player", "local": loc, "resposta": str(augurios[loc])}, ["player"]))
+	return out
+
+
+func _pista(loc: String) -> String:
+	if _ha_ameaca(loc):
+		return "ameaca"
+	if _ha_armadilha(loc):
+		return "armadilha"
+	if _ha_tesouro(loc):
+		return "tesouro"
+	return "caminho_livre"
 
 
 ## Círculo da Justiça (divina 2): esfera de 9m por um dia (permanente com a balança de prata).
@@ -803,7 +938,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -818,3 +953,4 @@ func from_dict(d: Dictionary) -> void:
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()
 	justicas = (d.get("justicas", []) as Array).duplicate(true)
+	augurios = (d.get("augurios", {}) as Dictionary).duplicate()
