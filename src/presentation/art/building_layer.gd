@@ -21,6 +21,10 @@ const STYLES := {
 	"moinho": {"roof": "palha", "sign": "trigo", "mill": true, "wall": Color(0.86, 0.8, 0.66)},
 	"casa_corvo": {"roof": "telha", "chimney": true, "wall": Color(0.78, 0.72, 0.62)},
 	"cabana_quill": {"roof": "palha", "chimney": true, "mossy": true, "wall": Color(0.62, 0.5, 0.36)},
+	"estalagem": {"roof": "telha", "sign": "caneca", "chimney": true, "wall": Color(0.87, 0.8, 0.64)},
+	"entreposto": {"roof": "palha", "sign": "trigo", "chimney": true, "wall": Color(0.8, 0.72, 0.56)},
+	"casa_barqueiro": {"roof": "palha", "chimney": true, "mossy": true, "wall": Color(0.7, 0.62, 0.48)},
+	"torre_vigia": {"roof": "ardosia", "sign": "escudo", "tower": true, "wall": Color(0.72, 0.7, 0.66), "banner": Color(0.2, 0.3, 0.6)},
 }
 const ROOF_COLORS := {
 	"telha": [Color(0.56, 0.24, 0.17), Color(0.7, 0.33, 0.22), Color(0.63, 0.29, 0.2)],

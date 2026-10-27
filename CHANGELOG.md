@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Ambiente (provisório, por código): grama com tufos, moitas com frutinhas, pedras e cogumelos; margem de rio e lago com lama, espuma e juncos; adereços junto das casas (barris, caixotes, lenha, feno, canteiros de flores); lavouras com sulcos, trigo e hortaliças, cercadas; as casas de Pedra Branca agora têm telhado e fachada (o local do prédio é o interior, como na vila).
+
 - Gráficos (provisórios): os personagens humanos agora são sprites de 64 px montados a partir das camadas do LPC Generator (jogador, aldeão, artesão, guarda, sacerdote, idoso, criança, bandido, Kael, aldeã e mercadora), recoloridos por `tools/gen_chars_lpc.py`; só camadas com licença de atribuição (OGA-BY, CC-BY, CC0), com créditos em `assets/CREDITOS_PERSONAGENS.txt` (aparecem em Créditos de arte). `ActorView` aceita quadros de qualquer tamanho; a hiena segue com o sprite antigo. Pendente de aprovação artística do usuário.
 
 - Pedra Branca: a Estalagem da Ponte Velha cobra o pernoite (1 T$) como a taverna; Berta vende pão e cerveja, Marta (entreposto) vende corda, tocha, pão, saco de dormir e poção de cura; duas hienas rondam a serra à noite.

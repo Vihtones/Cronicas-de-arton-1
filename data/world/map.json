@@ -715,10 +715,10 @@
    "name": "Estalagem da Ponte Velha",
    "zone": "pedrabranca",
    "rect": [
-    138,
-    17,
-    9,
-    6
+    139,
+    18,
+    7,
+    4
    ],
    "spot": [
     142,
@@ -732,10 +732,10 @@
    "name": "Entreposto de Pedra Branca",
    "zone": "pedrabranca",
    "rect": [
-    149,
-    17,
-    7,
-    6
+    150,
+    18,
+    5,
+    4
    ],
    "spot": [
     152,
@@ -749,10 +749,10 @@
    "name": "Casa do Barqueiro",
    "zone": "pedrabranca",
    "rect": [
-    138,
-    28,
-    6,
-    4
+    139,
+    29,
+    4,
+    2
    ],
    "spot": [
     140,
@@ -766,10 +766,10 @@
    "name": "Torre de Vigia",
    "zone": "pedrabranca",
    "rect": [
-    148,
-    29,
-    5,
-    6
+    149,
+    30,
+    3,
+    4
    ],
    "spot": [
     150,
