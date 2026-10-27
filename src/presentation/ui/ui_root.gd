@@ -555,6 +555,69 @@ func _h(text: String) -> Label:
 	return l
 
 
+## Grupo e guilda (Arton Viva, Fase 6): companheiros, ordens, contratos e caixa da guilda.
+func _secao_grupo(w: WorldState) -> void:
+	var party = w.modules.party
+	journal_body.add_child(_h("Grupo e guilda"))
+	if party.guild.is_empty():
+		journal_body.add_child(_label("Sem guilda. Registrar custa T$ %d e pede %d membros." % [PartyModule.GUILD_COST, PartyModule.GUILD_MIN_MEMBERS], 9))
+		journal_body.add_child(_button("Registrar guilda (T$ %d)" % PartyModule.GUILD_COST, func(): _acao("CreateGuild", {"name": "Guilda da vila"})))
+	else:
+		journal_body.add_child(_label("%s — caixa T$ %d" % [party.guild.name, party.caixa], 9))
+		journal_body.add_child(_button("Distribuir o caixa entre os membros", func(): _acao("GuildDistribute", {})))
+	if party.members.is_empty():
+		journal_body.add_child(_label("Nenhum companheiro ainda.", 9))
+	for id in party.members:
+		var m: Dictionary = party.members[id]
+		var situacao := "em contrato" if _em_contrato(party, id) else "livre"
+		journal_body.add_child(_label("• %s — lealdade %d%%, %s" % [w.db.npc_def(id).name, int(m.loyalty), situacao], 9))
+		var proxima: String = party.ORDERS[(party.ORDERS.find(m.order) + 1) % party.ORDERS.size()]
+		journal_body.add_child(_button("Ordem: %s (trocar para %s)" % [m.order, proxima], func(): _acao("SetOrder", {"npc_id": id, "order": proxima})))
+	if not party.guild.is_empty():
+		journal_body.add_child(_h("Contratos da guilda"))
+		for cid in w.db.economy.get("contratos_guilda", {}):
+			var d: Dictionary = w.db.economy.contratos_guilda[cid]
+			journal_body.add_child(_button("Aceitar: %s — T$ %d em %d dia(s), mínimo %d membro(s)" % [d.nome, d.pagamento, d.dias, d.membros_min], func(): _acao("AcceptContract", {"contrato": cid})))
+		for c in party.contratos.values():
+			journal_body.add_child(_label("Em curso: %s, até o dia %d" % [w.db.economy.contratos_guilda[c.contrato].nome, int(c.fim_dia)], 9))
+	_secao_recrutar(w, party)
+
+
+func _em_contrato(party: PartyModule, id: String) -> bool:
+	for c in party.contratos.values():
+		if c.membros.has(id):
+			return true
+	return false
+
+
+## Candidatos a companheiro: os três moradores que mais conhecem o jogador. Quem não confia pede a taxa.
+func _secao_recrutar(w: WorldState, party: PartyModule) -> void:
+	var npcs = w.modules.npcs
+	var rl = w.modules.relations
+	var candidatos: Array = []
+	for id in w.db.all_npc_ids():
+		if party.members.has(id) or not npcs.npc(id).get("alive", false) or npcs.npc(id).get("captive", false):
+			continue
+		if int(w.db.npc_def(id).get("age", 0)) < PartyModule.MIN_AGE:
+			continue
+		candidatos.append({"id": id, "r": rl.dims(id, "player")})
+	candidatos.sort_custom(func(a, b): return a.r.familiaridade > b.r.familiaridade)
+	journal_body.add_child(_h("Recrutar"))
+	for c in candidatos.slice(0, 3):
+		var id: String = c.id
+		var confia: bool = float(c.r.confianca) >= PartyModule.RECRUIT_TRUST and float(c.r.familiaridade) >= PartyModule.RECRUIT_FAMILIARITY
+		var pagar := 0 if confia else PartyModule.RECRUIT_FEE
+		var texto := "Convidar %s" % w.db.npc_def(id).name + ("" if confia else " (paga T$ %d)" % pagar)
+		journal_body.add_child(_button(texto, func(): _acao("RecruitCompanion", {"npc_id": id, "pay": pagar})))
+
+
+func _acao(tipo: String, payload: Dictionary) -> void:
+	var r = Game.send(tipo, payload)
+	if not r.accepted:
+		log_msg("✘ " + "; ".join(r.errors))
+	refresh_journal()
+
+
 func _botao_construir(id: String, d: Dictionary, tesouro: int) -> Button:
 	var b := _button("Construir por T$ %d" % int(d.custo), func(): _construir(id))
 	b.disabled = tesouro < int(d.custo)
@@ -667,6 +730,7 @@ func refresh_journal() -> void:
 	var cr: CrimeModule = w.modules.crime
 	if cr.enabled and cr.total_fines() > 0:
 		journal_body.add_child(_label("Multas pendentes: T$ %d (pague à Guarda)." % cr.total_fines(), 9))
+	_secao_grupo(w)
 	# cidade (Arton Viva, Fase 5): indicadores e construções pagas pelo tesouro da vila
 	journal_body.add_child(_h("Cidade da vila"))
 	var ind: Dictionary = w.modules.cities.indicators()

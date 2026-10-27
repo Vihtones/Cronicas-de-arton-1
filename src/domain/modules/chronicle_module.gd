@@ -15,7 +15,7 @@ func module_id() -> String: return "chronicle"
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["LEADERSHIP_CHANGED", "CITY_STATUS_CHANGED", "TORMENTA_STAGE_CHANGED", "ROUTE_CHANGED",
 		"GUILD_CREATED", "PARTY_LOST", "NPC_DIED",
-		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED", "SHORTAGE_STARTED", "SHORTAGE_ENDED", "TRADE_DELIVERED"])
+		"MYSTERY_LOST", "FACTION_ALERTED", "STOLEN_GOODS_RECOVERED", "SHORTAGE_STARTED", "SHORTAGE_ENDED", "TRADE_DELIVERED", "CONTRACT_DONE", "CONTRACT_FAILED", "GUILD_SHARED"])
 
 
 func on_event(e: GameEvent) -> Array:
@@ -58,6 +58,15 @@ func on_event(e: GameEvent) -> Array:
 		"STOLEN_GOODS_RECOVERED":
 			cat = "economia"
 			text = "Mercadoria roubada foi recuperada e voltou ao estoque."
+		"CONTRACT_DONE":
+			cat = "guildas"
+			text = "A guilda cumpriu o contrato \"%s\" e recebeu T$ %d." % [_contrato_nome(str(e.payload.contrato)), int(e.payload.pagamento)]
+		"CONTRACT_FAILED":
+			cat = "guildas"
+			text = "O contrato \"%s\" fracassou: %s morreu no meio do serviço." % [_contrato_nome(str(e.payload.contrato)), _nome(str(e.payload.npc))]
+		"GUILD_SHARED":
+			cat = "guildas"
+			text = "A guilda dividiu o caixa: T$ %d para cada um dos %d membros." % [int(e.payload.por_membro), int(e.payload.membros)]
 		"TRADE_DELIVERED":
 			cat = "economia"
 			var partes := PackedStringArray()
@@ -71,6 +80,10 @@ func on_event(e: GameEvent) -> Array:
 	if entries.size() > CAP:
 		entries = entries.slice(entries.size() - CAP)
 	return []
+
+
+func _contrato_nome(id: String) -> String:
+	return str(world.db.economy.get("contratos_guilda", {}).get(id, {}).get("nome", id))
 
 
 func _rota(id: String) -> String:

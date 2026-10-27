@@ -385,6 +385,10 @@ economy["construcoes"] = {
           "descricao": "abre duas vagas para famílias apertadas"},
  "guarita": {"nome": "Guarita", "custo": 100, "efeito": {"guardas": 1},
              "descricao": "posto de vigia: conta como mais um guarda"}}
+# Arton Viva, Fase 6: contratos que a guilda aceita para os membros; o pagamento vai ao caixa da guilda.
+economy["contratos_guilda"] = {
+ "escolta_mercado": {"nome": "Escolta de carroça até Valkaria", "pagamento": 40, "dias": 2, "membros_min": 2},
+ "patrulha_estrada": {"nome": "Patrulha da estrada do sul", "pagamento": 25, "dias": 1, "membros_min": 1}}
 laws = {"vila": {"furto": {"multa": 10, "severidade": 1}, "invasao": {"multa": 3, "severidade": 0}, "dano_propriedade": {"multa": 5, "severidade": 1},
                  "agressao": {"multa": 20, "severidade": 2}}, "status": "ORIGINAL_DO_JOGO"}
 distant = {"regions": [{"id": "valkaria", "name": "Valkaria", "lod": "L3", "events": [

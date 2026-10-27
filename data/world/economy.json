@@ -220,5 +220,19 @@
    },
    "descricao": "posto de vigia: conta como mais um guarda"
   }
+ },
+ "contratos_guilda": {
+  "escolta_mercado": {
+   "nome": "Escolta de carroça até Valkaria",
+   "pagamento": 40,
+   "dias": 2,
+   "membros_min": 2
+  },
+  "patrulha_estrada": {
+   "nome": "Patrulha da estrada do sul",
+   "pagamento": 25,
+   "dias": 1,
+   "membros_min": 1
+  }
  }
 }

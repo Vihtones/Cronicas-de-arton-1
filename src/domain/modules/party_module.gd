@@ -14,15 +14,36 @@ const RECRUIT_FEE := 10
 const GUILD_COST := 50
 const GUILD_MIN_MEMBERS := 2
 const ORDERS := ["seguir", "proteger", "manter_posicao", "recuar"]
+const CONTRACT_LOYALTY_GAIN := 5.0   # lealdade de quem cumpre um contrato
+const SHARE_LOYALTY_GAIN := 3.0      # lealdade de quem recebe parte do caixa da guilda
 
 var members: Dictionary = {}   # npc_id -> {loyalty: float, order: String}
 var guild: Dictionary = {}     # {} ou {name, members}
 var last_day := -1
+var caixa: int = 0                 # ouro da guilda (contratos pagam aqui; administração distribui)
+var contratos: Dictionary = {}    # id da instância -> {contrato, membros, fim_dia}
 
 
 func module_id() -> String: return "party"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["RecruitCompanion", "SetOrder", "CreateGuild"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["RecruitCompanion", "SetOrder", "CreateGuild", "AcceptContract", "GuildDistribute"])
 func subscribed_events() -> PackedStringArray: return PackedStringArray(["NPC_DIED", "TIME_ADVANCED"])
+
+
+func _contrato_def(id: String) -> Dictionary:
+	return world.db.economy.get("contratos_guilda", {}).get(id, {})
+
+
+func _livres() -> Array:
+	var ocupados := {}
+	for c in contratos.values():
+		for m in c.membros:
+			ocupados[m] = true
+	var out: Array = []
+	for id in members:
+		if not ocupados.has(id):
+			out.append(id)
+	out.sort()
+	return out
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -33,6 +54,23 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 				return PackedStringArray(["não é membro da party"])
 			if not ORDERS.has(str(cmd.payload.get("order", ""))):
 				return PackedStringArray(["ordem desconhecida"])
+			return PackedStringArray()
+		"AcceptContract":
+			if guild.is_empty():
+				return PackedStringArray(["sem guilda não há contratos"])
+			var d := _contrato_def(str(cmd.payload.get("contrato", "")))
+			if d.is_empty():
+				return PackedStringArray(["contrato desconhecido"])
+			if _livres().size() < int(d.membros_min):
+				return PackedStringArray(["membros livres insuficientes (precisa de %d)" % int(d.membros_min)])
+			return PackedStringArray()
+		"GuildDistribute":
+			if guild.is_empty():
+				return PackedStringArray(["sem guilda não há caixa"])
+			if members.is_empty():
+				return PackedStringArray(["não há membros para receber o caixa"])
+			if caixa <= 0:
+				return PackedStringArray(["o caixa da guilda está vazio"])
 			return PackedStringArray()
 		"CreateGuild":
 			if not guild.is_empty():
@@ -81,6 +119,20 @@ func execute(cmd: GameCommand) -> Array:
 			var id := str(cmd.payload.npc_id)
 			members[id].order = str(cmd.payload.order)
 			return [fact("ORDER_SET", {"npc": id, "order": members[id].order}, [id])]
+		"AcceptContract":
+			var d := _contrato_def(str(cmd.payload.contrato))
+			var escolhidos: Array = _livres().slice(0, int(d.membros_min))
+			var id := "%s_%d" % [cmd.payload.contrato, world.day_index()]
+			var fim := world.day_index() + int(d.dias)
+			contratos[id] = {"contrato": cmd.payload.contrato, "membros": escolhidos, "fim_dia": fim}
+			return [fact("CONTRACT_ACCEPTED", {"contrato": cmd.payload.contrato, "membros": escolhidos, "fim_dia": fim})]
+		"GuildDistribute":
+			var n := members.size()
+			var parte := caixa / n
+			caixa -= parte * n
+			for id in members:
+				members[id].loyalty = minf(100.0, float(members[id].loyalty) + SHARE_LOYALTY_GAIN)
+			return [fact("GUILD_SHARED", {"por_membro": parte, "membros": n})]
 		"CreateGuild":
 			guild = {"name": str(cmd.payload.get("name", "Guilda")), "members": members.keys()}
 			guild.members.sort()
@@ -91,21 +143,47 @@ func execute(cmd: GameCommand) -> Array:
 func on_event(e: GameEvent) -> Array:
 	if e.event_type == "NPC_DIED":
 		var id := str(e.payload.get("npc", ""))
+		var out: Array = []
+		# contrato em curso com o morto falha: sem pagamento, os outros voltam a ficar livres
+		for cid in contratos.keys():
+			if contratos[cid].membros.has(id):
+				out.append(fact("CONTRACT_FAILED", {"contrato": contratos[cid].contrato, "npc": id}, [id]))
+				contratos.erase(cid)
 		if members.erase(id):
-			return [fact("PARTY_LOST", {"npc": id, "cause": "morte"}, [id])]
-		return []
+			out.append(fact("PARTY_LOST", {"npc": id, "cause": "morte"}, [id]))
+		return out
 	if e.event_type == "TIME_ADVANCED" and world.day_index() != last_day:
 		last_day = world.day_index()
 		for id in members:
 			members[id].loyalty = minf(100.0, float(members[id].loyalty) + 1.0)
+		return _resolve_contracts()
 	return []
 
 
+## Contratos que chegaram ao prazo: pagam ao caixa da guilda e dão lealdade aos que cumpriram.
+func _resolve_contracts() -> Array:
+	var out: Array = []
+	for cid in contratos.keys():
+		var c: Dictionary = contratos[cid]
+		if world.day_index() < int(c.fim_dia):
+			continue
+		var pago := int(_contrato_def(c.contrato).get("pagamento", 0))
+		caixa += pago
+		for id in c.membros:
+			if members.has(id):
+				members[id].loyalty = minf(100.0, float(members[id].loyalty) + CONTRACT_LOYALTY_GAIN)
+		contratos.erase(cid)
+		out.append(fact("CONTRACT_DONE", {"contrato": c.contrato, "pagamento": pago, "membros": c.membros}))
+	return out
+
+
 func to_dict() -> Dictionary:
-	return {"members": members.duplicate(true), "guild": guild.duplicate(true), "last_day": last_day}
+	return {"members": members.duplicate(true), "guild": guild.duplicate(true), "last_day": last_day, "caixa": caixa, "contratos": contratos.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
 	members = d.get("members", {}).duplicate(true)
 	guild = d.get("guild", {}).duplicate(true)
 	last_day = int(d.get("last_day", -1))
+	caixa = int(d.get("caixa", 0))
+	contratos = d.get("contratos", {}).duplicate(true)
