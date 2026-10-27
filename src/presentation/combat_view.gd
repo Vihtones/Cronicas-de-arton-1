@@ -23,6 +23,8 @@ var spell_apr: Array = []     # aprimoramentos ligados na próxima magia (tecla 
 var apr_cursor := 0           # aprimoramento em foco (tecla G avança)
 var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla T)
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
+var cura_passos := 0        # Cura pelas Mãos: passos extras (+1 PM cada, a cada 4 níveis) no próximo toque (tecla N)
+var cura_remover := false   # Cura pelas Mãos: remove uma condição da lista (+1 PM, 6º nível; tecla H)
 var hover := Vector2i(-1, -1)
 var preview: Dictionary = {}
 var _queue: Array = []
@@ -215,6 +217,15 @@ func candidate_actions(t: Vector2i) -> Array:
 				message.emit("Sem arma de ataque à distância equipada.")
 				return []
 			return [{"type": "attack", "target": target, "attack": idx, "special": special, "raspao": raspao}]
+		"cura":
+			var alvo_c := "player" if t == me else gs.occupant(t, "player")
+			if alvo_c == "" or (alvo_c != "player" and gs.is_enemy("player", alvo_c)):
+				return []
+			return [{"type": "cura_maos", "target": alvo_c, "passos": cura_passos, "remover": cura_remover}]
+		"olhar":
+			if target == "" or not gs.is_enemy("player", target):
+				return []
+			return [{"type": "olhar_atordoante", "target": target}]
 		"magia":
 			var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 			if str(sp.get("alcance", "")) == "pessoal":
@@ -361,6 +372,41 @@ func extra_attack() -> void:
 	message.emit("Planeje um ataque primeiro; o Ataque Extra repete o alvo.")
 
 
+## Muda o modo de clique (cura: toque um aliado adjacente; olhar: inimigo em alcance curto).
+func set_mode(m: String) -> void:
+	mode = m
+	var dicas := {"cura": "Cura pelas Mãos: clique em você ou num aliado adjacente (N: passo extra, H: remover condição).",
+		"olhar": "Olhar atordoante: clique num inimigo em alcance curto."}
+	message.emit(dicas.get(m, "Modo: " + m))
+	_update_preview()
+
+
+func cycle_cura_passos() -> void:
+	var maxp := int(Game.world.player_sheet.level) / 4
+	cura_passos = (cura_passos + 1) % (maxp + 1)
+	message.emit("Cura pelas Mãos: %d passo(s) extra(s), +%d PM." % [cura_passos, cura_passos])
+	_update_preview()
+
+
+func toggle_cura_remover() -> void:
+	if int(Game.world.player_sheet.level) < 6:
+		message.emit("Remover condição com Cura pelas Mãos exige o 6º nível.")
+		return
+	cura_remover = not cura_remover
+	message.emit("Cura pelas Mãos remove condição (+1 PM): %s" % ("ligado" if cura_remover else "desligado"))
+	_update_preview()
+
+
+## Armadura de Allihanna (dahllan): ação de movimento, 1 PM, +Defesa até o fim da cena.
+func use_allihanna() -> void:
+	if Game.world.player_sheet.race_id != "dahllan":
+		message.emit("Só dahllans têm a Armadura de Allihanna.")
+		return
+	plan.append({"type": "allihanna"})
+	message.emit("Planejado: Armadura de Allihanna (1 PM)")
+	_update_preview()
+
+
 func toggle_pungente() -> void:
 	if not Game.world.player_sheet.has_power("magia_pungente"):
 		pungente = false
@@ -414,6 +460,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_V: use_power("velocidade_ladina")
 			KEY_M: use_power("emboscar")
 			KEY_P: toggle_pungente()
+			KEY_U: set_mode("cura")
+			KEY_N: cycle_cura_passos()
+			KEY_H: toggle_cura_remover()
+			KEY_O: set_mode("olhar")
+			KEY_Y: use_allihanna()
+			KEY_F: cycle_policy("golpe_divino")
+			KEY_Z: cycle_policy("golpe_divino_extra")
 			KEY_X: extra_attack()
 			KEY_A: cycle_policy("ataque_poderoso")
 			KEY_D: cycle_policy("combate_defensivo")
@@ -716,7 +769,8 @@ func _float_text(at: Vector2, txt: String, col: Color) -> void:
 
 ## Ataque Poderoso / Combate Defensivo (LB p.124-125): alterna a política do poder opcional.
 func cycle_policy(power: String) -> void:
-	if not Game.world.player_sheet.has_power(power):
+	var de_classe := power.begins_with("golpe_divino")   # Golpe Divino é do paladino, não um poder comprado
+	if not de_classe and not Game.world.player_sheet.has_power(power):
 		return
 	var opts: Array = CombatModule.POWER_POLICIES[power]
 	var cur: String = Game.world.modules.combat.power_policy.get(power, opts[0])

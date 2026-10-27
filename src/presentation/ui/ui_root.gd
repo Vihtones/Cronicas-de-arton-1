@@ -822,6 +822,13 @@ func _build_combat_bar(root: Control) -> void:
 			["pungente", "P", "Magia Pungente (+1 PM, +2 CD)", func(): combat_view.toggle_pungente(), "magia_pungente"], ["extra", "X", "Ataque extra", func(): combat_view.extra_attack(), "@extra"],
 			["poderoso", "A", "Ataque Poderoso: -2 ataque, +5 dano (auto/sempre/nunca)", func(): _cycle_policy("ataque_poderoso"), "ataque_poderoso"],
 			["defensivo", "D", "Combate Defensivo: -2 ataque, +5 Defesa (liga/desliga)", func(): _cycle_policy("combate_defensivo"), "combate_defensivo"],
+			["cura", "U", "Cura pelas Mãos (1 PM): toque você ou um aliado adjacente", func(): combat_view.set_mode("cura"), "@paladino"],
+			["passos", "N", "Cura: passo extra de +1d8+1 (+1 PM, a cada 4 níveis)", func(): combat_view.cycle_cura_passos(), "@paladino"],
+			["remover", "H", "Cura: remover condição (+1 PM, 6º nível)", func(): combat_view.toggle_cura_remover(), "@paladino"],
+			["golpe", "F", "Golpe Divino: +Car e +1d8 (2 PM; auto/nunca)", func(): _cycle_policy("golpe_divino"), "@paladino"],
+			["golpe_extra", "Z", "Golpe Divino: dados extras (+1 PM cada; auto/nunca)", func(): _cycle_policy("golpe_divino_extra"), "@paladino"],
+			["olhar", "O", "Olhar atordoante (medusa)", func(): combat_view.set_mode("olhar"), "@medusa"],
+			["allihanna", "Y", "Armadura de Allihanna (1 PM)", func(): combat_view.use_allihanna(), "@dahllan"],
 			["desfazer", "⌫", "Desfazer", func(): combat_view.undo(), ""], ["confirmar", "↵", "Confirmar plano", func(): combat_view.confirm(), ""], ["fim", "␣", "Fim do turno", func(): combat_view.end_turn(), ""]]:
 		var b := HotSlot.new().setup(spec[0], spec[1], spec[2], spec[3])
 		b.set_meta("needs", spec[4])
@@ -853,6 +860,9 @@ func update_combat_bar() -> void:
 			"@guerreiro": b.visible = sh.class_id in ["", "guerreiro"]
 			"@magia": b.visible = not sh.spells.is_empty() or sh.has_power("raio_arcano")
 			"@extra": b.visible = sh.class_id == "guerreiro" and sh.level >= 6
+			"@paladino": b.visible = sh.class_id == "paladino"
+			"@medusa": b.visible = sh.race_id == "medusa"
+			"@dahllan": b.visible = sh.race_id == "dahllan"
 			_: b.visible = sh.has_power(need)
 		var ic := b.icon_id
 		b.active = (ic == "especial" and combat_view.special) or (ic == "raspao" and combat_view.raspao) or (ic == "pungente" and combat_view.get("pungente") == true)
@@ -861,7 +871,15 @@ func update_combat_bar() -> void:
 			var pol: String = c.power_policy.get("ataque_poderoso" if ic == "poderoso" else "combate_defensivo", "")
 			b.badge = pol
 			b.active = pol == "sempre"
-		b.cost = {"especial": 1, "impeto": 1, "velocidade": 2, "emboscar": 2, "pungente": 1, "raspao": 2}.get(ic, 0)
+		if ic in ["golpe", "golpe_extra"]:
+			var pol_g: String = c.power_policy.get("golpe_divino" if ic == "golpe" else "golpe_divino_extra", "")
+			b.badge = pol_g
+			b.active = pol_g == "auto"
+		elif ic == "passos":
+			b.badge = str(combat_view.cura_passos)
+		elif ic in ["cura", "olhar"]:
+			b.active = combat_view.mode == ic
+		b.cost = {"especial": 1, "impeto": 1, "velocidade": 2, "emboscar": 2, "pungente": 1, "raspao": 2, "cura": 1, "olhar": 1, "allihanna": 1}.get(ic, 0)
 		var st := "%s|%s|%s|%d" % [b.visible, b.active, b.badge, b.cost]
 		if st != str(b.get_meta("st", "")):
 			b.set_meta("st", st)
