@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2981,3 +2981,27 @@ func test_condicao_acompanha_status_a_qualquer_distancia() -> void:
 	eq(st[1].tile, [5, 57], "sabe a posição mesmo longe")
 	sim.c("bandido_1").sheet.pv = -999
 	eq(m[1].status_conhecidos("player").size(), 1, "morto: deixa de detectar")
+
+
+func test_circulo_da_justica_penaliza_e_impede_mentir() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	var b2 := _bandido(m, "bandido_2", 99)
+	sim.c("bandido_2").tile = Vector2i(29, 57)
+	check(not _lanca(m, {"type": "cast", "spell": "circulo_da_justica", "tile": Vector2i(40, 57)}).ok, "fora do alcance curto")
+	check(_lanca(m, {"type": "cast", "spell": "circulo_da_justica", "tile": Vector2i(28, 57)}).ok, "Círculo da Justiça")
+	eq(b1.efeito_bonus("pericia_furtividade"), -10, "falhou: –10")
+	check(b1.efeito_bonus("nao_mente") > 0, "falhou: não mente")
+	eq(b2.efeito_bonus("pericia_enganacao"), -5, "passou: –5")
+	eq(b2.efeito_bonus("nao_mente"), 0, "passou: pode mentir")
+	sim.c("bandido_1").tile = Vector2i(5, 57)
+	m[1]._refresh_bencaos()
+	eq(b1.efeito_bonus("pericia_furtividade"), 0, "saiu da área")
+	sim.c("bandido_1").tile = Vector2i(28, 58)
+	m[1]._refresh_bencaos()
+	eq(b1.efeito_bonus("pericia_furtividade"), -10, "voltou: a resistência não se repete")
+	check(not _lanca(m, {"type": "cast", "spell": "circulo_da_justica", "tile": Vector2i(28, 57), "aprimoramentos": [2]}).ok, "permanente só fora de combate")
+	var m2 := _cena_grupo(5)
+	check(_lanca(m2, {"type": "cast", "spell": "circulo_da_justica", "aprimoramentos": [0]}).ok, "versão pessoal")
+	check(m2[2].c("player").sheet.efeito_bonus("ve_invisivel") > 0, "vê o invisível")

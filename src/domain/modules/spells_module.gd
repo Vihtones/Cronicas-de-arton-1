@@ -29,7 +29,8 @@ const FORA_DE_COMBATE := {
 	"silencio": [0, 1],   # fora de combate, o objeto que você carrega, pela cena: nenhum som sai (furtividade)
 	"escuridao": [],
 	"voz_divina": [],
-	"condicao": [],   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
+	"condicao": [],
+	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
 const RAIO_DETECTAR := 12   # esfera de 18m
@@ -37,8 +38,11 @@ const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
 const TOTAL_PERMANENTE := 1000   # T$ de incenso e óleos da versão permanente
 const DIAS_SEMANA := 7
+const BALANCA_DE_PRATA := 5000   # T$ da versão permanente do Círculo da Justiça
+const PERICIAS_JUSTICA := ["acrobacia", "enganacao", "furtividade", "ladinagem"]
 const MINUTOS_DIA := 24 * 60
 
+var justicas: Array = []   # Círculo da Justiça: {centro:[x,y], raio, ate (minuto, -1 permanente), cd, forte, resistiu:{id: bool}}
 var interrogados: Dictionary = {}   # Voz Divina: cadáveres que já responderam (um corpo só uma vez)
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
 var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
@@ -169,6 +173,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["fora do alcance"])
 				if not SpellRules.alvo_social_valido(sp_id, apr, CharacterSheet.from_dict(combat_v.creature_state[tg].sheet)):
 					return PackedStringArray(["tipo de criatura que a magia não afeta"])
+		"circulo_da_justica":
+			if apr.has(2) and int(world.player.gold) < BALANCA_DE_PRATA:
+				return PackedStringArray(["falta a balança de prata (T$ %d)" % BALANCA_DE_PRATA])
 		"condicao":
 			var alvos_cd: Array = cmd.payload.get("targets", [])
 			if alvos_cd.is_empty() or alvos_cd.size() > 5 + apr.count(0):
@@ -347,6 +354,20 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, ["player"]))
 			else:
 				out.append(falar_com_plantas(p_cp))
+		"circulo_da_justica":
+			var apr_cj: Array = cmd.payload.get("aprimoramentos", [])
+			if apr_cj.has(0):
+				sh.add_efeito("magia.circulo_da_justica", "ve_invisivel", 1, "cena")
+				out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "circulo_da_justica", "tags": ["magia"]}, ["player"]))
+			else:
+				if apr_cj.has(2):
+					out.append(fact("GOLD_CHANGED", {"delta": -BALANCA_DE_PRATA, "reason": sp_id}))
+				var combat_cj = world.module("combat")
+				var cd_cj: int = 10
+				if combat_cj != null:
+					cd_cj = combat_cj.spell_dc(sh, cmd.payload)
+				criar_justica(_tile_jogador(), cd_cj, apr_cj)
+				out.append(fact("AREA_BLESSED", {"caster": "player", "spell": sp_id, "permanente": apr_cj.has(2)}, ["player"]))
 		"condicao":
 			var apr_cd: Array = cmd.payload.get("aprimoramentos", [])
 			for tg in cmd.payload.get("targets", []):
@@ -415,6 +436,58 @@ func criar_area(tipo: String, centro: Vector2i, apr: Array, sh: CharacterSheet, 
 			mod = -mod
 	areas.append({"tipo": tipo, "centro": [centro.x, centro.y], "raio": raio, "ate": -1 if apr.has(2) else world.clock.total_minutes() + MINUTOS_DIA,
 		"mod_mv": mod, "conjurador": conj})
+
+
+## Círculo da Justiça (divina 2): esfera de 9m por um dia (permanente com a balança de prata).
+func criar_justica(centro: Vector2i, cd: int, apr: Array) -> void:
+	justicas.append({"centro": [centro.x, centro.y], "raio": Area.quadrados(9.0), "ate": -1 if apr.has(2) else world.clock.total_minutes() + MINUTOS_DIA,
+		"cd": cd, "forte": apr.has(1), "resistiu": {}})
+
+
+func _justicas_em(t: Vector2i) -> Array:
+	var agora := world.clock.total_minutes()
+	return justicas.filter(func(ar): return (int(ar.ate) < 0 or int(ar.ate) > agora) and _dist(ar, t) <= int(ar.raio))
+
+
+## Efeito do Círculo da Justiça sobre a criatura `id` no quadrado `t`: {} fora da área; senão {penalidade, mente}.
+## Cada criatura resiste (Vontade) uma vez por círculo: falhou, –10 (–20 com o aprimoramento) e não pode mentir;
+## passou, –5 (–10) e pode mentir.
+func justica_sobre(id: String, ficha: CharacterSheet, t: Vector2i) -> Dictionary:
+	var pior := {}
+	for ar in _justicas_em(t):
+		if not (ar.resistiu as Dictionary).has(id):
+			ar.resistiu[id] = Checks.skill(ficha, "vontade", int(ar.cd), world.rules, world.rng, "world").get("success", false)
+		var passou: bool = ar.resistiu[id]
+		var pen := (10 if passou else 20) if bool(ar.forte) else (5 if passou else 10)
+		if pior.is_empty() or pen > int(pior.penalidade):
+			pior = {"penalidade": pen, "mente": passou and bool(pior.get("mente", true))}
+		elif not passou:
+			pior["mente"] = false
+	return pior
+
+
+## Um NPC no lugar `loc` pode mentir (distorcer o que conta)? Não, se o centro de um Círculo da Justiça ativo fica
+## nesse lugar e ele falhou na resistência.
+func pode_mentir(npc: String, loc: String) -> bool:
+	var agora := world.clock.total_minutes()
+	for ar in justicas:
+		if (int(ar.ate) < 0 or int(ar.ate) > agora) and world.db.location_at(Vector2i(int(ar.centro[0]), int(ar.centro[1]))) == loc:
+			var j := justica_sobre(npc, _ficha_npc(npc), Vector2i(int(ar.centro[0]), int(ar.centro[1])))
+			if not bool(j.get("mente", true)):
+				return false
+	return true
+
+
+## Aplica na ficha as penalidades do Círculo da Justiça para quem está no quadrado (remove as antigas).
+func aplicar_justica(id: String, ficha: CharacterSheet, t: Vector2i) -> void:
+	ficha.anular_magia("magia.circulo_da_justica_area")
+	var j := justica_sobre(id, ficha, t)
+	if j.is_empty():
+		return
+	for p in PERICIAS_JUSTICA:
+		ficha.add_efeito("magia.circulo_da_justica_area", "pericia_" + p, -int(j.penalidade), "cena")
+	if not bool(j.mente):
+		ficha.add_efeito("magia.circulo_da_justica_area", "nao_mente", 1, "cena")
 
 
 func _areas_em(t: Vector2i) -> Array:
@@ -667,6 +740,8 @@ func auras_no_mundo(centro: Vector2i, raio: int, completo: bool) -> Array:
 	var out: Array = []
 	for ar in _areas_em(centro):
 		out.append(_aura(str(ar.tipo), Vector2i(int(ar.centro[0]), int(ar.centro[1])), completo))
+	for ar in _justicas_em(centro):
+		out.append(_aura("circulo_da_justica", Vector2i(int(ar.centro[0]), int(ar.centro[1])), completo))
 	var combat = world.module("combat")
 	for id in cadaveres:
 		if cadaver_preservado(id) and combat != null and combat.creature_state.has(id):
@@ -728,7 +803,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate()}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -742,3 +817,4 @@ func from_dict(d: Dictionary) -> void:
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()
+	justicas = (d.get("justicas", []) as Array).duplicate(true)

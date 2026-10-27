@@ -562,6 +562,15 @@ func _refresh_oracao() -> void:
 
 
 ## Silêncio: quem está na área (não a versão que só contém o som) fica surdo enquanto estiver lá.
+## Círculo da Justiça: penalidades de quem está numa área (cada um resiste uma vez por círculo; ver SpellsModule).
+func _refresh_justica() -> void:
+	var magia_j = world.module("magia")
+	if magia_j == null:
+		return
+	for cid in sim.combatants:
+		magia_j.aplicar_justica(cid, sim.c(cid).sheet, sim.c(cid).tile)
+
+
 func _refresh_silencio() -> void:
 	for cid in sim.combatants:
 		var s: CharacterSheet = sim.c(cid).sheet
@@ -649,6 +658,7 @@ func _refresh_bencaos() -> void:
 	_refresh_areas_sagradas()
 	_refresh_oracao()
 	_refresh_silencio()
+	_refresh_justica()
 	for id in sim.combatants:
 		var sh: CharacterSheet = sim.c(id).sheet
 		sh.remove_efeito("aura_sagrada")
@@ -2672,6 +2682,20 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_raio_solar(id, a))
 		"soco_de_arsenal":
 			out.append_array(_soco_de_arsenal(id, a))
+		"circulo_da_justica":
+			# Círculo da Justiça (divina 2): esfera de 9m num ponto em alcance curto, por um dia (SpellsModule). Quem está
+			# dentro sofre –10 em Acrobacia, Enganação, Furtividade e Ladinagem e não mente; Vontade: –5 e pode mentir.
+			# Aprimoramentos: pessoal, pela cena, vê o invisível em alcance curto; –10/–20 (4º); permanente (fora de combate).
+			var apr_cj: Array = a.get("aprimoramentos", [])
+			if apr_cj.has(0):
+				sh.add_efeito("magia.circulo_da_justica", "ve_invisivel", 1, "cena")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "circulo_da_justica", "tags": ["magia"]}, [id]))
+			else:
+				var magia_cj = world.module("magia")
+				if magia_cj != null:
+					magia_cj.criar_justica(a.get("tile", sim.c(id).tile), spell_dc(sh, a), apr_cj)
+				_refresh_justica()
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "circulo_da_justica", "tags": ["magia", "area"]}, [id]))
 		"condicao":
 			# Condição (divina 2): até 5 criaturas em alcance curto (+1 por aprimoramento), pela cena (um dia com
 			# aprimoramento): o conjurador sabe posição e status delas a qualquer distância (status_conhecidos).

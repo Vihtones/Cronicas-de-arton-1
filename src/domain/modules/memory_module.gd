@@ -207,7 +207,9 @@ func on_tick(tick: int) -> Array:
 				copy.tick = tick
 				copy.location = loc
 				# NPC mentiroso pode distorcer (NPCs não são oniscientes nem sempre honestos)
-				if world.npc_def(speaker).get("traits", []).has("mentiroso") and world.rng.stream("world").randf() < 0.3:
+				var magia_mm = world.module("magia")
+				var pode_mentir: bool = magia_mm == null or magia_mm.pode_mentir(speaker, loc)   # Círculo da Justiça
+				if pode_mentir and world.npc_def(speaker).get("traits", []).has("mentiroso") and world.rng.stream("world").randf() < 0.3:
 					copy.valence = -int(copy.valence)
 					copy.text = "(distorcido) " + str(copy.text)
 					copy.reliability *= 0.5
