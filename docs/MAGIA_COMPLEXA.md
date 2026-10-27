@@ -33,12 +33,45 @@ Tudo isso é salvo com o combate (zonas e marcas em `CombatModule.to_dict`).
 Estes sistemas guardam o estado, mas ainda não produzem efeito por si. Cada magia que precisar deles
 deve implementar o efeito, e os próximos passos são:
 
-1. **Entrada na zona**: o efeito acontece só no início do turno. Não há efeito ao entrar na zona no meio do turno.
+1. **Entrada na zona**: o efeito acontece só no início do turno. Não há efeito ao entrar na zona no meio do turno
+   (a Aura Divina já trata a entrada, mas só para o movimento de criaturas, não para a aura se mover).
 2. **Movimento bloqueado por zona** (Cúpula de Repulsão, Muralha): hoje a zona só dobra o custo.
 3. **Expiração com aviso**: `expiradas` guarda os ids, mas nenhum fato de jogo é emitido ainda.
-4. **Invocações com habilidades próprias** (Guardião Divino, Montaria): a criatura usa o bestiário, sem
-   ações especiais além dele. Servos com ações próprias precisam de ficha própria.
-5. **Aprendizado de magias pelo clérigo**: ver `CHANGELOG.md` (0.7.1).
+4. **Servos com ação própria** (Montaria, Servo Divino, Servo Morto-vivo): o Guardião Divino já tem turno próprio
+   (`CombatModule._turno_guardiao`, marcado com a flag `guardiao`); a generalização para outros servos ainda não existe.
+5. **Escolha do jogador**: magia aprendida ao subir de nível e versão do Manto do Cruzado saem automáticos.
+
+Resolvido nesta fase: execução longa (`CombatSim.conjurando`, Banimento), concentração ao ser ferido na
+execução, ritual de um dia (`CombatModule.processar_rituais_do_dia`, Lágrimas de Wynna), registro de magias
+ativas por escola (dissipar), reação após teste (Premonição) e condições com efeito no combate.
+
+## Restante do catálogo (triagem)
+
+Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
+85 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
+
+- Divinas de 1º círculo (17): abencoar_alimentos, acalmar_animal, arma_espiritual, armamento_da_natureza,
+  bencao, caminhos_da_natureza, comando, consagrar, controlar_plantas, criar_elementos, despedacar,
+  detectar_ameacas, orientacao, profanar, santuario, suporte_ambiental, tranquilidade.
+- Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
+  controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
+  raio_solar, rogar_maldicao, silencio, soco_de_arsenal, tempestade_divina, voz_divina.
+- Divinas de 3º círculo (12): anular_a_luz, comunhao_com_a_natureza, controlar_agua, controlar_terra,
+  despertar_consciencia, dispersar_as_trevas, heroismo, missao_divina, potencia_divina, protecao_contra_magia,
+  servo_divino, viagem_arborea.
+- Divinas de 4º círculo (4): conceder_milagre, controlar_o_clima, cupula_de_repulsao, terremoto.
+- Divinas de 5º círculo (4): furia_do_panteao, intervencao_divina, reanimacao_impura, segunda_chance.
+- Universais de 1º círculo (7): arma_magica, aviso, compreensao, escuridao, luz, nevoa, visao_mistica.
+- Universais de 2º círculo (4): conjurar_mortos_vivos, dissipar_magia, marca_da_obediencia, runa_de_protecao.
+- Universais de 3º círculo (7): imobilizar, lendas_e_historias, manto_de_sombras, pele_de_pedra, selo_de_mana,
+  servo_morto_vivo, videncia.
+- Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
+- Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
+- Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
+
+Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
+servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate
+(viagem arbórea, viagem planar, projetar consciência, videncia, lendas e histórias).
 
 ## Magias de referência por sistema
 
