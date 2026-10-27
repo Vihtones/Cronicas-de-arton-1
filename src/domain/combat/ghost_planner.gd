@@ -121,6 +121,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if not A.sheet.has_power("raio_arcano"): return {"ok": false, "reason": "poder Raio Arcano não adquirido"}
 			elif not A.sheet.spells.has(sp_id): return {"ok": false, "reason": "magia não conhecida"}
 			if sp.is_empty(): return {"ok": false, "reason": "magia sem regra"}
+			if A.sheet.has_efeito("magia.potencia_divina"): return {"ok": false, "reason": "sob Potência Divina você não pode lançar magias"}
 			if a.get("pungente", false) and not A.sheet.has_power("magia_pungente"):
 				return {"ok": false, "reason": "você não tem Magia Pungente"}
 			var cost := spell_cost(sim.rules, sp, a)
@@ -182,6 +183,37 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				var TM3 := sim.c(tg_m)
 				var erro_m := SpellRules.erro_madeira(sim.rules, sim.db, a, A.tile, TM3.tile if not TM3.is_empty() else A.tile, TM3.sheet if not TM3.is_empty() else null)
 				if erro_m != "": return {"ok": false, "reason": erro_m}
+				targets = [actor]
+			# Proteção contra Magia (imune a escola): o alvo não é afetado por magias dessa escola.
+			var escola_sp := str(sp.get("escola", "")).to_lower()
+			for tg_e in targets:
+				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
+					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "heroismo" or sp_id == "protecao_contra_magia":
+				for tg_h in targets:
+					if not sim.combatants.has(tg_h) or sim.is_enemy(actor, tg_h) or sim.c(tg_h).sheet.is_dead():
+						return {"ok": false, "reason": "%s só ajuda aliados" % sp_id.replace("_", " ")}
+			if sp_id == "protecao_contra_magia" and (apr.has(1) or apr.has(2)):
+				var escolas_pc: Array = a.get("escolas", [])
+				if escolas_pc.size() != (2 if apr.has(2) else 1):
+					return {"ok": false, "reason": "escolha %d escola(s) de magia" % (2 if apr.has(2) else 1)}
+				for esc_pc in escolas_pc:
+					if not SpellRules.escola_valida(str(esc_pc)) or escolas_pc.count(esc_pc) > 1:
+						return {"ok": false, "reason": "escola de magia inválida ou repetida"}
+			if sp_id == "potencia_divina":
+				if apr.has(2):
+					if targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.is_enemy(actor, targets[0]):
+						return {"ok": false, "reason": "escolha 1 aliado"}
+					if sim.c(targets[0]).sheet.has_efeito("magia.potencia_divina"):
+						return {"ok": false, "reason": "o alvo já está sob Potência Divina"}
+				else:
+					targets = [actor]
+			if sp_id == "dispersar_as_trevas" and apr.has(1):
+				if targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.is_enemy(actor, targets[0]):
+					return {"ok": false, "reason": "escolha 1 aliado"}
+				if CombatSim.cheb(A.tile, sim.c(targets[0]).tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)):
+					return {"ok": false, "reason": "fora do alcance"}
+			elif sp_id == "dispersar_as_trevas" or sp_id == "anular_a_luz":
 				targets = [actor]
 			if sp_id == "tempestade_divina":
 				var tt: Vector2i = a.get("tile", A.tile)

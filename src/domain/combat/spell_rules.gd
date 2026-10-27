@@ -10,6 +10,11 @@ const COMPLETAS := {
 	"resistencia_a_energia": {"aprimoramentos": [0, 1, 2, 3, 4]},
 	"escudo_da_fe": {"aprimoramentos": [0, 1, 2, 3, 4]},
 	"protecao_divina": {"aprimoramentos": [0, 1, 2, 3]},
+	"heroismo": {"aprimoramentos": [0]},   # imune a medo; 40 PV temporários; +4 (+6 com o aprimoramento) contra o maior ND
+	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
+	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
+	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"anular_a_luz": {"aprimoramentos": [0, 1, 2]},   # dissipa até 3º (4º, 5º); aliados +4 Defesa (+1); inimigos enjoados 1x por cena
 	"curar_ferimentos": {"aprimoramentos": [0, 1, 2, 3]},
 	"vestimenta_da_fe": {"aprimoramentos": [0, 1, 2]},
 	"manto_do_cruzado": {"aprimoramentos": []},   # sem aprimoramentos; versão luz ou trevas escolhida ao aprender
@@ -91,9 +96,15 @@ const ALVO_QUADRADO := ["controlar_madeira", "tempestade_divina", "enxame_de_pes
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
 const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
-	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
+	"protecao_divina": {1: "curto"}, "potencia_divina": {2: "toque"}, "dispersar_as_trevas": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
-const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]]}
+const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]]}
+## Escolas de magia (LB, Proteção contra Magia): minúsculas, sem acento na comparação (ver `escola_valida`).
+const ESCOLAS := ["abjuração", "adivinhação", "convocação", "encantamento", "evocação", "ilusão", "necromancia", "transmutação"]
+
+
+static func escola_valida(nome: String) -> bool:
+	return ESCOLAS.has(nome.to_lower())
 const TIPOS_ENERGIA := ["acido", "eletricidade", "fogo", "frio", "luz", "trevas"]
 
 

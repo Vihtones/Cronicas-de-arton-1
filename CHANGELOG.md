@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Divinas de 3º círculo (lote 1): Heroísmo, Proteção contra Magia, Potência Divina, Dispersar as Trevas e Anular a Luz completas com todos os aprimoramentos. Heroísmo: 40 PV temporários, imunidade a medo e bônus contra o inimigo de maior ND. Proteção contra Magia: bônus de resistência ou imunidade a uma ou duas escolas (tecla T escolhe a escola). Potência Divina: sustentada, Força, RD e tamanho; toque em aliado devoto da mesma divindade. Dispersar e Anular dissipam magias de até 3º, 4º ou 5º círculo com teste de Religião contra a CD de cada uma; Dispersar cega inimigos e dá resistência e RD aos aliados; Anular dá Defesa aos aliados e enjoa inimigos (uma vez por cena). Corrigido o catálogo de Heroísmo, que tinha aprimoramentos do Hipnotismo. Testes em `tests/unit/test_magia_complexa.gd`.
+
 - Ambiente (provisório, por código): grama com tufos, moitas com frutinhas, pedras e cogumelos; margem de rio e lago com lama, espuma e juncos; adereços junto das casas (barris, caixotes, lenha, feno, canteiros de flores); lavouras com sulcos, trigo e hortaliças, cercadas; as casas de Pedra Branca agora têm telhado e fachada (o local do prédio é o interior, como na vila).
 
 - Gráficos (provisórios): os personagens humanos agora são sprites de 64 px montados a partir das camadas do LPC Generator (jogador, aldeão, artesão, guarda, sacerdote, idoso, criança, bandido, Kael, aldeã e mercadora), recoloridos por `tools/gen_chars_lpc.py`; só camadas com licença de atribuição (OGA-BY, CC-BY, CC0), com créditos em `assets/CREDITOS_PERSONAGENS.txt` (aparecem em Créditos de arte). `ActorView` aceita quadros de qualquer tamanho; a hiena segue com o sprite antigo. Pendente de aprovação artística do usuário.

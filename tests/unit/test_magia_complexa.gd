@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3332,3 +3332,181 @@ func test_controlar_madeira_equipamento_objetos_e_arvore() -> void:
 	var r4 := WorldHelpers.cmd(w4, "CastSpell", {"spell": "controlar_madeira", "aprimoramentos": [0]})
 	check(r4.accepted, "árvore fora de combate")
 	check(not WorldHelpers.cmd(w4, "MovePlayer", {"dx": 1, "dy": 0}).accepted, "árvore não anda")
+
+
+# --- Divinas de 3º círculo: Heroísmo, Proteção contra Magia, Potência Divina, Dispersar as Trevas, Anular a Luz ---
+func test_heroismo_exige_circulo_3_e_so_ajuda_aliados() -> void:
+	check(not GhostPlanner.validate_action(_cena_grupo(5)[2], "player", {"type": "cast", "spell": "heroismo", "target": "player", "targets": ["player"]}).ok, "clérigo de nível 5 não lança Heroísmo")
+	var m := _cena_grupo(9)
+	check(_lanca(m, {"type": "cast", "spell": "heroismo", "target": "player", "targets": ["player"]}).ok, "Heroísmo em si mesmo")
+	check(not _lanca(m, {"type": "cast", "spell": "heroismo", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "inimigo não recebe Heroísmo")
+
+
+func test_heroismo_da_40_pv_temporarios_imunidade_a_medo_e_bonus_contra_o_maior_nd() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1").sheet.pv = 999
+	check(_lanca(m, {"type": "cast", "spell": "heroismo", "target": "player", "targets": ["player"]}).ok, "Heroísmo lançado")
+	var P: CharacterSheet = sim.c("player").sheet
+	eq(P.pv_temp, 40, "40 PV temporários")
+	check(P.efeito_tipo_existe("imune", "apavorado"), "imune a medo (apavorado)")
+	var total: int = sim.c("bandido_1").sheet.efeito_bonus_tipo("ataque_vs", "bandido_1") + sim.c("bandido_2").sheet.efeito_bonus_tipo("ataque_vs", "bandido_2")
+	eq(P.efeito_bonus_tipo("ataque_vs", "bandido_1") + P.efeito_bonus_tipo("ataque_vs", "bandido_2"), 4, "+4 contra um inimigo (o de maior ND)")
+	eq(total, 0, "o bônus não vale contra os outros inimigos")
+
+
+func test_heroismo_aprimoramento_muda_bonus_para_6() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	check(_lanca(m, {"type": "cast", "spell": "heroismo", "target": "player", "targets": ["player"], "aprimoramentos": [0]}).ok, "Heroísmo +6")
+	var P: CharacterSheet = sim.c("player").sheet
+	eq(P.efeito_bonus_tipo("ataque_vs", "bandido_1") + P.efeito_bonus_tipo("ataque_vs", "bandido_2"), 6, "+6 com o aprimoramento")
+
+
+func test_protecao_contra_magia_da_5_e_com_aprimoramento_10() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	check(not _lanca(m, {"type": "cast", "spell": "protecao_contra_magia", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "inimigo não é protegido")
+	eq(sim.c("bandido_1").sheet.efeito_bonus("resistencia"), 0, "bandido_1 é inimigo: não recebe")
+	var m2 := _cena_grupo(9)
+	check(_lanca(m2, {"type": "cast", "spell": "protecao_contra_magia", "target": "player", "targets": ["player"]}).ok, "em si mesmo")
+	eq(m2[2].c("player").sheet.efeito_bonus("resistencia"), 5, "+5 em testes de resistência")
+	var m3 := _cena_grupo(13)
+	check(_lanca(m3, {"type": "cast", "spell": "protecao_contra_magia", "target": "player", "targets": ["player"], "aprimoramentos": [0]}).ok, "+10")
+	eq(m3[2].c("player").sheet.efeito_bonus("resistencia"), 10, "+10 com o aprimoramento")
+
+
+func test_protecao_contra_magia_imunidade_a_escolas_substitui_o_bonus() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	check(not _lanca(m, {"type": "cast", "spell": "protecao_contra_magia", "target": "player", "targets": ["player"], "aprimoramentos": [1]}).ok, "imunidade exige a escola")
+	check(_lanca(m, {"type": "cast", "spell": "protecao_contra_magia", "target": "player", "targets": ["player"], "aprimoramentos": [1], "escolas": ["Evocação"]}).ok, "imune a Evocação")
+	eq(sim.c("player").sheet.efeito_bonus("resistencia"), 0, "a imunidade troca o bônus")
+	check(sim.c("player").sheet.efeito_tipo_existe("imune_escola", "evocação"), "registrada a escola")
+	check(not _lanca(m, {"type": "cast", "spell": "protecao_contra_magia", "target": "player", "targets": ["player"], "aprimoramentos": [2], "escolas": ["Evocação", "Evocação"]}).ok, "escolas repetidas não valem")
+	sim.c("bandido_1").side = "player"   # aliado para o teste de imunidade
+	check(_lanca(m, {"type": "cast", "spell": "protecao_contra_magia", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [2], "escolas": ["Necromancia", "Ilusão"]}).ok, "duas escolas")
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "infligir_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]})
+	check(not v.ok, "magia de Necromancia não afeta quem é imune à escola")
+
+
+func test_potencia_divina_forca_rd_tamanho_e_sustentada() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var P: CharacterSheet = sim.c("player").sheet
+	var for0 := int(P.attrs["for"])
+	var tam0 := P.size
+	check(_lanca(m, {"type": "cast", "spell": "potencia_divina", "target": "player", "targets": ["player"]}).ok, "Potência Divina")
+	eq(int(P.attrs["for"]), for0 + 4, "Força +4")
+	eq(P.efeito_rd("fogo"), 10, "RD 10")
+	check(P.size != tam0, "uma categoria de tamanho acima")
+	check(not GhostPlanner.validate_action(sim, "player", {"type": "cast", "spell": "coluna_de_chamas", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "não lança magias sob Potência Divina")
+	c_fim(m)
+	eq(int(P.attrs["for"]), for0, "Força volta ao normal ao terminar")
+	eq(P.size, tam0, "tamanho volta ao normal")
+	eq(P.efeito_rd("fogo"), 0, "RD some")
+
+
+func c_fim(m: Array) -> void:
+	m[1]._encerrar_sustentada("player", [])
+
+
+func test_potencia_divina_aprimoramentos_forca_rd_e_toque() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	check(_lanca(m, {"type": "cast", "spell": "potencia_divina", "target": "player", "targets": ["player"], "aprimoramentos": [0, 1]}).ok, "Força +1 e RD +5")
+	eq(sim.c("player").sheet.efeito_rd("fogo"), 15, "RD 15")
+	c_fim(m)
+	var m2 := _cena_grupo(9)
+	check(not _lanca(m2, {"type": "cast", "spell": "potencia_divina", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [2]}).ok, "toque: só aliado")
+	check(_lanca(m2, {"type": "cast", "spell": "potencia_divina", "target": "player", "targets": ["player"], "aprimoramentos": [2]}).ok, "toque em aliado")
+
+
+func test_dispersar_dissipa_magia_de_ate_3_circulo_e_poupa_a_de_4() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var b1: CharacterSheet = sim.c("bandido_1").sheet
+	sim.c("player").sheet.add_efeito("magia.bencao", "testes", 99, "cena")   # força o teste de Religião
+	b1.add_efeito("magia.bencao", "ataque", 1, "cena")
+	b1.add_efeito("magia.circulo_da_restauracao", "defesa", 1, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "Dispersar as Trevas")
+	check(not b1.has_efeito("magia.bencao"), "Bênção (1º círculo) foi dissipada")
+	check(b1.has_efeito("magia.circulo_da_restauracao"), "4º círculo: fica (o alcance é 3º)")
+
+
+func test_dispersar_aprimoramento_dissipa_ate_4_circulo() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	var b1: CharacterSheet = sim.c("bandido_1").sheet
+	sim.c("player").sheet.add_efeito("magia.bencao", "testes", 99, "cena")
+	b1.add_efeito("magia.circulo_da_restauracao", "defesa", 1, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"], "aprimoramentos": [2]}).ok, "com 4º círculo")
+	check(not b1.has_efeito("magia.circulo_da_restauracao"), "dissipada")
+
+
+func test_dispersar_aliados_ganham_resistencia_e_rd_e_inimigos_ficam_cegos_uma_vez() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("magia.bencao", "testes", 99, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "primeira vez")
+	eq(sim.c("player").sheet.efeito_bonus("resistencia"), 4, "aliado +4 em resistências")
+	eq(sim.c("player").sheet.efeito_rd("trevas"), 10, "RD 10")
+	check(sim.c("bandido_1").sheet.conditions.has("cego"), "inimigo na área fica cego")
+	var m2 := _cena_grupo(9)
+	check(_lanca(m2, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"], "aprimoramentos": [0]}).ok, "+1")
+	eq(m2[2].c("player").sheet.efeito_bonus("resistencia"), 5, "+5 com o aprimoramento")
+	var m3 := _cena_grupo(9)
+	check(_lanca(m3, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "primeira")
+	m3[2].c("bandido_1").sheet.remove_condition("cego")
+	check(_lanca(m3, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "segunda na mesma cena")
+	check(not m3[2].c("bandido_1").sheet.conditions.has("cego"), "cego só uma vez por cena")
+
+
+func test_dispersar_aprimoramento_alvo_unico_e_imune_a_trevas() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	check(not _lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["bandido_1"], "aprimoramentos": [1]}).ok, "alvo único: aliado")
+	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"], "aprimoramentos": [1]}).ok, "alvo único")
+	check(sim.c("player").sheet.efeito_tipo_existe("imune", "trevas"), "imune a efeitos de trevas")
+
+
+func test_dispersar_anula_anular_a_luz() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("magia.bencao", "testes", 99, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "anular_a_luz", "targets": ["player"]}).ok, "Anular a Luz")
+	check(sim.c("player").sheet.has_efeito("magia.anular_a_luz"), "aura de Defesa")
+	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "Dispersar")
+	check(not sim.c("player").sheet.has_efeito("magia.anular_a_luz"), "Dispersar anula Anular a Luz")
+
+
+func test_anular_a_luz_defesa_para_aliados_enjoo_para_inimigos() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	check(_lanca(m, {"type": "cast", "spell": "anular_a_luz", "targets": ["player"]}).ok, "Anular a Luz")
+	eq(sim.c("player").sheet.efeito_bonus("defesa"), 4, "+4 na Defesa dos aliados")
+	check(sim.c("bandido_1").sheet.conditions.has("enjoado"), "inimigo enjoado")
+	var m2 := _cena_grupo(9)
+	check(_lanca(m2, {"type": "cast", "spell": "anular_a_luz", "targets": ["player"], "aprimoramentos": [0]}).ok, "+1")
+	eq(m2[2].c("player").sheet.efeito_bonus("defesa"), 5, "+5 com o aprimoramento")
+
+
+func test_anular_a_luz_dissipa_ate_o_circulo_do_aprimoramento() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	var b1: CharacterSheet = sim.c("bandido_1").sheet
+	sim.c("player").sheet.add_efeito("magia.bencao", "testes", 99, "cena")
+	b1.add_efeito("magia.circulo_da_restauracao", "defesa", 1, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "anular_a_luz", "targets": ["player"]}).ok, "sem aprimoramento")
+	check(b1.has_efeito("magia.circulo_da_restauracao"), "4º círculo fica")
+	check(_lanca(m, {"type": "cast", "spell": "anular_a_luz", "targets": ["player"], "aprimoramentos": [1]}).ok, "até o 4º")
+	check(not b1.has_efeito("magia.circulo_da_restauracao"), "dissipada com o aprimoramento")
+
+
+func test_dissipacao_depende_do_teste_de_religiao() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	sim.c("player").sheet.add_efeito("magia.bencao", "testes", -99, "cena")
+	sim.c("bandido_1").sheet.add_efeito("magia.bencao", "ataque", 1, "cena")
+	check(_lanca(m, {"type": "cast", "spell": "dispersar_as_trevas", "targets": ["player"]}).ok, "Dispersar lançada")
+	check(sim.c("bandido_1").sheet.has_efeito("magia.bencao"), "sem passar no teste, a magia fica")

@@ -201,9 +201,10 @@ func add_condition(c: String, rules: RuleRegistry) -> void:
 
 
 ## Adiciona um efeito temporário (troca o anterior com o mesmo id).
-func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: String = "", ate: int = -1) -> void:
+## `conj` é o id de quem lançou a magia na combate: Dispersar as Trevas testa contra a CD de quem a lançou.
+func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: String = "", ate: int = -1, conj: String = "") -> void:
 	_remover_onde(func(e): return e.id == id_efeito and e.stat == stat and str(e.tipo) == tipo)
-	var novo := {"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo, "ate": ate}
+	var novo := {"id": id_efeito, "stat": stat, "bonus": bonus, "fim": fim, "tipo": tipo, "ate": ate, "conj": conj}
 	efeitos.append(novo)
 	_ao_entrar(novo)
 
@@ -218,6 +219,8 @@ func _ao_entrar(e: Dictionary) -> void:
 func _ao_sair(e: Dictionary) -> void:
 	if e.stat == "atributo":
 		attrs[str(e.tipo)] = int(attrs.get(str(e.tipo), 0)) - int(e.bonus)
+	elif e.stat == "tamanho":
+		size = str(e.tipo)   # Potência Divina: o tamanho volta ao que era (tipo guarda o tamanho original)
 
 
 ## Remove os efeitos para os quais `pred` é verdadeiro, desfazendo o que eles mudaram.

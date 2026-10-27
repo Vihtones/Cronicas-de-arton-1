@@ -25,6 +25,7 @@ var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla
 var truque := false          # truque da magia em foco (tecla T): 0 PM, sem aprimoramentos
 var comando_ordem := "pare"   # ordem do Comando (tecla T)
 var elemento := "fogo"         # elemento de Criar Elementos (tecla T)
+var escola_pc := "abjuração"   # escola escolhida na Proteção contra Magia (tecla T); com 2 escolas, a seguinte da lista
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var cura_passos := 0        # Cura pelas Mãos: passos extras (+1 PM cada, a cada 4 níveis) no próximo toque (tecla N)
 var cura_remover := false   # Cura pelas Mãos: remove uma condição da lista (+1 PM, 6º nível; tecla H)
@@ -249,8 +250,10 @@ func candidate_actions(t: Vector2i) -> Array:
 		"magia":
 			var sp: Dictionary = GhostPlanner.spell_rule(Game.world.rules, spell)
 			var base := {"type": "cast", "spell": spell, "pungente": pungente, "aprimoramentos": spell_apr.duplicate(), "tipo_energia": energia_tipo,
-				"truque": truque, "ordem": comando_ordem, "elemento": elemento, "tile": t, "tiles": [] if t == me else [[t.x, t.y]]}
-			if str(sp.get("alcance", "")) == "pessoal" or (target == "" and SpellRules.ALVO_QUADRADO.has(spell)):
+				"truque": truque, "ordem": comando_ordem, "elemento": elemento, "tile": t, "tiles": [] if t == me else [[t.x, t.y]], "escolas": escolas_pc()}
+			# Potência Divina (toque) e Dispersar as Trevas (alvo único) escolhem um alvo quando o aprimoramento está ligado
+			var alvo_por_apr := (spell == "potencia_divina" and spell_apr.has(2)) or (spell == "dispersar_as_trevas" and spell_apr.has(1))
+			if (str(sp.get("alcance", "")) == "pessoal" and not alvo_por_apr) or (target == "" and SpellRules.ALVO_QUADRADO.has(spell)):
 				base["targets"] = ["player"]
 				base["target"] = "player"
 				base["no_chao"] = target == "" and t != me   # Luz e Escuridão num ponto, não num objeto carregado
@@ -326,7 +329,22 @@ func cycle_aprimoramento() -> void:
 	message.emit("Aprimoramento em foco: %d de %d (B liga/desliga)." % [apr_cursor + 1, disp.size()])
 
 
+## Escolas da Proteção contra Magia: a escolhida (T) e, com o aprimoramento de duas, a seguinte da lista.
+func escolas_pc() -> Array:
+	var esc: Array = SpellRules.ESCOLAS
+	var i := esc.find(escola_pc)
+	var lista: Array = [escola_pc]
+	if spell_apr.has(2):
+		lista.append(esc[(i + 1) % esc.size()])
+	return lista
+
+
 func cycle_energia() -> void:
+	if spell == "protecao_contra_magia":
+		var esc: Array = SpellRules.ESCOLAS
+		escola_pc = esc[(esc.find(escola_pc) + 1) % esc.size()]
+		message.emit("Escola de magia: %s (T troca)." % ", ".join(PackedStringArray(escolas_pc())))
+		return
 	if spell == "criar_elementos":
 		var els: Array = SpellRules.ELEMENTOS
 		elemento = els[(els.find(elemento) + 1) % els.size()]
@@ -352,7 +370,7 @@ func cycle_energia() -> void:
 
 func confirm() -> void:
 	if not spell_alvos.is_empty() and my_turn():
-		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo, "truque": truque, "ordem": comando_ordem})
+		plan.append({"type": "cast", "spell": spell, "targets": spell_alvos.duplicate(), "target": spell_alvos[0], "aprimoramentos": spell_apr.duplicate(), "pungente": pungente, "tipo_energia": energia_tipo, "truque": truque, "ordem": comando_ordem, "escolas": escolas_pc()})
 		spell_alvos.clear()
 		mode = "mover"
 	if plan.is_empty() or not my_turn():

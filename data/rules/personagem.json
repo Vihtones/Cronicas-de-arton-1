@@ -14813,27 +14813,7 @@
     "aprimoramentos": [
      {
       "pm": 2,
-      "texto": "muda o bônus para +6. Hipnotismo arcana 1 (Encantamento) Execução: padrão; Alcance: curto; Alvos: 1 animal ou humanoide; Duração: 1d4 rodadas; Resistência: Vontade anula. Suas palavras e movimentos ritmados deixam o alvo fascinado. Esta magia só afeta criaturas que possam perceber você. Se usar esta magia em combate, o alvo recebe +5 em seu teste de resistência. Se a criatura passar, fica imune a este efeito por um dia. Truque: muda a duração para 1 rodada. Em vez de fascinado, o alvo fica pasmo (apenas uma vez por cena)."
-     },
-     {
-      "pm": 1,
-      "texto": "como o normal, mas alvos que passem na resistência não sabem que foram vítimas de uma magia."
-     },
-     {
-      "pm": 2,
-      "texto": "muda o alvo para animais ou humanoides escolhidos."
-     },
-     {
-      "pm": 2,
-      "texto": "muda a duração para sustentada."
-     },
-     {
-      "pm": 2,
-      "texto": "também afeta espíritos e monstros na área. Requer 2º círculo."
-     },
-     {
-      "pm": 5,
-      "texto": "também afeta construtos, espíritos, monstros e mortos-vivos na área. Requer 3º círculo."
+      "texto": "muda o bônus para +6."
      }
     ]
    },

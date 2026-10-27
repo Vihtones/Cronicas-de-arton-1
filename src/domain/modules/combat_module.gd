@@ -2169,6 +2169,111 @@ func _soco_de_arsenal(id: String, a: Dictionary) -> Array:
 	return out
 
 
+## Imunidade a condições de certos tipos (Heroísmo: medo; Proteção Divina: medo e mental) pela duração da magia.
+func _imune_condicoes(ts: CharacterSheet, id_magia: String, tipos: Array, fim: String) -> void:
+	var tabela: Dictionary = world.rules.value("condicoes", {})
+	for cond in tabela.keys():
+		if not tabela[cond] is Dictionary:
+			continue   # "_regra" é texto, não condição
+		if tipos.has(str((tabela[cond] as Dictionary).get("tipo", ""))):
+			ts.add_efeito(id_magia, "imune", 1, fim, str(cond))
+
+
+## Inimigo de maior ND do conjurador (Heroísmo). "" se não há inimigos na cena.
+func _inimigo_de_maior_nd(id: String) -> String:
+	var melhor := ""
+	var nd_melhor := -1.0
+	for x in sim.combatants:
+		if not sim.is_enemy(id, x) or sim.c(x).sheet.is_dead():
+			continue
+		var nd_x := ProgressionModule.nd_value(world.rules.value(sim.c(x).sheet.source_rule, {}).get("nd", "0"))
+		if nd_x > nd_melhor:
+			nd_melhor = nd_x
+			melhor = x
+	return melhor
+
+
+## Próximo tamanho (Potência Divina): uma categoria acima, até Colossal.
+static func _tamanho_acima(tam: String) -> String:
+	var ordem := ["minusculo", "pequeno", "medio", "grande", "enorme", "colossal"]
+	var i := ordem.find(tam)
+	return ordem[mini(i + 1, ordem.size() - 1)] if i >= 0 else tam
+
+
+## Sp (id sem "magia.") de um efeito ou fonte de zona/marca, se for magia do catálogo; "" caso contrário.
+func _sp_de_fonte(eid: String) -> String:
+	if not eid.begins_with("magia."):
+		return ""
+	var sp := eid.trim_prefix("magia.")
+	if sp.begins_with("rogar_maldicao_"):
+		return "rogar_maldicao"
+	return sp if not world.rules.value("magia." + sp, {}).is_empty() else ""
+
+
+func _circulo_ate(sp: String, circ_max: int) -> bool:
+	return int(world.rules.value("magia." + sp, {}).get("circulo", 99)) <= circ_max
+
+
+## Remove, sem teste, magias de um tipo que estão na área (Dispersar anula Anular a Luz e vice-versa).
+func _remover_magia_sem_teste(sp: String, tiles: Array, out: Array) -> void:
+	for cid in sim.combatants:
+		if tiles.has(sim.c(cid).tile) and sim.c(cid).sheet.has_efeito("magia." + sp):
+			sim.c(cid).sheet.anular_magia("magia." + sp)
+			out.append(fact("SPELL_ENDED", {"spell": sp, "target": cid, "reason": "anulada"}, [cid]))
+	for z in sim.zonas.duplicate(true):
+		if str(z.fonte) == sp and _alguma_em(z.tiles, tiles):
+			sim.remove_zona(str(z.id))
+	for m in sim.marcas.duplicate(true):
+		if str(m.fonte) == sp and tiles.has(sim.c(m.alvo).tile):
+			sim.remove_marca(str(m.id), str(m.alvo))
+
+
+## Dissipação (Dispersar / Anular a Luz): cada magia de até `circ_max` na área faz um teste de Religião do conjurador
+## contra a CD da própria magia (CD de quem a lançou, se ainda estiver na cena; senão a de quem dissipa).
+func _dispersar_magias(caster: String, tiles: Array, circ_max: int, out: Array) -> void:
+	var csh: CharacterSheet = sim.c(caster).sheet
+	var candidatos: Array = []
+	var vistos := {}
+	for cid in sim.combatants:
+		if not tiles.has(sim.c(cid).tile):
+			continue
+		for e in sim.c(cid).sheet.efeitos.duplicate(true):
+			var sp := _sp_de_fonte(str(e.id))
+			if sp == "" or not _circulo_ate(sp, circ_max) or vistos.has(sp + "@" + cid):
+				continue
+			vistos[sp + "@" + cid] = true
+			candidatos.append({"sp": sp, "kind": "efeito", "id": "", "alvo": cid, "conj": str(e.get("conj", ""))})
+	for z in sim.zonas.duplicate(true):
+		var sp_z := _sp_de_fonte("magia." + str(z.fonte))
+		if sp_z != "" and _circulo_ate(sp_z, circ_max) and _alguma_em(z.tiles, tiles):
+			candidatos.append({"sp": sp_z, "kind": "zona", "id": str(z.id), "alvo": "", "conj": str((z.get("dados", {}) as Dictionary).get("conjurador", ""))})
+	for m in sim.marcas.duplicate(true):
+		var sp_m := _sp_de_fonte("magia." + str(m.fonte))
+		if sp_m != "" and _circulo_ate(sp_m, circ_max) and tiles.has(sim.c(m.alvo).tile):
+			candidatos.append({"sp": sp_m, "kind": "marca", "id": str(m.id), "alvo": str(m.alvo), "conj": str((m.get("dados", {}) as Dictionary).get("conjurador", ""))})
+	for cand in candidatos:
+		var conj_sh: CharacterSheet = sim.c(cand.conj).sheet if sim.combatants.has(cand.conj) else csh
+		var cd := spell_dc(conj_sh, {"spell": cand.sp})
+		var r := Checks.skill(csh, "religiao", cd, world.rules, world.rng, "combat")
+		if not r.get("success", false):
+			continue
+		_encerrar_magia_dissipada(cand, out)
+		out.append(fact("SPELL_ENDED", {"caster": caster, "spell": cand.sp, "reason": "dissipada", "cd": cd, "d20": int(r.get("d20", 0)), "total": int(r.get("total", 0))}, [caster]))
+
+
+func _encerrar_magia_dissipada(cand: Dictionary, out: Array) -> void:
+	match str(cand.kind):
+		"efeito":
+			var dono := str(cand.conj) if str(cand.conj) != "" else str(cand.alvo)
+			if str(sim.sustentadas.get(dono, "")) == str(cand.sp):
+				_encerrar_sustentada(dono, out)
+			sim.c(str(cand.alvo)).sheet.anular_magia("magia." + str(cand.sp))
+		"zona":
+			sim.remove_zona(str(cand.id))
+		"marca":
+			sim.remove_marca(str(cand.id), str(cand.alvo))
+
+
 func _resiste(alvo: String, pericia: String, cd: int, out: Array) -> bool:
 	var sv := Checks.skill(sim.c(alvo).sheet, pericia, cd, world.rules, world.rng, "combat")
 	sv = _pos_teste(alvo, sv, cd, out)
@@ -2549,6 +2654,9 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
 					sim.remove_marca(str(m.id), id)
+		"potencia_divina":
+			for cid in sim.combatants:
+				sim.c(cid).sheet.remove_efeito("magia.potencia_divina")   # tamanho e Força voltam ao normal (ficha)
 		"silencio":
 			sim.remove_zona("silencio_%s" % id)
 			for cid in sim.combatants:
@@ -3528,13 +3636,7 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				ts3.add_efeito("magia.protecao_divina", "resistencia", 2 + (1 if apr3.has(0) else 0), "cena")
 				if apr3.has(3):
 					# +5 PM: imune a efeitos mentais e de medo (LB, Proteção Divina) — tipos da tabela de condições
-					var tabela_cond: Dictionary = world.rules.value("condicoes", {})
-					for cond in tabela_cond.keys():
-						if not tabela_cond[cond] is Dictionary:
-							continue   # "_regra" é texto, não condição
-						var info_cond: Dictionary = tabela_cond[cond]
-						if str(info_cond.get("tipo", "")) in ["medo", "mental"]:
-							ts3.add_efeito("magia.protecao_divina", "imune", 1, "cena", str(cond))
+					_imune_condicoes(ts3, "magia.protecao_divina", ["medo", "mental"], "cena")
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "protecao_divina", "tags": ["magia"]}, [id, tg]))
 		"resistencia_a_energia":
 			# Resistência a Energia (universal 1): redução de dano 10 contra um tipo de energia (aprimoramentos ajustam).
@@ -3553,6 +3655,95 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, tipo, ate)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "resistencia_a_energia", "tipo": tipo, "tags": ["magia"]}, [id, tg]))
+		"heroismo":
+			# Heroísmo (divina 3): alvo imune a medo, 40 PV temporários e +4 (+6) em ataque e dano contra o inimigo de maior ND.
+			var apr_hr: Array = a.get("aprimoramentos", [])
+			var bonus_hr := 6 if apr_hr.has(0) else 4
+			var alvo_hr := _inimigo_de_maior_nd(id)
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts_hr: CharacterSheet = sim.c(tg).sheet
+				ts_hr.pv_temp = maxi(ts_hr.pv_temp, 40)
+				_imune_condicoes(ts_hr, "magia.heroismo", ["medo"], "cena")
+				if alvo_hr != "":
+					ts_hr.add_efeito("magia.heroismo", "ataque_vs", bonus_hr, "cena", alvo_hr, -1, id)
+					ts_hr.add_efeito("magia.heroismo", "dano_vs", bonus_hr, "cena", alvo_hr, -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "heroismo", "tags": ["magia"]}, [id, tg]))
+		"protecao_contra_magia":
+			# Proteção contra Magia (divina 3): +5 em testes de resistência (+10). Com imunidade (aprimoramentos 2 e 3),
+			# o alvo fica imune a uma ou duas escolas de magia, em vez do bônus.
+			var apr_pc: Array = a.get("aprimoramentos", [])
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts_pc: CharacterSheet = sim.c(tg).sheet
+				if apr_pc.has(1) or apr_pc.has(2):
+					for esc in a.get("escolas", []):
+						ts_pc.add_efeito("magia.protecao_contra_magia", "imune_escola", 1, "cena", str(esc).to_lower(), -1, id)
+				else:
+					ts_pc.add_efeito("magia.protecao_contra_magia", "resistencia", 10 if apr_pc.has(0) else 5, "cena", "", -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "protecao_contra_magia", "tags": ["magia"]}, [id, tg]))
+		"potencia_divina":
+			# Potência Divina (divina 3): sustentada. Força +4 (+1), RD 10 (+5) e um categoria de tamanho acima.
+			# Com toque (aprimoramento 3), vale para 1 aliado devoto da mesma divindade (senão a magia falha).
+			var apr_pd: Array = a.get("aprimoramentos", [])
+			var alvos_pd: Array = [id]
+			if apr_pd.has(2):
+				alvos_pd = [a.get("target", id)]
+				if str(sh.devotion) != str(sim.c(alvos_pd[0]).sheet.devotion):
+					out.append(fact("SPELL_FAILED", {"caster": id, "check": "devocao", "cd": 0, "reason": "devocao", "d20": 0, "total": 0}, [id]))
+					out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm, "failed": true}, [id]))
+					return out
+			_iniciar_sustentada(id, "potencia_divina", out)
+			for tg in alvos_pd:
+				var ts_pd: CharacterSheet = sim.c(tg).sheet
+				var tam_original := ts_pd.size
+				ts_pd.add_efeito("magia.potencia_divina", "atributo", 4 + (1 if apr_pd.has(0) else 0), "cena", "for", -1, id)
+				ts_pd.add_efeito("magia.potencia_divina", "rd", 10 + (5 if apr_pd.has(1) else 0), "cena", "*", -1, id)
+				ts_pd.add_efeito("magia.potencia_divina", "tamanho", 0, "cena", tam_original, -1, id)
+				ts_pd.size = _tamanho_acima(tam_original)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "potencia_divina", "tags": ["magia"]}, [id, tg]))
+		"dispersar_as_trevas":
+			# Dispersar as Trevas (divina 3): dissipa magias até o 3º círculo (4º, 5º) na esfera de 6m (Religião contra a CD
+			# de cada uma). Aliados +4 (+1) em testes de resistência e RD 10 até o fim da cena; inimigos cegos 1d4 rodadas
+			# (uma vez por cena). Com alvo único (aprimoramento 1): alcance curto, aliado imune a efeitos de trevas.
+			var apr_dt: Array = a.get("aprimoramentos", [])
+			var tiles_dt: Array = Area.esfera(sim.c(id).tile, Area.quadrados(6.0))
+			if apr_dt.has(1):
+				tiles_dt = [sim.c(a.get("target", id)).tile]
+			var circ_dt := 5 if apr_dt.has(3) else (4 if apr_dt.has(2) else 3)
+			_remover_magia_sem_teste("anular_a_luz", tiles_dt, out)   # Dispersar anula Anular a Luz (instantâneo)
+			_dispersar_magias(id, tiles_dt, circ_dt, out)
+			for cid in sim.combatants.duplicate():
+				if not tiles_dt.has(sim.c(cid).tile) or sim.c(cid).sheet.is_dead():
+					continue
+				var ts_dt: CharacterSheet = sim.c(cid).sheet
+				if sim.is_enemy(id, cid):
+					if ts_dt.efeito_bonus("cegueira_usada") == 0:
+						sim.add_condicao(cid, "cego", int(Dice.roll("1d4", world.rng, "combat").total), "dispersar_as_trevas")
+						ts_dt.add_efeito("magia.dispersar_as_trevas", "cegueira_usada", 1, "cena", "", -1, id)
+				else:
+					ts_dt.add_efeito("magia.dispersar_as_trevas", "resistencia", 4 + (1 if apr_dt.has(0) else 0), "cena", "", -1, id)
+					ts_dt.add_efeito("magia.dispersar_as_trevas", "rd", 10, "cena", "*", -1, id)
+					if apr_dt.has(1):
+						ts_dt.add_efeito("magia.dispersar_as_trevas", "imune", 1, "cena", "trevas", -1, id)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "dispersar_as_trevas", "tags": ["magia"]}, [id]))
+		"anular_a_luz":
+			# Anular a Luz (divina 3): dissipa magias até o 3º círculo (4º, 5º) na esfera de 6m (Religião contra a CD de cada
+			# uma). Aliados +4 (+1) na Defesa até o fim da cena; inimigos enjoados 1d4 rodadas (uma vez por cena).
+			var apr_al: Array = a.get("aprimoramentos", [])
+			var tiles_al: Array = Area.esfera(sim.c(id).tile, Area.quadrados(6.0))
+			var circ_al := 5 if apr_al.has(2) else (4 if apr_al.has(1) else 3)
+			_remover_magia_sem_teste("dispersar_as_trevas", tiles_al, out)   # Anular anula Dispersar as Trevas
+			_dispersar_magias(id, tiles_al, circ_al, out)
+			for cid in sim.combatants.duplicate():
+				if not tiles_al.has(sim.c(cid).tile) or sim.c(cid).sheet.is_dead():
+					continue
+				var ts_al: CharacterSheet = sim.c(cid).sheet
+				if sim.is_enemy(id, cid):
+					if ts_al.efeito_bonus("enjoo_usado") == 0:
+						sim.add_condicao(cid, "enjoado", int(Dice.roll("1d4", world.rng, "combat").total), "anular_a_luz")
+						ts_al.add_efeito("magia.anular_a_luz", "enjoo_usado", 1, "cena", "", -1, id)
+				else:
+					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
 		"manto_do_cruzado":
 			# Manto do Cruzado (4º círculo): sustentada (1 PM por turno, _sustentar); a versão é a escolhida ao aprender.
 			_iniciar_sustentada(id, "manto_do_cruzado", out)
@@ -4073,6 +4264,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		if v.mods.any(func(m): return m[0] == "névoa espessa"): extra -= 2   # Névoa espessa: –2 no dano
 		extra += CombatSim.archer_bonus(A.sheet, bool(v.get("ranged", false)))   # Arqueiro (LB p.65)
 		extra += A.sheet.efeito_bonus("dano")   # efeitos de magia (Bênção, Perdição)
+		extra += A.sheet.efeito_bonus_tipo("dano_vs", target)   # Heroísmo: contra o inimigo de maior ND
 		if A.sheet.has_power("especializacao_arma") and str(A.sheet.powers.especializacao_arma) == str(A.sheet.equipment.get("weapon", "")): extra += 2
 		if not bool(v.get("ranged", false)):
 			extra += ClassFeatures.furia_bonus(A.sheet)   # Fúria do bárbaro: +dano corpo a corpo
