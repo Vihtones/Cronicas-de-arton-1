@@ -16,6 +16,13 @@ var round_no := 1
 var turn_counter := 0
 var budget := {"std": 1, "move": 1}
 var toggles: Dictionary = {}   # políticas de poderes opcionais do jogador: "ataque_poderoso"/"combate_defensivo" -> auto|sempre|nunca
+## Zonas persistentes no terreno (Muralha, névoa, terreno difícil): {id, tiles: Array[Vector2i], tipo, rodadas, fonte}.
+## rodadas = -1 não expira sozinha; os demais contam rodadas e saem ao chegar a 0.
+var zonas: Array = []
+## Marcas em criaturas (maldições, vínculos, invocações): {id, alvo, fonte, tipo, rodadas}. Mesma regra de rodadas.
+var marcas: Array = []
+## Ids que expiraram na última passagem de rodada (a apresentação pode mostrar o fim do efeito).
+var expiradas: Array = []
 
 
 func clone() -> CombatSim:
@@ -30,6 +37,9 @@ func clone() -> CombatSim:
 	c.turn_idx = turn_idx; c.round_no = round_no; c.turn_counter = turn_counter
 	c.budget = budget.duplicate()
 	c.toggles = toggles.duplicate()
+	c.zonas = zonas.duplicate(true)
+	c.marcas = marcas.duplicate(true)
+	c.expiradas = expiradas.duplicate()
 	return c
 
 
@@ -103,7 +113,7 @@ func spend(kind: String) -> void:
 ## --- Movimento (LB p.238) ----------------------------------------------------
 func step_cost(from: Vector2i, to: Vector2i) -> int:
 	var base := 2 if (from.x != to.x and from.y != to.y) else 1
-	if db.is_difficult(to): base *= 2
+	if db.is_difficult(to) or zona_em(to, "terreno_dificil"): base *= 2
 	return base
 
 
@@ -326,6 +336,10 @@ func apply_damage(target: String, amount: int) -> Array:
 			apply_damage(link, metade)
 		else:
 			s.remove_efeito_link()
+	# PV temporários (Heroísmo) absorvem o dano antes dos PV
+	var absorvido := mini(s.pv_temp, amount)
+	s.pv_temp -= absorvido
+	amount -= absorvido
 	var was_down := s.is_down()
 	s.pv -= amount
 	T.damaged_round = round_no
@@ -347,6 +361,7 @@ func next_turn() -> void:
 	if turn_idx >= order.size():
 		turn_idx = 0
 		round_no += 1
+		_passar_rodada()
 		for id in combatants:
 			combatants[id].sheet.sorte_usada = false   # Sorte Salvadora volta a valer a cada rodada
 	budget = {"std": 1, "move": 1}
@@ -358,3 +373,75 @@ func sides_alive() -> Dictionary:
 		if conscious(id):
 			out[combatants[id].side] = true
 	return out
+
+
+## --- Zonas e marcas (magias complexas: ver docs/MAGIA_COMPLEXA.md) ----------------------
+func add_zona(id: String, tiles: Array, tipo: String, rodadas: int, fonte: String) -> void:
+	zonas = zonas.filter(func(z): return z.id != id)
+	zonas.append({"id": id, "tiles": tiles.duplicate(), "tipo": tipo, "rodadas": rodadas, "fonte": fonte})
+
+
+func remove_zona(id: String) -> void:
+	zonas = zonas.filter(func(z): return z.id != id)
+
+
+func zona_em(t: Vector2i, tipo: String) -> bool:
+	for z in zonas:
+		if z.tipo == tipo and (z.tiles as Array).has(t):
+			return true
+	return false
+
+
+func add_marca(id: String, alvo: String, fonte: String, tipo: String, rodadas: int) -> void:
+	marcas = marcas.filter(func(m): return not (m.id == id and m.alvo == alvo))
+	marcas.append({"id": id, "alvo": alvo, "fonte": fonte, "tipo": tipo, "rodadas": rodadas})
+
+
+func remove_marca(id: String, alvo: String) -> void:
+	marcas = marcas.filter(func(m): return not (m.id == id and m.alvo == alvo))
+
+
+func tem_marca(alvo: String, tipo: String) -> bool:
+	for m in marcas:
+		if m.alvo == alvo and m.tipo == tipo:
+			return true
+	return false
+
+
+## Criaturas consciências cujo quadrado está em `tiles` (para áreas de magia).
+func ids_em(tiles: Array) -> Array[String]:
+	var out: Array[String] = []
+	for id in combatants:
+		if conscious(id) and tiles.has(combatants[id].tile):
+			out.append(id)
+	return out
+
+
+## Tira uma criatura da simulação (invocação que expira). Ajusta a vez atual se ela estava antes.
+func remove_combatant(id: String) -> void:
+	var i := order.find(id)
+	if i >= 0:
+		if i < turn_idx:
+			turn_idx -= 1
+		order.remove_at(i)
+	combatants.erase(id)
+
+
+## Passagem de rodada: conta as rodadas de zonas e marcas; invocações que acabam saem do combate.
+func _passar_rodada() -> void:
+	expiradas.clear()
+	for z in zonas:
+		if z.rodadas > 0:
+			z.rodadas -= 1
+	zonas = zonas.filter(func(z): return z.rodadas != 0)
+	var vivas: Array = []
+	for m in marcas:
+		if m.rodadas > 0:
+			m.rodadas -= 1
+		if m.rodadas == 0:
+			expiradas.append(m.id)
+			if m.tipo == "invocacao" and combatants.has(m.alvo):
+				remove_combatant(m.alvo)
+		else:
+			vivas.append(m)
+	marcas = vivas

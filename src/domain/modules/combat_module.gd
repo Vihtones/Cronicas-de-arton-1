@@ -472,6 +472,36 @@ func _refresh_bencaos() -> void:
 				ax.sheet.add_efeito("egide_sagrada", "defesa", car, "cena")
 
 
+## Quadrado livre e transitável mais perto de `centro`, pela própria simulação (vale no planejamento também).
+func _tile_livre_na_sim(centro: Vector2i, usados: Array) -> Vector2i:
+	for raio in range(1, 5):
+		for dx in range(-raio, raio + 1):
+			for dy in range(-raio, raio + 1):
+				if maxi(absi(dx), absi(dy)) != raio:
+					continue
+				var t := centro + Vector2i(dx, dy)
+				if not usados.has(t) and sim.walk_fn.call(t):
+					return t
+	return centro
+
+
+## Invocação (Servo Divino, Guardião Divino...): cria uma criatura do bestiário do mesmo lado do conjurador,
+## logo depois dele na ordem. Dura `rodadas` rodadas (-1 = até o fim do combate); ao acabar, sai da simulação.
+func invocar(caster: String, rule_id: String, rodadas: int, fonte: String) -> String:
+	var cx: Dictionary = sim.c(caster)
+	var usados: Array = []
+	for id in sim.combatants:
+		usados.append(sim.c(id).tile)
+	var nova := "inv_%s_%d" % [fonte, sim.combatants.size()]
+	var sh := CharacterSheet.from_creature(sim.rules, rule_id, nova)
+	sim.combatants[nova] = {"id": nova, "side": cx.side, "order": "", "tile": _tile_livre_na_sim(cx.tile, usados), "sheet": sh,
+		"charge_turn": -99, "damaged_round": -1, "surprised": false, "flags": []}
+	sim.order.insert(sim.order.find(caster) + 1, nova)
+	if rodadas != 0:
+		sim.add_marca(nova, nova, fonte, "invocacao", rodadas)
+	return nova
+
+
 ## Manto do Cruzado no início de cada turno do conjurador (LB p.84 do 4º círculo, ver catálogo).
 ## Luz: 2d8 PV a você e aliados em alcance curto. Trevas: 4d8 de dano de trevas a inimigos em alcance curto;
 ## o conjurador cura metade do dano causado.
@@ -1425,13 +1455,14 @@ func _end_combat(outcome: String) -> Array:
 		sh_f.aura_sagrada_ativa = false
 		sh_f.egide_ativa = false
 		sh_f.manto_cruzado = ""
+		sh_f.pv_temp = 0
 		sh_f.remove_efeito("manto_do_cruzado")
 		sh_f.remove_efeito("aura_sagrada")
 		sh_f.remove_efeito("egide_sagrada")
 	world.player_sheet.olhar_usado = false
 	world.player.position = world.db.tile_to_world(P.tile)
 	for id in sim.combatants:
-		if id == "player":
+		if id == "player" or str(id).begins_with("inv_"):   # invocações não são criaturas do mundo nem companheiros
 			continue
 		var x := sim.c(id)
 		if x.side == "player":
@@ -1500,7 +1531,8 @@ func to_dict() -> Dictionary:
 			cs[id] = {"id": id, "side": x.side, "order": x.get("order", ""), "tile": [x.tile.x, x.tile.y], "sheet": x.sheet.to_dict(), "charge_turn": x.charge_turn,
 				"damaged_round": x.damaged_round, "surprised": x.surprised, "flags": x.flags.duplicate()}
 		d["sim"] = {"combatants": cs, "order": sim.order.duplicate(), "initiative": sim.initiative.duplicate(), "turn_idx": sim.turn_idx,
-			"round_no": sim.round_no, "turn_counter": sim.turn_counter, "budget": sim.budget.duplicate()}
+			"round_no": sim.round_no, "turn_counter": sim.turn_counter, "budget": sim.budget.duplicate(),
+			"zonas": sim.zonas.duplicate(true), "marcas": sim.marcas.duplicate(true)}
 	return d
 
 
@@ -1527,5 +1559,7 @@ func from_dict(d: Dictionary) -> void:
 		sim.initiative = s.initiative.duplicate()
 		sim.turn_idx = int(s.turn_idx); sim.round_no = int(s.round_no); sim.turn_counter = int(s.turn_counter)
 		sim.budget = {"std": int(s.budget.std), "move": int(s.budget.move)}
+		sim.zonas = (s.get("zonas", []) as Array).duplicate(true)
+		sim.marcas = (s.get("marcas", []) as Array).duplicate(true)
 	else:
 		active = false
