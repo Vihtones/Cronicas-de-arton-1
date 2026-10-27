@@ -159,6 +159,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				targets = [actor]
 			if sp_id == "oracao":
 				targets = [actor]
+			if sp_id == "condicao" and targets.size() > 5 + apr.count(0): return {"ok": false, "reason": "alvos demais"}
 			if sp_id == "voz_divina":
 				if apr.has(0):
 					var TC := sim.c(a.get("target", ""))

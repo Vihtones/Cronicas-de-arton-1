@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2966,3 +2966,18 @@ func test_voz_divina_cadaver_responde_uma_vez() -> void:
 	check(not WorldHelpers.cmd(w, "CastSpell", payload).accepted, "um corpo só uma vez")
 	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "voz_divina"}).accepted, "versão básica fora de combate")
 	eq(sh.efeito_bonus("voz_divina"), 1, "fala com criaturas pela cena")
+
+
+func test_condicao_acompanha_status_a_qualquer_distancia() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	check(not _lanca(m, {"type": "cast", "spell": "condicao", "targets": ["player", "bandido_1", "bandido_2", "player", "bandido_1", "bandido_2"]}).ok, "no máximo 5")
+	check(_lanca(m, {"type": "cast", "spell": "condicao", "targets": ["bandido_1", "bandido_2"]}).ok, "Condição")
+	sim.c("bandido_2").tile = Vector2i(5, 57)
+	sim.c("bandido_1").sheet.add_condition("caido", sim.rules)
+	var st: Array = m[1].status_conhecidos("player")
+	eq(st.size(), 2, "dois alvos acompanhados")
+	check((st[0].condicoes as Array).has("caido"), "vê a condição")
+	eq(st[1].tile, [5, 57], "sabe a posição mesmo longe")
+	sim.c("bandido_1").sheet.pv = -999
+	eq(m[1].status_conhecidos("player").size(), 1, "morto: deixa de detectar")

@@ -44,9 +44,10 @@ const COMPLETAS := {
 	"oracao": {"aprimoramentos": [0, 1, 2, 3]},   # +1 bônus; –1 penalidade (repetíveis, até o círculo); médio; cena
 	"purificacao": {"aprimoramentos": [0, 1, 2, 3]},   # PV de veneno; todas as condições; soltar item amaldiçoado; dissipar
 	"raio_solar": {"aprimoramentos": [0, 1, 2]},   # +1d8 (+1d12); cura vivos escolhidos; cegos; truque: facho de luz
-	"silencio": {"aprimoramentos": [0, 1]},
+	"silencio": {"aprimoramentos": [0, 1]},   # objeto que emana 3m; nenhum som sai da área (cena)
+	"condicao": {"aprimoramentos": [0, 1]},   # +1 alvo (repetível); um dia
 	"voz_divina": {"aprimoramentos": [0, 1]},   # interrogar um cadáver (uma vez por corpo); falar com plantas e rochas
-	"soco_de_arsenal": {"aprimoramentos": [0, 1, 2, 3]},   # alcance natural +3m (cena); +1d6 (repetível); +3m de empurrão (repetível); essência   # objeto que emana 3m; nenhum som sai da área (cena)
+	"soco_de_arsenal": {"aprimoramentos": [0, 1, 2, 3]},   # alcance natural +3m (cena); +1d6 (repetível); +3m de empurrão (repetível); essência
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz
@@ -77,7 +78,7 @@ const REACAO_APR := {"armadura_arcana": [0], "protecao_divina": [1], "premonicao
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
 const ALVO_QUADRADO := ["criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
-const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0], "soco_de_arsenal": [1, 2]}
+const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
 const ALCANCE_APR := {"soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
@@ -129,7 +130,7 @@ static func circulo_exigido(sp_id: String, i: int, rules: RuleRegistry) -> int:
 
 
 static func multi_alvo(sp_id: String, sp: Dictionary, apr: Array) -> bool:
-	if str(sp.get("alvo_tipo", "")) == "Alvos":
+	if str(sp.get("alvo_tipo", "")) == "Alvos" or str(sp.get("alvo", "")).begins_with("até "):
 		return true
 	for i in MULTI_APR.get(sp_id, []):
 		if apr.has(i):
@@ -297,6 +298,16 @@ const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]
 
 ## Acalmar Animal: animal; monstro ou espírito com Int –5 ou –4 (1 PM); qualquer monstro ou espírito (5 PM).
 ## Tranquilidade: animal ou humanoide; qualquer criatura (1 PM, ou criaturas escolhidas com o de 5 PM).
+## Condição (divina 2): o que o conjurador sabe de um alvo — posição, PV, condições e magias ativas sobre ele.
+static func status_de(id: String, sh: CharacterSheet, tile: Vector2i) -> Dictionary:
+	var magias: Array = []
+	for e in sh.efeitos:
+		var fonte := str(e.id)
+		if fonte.begins_with("magia.") and not magias.has(fonte.trim_prefix("magia.")):
+			magias.append(fonte.trim_prefix("magia."))
+	return {"target": id, "tile": [tile.x, tile.y], "pv": sh.pv, "pv_max": sh.pv_max, "condicoes": sh.conditions.duplicate(), "magias": magias}
+
+
 ## Comunicação para Mudar Atitude: humanoides falam; outros tipos só com Voz Divina (ou Compreensão nesse alvo).
 static func pode_conversar(fala: CharacterSheet, alvo_id: String, alvo: CharacterSheet) -> bool:
 	if alvo.creature_type == "" or alvo.creature_type == "humanoide":

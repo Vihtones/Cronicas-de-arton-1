@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Condição (divina, 2º círculo) completa: até 5 criaturas (+1 por aprimoramento), pela cena ou um dia; o conjurador sabe posição, PV, condições e magias ativas delas a qualquer distância, até morrerem. Fora de combate, nos companheiros e NPCs presentes. Correção: Soco de Arsenal não é magia de vários alvos.
+
 - Voz Divina (divina, 2º círculo) completa: pela cena, conversa com criaturas de qualquer tipo; um cadáver tocado responde com o que sabia (uma vez por corpo); falar com plantas e rochas. Mudar Atitude com criaturas não humanoides agora exige um meio de comunicação (Voz Divina ou Compreensão nelas).
 
 - Soco de Arsenal (divina, 2º círculo) completa: 4d6 + Força de impacto em alcance médio e empurrão de 3m (Fortitude reduz à metade e evita), +1d6, +3m de empurrão, dano de essência, e a versão pessoal que aumenta o alcance natural corpo a corpo em 3m pela cena. Novos sistemas: empurrão (CombatSim.empurrar) e alcance natural (efeito alcance_corpo).

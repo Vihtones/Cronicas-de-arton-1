@@ -1692,6 +1692,19 @@ func _revelar_pensamentos(alvo: String, todos: bool) -> Array:
 
 
 ## Teste de resistência com a reação de Premonição; devolve se passou.
+## Condição: posição e status de cada alvo da magia que o conjurador acompanha (morto ou fora do plano: some).
+func status_conhecidos(id: String) -> Array:
+	var out: Array = []
+	var C := sim.c(id)
+	if C.is_empty():
+		return out
+	for e in C.sheet.efeitos:
+		var tg := str(e.tipo)
+		if e.stat == "condicao" and sim.combatants.has(tg) and not sim.c(tg).sheet.is_dead():
+			out.append(SpellRules.status_de(tg, sim.c(tg).sheet, sim.c(tg).tile))
+	return out
+
+
 ## Soco de Arsenal (divina 2, LB p.206): 4d6 + Força de impacto em alcance médio e empurrão de 3m para longe do
 ## conjurador; Fortitude reduz à metade e evita o empurrão. Aprimoramentos: pessoal, pela cena o alcance natural
 ## corpo a corpo aumenta 3m (1 PM); +1d6 (2 PM, repetível); +3m de empurrão (4 PM, repetível); dano de essência (5 PM).
@@ -2659,6 +2672,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_raio_solar(id, a))
 		"soco_de_arsenal":
 			out.append_array(_soco_de_arsenal(id, a))
+		"condicao":
+			# Condição (divina 2): até 5 criaturas em alcance curto (+1 por aprimoramento), pela cena (um dia com
+			# aprimoramento): o conjurador sabe posição e status delas a qualquer distância (status_conhecidos).
+			var apr_cd: Array = a.get("aprimoramentos", [])
+			for tg_cd in a.get("targets", [a.get("target", "")]):
+				sh.add_efeito("magia.condicao", "condicao", 1, "dia" if apr_cd.has(1) else "cena", str(tg_cd), world.day_index() + 1 if apr_cd.has(1) else -1)
+			out.append(fact("CREATURE_STATUS", {"caster": id, "status": status_conhecidos(id)}, [id]))
 		"voz_divina":
 			# Voz Divina (divina 2): pessoal, pela cena; conversa com criaturas de qualquer tipo (Mudar Atitude passa a valer
 			# para elas). Aprimoramentos: um cadáver responde (uma vez por corpo); falar com plantas e rochas.

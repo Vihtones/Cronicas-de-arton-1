@@ -28,7 +28,8 @@ const FORA_DE_COMBATE := {
 	"visao_mistica": [],
 	"silencio": [0, 1],   # fora de combate, o objeto que você carrega, pela cena: nenhum som sai (furtividade)
 	"escuridao": [],
-	"voz_divina": [],   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
+	"voz_divina": [],
+	"condicao": [],   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
 const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
 const RAIO_DETECTAR := 12   # esfera de 18m
@@ -168,6 +169,13 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["fora do alcance"])
 				if not SpellRules.alvo_social_valido(sp_id, apr, CharacterSheet.from_dict(combat_v.creature_state[tg].sheet)):
 					return PackedStringArray(["tipo de criatura que a magia não afeta"])
+		"condicao":
+			var alvos_cd: Array = cmd.payload.get("targets", [])
+			if alvos_cd.is_empty() or alvos_cd.size() > 5 + apr.count(0):
+				return PackedStringArray(["escolha de 1 a %d alvos" % (5 + apr.count(0))])
+			for tg in alvos_cd:
+				if not _no_mesmo_lugar(str(tg)):
+					return PackedStringArray(["%s não está aqui" % tg])
 		"voz_divina":
 			if apr.has(0):
 				var alvo_vd := str(cmd.payload.get("target", ""))
@@ -339,6 +347,11 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(fact("PLANTS_PRUNED", {"tiles": podadas.size()}, ["player"]))
 			else:
 				out.append(falar_com_plantas(p_cp))
+		"condicao":
+			var apr_cd: Array = cmd.payload.get("aprimoramentos", [])
+			for tg in cmd.payload.get("targets", []):
+				sh.add_efeito("magia.condicao", "condicao", 1, "dia" if apr_cd.has(1) else "cena", str(tg), world.day_index() + 1 if apr_cd.has(1) else -1)
+			out.append(fact("CREATURE_STATUS", {"caster": "player", "status": status_acompanhados()}, ["player"]))
 		"voz_divina":
 			var apr_vd: Array = cmd.payload.get("aprimoramentos", [])
 			if apr_vd.has(0):
@@ -465,6 +478,21 @@ func falar_com_plantas(p: Vector2i, rochas: bool = false) -> Dictionary:
 			if bool(st_c.get("alive", false)) and bool(st_c.get("present", false)) and maxi(absi(p.x - int(t[0])), absi(p.y - int(t[1]))) <= longo:
 				perto.append(id)
 	return fact("PLANTS_TALKED", {"caster": "player", "criaturas_perto": perto.size(), "atitude": "prestativa", "rochas": rochas}, ["player"])
+
+
+## Condição fora de combate: status dos companheiros e NPCs que o jogador acompanha, a qualquer distância.
+func status_acompanhados() -> Array:
+	var out: Array = []
+	var npcs = world.module("npcs")
+	if world.player_sheet == null or npcs == null:
+		return out
+	for e in world.player_sheet.efeitos:
+		var tg := str(e.tipo)
+		if e.stat == "condicao" and not npcs.npc(tg).is_empty() and bool(npcs.npc(tg).alive):
+			var st_c := SpellRules.status_de(tg, _ficha_npc(tg), Vector2i.ZERO)
+			st_c["local"] = str(npcs.npc(tg).location)
+			out.append(st_c)
+	return out
 
 
 ## Voz Divina (cadáver, 1 PM): o corpo responde com o que sabia em vida (respostas curtas: os fatos do diálogo que
