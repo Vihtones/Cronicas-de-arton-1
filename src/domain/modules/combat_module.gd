@@ -759,11 +759,34 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					ts2.add_efeito("magia.resistencia_a_energia", "rd", rd, fim, tipo, ate)
 				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "resistencia_a_energia", "tipo": tipo, "tags": ["magia"]}, [id, tg]))
 		"curar_ferimentos":
-			var tgt: String = a.get("target", id)
-			var r := Dice.roll(sp.cura, world.rng, "combat")
-			var ts: CharacterSheet = sim.c(tgt).sheet
-			ts.pv = mini(ts.pv_max, ts.pv + int(r.total))
-			out.append(fact("HEALED", {"actor": id, "target": tgt, "amount": r.total, "pv_after": ts.pv, "source": a.spell, "tags": ["magia", "cura"]}, [id, tgt]))
+			var apr_c: Array = a.get("aprimoramentos", [])
+			for tgt in a.get("targets", [a.get("target", id)]):
+				var ts: CharacterSheet = sim.c(tgt).sheet
+				if ts.creature_type == "morto-vivo":
+					# Truque (LB p.189): contra morto-vivo causa 1d8 de dano de luz; Vontade reduz à metade
+					var cd_c := spell_dc(sh, a)
+					var sv_c := Checks.skill(ts, "vontade", cd_c, world.rules, world.rng, "combat")
+					var dano_c := int(Dice.roll("1d8", world.rng, "combat").total)
+					if sv_c.get("success", false):
+						dano_c = maxi(1, dano_c / 2)
+					var tags_c: Array = ["magia", "luz"]
+					if sv_c.get("success", false): tags_c.append("resistiu")
+					tags_c.append_array(sim.apply_damage(tgt, dano_c))
+					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Curar Ferimentos (truque)", "d20": int(sv_c.get("d20", 0)), "mod": int(sv_c.get("mod", 0)),
+						"mods": [], "total": int(sv_c.get("total", 0)), "defense": cd_c, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_c, "rolls": [],
+						"pv_after": ts.pv, "special": false, "ranged": false, "spell": true, "save": "vontade", "saved": sv_c.get("success", false), "tags": tags_c}, [id, tgt]))
+					continue
+				var cura_c := int(Dice.roll(str(sp.cura), world.rng, "combat").total)
+				if apr_c.has(0):
+					cura_c += int(Dice.roll("1d8+1", world.rng, "combat").total)
+				ts.pv = mini(ts.pv_max, ts.pv + cura_c)
+				ts.anular_magia("magia.infligir_ferimentos")   # Curar Ferimentos anula Infligir Ferimentos (LB p.189)
+				if apr_c.has(1):
+					for cans in ["exausto", "fatigado"]:   # uma condição de cansaço: a mais severa
+						if ts.conditions.has(cans):
+							ts.remove_condition(cans)
+							break
+				out.append(fact("HEALED", {"actor": id, "target": tgt, "amount": cura_c, "pv_after": ts.pv, "source": a.spell, "tags": ["magia", "cura"]}, [id, tgt]))
 	if id == "player" and not stats.is_empty():
 		stats.tactics["magia"] = true
 		stats.pm_spent = int(stats.pm_spent) + int(v.cost)

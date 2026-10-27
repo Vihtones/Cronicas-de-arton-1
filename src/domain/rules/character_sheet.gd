@@ -183,6 +183,14 @@ func has_efeito(id_efeito: String) -> bool:
 	return efeitos.any(func(e): return e.id == id_efeito)
 
 
+## Anula uma magia no alvo (ex.: Curar Ferimentos anula Infligir Ferimentos): tira também as condições que ela causou.
+func anular_magia(id_efeito: String) -> void:
+	for e in efeitos:
+		if e.id == id_efeito and e.stat == "condicao":
+			remove_condition(str(e.tipo))
+	remove_efeito(id_efeito)
+
+
 ## Conexão de magia (Escudo da Fé, 4º aprimoramento) acaba quando o alvo se afasta.
 func remove_efeito_link() -> void:
 	efeitos = efeitos.filter(func(e): return e.stat != "link")

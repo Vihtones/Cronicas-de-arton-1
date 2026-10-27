@@ -1334,12 +1334,36 @@
   {
    "id": "magia.curar_ferimentos",
    "valor": {
+    "nome": "Curar Ferimentos",
     "tipo": "divina",
     "circulo": 1,
     "escola": "evocacao",
-    "execucao": "padrao",
+    "execucao": "padrão",
     "alcance": "toque",
-    "cura": "2d8+2"
+    "alvo_tipo": "Alvo",
+    "alvo": "1 criatura",
+    "duracao": "instantânea",
+    "resistencia": "Vontade reduz à metade (truque)",
+    "cura": "2d8+2",
+    "texto": "Canaliza luz que recupera 2d8+2 pontos de vida na criatura tocada. Curar Ferimentos anula Infligir Ferimentos. Truque: muda o alvo para 1 morto-vivo; em vez do normal, causa 1d8 pontos de dano de luz (Vontade reduz à metade).",
+    "aprimoramentos": [
+     {
+      "pm": 1,
+      "texto": "aumenta a cura em +1d8+1."
+     },
+     {
+      "pm": 2,
+      "texto": "também remove uma condição de cansaço do alvo."
+     },
+     {
+      "pm": 2,
+      "texto": "muda o alcance para curto."
+     },
+     {
+      "pm": 5,
+      "texto": "muda o alcance para curto e o alvo para criaturas escolhidas."
+     }
+    ]
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 189,

@@ -347,3 +347,43 @@ func test_protecao_divina_reacao_da_mais_cinco_no_teste() -> void:
 	var fora: Array = []
 	c._reacao_protecao("bandido_2", "player", fora)
 	eq(sim.c("player").sheet.pm, pm_depois, "não reage por quem não é aliado")
+
+
+func test_curar_ferimentos_cura_anula_infligir_e_remove_cansaco() -> void:
+	var m := _cena_com("curar_ferimentos", 1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	sim.c("bandido_1")["side"] = sim.c("player")["side"]
+	sim.c("player").sheet.pm = 20
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	var a := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "curar válida em aliado adjacente: %s" % str(v))
+	alvo.pv = 1
+	c._cast("player", a, v)
+	check(alvo.pv > 1, "cura PV: %d" % alvo.pv)
+	alvo.pv = 1
+	alvo.add_efeito("magia.infligir_ferimentos", "condicao", 0, "cena", "fraco")
+	alvo.add_condition("fraco", sim.rules)
+	c._cast("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(not alvo.conditions.has("fraco") and not alvo.has_efeito("magia.infligir_ferimentos"), "anula Infligir Ferimentos")
+	var a1 := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"], "aprimoramentos": [1]}
+	alvo.add_condition("fatigado", sim.rules)
+	var v1 := GhostPlanner.validate_action(sim, "player", a1)
+	check(v1.ok, "aprimoramento de cansaço válido: %s" % str(v1))
+	c._cast("player", a1, v1)
+	check(not alvo.conditions.has("fatigado"), "+2 PM remove cansaço")
+
+
+func test_curar_ferimentos_truque_contra_morto_vivo_causa_dano() -> void:
+	var m := _cena_com("curar_ferimentos", 1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	var alvo: CharacterSheet = sim.c("bandido_1").sheet
+	alvo.creature_type = "morto-vivo"
+	alvo.pv = 10
+	var a := {"type": "cast", "spell": "curar_ferimentos", "target": "bandido_1", "targets": ["bandido_1"]}
+	var v := GhostPlanner.validate_action(sim, "player", a)
+	check(v.ok, "truque válido contra morto-vivo adjacente: %s" % str(v))
+	c._cast("player", a, v)
+	check(alvo.pv < 10, "contra morto-vivo causa dano, não cura (PV %d)" % alvo.pv)
