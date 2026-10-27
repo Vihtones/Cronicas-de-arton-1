@@ -4,6 +4,8 @@ extends WorldModule
 ## efeitos reais, rolagens só na execução, log de eventos para a apresentação.
 
 const DETECT_AWAKE := 6
+## Classe de combate de cada profissão de companheiro: [classe, índice do preset] (Arton Viva, Fase 6).
+const PARTY_CLASS := {"guarda": ["guerreiro", 0], "capitã da guarda": ["guerreiro", 0], "ferreiro": ["guerreiro", 0], "caçador": ["ladino", 0], "mensageiro": ["ladino", 1]}
 const DETECT_ASLEEP := 3
 const SIGNAL_RADIUS := 12
 const FLEE_DISTANCE := 10
@@ -32,7 +34,7 @@ func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
 	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy"])
 func subscribed_events() -> PackedStringArray:
-	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH"])
+	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH", "ORDER_SET"])
 
 
 func _ensure() -> void:
@@ -186,6 +188,10 @@ func execute(cmd: GameCommand) -> Array:
 # --- Encontros ------------------------------------------------------------------
 func on_event(e: GameEvent) -> Array:
 	_ensure()
+	# ordem nova dada a um companheiro no meio da luta vale já (Arton Viva, Fase 6)
+	if e.event_type == "ORDER_SET" and active and sim.combatants.has(str(e.payload.get("npc", ""))):
+		sim.c(str(e.payload.npc))["order"] = str(e.payload.order)
+		return []
 	match e.event_type:
 		"TRAVEL_AMBUSH":
 			if not e.payload.get("tactical", false) or active:
@@ -384,6 +390,18 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	for id in sim.combatants:
 		if sim.c(id).surprised:
 			sim.c(id).sheet.conditions.append("surpreendido")
+	# companheiros (Arton Viva, Fase 6): IAs do lado do jogador, guiadas pelas ordens; logo depois do jogador na vez
+	var usados: Array = [sim.c("player").tile]
+	for id in enemy_ids:
+		usados.append(sim.c(id).tile)
+	var companheiros := _companheiros_em_luta()
+	for c in companheiros:
+		var t := _tile_livre_perto(sim.c("player").tile, usados)
+		usados.append(t)
+		sim.combatants[c.id] = {"id": c.id, "side": "player", "order": c.order, "tile": t, "sheet": c.sheet,
+			"charge_turn": -99, "damaged_round": -1, "surprised": false, "flags": []}
+		var pos := sim.order.find("player")
+		sim.order.insert(pos + 1, c.id)
 	var roster := {}
 	for id in sim.combatants:
 		var x: Dictionary = sim.c(id)
@@ -886,16 +904,22 @@ func _coup(attacker: String, target: String) -> Array:
 func _ai_turn(id: String) -> Array:
 	var out: Array = []
 	var me := sim.c(id)
+	var ordem := str(me.get("order", ""))
+	# recuar (companheiro): ferido, afasta-se do inimigo mais próximo em vez de lutar
+	if ordem == "recuar" and me.sheet.pv < me.sheet.pv_max / 2:
+		return _recuar(id)
 	var is_animal: bool = world.rules.value(me.sheet.source_rule, {}).get("tipo", "") == "animal"
 	var target := ""
 	var best := 999
+	# proteger: escolhe o inimigo mais perto do jogador, não o mais perto de si
+	var origem: Vector2i = sim.c("player").tile if ordem == "proteger" else me.tile
 	for oid in sim.combatants:
 		var o := sim.c(oid)
 		if o.side == me.side or o.sheet.is_dead() or o.flags.has("fora"):
 			continue
 		if o.sheet.is_down() and not is_animal:
 			continue  # bandidos não executam quem caiu (ORIGINAL_DO_JOGO: preferem capturar)
-		var d := CombatSim.cheb(me.tile, o.tile)
+		var d := CombatSim.cheb(origem, o.tile)
 		if d < best:
 			best = d; target = oid
 	if target == "":
@@ -923,6 +947,8 @@ func _ai_turn(id: String) -> Array:
 			break
 		if not sim.can_spend("movimento"):
 			break
+		if ordem == "manter_posicao":
+			break  # companheiro que mantém posição só ataca o que alcança daqui
 		# C24: inimigo com Ímpeto usa o poder quando só assim alcança o alvo nesta rodada
 		if me.sheet.has_power("impeto") and d - 1 > sim.speed_squares(id) and d - 1 <= sim.speed_squares(id) + 4:
 			out.append_array(_try(id, {"type": "impeto"}))
@@ -934,6 +960,73 @@ func _ai_turn(id: String) -> Array:
 			break
 		out.append_array(r)
 	return out
+
+
+## Recuo de companheiro: um passo para a casa vizinha mais longe do inimigo mais próximo.
+func _recuar(id: String) -> Array:
+	var me := sim.c(id)
+	if not sim.can_spend("movimento"):
+		return []
+	var melhor: Vector2i = me.tile
+	var melhor_d := _inimigo_mais_perto(me.tile, id)
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var t: Vector2i = me.tile + Vector2i(dx, dy)
+			if (dx == 0 and dy == 0) or not _sim_walkable(t) or sim.occupant(t, id) != "":
+				continue
+			var d := _inimigo_mais_perto(t, id)
+			if d > melhor_d:
+				melhor_d = d
+				melhor = t
+	if melhor == me.tile:
+		return []
+	return _try(id, {"type": "move", "path": [[melhor.x, melhor.y]]})
+
+
+func _inimigo_mais_perto(t: Vector2i, id: String) -> int:
+	var me := sim.c(id)
+	var d := 99
+	for oid in sim.combatants:
+		var o := sim.c(oid)
+		if o.side != me.side and not o.sheet.is_dead():
+			d = mini(d, CombatSim.cheb(t, o.tile))
+	return d
+
+
+## Companheiros: fichas de combate montadas a partir do personagem (classe pela profissão), equipados.
+func _companheiros_em_luta() -> Array:
+	var party = world.module("party")
+	if party == null:
+		return []
+	var busy := {}
+	for c in party.contratos.values():
+		for m in c.membros:
+			busy[m] = true
+	var out: Array = []
+	var ids: Array = party.members.keys()
+	ids.sort()
+	for id in ids:
+		if busy.has(id):
+			continue
+		var d := world.db.npc_def(id)
+		var perfil: Array = PARTY_CLASS.get(str(d.get("profession", "")), ["guerreiro", 1])
+		var attrs: Dictionary = CharacterBuilder.presets(str(perfil[0]))[int(perfil[1])]
+		var sh := CharacterBuilder.build(world.rules, "humano", str(perfil[0]), attrs, ["for", "des", "con"], str(d.get("name", id)))
+		CharacterBuilder.apply_equipment(world.rules, sh)
+		out.append({"id": id, "order": str(party.members[id].order), "sheet": sh})
+	return out
+
+
+func _tile_livre_perto(centro: Vector2i, usados: Array) -> Vector2i:
+	for raio in [1, 2, 3, 4]:
+		for dx in range(-raio, raio + 1):
+			for dy in range(-raio, raio + 1):
+				if maxi(absi(dx), absi(dy)) != raio:
+					continue
+				var t := centro + Vector2i(dx, dy)
+				if not usados.has(t) and _sim_walkable(t):
+					return t
+	return centro
 
 
 func _try(id: String, a: Dictionary) -> Array:
@@ -986,6 +1079,11 @@ func _end_combat(outcome: String) -> Array:
 		if id == "player":
 			continue
 		var x := sim.c(id)
+		if x.side == "player":
+			# companheiro: não é criatura; se morreu, sai como NPC_DIED (a party reage)
+			if x.sheet.is_dead():
+				out.append(fact("NPC_DIED", {"npc": id, "cause": "combate"}, [id]))
+			continue
 		creature_state[id].sheet = x.sheet.to_dict()
 		creature_state[id].tile = [x.tile.x, x.tile.y]
 		if outcome == "vitoria" or x.sheet.is_dead():
@@ -1008,13 +1106,13 @@ func _end_combat(outcome: String) -> Array:
 				# salteadores (ORIGINAL): roubam e somem; o jogador acorda onde caiu
 				out.append(fact("PLAYER_ROBBED", {"by": enemy_faction, "location": loc}, ["player"]))
 				for id in sim.combatants:
-					if id != "player": creature_state[id].present = false
+					if sim.c(id).side == "enemy": creature_state[id].present = false
 			for id in sim.combatants:
-				if id != "player" and sim.c(id).sheet.pv > 0:
+				if sim.c(id).side == "enemy" and sim.c(id).sheet.pv > 0:
 					creature_state[id].tile = world.db.creature_def(id).spawn.duplicate()
 		"morte":
 			out.append(fact("PLAYER_DIED", {"location": loc, "round": sim.round_no}, ["player"]))
-	var enemies: Array = sim.combatants.keys().filter(func(x): return x != "player")
+	var enemies: Array = sim.combatants.keys().filter(func(x): return sim.c(x).side == "enemy")
 	stats.rounds = sim.round_no
 	stats.pv_end = maxi(0, P.sheet.pv)
 	stats.defeated = enemies.filter(func(x): return sim.c(x).sheet.is_down())
@@ -1042,7 +1140,7 @@ func to_dict() -> Dictionary:
 		var cs := {}
 		for id in sim.combatants:
 			var x: Dictionary = sim.c(id)
-			cs[id] = {"id": id, "side": x.side, "tile": [x.tile.x, x.tile.y], "sheet": x.sheet.to_dict(), "charge_turn": x.charge_turn,
+			cs[id] = {"id": id, "side": x.side, "order": x.get("order", ""), "tile": [x.tile.x, x.tile.y], "sheet": x.sheet.to_dict(), "charge_turn": x.charge_turn,
 				"damaged_round": x.damaged_round, "surprised": x.surprised, "flags": x.flags.duplicate()}
 		d["sim"] = {"combatants": cs, "order": sim.order.duplicate(), "initiative": sim.initiative.duplicate(), "turn_idx": sim.turn_idx,
 			"round_no": sim.round_no, "turn_counter": sim.turn_counter, "budget": sim.budget.duplicate()}
@@ -1065,7 +1163,7 @@ func from_dict(d: Dictionary) -> void:
 		var s: Dictionary = d.sim
 		for id in s.combatants:
 			var x: Dictionary = s.combatants[id]
-			sim.combatants[id] = {"id": id, "side": x.side, "tile": Vector2i(int(x.tile[0]), int(x.tile[1])), "sheet": CharacterSheet.from_dict(x.sheet),
+			sim.combatants[id] = {"id": id, "side": x.side, "order": str(x.get("order", "")), "tile": Vector2i(int(x.tile[0]), int(x.tile[1])), "sheet": CharacterSheet.from_dict(x.sheet),
 				"charge_turn": int(x.charge_turn), "damaged_round": int(x.damaged_round), "surprised": bool(x.surprised), "flags": x.flags.duplicate()}
 		sim.order.clear()
 		for id in s.order: sim.order.append(str(id))

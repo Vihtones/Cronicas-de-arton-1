@@ -38,6 +38,7 @@ const SUITES := [
 	"res://tests/unit/test_rota_samburdia.gd",
 	"res://tests/unit/test_cidade_fase5.gd",
 	"res://tests/unit/test_contratos_guilda.gd",
+	"res://tests/unit/test_companheiros_combate.gd",
 	"res://tests/unit/test_cidades.gd",
 	"res://tests/unit/test_grupo.gd",
 	"res://tests/unit/test_tormenta.gd",

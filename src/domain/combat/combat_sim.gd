@@ -22,7 +22,7 @@ func clone() -> CombatSim:
 	c.rules = rules; c.db = db; c.walk_fn = walk_fn; c.env_fn = env_fn
 	for id in combatants:
 		var x: Dictionary = combatants[id]
-		c.combatants[id] = {"id": x.id, "side": x.side, "tile": x.tile, "sheet": x.sheet.duplicate_sheet(), "charge_turn": x.charge_turn,
+		c.combatants[id] = {"id": x.id, "side": x.side, "order": x.get("order", ""), "tile": x.tile, "sheet": x.sheet.duplicate_sheet(), "charge_turn": x.charge_turn,
 			"damaged_round": x.damaged_round, "surprised": x.surprised, "flags": x.flags.duplicate()}
 	c.order = order.duplicate()
 	c.initiative = initiative.duplicate()
