@@ -229,7 +229,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -2473,3 +2473,62 @@ func test_calor_extremo_fere_e_suporte_ambiental_imuniza() -> void:
 	wm.region.temp_c = 65
 	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "suporte_ambiental"}).accepted, "Suporte Ambiental")
 	eq(wm.perigo_clima(w.clock.tick).size(), 0, "imune ao clima")
+
+
+# --- Abençoar Alimentos (divina, 1º círculo), comida e água benta -------------------------------
+func test_abencoar_alimentos_da_bonus_ao_comer_uma_vez_por_dia() -> void:
+	var w := _mundo_explorador(["abencoar_alimentos"])
+	w.module("state").inventory["pao"] = 3
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "item": "corda"}).accepted, "só comida ou bebida")
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "item": "pao", "aprimoramentos": [0]}).accepted, "duas porções")
+	check(WorldHelpers.cmd(w, "UseItem", {"item": "pao", "bonus": "pv"}).accepted, "come o pão")
+	eq(w.player_sheet.pv_temp, 5, "5 PV temporários")
+	var pm := w.player_sheet.pm
+	WorldHelpers.cmd(w, "UseItem", {"item": "pao", "bonus": "pm"})
+	eq(w.player_sheet.pm, pm, "só um bônus de alimentação por dia")
+	eq(w.module("state").item_count("pao"), 1, "comeu dois")
+
+
+func test_abencoar_alimentos_porcao_fora_da_cena_nao_vale_e_pm_temporario() -> void:
+	var w := _mundo_explorador(["abencoar_alimentos"])
+	w.module("state").inventory["cerveja"] = 2
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "item": "cerveja"})
+	var pm := w.player_sheet.pm
+	WorldHelpers.cmd(w, "UseItem", {"item": "cerveja", "bonus": "pm"})
+	eq(w.player_sheet.pm, pm + 1, "1 PM temporário")
+	WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "item": "cerveja"})
+	WorldHelpers.advance_hours(w, 3)
+	check(not w.module("magia").consumir_abencoado("cerveja"), "a cena acabou: a bênção passou")
+
+
+func test_abencoar_alimentos_truque_purifica_e_agua_benta() -> void:
+	var w := _mundo_explorador(["abencoar_alimentos"])
+	w.db.items["pao_mofado"] = {"name": "Pão mofado", "price": 0, "estragado": true, "limpo": "pao"}
+	w.module("state").inventory["pao_mofado"] = 1
+	var pm := w.player_sheet.pm
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "item": "pao_mofado", "truque": true}).accepted, "truque")
+	eq(w.player_sheet.pm, pm, "truque: 0 PM")
+	eq(w.module("state").item_count("pao"), 1, "o pão mofado ficou próprio")
+	w.db.items.erase("pao_mofado")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "aprimoramentos": [1]}).accepted, "água benta precisa do frasco")
+	w.module("state").inventory["frasco_agua"] = 1
+	w.player.gold = 10
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "abencoar_alimentos", "aprimoramentos": [1]}).accepted, "água benta")
+	eq(w.module("state").item_count("agua_benta"), 1, "frasco de água benta")
+	eq(int(w.player.gold), 5, "T$ 5 de pó de prata")
+
+
+func test_agua_benta_fere_morto_vivo_e_nao_os_vivos() -> void:
+	var m := _cena_grupo(1)
+	var c: CombatModule = m[1]
+	var sim: CombatSim = m[2]
+	m[0].module("state").inventory["agua_benta"] = 2
+	var mv := _bandido(m, "bandido_2", -50)
+	mv.creature_type = "morto-vivo"
+	var a := {"type": "agua_benta", "target": "bandido_2"}
+	var out: Array = c._execute_action("player", a, GhostPlanner.validate_action(sim, "player", a))
+	check(999 - mv.pv >= 2 and 999 - mv.pv <= 20, "2d10 de luz (%d)" % (999 - mv.pv))
+	sim.budget.std = 1
+	var a2 := {"type": "agua_benta", "target": "bandido_1"}
+	c._execute_action("player", a2, GhostPlanner.validate_action(sim, "player", a2))
+	eq(sim.c("bandido_1").sheet.pv, 999, "inofensiva contra os vivos")

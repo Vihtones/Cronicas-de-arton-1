@@ -301,6 +301,10 @@ func limpar_dia(dia_atual: int) -> void:
 		if e.fim == "dia" and dia_atual >= int(e.ate):
 			if e.stat == "condicao":
 				remove_condition(str(e.tipo))
+			elif e.stat == "pm_temp":
+				pm = mini(pm, pm_max)   # PM temporário não gasto some
+			elif e.stat == "pv_temp_alimento":
+				pv_temp = 0
 	efeitos = efeitos.filter(func(e): return not (e.fim == "dia" and dia_atual >= int(e.ate)))
 
 

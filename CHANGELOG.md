@@ -2,6 +2,9 @@
 
 ## 0.7.1 (em andamento)
 
+- Abençoar Alimentos (divina, 1º círculo) completa: porções de comida ou bebida do inventário, consumidas na cena, dão 5 PV ou 1 PM temporários (um bônus de alimentação por dia); +1 porção por aprimoramento; água benta de um frasco com água e T$ 5 de pó de prata; truque que só purifica comida estragada ou envenenada. Comer e beber pelo diário. Água benta (LB p.160) no combate: 2d10 de luz em morto-vivo ou abissal, Reflexos reduz (Shift+5).
+- O diário ganhou botões para lançar fora de combate as magias que funcionam no mundo (Consagrar, Caminhos, Detectar Ameaças, Despedaçar em objetos, Bênção em cadáver, Controlar Plantas, Acalmar Animal, Tranquilidade...).
+
 - Perigos (LB p.318): calor e frio extremos (Fortitude por dia, ou por minuto no extremo; o dano só cura fora do clima), fumaça densa (Fortitude ou perde o turno; duas falhas, –1d6 PV; camuflagem leve) e sufocamento (prender a respiração por 1 + Con rodadas, depois Fortitude ou desmaia perdendo 1d6 PV por rodada).
 - Suporte Ambiental (divina, 1º círculo) completa: por 1 dia, imune a calor e frio extremos, respira na água e não sufoca em fumaça; aprimoramento de alcance curto e criaturas escolhidas (fora de combate, os companheiros presentes). Correção: o solo lamacento agora conta como macio para rastrear.
 

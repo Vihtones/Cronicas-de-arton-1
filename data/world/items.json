@@ -11,12 +11,14 @@
  "pao": {
   "name": "Pão",
   "price": 1,
-  "good": "comida"
+  "good": "comida",
+  "alimento": true
  },
  "cerveja": {
   "name": "Caneca de cerveja",
   "price": 1,
-  "good": "bebida"
+  "good": "bebida",
+  "alimento": true
  },
  "corda": {
   "name": "Corda (15m)",
@@ -91,5 +93,16 @@
   "name": "Tábua de madeira",
   "price": 2,
   "good": "madeira"
+ },
+ "frasco_agua": {
+  "name": "Frasco com água",
+  "price": 1,
+  "nota": "ORIGINAL_DO_JOGO: alvo da Água Benta de Abençoar Alimentos"
+ },
+ "agua_benta": {
+  "name": "Água benta",
+  "price": 10,
+  "agua_benta": true,
+  "fonte": "LB p.159-160"
  }
 }

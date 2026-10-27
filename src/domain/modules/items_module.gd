@@ -31,7 +31,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		"UseItem":
 			var it: String = cmd.payload.get("item", "")
 			if not st.has_item(it): return PackedStringArray(["você não tem " + it])
-			if it != "pocao_cura": return PackedStringArray(["não é usável"])
+			if it != "pocao_cura" and not bool(world.db.items.get(it, {}).get("alimento", false)): return PackedStringArray(["não é usável"])
 	return PackedStringArray()
 
 
@@ -50,8 +50,37 @@ func execute(cmd: GameCommand) -> Array:
 			out.append(fact("EQUIPPED", {"item": it, "slot": slot, "previous": old, "defense": s.defense(world.rules)}, ["player"]))
 			return out
 		"UseItem":
+			if bool(world.db.items.get(str(cmd.payload.item), {}).get("alimento", false)):
+				return _comer(str(cmd.payload.item), str(cmd.payload.get("bonus", "pv")))
 			var r := Dice.roll(str(world.rules.value("magia.curar_ferimentos").cura), world.rng, "world")
 			s.pv = mini(s.pv_max, s.pv + int(r.total))
 			return [fact("ITEM_LOST", {"item": cmd.payload.item}, ["player"]),
 				fact("HEALED", {"actor": "player", "target": "player", "amount": r.total, "pv_after": s.pv, "source": cmd.payload.item}, ["player"])]
 	return []
+
+
+## Comer ou beber (LB p.161): a porção abençoada (Abençoar Alimentos) dá 5 PV temporários ou 1 PM temporário se
+## consumida na cena, e só um bônus de alimentação por dia. Alimento estragado ou envenenado faz mal (Fortitude CD 15
+## ou enjoado pelo dia; ORIGINAL_DO_JOGO), a menos que tenha sido purificado.
+func _comer(item: String, bonus: String) -> Array:
+	var s := world.player_sheet
+	var out: Array = [fact("ITEM_LOST", {"item": item}, ["player"]), fact("ATE", {"item": item}, ["player"])]
+	var d: Dictionary = world.db.items.get(item, {})
+	var magia = world.module("magia")
+	var abencoado: bool = magia != null and magia.consumir_abencoado(item)
+	if (bool(d.get("estragado", false)) or bool(d.get("envenenado", false))) and not abencoado:
+		if not Checks.skill(s, "fortitude", 15, world.rules, world.rng, "world").get("success", false):
+			s.add_condition("enjoado", world.rules)
+			s.add_efeito("alimento_estragado", "condicao", 1, "dia", "enjoado", world.day_index() + 1)
+			out.append(fact("CONDITION_APPLIED", {"condition": "enjoado", "source": item}, ["player"]))
+		return out
+	if abencoado and s.efeito_bonus("bonus_alimentacao") <= 0:
+		s.add_efeito("alimentacao", "bonus_alimentacao", 1, "dia", "", world.day_index() + 1)
+		if bonus == "pm":
+			s.pm += 1   # PM temporário: some no fim do dia se não for gasto (limpar_dia)
+			s.add_efeito("alimentacao", "pm_temp", 1, "dia", "", world.day_index() + 1)
+		else:
+			s.add_efeito("alimentacao", "pv_temp_alimento", 5, "dia", "", world.day_index() + 1)
+			s.pv_temp = maxi(s.pv_temp, 5)
+		out.append(fact("FOOD_BONUS", {"item": item, "bonus": bonus}, ["player"]))
+	return out

@@ -666,9 +666,12 @@ func refresh_journal() -> void:
 			inv_row.add_child(_button("Equipar " + Game.db.items.get(it, {}).get("name", it), func(): _cmd_log("Equip", {"item": it}); refresh_journal()))
 		elif it == "pocao_cura":
 			inv_row.add_child(_button("Beber poção", func(): _cmd_log("UseItem", {"item": it}); refresh_journal()))
+		elif bool(Game.db.items.get(it, {}).get("alimento", false)):
+			inv_row.add_child(_button("Consumir " + str(Game.db.items.get(it, {}).get("name", it)), func(): _cmd_log("UseItem", {"item": it, "bonus": "pv"}); refresh_journal()))
 	for sp in s.spells:
 		if w.rules.value("magia." + sp, {}).has("cura"):
 			inv_row.add_child(_button("Lançar " + sp, func(): _cmd_log("CastSpell", {"spell": sp}); refresh_journal()))
+	_botoes_magia_fora(w, s, inv_row)
 	if inv_row.get_child_count() > 0:
 		journal_body.add_child(inv_row)
 	var prog: ProgressionModule = w.modules.progression
@@ -1554,3 +1557,45 @@ func show_loading(on: bool) -> void:
 		var tw := create_tween()
 		tw.tween_property(_loading, "modulate:a", 0.0, 0.4)
 		tw.tween_callback(func(): _loading.visible = false)
+
+
+## Magias fora de combate (SpellsModule.FORA_DE_COMBATE): um botão por versão útil, com o alvo por perto.
+func _botoes_magia_fora(w: WorldState, s: CharacterSheet, row: HFlowContainer) -> void:
+	var magia = w.module("magia")
+	if magia == null:
+		return
+	var p := w.db.world_to_tile(w.player.position)
+	var combat = w.module("combat")
+	for sp in s.spells:
+		if not magia.FORA_DE_COMBATE.has(sp):
+			continue
+		var nome := str(w.rules.value("magia." + sp, {}).get("nome", sp))
+		match sp:
+			"consagrar", "profanar", "caminhos_da_natureza", "detectar_ameacas", "suporte_ambiental":
+				row.add_child(_button("Lançar " + nome, func(): _cmd_log("CastSpell", {"spell": sp}); refresh_journal()))
+			"abencoar_alimentos":
+				for it in w.modules.state.inventory:
+					if bool(Game.db.items.get(it, {}).get("alimento", false)):
+						row.add_child(_button("Abençoar " + str(Game.db.items.get(it, {}).get("name", it)), func(): _cmd_log("CastSpell", {"spell": sp, "item": it}); refresh_journal()))
+				if w.modules.state.has_item("frasco_agua"):
+					row.add_child(_button("Fazer água benta", func(): _cmd_log("CastSpell", {"spell": sp, "aprimoramentos": [1]}); refresh_journal()))
+			"controlar_plantas":
+				row.add_child(_button("Podar plantas", func(): _cmd_log("CastSpell", {"spell": sp, "aprimoramentos": [0]}); refresh_journal()))
+				row.add_child(_button("Falar com plantas", func(): _cmd_log("CastSpell", {"spell": sp, "aprimoramentos": [2]}); refresh_journal()))
+			"despedacar":
+				for o in w.db.all_objects():
+					var ot := Vector2i(int(o.tile[0]), int(o.tile[1]))
+					if o.has("break") and maxi(absi(ot.x - p.x), absi(ot.y - p.y)) <= 6:
+						row.add_child(_button("Despedaçar " + str(o.get("name", o.id)), func(): _cmd_log("CastSpell", {"spell": sp, "objeto": o.id}); refresh_journal()))
+			"bencao", "acalmar_animal", "tranquilidade":
+				if combat == null:
+					continue
+				for cid in combat.creature_state:
+					var cs: Dictionary = combat.creature_state[cid]
+					var ct: Array = cs.get("tile", [0, 0])
+					if maxi(absi(int(ct[0]) - p.x), absi(int(ct[1]) - p.y)) > 6:
+						continue
+					if sp == "bencao" and not bool(cs.get("alive", true)):
+						row.add_child(_button("Bênção no cadáver (" + str(cid) + ")", func(): _cmd_log("CastSpell", {"spell": sp, "target": cid, "aprimoramentos": [0]}); refresh_journal()))
+					elif sp != "bencao" and combat.is_active_creature(cid):
+						row.add_child(_button(nome + " (" + str(cid) + ")", func(): _cmd_log("CastSpell", {"spell": sp, "targets": [cid]}); refresh_journal()))

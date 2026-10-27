@@ -20,7 +20,9 @@ const FORA_DE_COMBATE := {
 	"tranquilidade": [],
 	"detectar_ameacas": [],
 	"suporte_ambiental": [],   # você (e, com o aprimoramento, os companheiros presentes)
+	"abencoar_alimentos": [],
 }
+const PO_DE_PRATA := 5   # T$ de pó de prata da água benta
 const RAIO_DETECTAR := 12   # esfera de 18m
 const OPOSTA := {"consagrar": "profanar", "profanar": "consagrar"}
 const ENERGIA := {"consagrar": "luz", "profanar": "trevas"}
@@ -31,6 +33,7 @@ const MINUTOS_DIA := 24 * 60
 var cadaveres: Dictionary = {}   # creature_id -> último dia (inclusive) em que está preservado
 var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [...]} (cena, até ser descarregada)
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
+var abencoados: Dictionary = {}  # item -> {n: porções abençoadas, ate: tick do fim da cena}
 var podas: Dictionary = {}       # "x,y" -> true: vegetação podada por Controlar Plantas (instantânea, fica)
 var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim (-1 permanente), mod_mv:int, conjurador}
 
@@ -91,6 +94,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var p := _tile_jogador()
 			if maxi(absi(p.x - int(od.tile[0])), absi(p.y - int(od.tile[1]))) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
 				return PackedStringArray(["objeto fora do alcance"])
+		"abencoar_alimentos":
+			return _valida_abencoar(cmd.payload, apr)
 		"acalmar_animal", "tranquilidade":
 			var combat_v = world.module("combat")
 			var alvos_v: Array = cmd.payload.get("targets", [])
@@ -143,6 +148,8 @@ func execute(cmd: GameCommand) -> Array:
 		out.append(fact("HEALED", {"actor": "player", "target": "player", "amount": cura, "pv_after": sh.pv, "source": sp_id}, ["player"]))
 		return out
 	match sp_id:
+		"abencoar_alimentos":
+			out.append_array(abencoar(cmd.payload))
 		"suporte_ambiental":
 			SpellRules.aplicar_suporte(sh, world.day_index() + 1)
 			var alvos_s: Array = ["player"]
@@ -304,6 +311,58 @@ func falar_com_plantas(p: Vector2i) -> Dictionary:
 	return fact("PLANTS_TALKED", {"caster": "player", "criaturas_perto": perto.size(), "atitude": "prestativa"}, ["player"])
 
 
+## Abençoar Alimentos (divina 1): purifica e abençoa porções de comida ou bebida do inventário. Consumidas na cena,
+## dão o bônus (ItemsModule._comer). Truque: só purifica (estragado ou envenenado vira próprio, sem bônus).
+## Aprimoramentos: +1 alvo (1 PM, repetível); água benta permanente de 1 frasco com água e T$ 5 de pó de prata (1 PM).
+func _valida_abencoar(payload: Dictionary, apr: Array) -> PackedStringArray:
+	var st = world.module("state")
+	var item := str(payload.get("item", ""))
+	if apr.has(1):
+		if apr.has(0): return PackedStringArray(["a água benta é de um frasco só"])
+		if st == null or not st.has_item("frasco_agua"): return PackedStringArray(["precisa de um frasco com água"])
+		if int(world.player.gold) < PO_DE_PRATA: return PackedStringArray(["faltam T$ %d de pó de prata" % PO_DE_PRATA])
+		return PackedStringArray()
+	if not bool(world.db.items.get(item, {}).get("alimento", false)) and not bool(world.db.items.get(item, {}).get("estragado", false)):
+		return PackedStringArray(["escolha comida ou bebida"])
+	if st == null or st.item_count(item) < (1 if payload.get("truque", false) else 1 + apr.count(0)):
+		return PackedStringArray(["porções insuficientes"])
+	return PackedStringArray()
+
+
+func abencoar(payload: Dictionary) -> Array:
+	var apr: Array = payload.get("aprimoramentos", [])
+	var item := str(payload.get("item", ""))
+	if apr.has(1):
+		return [fact("ITEM_LOST", {"item": "frasco_agua"}, ["player"]), fact("GOLD_CHANGED", {"delta": -PO_DE_PRATA, "reason": "pó de prata"}),
+			fact("ITEM_GAINED", {"item": "agua_benta", "from": "abencoar_alimentos"}, ["player"])]
+	var d: Dictionary = world.db.items.get(item, {})
+	var out: Array = []
+	if bool(d.get("estragado", false)) or bool(d.get("envenenado", false)):
+		var limpo := str(d.get("limpo", item))
+		out.append(fact("ITEM_LOST", {"item": item}, ["player"]))
+		out.append(fact("ITEM_GAINED", {"item": limpo, "from": "purificado"}, ["player"]))
+		item = limpo
+	if payload.get("truque", false):
+		return out + [fact("FOOD_PURIFIED", {"item": item}, ["player"])]
+	var combat = world.module("combat")
+	var n := 1 + apr.count(0)
+	var atual: Dictionary = abencoados.get(item, {})
+	var antes := int(atual.get("n", 0)) if int(atual.get("ate", -1)) > world.clock.tick else 0
+	abencoados[item] = {"n": antes + n, "ate": world.clock.tick + (combat.TICKS_CENA if combat != null else 6)}
+	return out + [fact("FOOD_BLESSED", {"item": item, "portions": n}, ["player"])]
+
+
+## Consome uma porção abençoada do item, se houver uma valendo. Chamado ao comer.
+func consumir_abencoado(item: String) -> bool:
+	var a: Dictionary = abencoados.get(item, {})
+	if a.is_empty() or int(a.ate) <= world.clock.tick or int(a.n) <= 0:
+		return false
+	a.n = int(a.n) - 1
+	if int(a.n) <= 0:
+		abencoados.erase(item)
+	return true
+
+
 ## Detectar Ameaças (divina 1): pessoal, esfera de 18m, pela cena (TICKS_CENA) ou até ser descarregada.
 ## Aprimoramentos: raça e aura da criatura (1 PM); não ser surpreendido pelo que detectou e +5 contra armadilhas
 ## (2 PM, 2º círculo).
@@ -356,7 +415,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate()}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -365,3 +424,4 @@ func from_dict(d: Dictionary) -> void:
 	podas = (d.get("podas", {}) as Dictionary).duplicate()
 	detectar = (d.get("detectar", {}) as Dictionary).duplicate(true)
 	protecao_detectar = (d.get("protecao_detectar", {}) as Dictionary).duplicate()
+	abencoados = (d.get("abencoados", {}) as Dictionary).duplicate(true)

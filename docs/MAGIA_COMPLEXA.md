@@ -48,6 +48,8 @@ versões de magia que agem no mundo (`FORA_DE_COMBATE`); guarda os cadáveres pr
 
 Terreno: o mapa marca `natural` e `solo` por tipo de quadrado. Rastrear (LB p.123) é `Checks.cd_rastrear`; ao fugir de
 um combate, inimigos treinados em Sobrevivência tentam seguir os rastros e alcançam o jogador (`_tentar_rastrear`).
+Comida (LB p.161): itens com `alimento`; `UseItem` come (bônus de alimentação, um por dia); água benta é item e ação
+`agua_benta` no combate (Shift+5). O diário mostra botões para as magias fora de combate.
 Perigos (LB p.318): calor e frio no WeatherModule (`perigo_clima`; o dano só cura fora do clima, `dano_clima`); fumaça
 densa (zona `fumaca`) e sufocamento (flag `submerso`) em `CombatModule._perigos_inicio_de_turno`. As fontes de
 fumaça e de submersão virão das magias de fogo e água.
@@ -87,7 +89,7 @@ O objetivo é implementar todas as magias do catálogo (divinas e universais de 
 Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `SpellRules.COMPLETAS`:
 83 magias. Quatro entradas do filtro (custo, CD, concentração e armadura) são regras, não magias.
 
-- Divinas de 1º círculo (2): abencoar_alimentos, criar_elementos.
+- Divinas de 1º círculo (1): criar_elementos.
 - Divinas de 2º círculo (18): aliado_animal, augurio, circulo_da_justica, condicao, controlar_fogo,
   controlar_madeira, enxame_de_pestes, fisico_divino, mente_divina, miasma_mefitico, oracao, purificacao,
   raio_solar, rogar_maldicao, silencio, soco_de_arsenal, tempestade_divina, voz_divina.
@@ -103,7 +105,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo (3, para o arcanista): armadura_arcana, toque_chocante, seta_infalivel.
-- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas, Santuário, Comando, Acalmar Animal, Tranquilidade, Detectar Ameaças e Suporte Ambiental (1º divina), Arma Mágica e Névoa (1º universal).
+- Já feitas nesta fase: Orientação, Bênção, Consagrar, Profanar, Despedaçar, Arma Espiritual, Armamento da Natureza, Caminhos da Natureza, Controlar Plantas, Santuário, Comando, Acalmar Animal, Tranquilidade, Detectar Ameaças, Suporte Ambiental e Abençoar Alimentos (1º divina), Arma Mágica e Névoa (1º universal).
 
 Ordem sugerida: primeiro as que usam sistemas já prontos (área, marca, zona, invocação); depois as que pedem
 servos com ação própria (generalizando o turno do Guardião); por último as que dependem de fora do combate

@@ -29,6 +29,7 @@ const COMPLETAS := {
 	"tranquilidade": {"aprimoramentos": [0, 1, 2]},   # qualquer criatura; +1 alvo; médio e criaturas escolhidas
 	"detectar_ameacas": {"aprimoramentos": [0, 1]},   # raça e aura; não surpreendido e +5 contra armadilhas
 	"suporte_ambiental": {"aprimoramentos": [0]},   # alcance curto e criaturas escolhidas
+	"abencoar_alimentos": {"aprimoramentos": [0, 1]},   # +1 alvo (repetível); água benta; truque: só purifica
 	"nevoa": {"aprimoramentos": [0, 1, 2, 3, 4, 5]},   # sob a água; quem enxerga; cheiro (enjoado); ácido 2d4 / +2d4; espessa
 	"lagrimas_de_wynna": {"aprimoramentos": [0, 1]},   # esfera de 6m com criaturas escolhidas (2 PM); ritual de um dia (5 PM + 1 PM)
 	"guardiao_divino": {"aprimoramentos": []},   # elemental de luz com 100 pontos: cura PV e remove condições; some sem luz

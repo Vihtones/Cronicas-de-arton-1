@@ -233,6 +233,10 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "" or not gs.is_enemy("player", target):
 				return []
 			return [{"type": "arma_espiritual", "target": target}]
+		"agua":
+			if target == "":
+				return []
+			return [{"type": "agua_benta", "target": target}]
 		"conversar", "adestrar":
 			if target == "" or not gs.is_enemy("player", target):
 				return []
@@ -399,6 +403,7 @@ func set_mode(m: String) -> void:
 	var dicas := {"cura": "Cura pelas Mãos: clique em você ou num aliado adjacente (N: passo extra, H: remover condição).",
 		"olhar": "Olhar atordoante: clique num inimigo em alcance curto.",
 		"arma": "Arma Espiritual (ação livre): clique num inimigo adjacente. Shift+W: sustentar ou soltar a magia sustentada.",
+		"agua": "Água benta (ação padrão): clique num morto-vivo ou abissal em alcance curto.",
 		"conversar": "Mudar atitude (Diplomacia, ação completa, –10): clique num inimigo em alcance curto.",
 		"adestrar": "Acalmar animal (Adestramento, ação completa, CD 25): clique num animal em alcance curto."}
 	message.emit(dicas.get(m, "Modo: " + m))
@@ -502,7 +507,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_B: toggle_aprimoramento()
 			KEY_G: cycle_aprimoramento()
 			KEY_T: cycle_energia()
-			KEY_5: drink_potion()
+			KEY_5:
+				if event.shift_pressed: set_mode("agua")
+				else: drink_potion()
 			KEY_6: mode = "atirar"; message.emit("Modo tiro: clique no alvo (sem se mover)."); _update_preview()
 			KEY_Q: special = not special; message.emit("Ataque Especial (1 PM, +4): %s" % ("ligado" if special else "desligado")); _update_preview()
 			KEY_L: stand_up()

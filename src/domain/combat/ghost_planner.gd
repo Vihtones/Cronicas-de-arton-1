@@ -258,6 +258,13 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			elif sp.has("dano"): avg = Dice.average(raio_dice(A.sheet) if sp_id == "raio_arcano" else str(sp.dano)) * 0.75   # resistência reduz à metade: média aproximada
 			if avg > 0.0 and A.sheet.has_power("arcano_de_batalha"): avg += maxi(0, int(A.sheet.attrs.get(A.sheet.caster_attr, 0)))
 			return {"ok": true, "kind": kind_c, "cost": cost, "hit_chance": 1.0, "crit_chance": 0.0, "avg_damage": avg, "mods": [], "defense": 0, "miss_chance": 0, "ranged": true}
+		"agua_benta":
+			# Água benta (LB p.160): ação padrão, morto-vivo ou abissal em alcance curto; 2d10 de luz (Reflexos CD Sab reduz).
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "usar água benta exige ação padrão"}
+			var TB := sim.c(a.get("target", ""))
+			if TB.is_empty() or TB.sheet.is_dead(): return {"ok": false, "reason": "alvo inválido"}
+			if CombatSim.cheb(A.tile, TB.tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance curto"}
+			return {"ok": true, "kind": "padrao"}
 		"drink":
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "beber poção exige ação padrão (LB p.234)"}
 			if str(a.get("item", "")) == "": return {"ok": false, "reason": "sem item"}

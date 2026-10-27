@@ -156,6 +156,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			for act in actions:
 				if act.get("type", "") == "drink" and (st == null or not st.has_item(str(act.get("item", "")))):
 					return PackedStringArray(["você não tem " + str(act.get("item", ""))])
+				if act.get("type", "") == "agua_benta" and (st == null or not st.has_item("agua_benta")):
+					return PackedStringArray(["você não tem água benta"])
 			var g := GhostPlanner.simulate(sim, "player", actions)
 			if not g.valid:
 				return PackedStringArray(["plano inválido: " + str(g.steps[-1].reason)])
@@ -1946,6 +1948,23 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sh_a.pm -= 1
 			sh_a.allihanna_ativa = true
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "armadura_de_allihanna", "defense": sh_a.allihanna_defense(true), "pm_after": sh_a.pm, "tags": ["racial"]}, [id]))
+		"agua_benta":
+			# Inofensiva para quem não é morto-vivo nem abissal.
+			var T_ab: Dictionary = sim.c(str(a.target))
+			var ts_ab: CharacterSheet = T_ab.sheet
+			out.append(fact("ITEM_LOST", {"item": "agua_benta"}, [id]))
+			if ts_ab.creature_type == "morto-vivo" or Array(ts_ab.habilidades).has("abissal"):
+				var cd_ab: int = 10 + sim.c(id).sheet.level / 2 + int(sim.c(id).sheet.attrs.get("sab", 0))
+				var sv_ab := Checks.skill(ts_ab, "reflexos", cd_ab, world.rules, world.rng, "combat")
+				var dano_ab := _dados_energia("2d10", "luz", T_ab.tile)
+				if sv_ab.get("success", false):
+					dano_ab /= 2
+				dano_ab = _dano_por_tipo(ts_ab, "luz", dano_ab)
+				var tags_ab: Array = ["item", "luz"]
+				tags_ab.append_array(sim.apply_damage(str(a.target), dano_ab))
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": a.target, "weapon": "Água benta", "d20": 0, "mod": 0, "mods": [], "total": 0,
+					"defense": cd_ab, "camo_roll": 0, "hit": true, "crit": false, "damage": dano_ab, "rolls": [], "pv_after": ts_ab.pv, "special": false,
+					"ranged": true, "save": "reflexos", "saved": sv_ab.get("success", false), "tags": tags_ab}, [id, str(a.target)]))
 		"drink":
 			var heal := {"total": _dados_energia(str(world.rules.value("magia.curar_ferimentos").cura), "luz", sim.c(id).tile)}
 			var sh: CharacterSheet = sim.c(id).sheet
@@ -2064,6 +2083,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 					out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tgt, "weapon": "Seta Infalível", "d20": 0, "mod": 0, "mods": [],
 						"total": 0, "defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": r.total, "rolls": r.rolls,
 						"pv_after": sim.c(tgt).sheet.pv, "special": false, "ranged": true, "spell": true, "tags": tags}, [id, tgt]))
+		"abencoar_alimentos":
+			# Abençoar Alimentos (divina 1): age sobre o inventário (SpellsModule.abencoar).
+			var magia_ab = world.module("magia")
+			if magia_ab != null:
+				out.append_array(magia_ab.abencoar(a))
 		"suporte_ambiental":
 			# Suporte Ambiental (divina 1): toque (curto e criaturas escolhidas com o aprimoramento), 1 dia. Imune a calor
 			# e frio extremos, respira na água (e o que respira água, no ar) e não sufoca em fumaça densa.
@@ -3248,7 +3272,12 @@ func _end_combat(outcome: String) -> Array:
 		sh_f.aura_sagrada_ativa = false
 		sh_f.egide_ativa = false
 		sh_f.manto_cruzado = ""
-		sh_f.pv_temp = 0
+		var resto_pv: int = mini(sh_f.pv_temp, sh_f.efeito_bonus("pv_temp_alimento"))   # bônus de alimentação dura o dia
+		if sh_f.has_efeito("alimentacao") and sh_f.efeito_tipo_existe("pv_temp_alimento", ""):
+			for e_al in sh_f.efeitos:
+				if e_al.stat == "pv_temp_alimento":
+					e_al.bonus = resto_pv
+		sh_f.pv_temp = resto_pv
 		sh_f.remove_efeito("manto_do_cruzado")
 		sh_f.remove_efeito("aura_sagrada")
 		sh_f.remove_efeito("egide_sagrada")
