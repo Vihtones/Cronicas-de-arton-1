@@ -6259,11 +6259,17 @@
     "itens": [
      "símbolo de sua herança (anel de sinete ou manto cerimonial)"
     ],
-    "pericias": [],
-    "poderes": [],
-    "poder_unico": null,
-    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder",
-    "pendente": "benefícios não localizados no texto extraído: verificar LB p.91"
+    "pericias": [
+     "misticismo",
+     "nobreza",
+     "oficio"
+    ],
+    "poderes": [
+     "comandar",
+     "heranca"
+    ],
+    "poder_unico": "heranca",
+    "escolha": "dois benefícios: duas perícias, dois poderes ou uma perícia e um poder"
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 87,
@@ -8988,6 +8994,566 @@
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
    "pagina": 137,
    "pdf_page": 143,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.membro_da_igreja",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você consegue hospedagem confortável e informação em qualquer templo de sua divindade, para você e seus aliados",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem acolito"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 85,
+   "pdf_page": 91,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.amigo_especial",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você recebe +5 em testes de Adestramento com animais. Possui um animal de estimação que é um parceiro que fornece +2 em uma perícia a sua escolha (exceto Luta ou Pontaria, aprovada pelo mestre) e não conta em seu limite de parceiros",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem amigo_dos_animais"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 85,
+   "pdf_page": 91,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.lembrancas_graduais",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Em determinados momentos, a critério do mestre, você pode fazer um teste de Sabedoria (CD 10) para reconhecer pessoas, criaturas ou lugares que tenha encontrado antes de perder a memória",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem amnesico"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.sangue_azul",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você tem influência política suficiente para ser tratado com mais leniência pela guarda, conseguir uma audiência com o nobre local etc.",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem aristocrata"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.frutos_do_trabalho",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "No início de cada aventura, você recebe até 5 itens gerais que possa fabricar, num valor total de até T$ 50. O valor aumenta para T$ 100 no patamar veterano, T$ 300 no campeão e T$ 500 no lenda",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem artesao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 86,
+   "pdf_page": 92,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.dom_artistico",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você recebe +2 em testes de Atuação e o dobro de tibares em apresentações",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem artista"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 87,
+   "pdf_page": 93,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.esse_cheiro",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você recebe +2 em Fortitude e detecta automaticamente a presença (mas não a localização ou natureza) de itens alquímicos em alcance curto",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem assistente_de_laboratorio"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 88,
+   "pdf_page": 94,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.a_prova_de_tudo",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você não sofre penalidade em deslocamento e Sobrevivência por clima ruim e por terreno difícil natural",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem batedor"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 88,
+   "pdf_page": 94,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.confissao",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode usar Intimidação para interrogar sem custo e em um minuto (veja Investigação)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem capanga"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 88,
+   "pdf_page": 94,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.alpinista_social",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode substituir testes de Diplomacia por testes de Enganação",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem charlatao"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 89,
+   "pdf_page": 95,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.medico_de_campo",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você soma sua Sabedoria aos PV restaurados por suas habilidades e itens mundanos de cura",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem curandeiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 89,
+   "pdf_page": 95,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.busca_interior",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Quando você e seus companheiros estão diante de um mistério, incapazes de prosseguir, pode gastar 1 PM para meditar sozinho por algum tempo e receber uma dica do mestre",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem eremita"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 89,
+   "pdf_page": 95,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.truque_de_magica",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode lançar Explosão de Chamas, Hipnotismo e Queda Suave, mas apenas com o aprimoramento Truque. Não é habilidade mágica: os efeitos provêm de prestidigitação",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem circense"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 89,
+   "pdf_page": 95,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.punguista",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode fazer testes de Ladinagem para sustento (como a perícia Ofício), mas em apenas um dia. Se passar, recebe o dobro do dinheiro; se falhar, pode ter problemas com a lei (a critério do mestre)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem criminoso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 89,
+   "pdf_page": 95,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.desejo_de_liberdade",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você recebe +5 em testes contra a manobra agarrar e efeitos de movimento",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem escravo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 90,
+   "pdf_page": 96,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.palpite_fundamentado",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Ao fazer um teste de perícia originalmente baseada em Inteligência ou Sabedoria, pode gastar 2 PM para substituí-la por Conhecimento",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem estudioso"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 90,
+   "pdf_page": 96,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.cultura_exotica",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Quando vai fazer um teste de perícia que requer treinamento, pode gastar 1 PM para ignorar esse requisito nesse teste",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem forasteiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 90,
+   "pdf_page": 96,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.agua_no_feijao",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você não sofre a penalidade de –5 e não gasta matéria-prima adicional para fabricar pratos para cinco pessoas",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem fazendeiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 90,
+   "pdf_page": 96,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.pao_e_circo",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode escolher causar dano não letal sem sofrer a penalidade de –5",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem gladiador"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 91,
+   "pdf_page": 97,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.detetive",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode gastar 1 PM para substituir testes de Percepção e Intuição por testes de Investigação até o fim da cena",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem guarda"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 91,
+   "pdf_page": 97,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.heranca",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você herdou um item de preço de até T$ 1.000. Pode escolher este poder duas vezes, para um item de até T$ 2.000",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem herdeiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 91,
+   "pdf_page": 97,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.coracao_heroico",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você recebe +3 pontos de mana. Quando atinge um novo patamar (5º, 11º e 17º níveis), recebe +3 PM",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem heroi_campones"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 92,
+   "pdf_page": 98,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.passagem_de_navio",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você consegue transporte marítimo para você e seus aliados, sem custos, desde que todos paguem com trabalho (passar em pelo menos um teste de perícia adequado durante a viagem)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem marujo"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 92,
+   "pdf_page": 98,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.vendedor_de_carcacas",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode extrair recursos de criaturas em um minuto, em vez de uma hora, e recebe +5 no teste",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem mateiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 92,
+   "pdf_page": 98,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.rede_de_contatos",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Graças à influência de sua guilda, você pode usar Diplomacia para interrogar sem custo e em um minuto (veja Investigação)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem membro_de_guilda"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 92,
+   "pdf_page": 98,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.negociacao",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você pode vender itens 10% mais caro (não cumulativo com barganha)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem mercador"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 93,
+   "pdf_page": 99,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.escavador",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você se torna proficiente em picaretas, causa +1 de dano com elas e não é afetado por terreno difícil em masmorras e subterrâneos",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem minerador"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 93,
+   "pdf_page": 99,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.mochileiro",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Seu limite de carga aumenta em 5 espaços",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem nomade"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 93,
+   "pdf_page": 99,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.quebra_galho",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Em cidades ou metrópoles, você pode comprar qualquer item mundano não superior por metade do preço normal. Esses itens não podem ser matérias-primas e não podem ser revendidos (são velhos, sujos, furtados...)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem pivete"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 93,
+   "pdf_page": 99,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.estoico",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Sua condição de descanso é uma categoria acima do padrão pela situação (normal em condições ruins, confortável em condições normais e luxuosa em condições confortáveis ou melhores). Veja as regras de recuperação na página 106",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem refugiado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 94,
+   "pdf_page": 100,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.vida_rustica",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você é imune a efeitos prejudiciais de itens ingeríveis e consegue descansar nos lugares mais desconfortáveis (mesmo ao relento); sua recuperação de PV e PM nunca é inferior ao seu próprio nível",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem selvagem"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 94,
+   "pdf_page": 100,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.antigo_mestre",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Uma vez por aventura, o herói que você serviu surge para ajudá-lo por uma cena. Ele é um parceiro mestre de um tipo a sua escolha (definido ao obter este poder) que não conta em seu limite de aliados",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem seguidor"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 94,
+   "pdf_page": 100,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.influencia_militar",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Onde houver acampamentos ou bases militares, você pode conseguir hospedagem e informações para você e seus aliados",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem soldado"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 94,
+   "pdf_page": 100,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.gororoba",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você não sofre a penalidade de –5 para fabricar um prato especial adicional",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem taverneiro"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 95,
+   "pdf_page": 101,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "poder.esforcado",
+   "valor": {
+    "classe": "origem",
+    "grupo": "origem",
+    "efeito": "Você não teme trabalho duro, nem prazos apertados. Você recebe +2 em todos os testes de perícias estendidos (incluindo perigos complexos)",
+    "implementado": false,
+    "prereq": {
+     "texto": "exclusivo da origem trabalhador"
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 95,
+   "pdf_page": 101,
    "status": "VERIFICADA"
   }
  ]
