@@ -270,8 +270,11 @@ func _build_hud(root: Control) -> void:
 	signals_label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
 	root.add_child(signals_label)
 	log_box = VBoxContainer.new()
-	log_box.position = Vector2(6, 214)
-	log_box.size = Vector2(300, 72)
+	log_box.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)   # ancorado acima do HUD e cresce para cima (não cobre o retrato)
+	log_box.offset_left = 6
+	log_box.offset_right = 306
+	log_box.offset_bottom = -78
+	log_box.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	log_box.add_theme_constant_override("separation", 0)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(log_box)
@@ -326,6 +329,9 @@ func log_msg(text: String) -> void:
 		c.queue_free()
 	for i in _log_lines.size():
 		var l := _label(_log_lines[i], 8)
+		l.custom_minimum_size = Vector2(300, 0)
+		l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))   # legível sobre qualquer fundo
+		l.add_theme_constant_override("outline_size", 3)
 		l.modulate.a = 0.45 + 0.55 * float(i + 1) / _log_lines.size()
 		log_box.add_child(l)
 

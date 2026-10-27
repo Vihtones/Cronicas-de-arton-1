@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Interface: o registro de mensagens fica ancorado acima do HUD e cresce para cima, com contorno no texto; em combate ele não cobre mais o retrato nem a barra de ações.
+
 - Controlar Madeira (divina, 2º círculo) completa: fortalecer (armas +1 passo de dano, escudos +2 na Defesa, objetos +5 RD e PV dobrados), modelar (arma de madeira vira outra; porta ou baú se molda; passagem em parede de madeira), repelir (ataques da arma contra o conjurador falham; porta ou baú se abre) e retorcer (arma –5 nos ataques, escudo sem bônus, porta emperrada); Vontade anula em objetos de inimigos. Aprimoramentos: forma de árvore por um dia (atacado, dissipa; o personagem não age), vegetação afiada (terreno difícil e 1d6 de corte por quadrado), Enorme e Colossal. Com isso todas as magias divinas de 2º círculo estão feitas.
 
 - Aliado Animal (divina, 2º círculo) completa, com o novo sistema de parceiros do livro (LB p.260): ajudante, combatente, fortão, guardião, montaria e perseguidor nos poderes iniciante, veterano e mestre, limite de 1, 2 ou 3 parceiros por nível e bônus aplicados na ficha (ataque, Defesa, resistência, perícias, dano extra do fortão, ataque extra do combatente mestre, Sentidos Aguçados e Percepção às Cegas). A magia vincula um animal prestativo por um dia (mestre e dois animais com os aprimoramentos) ou envia um mensageiro Minúsculo com um item até um local.
