@@ -71,6 +71,9 @@ func apply_command(cmd: GameCommand, _legacy_bus: EventBus = null) -> GameComman
 				return GameCommand.Result.rejected(["posição inválida"], revision)
 			player.position = to
 			facts.append(WorldModule.fact("PLAYER_MOVED", {"to": [to.x, to.y]}, [cmd.actor_id]))
+			var magia_mv := module("magia")
+			if magia_mv != null:
+				facts.append_array(magia_mv.ao_mover())   # magias que dependem de onde o jogador está (Comunhão com a Natureza)
 		"AdvanceTime":
 			var n := int(cmd.payload.get("ticks", 0))
 			if n <= 0 or n > 60 * 24 * 6:

@@ -3766,3 +3766,18 @@ func test_despertar_consciencia_escultura_permanente_com_penalidade_de_pm() -> v
 	eq(str(w.module("party").parceiro("despertar_estatua_lena").get("nivel", "")), "veterano", "parceiro veterano")
 	eq(w.player_sheet.pm_max, pm_max0 - 3, "–3 PM pela versão permanente")
 	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "despertar_consciencia", "alvo_tipo": "parceiro", "alvo": "despertar_estatua_lena", "tipo": "guardiao"}).accepted, "o mesmo parceiro não é despertado duas vezes")
+
+
+func test_comunhao_com_a_natureza_dados_de_auxilio_salvam_o_teste() -> void:
+	var r := RuleRegistry.load_default()
+	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
+	sh.add_efeito("magia.comunhao_com_a_natureza", "auxilio_dados", 6, "dia", "4", 99)
+	sh.add_efeito("magia.comunhao_com_a_natureza", "auxilio_gasto", 2, "dia", "", 99)
+	sh.add_efeito("comunhao.area", "area_natural", 1, "dia", "", 99)
+	var rng := RngStreams.new(7)
+	var gastou := false
+	for i in 20:
+		var antes := sh.efeito_bonus("auxilio_dados")
+		Checks.skill(sh, "sobrevivencia", 18, r, rng, "world")
+		gastou = gastou or sh.efeito_bonus("auxilio_dados") < antes
+	check(gastou, "em algum teste perto da CD, os dados foram gastos")

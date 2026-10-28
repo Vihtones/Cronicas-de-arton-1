@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"comunhao_com_a_natureza": [],   # dados de auxílio pelo dia, ou (aprimoramento) informações da região
 	"despertar_consciencia": [],   # animal ou planta ao lado, escultura (aprimoramento) ou um parceiro seu
 	"servo_morto_vivo": [],   # cadáver de humanoide, animal ou monstro vira parceiro morto-vivo permanente
 	"videncia": [],   # um NPC a qualquer distância; a familiaridade muda a Vontade dele
@@ -191,6 +192,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"comunhao_com_a_natureza":
+			if not world.db.is_natural(_tile_jogador()):
+				return PackedStringArray(["é preciso estar numa área natural"])
 		"despertar_consciencia":
 			var err_dc := _valida_despertar(cmd.payload)
 			if err_dc != "":
@@ -463,6 +467,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"comunhao_com_a_natureza":
+			out.append_array(comunhao_com_a_natureza(cmd.payload, sh))
 		"despertar_consciencia":
 			out.append_array(despertar_consciencia(cmd.payload))
 		"servo_morto_vivo":
@@ -705,6 +711,77 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Comunhão com a Natureza: 6d4 dados de auxílio pelo dia (+2 por aprimoramento; d6 ou d8), gastos 2 por vez (+2 por
+## círculo acima do 3º) em testes em área natural (Checks._auxilio_natural). Com o aprimoramento de 1 minuto, em vez disso,
+## 1d4+1 informações sobre a região: terreno, animais, vegetais, minerais, cursos d'água e criaturas antinaturais.
+func comunhao_com_a_natureza(p: Dictionary, sh: CharacterSheet) -> Array:
+	var apr: Array = p.get("aprimoramentos", [])
+	if apr.has(0):
+		var out: Array = world.advance_ticks(maxi(1, 1 / world.clock.tick_minutes))
+		var temas: Array = _temas_da_natureza()
+		var n := mini(temas.size(), int(Dice.roll("1d4+1", world.rng, "world").total))
+		var escolhidos: Array = []
+		while escolhidos.size() < n:
+			var t: Dictionary = temas[world.rng.stream("world").randi() % temas.size()]
+			if not escolhidos.has(t):
+				escolhidos.append(t)
+		out.append(fact("NATURE_INFO", {"caster": "player", "zona": world.db.zone_at(_tile_jogador()), "informacoes": escolhidos}, ["player"]))
+		return out
+	var lado := 8 if apr.has(3) else (6 if apr.has(2) else 4)
+	var gasto := 2 + 2 * maxi(0, SpellRules.circulo_maximo(sh, world.rules) - 3)
+	sh.add_efeito("magia.comunhao_com_a_natureza", "auxilio_dados", 6 + 2 * apr.count(1), "dia", str(lado), world.day_index() + 1)
+	sh.add_efeito("magia.comunhao_com_a_natureza", "auxilio_gasto", gasto, "dia", "", world.day_index() + 1)
+	ao_mover()
+	return [fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "comunhao_com_a_natureza", "dados": 6 + 2 * apr.count(1), "lado": lado, "tags": ["magia"]}, ["player"])]
+
+
+## Informações da zona natural onde o jogador está (Comunhão com a Natureza, aprimoramento).
+func _temas_da_natureza() -> Array:
+	var zona := world.db.zone_at(_tile_jogador())
+	var agua := 0
+	var veg := 0
+	var duro := 0
+	var dificil := 0
+	for y in world.db.size.y:
+		for x in world.db.size.x:
+			var t := Vector2i(x, y)
+			if world.db.zone_at(t) != zona:
+				continue
+			agua += 1 if world.db.is_water(t) else 0
+			veg += 1 if world.db.is_vegetation(t) else 0
+			duro += 1 if world.db.solo(t) == "duro" else 0
+			dificil += 1 if world.db.is_difficult(t) or world.db.is_chasm(t) else 0
+	var combat = world.module("combat")
+	var animais: Array = []
+	var antinaturais: Array = []
+	if combat != null:
+		for cid in combat.creature_state:
+			var st: Dictionary = combat.creature_state[cid]
+			if not bool(st.get("alive", false)):
+				continue
+			var tl: Array = st.get("tile", [0, 0])
+			if world.db.zone_at(Vector2i(int(tl[0]), int(tl[1]))) != zona:
+				continue
+			var tp := str((st.get("sheet", {}) as Dictionary).get("creature_type", ""))
+			if tp == "animal":
+				animais.append(cid)
+			elif tp in ["morto-vivo", "construto", "espirito"]:
+				antinaturais.append(cid)
+	return [{"tema": "terreno", "trechos_dificeis": dificil}, {"tema": "animais", "quais": animais}, {"tema": "vegetais", "trechos": veg},
+		{"tema": "minerais", "solo_duro": duro}, {"tema": "cursos_dagua", "trechos": agua}, {"tema": "criaturas_antinaturais", "quais": antinaturais}]
+
+
+## Chamado a cada passo do jogador (WorldState, MovePlayer): marca se ele está em área natural (Comunhão com a Natureza).
+func ao_mover() -> Array:
+	var sh: CharacterSheet = world.player_sheet
+	if sh == null:
+		return []
+	sh.remove_efeito_stat("area_natural")
+	if sh.efeito_bonus("auxilio_dados") > 0 and world.db.is_natural(_tile_jogador()):
+		sh.add_efeito("comunhao.area", "area_natural", 1, "dia", "", world.day_index() + 1)
+	return []
 
 
 ## Despertar Consciência: alvo_tipo "animal" (criatura viva ao lado), "planta" (vegetação ao lado), "escultura" (objeto com

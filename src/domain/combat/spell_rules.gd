@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"comunhao_com_a_natureza": {"aprimoramentos": [0, 1, 2, 3]},   # dados de auxílio em áreas naturais; informações da região; +2 dados; d6; d8
 	"despertar_consciencia": {"aprimoramentos": [0, 1]},   # animal, planta ou parceiro vira parceiro veterano por um dia; escultura; permanente (–3 PM)
 	"servo_morto_vivo": {"aprimoramentos": [0, 1, 2]},   # cadáver vira parceiro morto-vivo (esqueleto/zumbi, carniçal, sombra, múmia)
 	"videncia": {"aprimoramentos": []},   # fora de combate: vê e ouve um NPC a qualquer distância (Vontade anula, com modificador por familiaridade)

@@ -40,6 +40,7 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 			if vant_geral:
 				sheet.remove_efeito_stat("vantagem_pericia")
 	var total := d20 + mod
+	total += _auxilio_natural(sheet, total, cd, rng, stream)
 	if eh_resistencia:
 		sheet.limpar_efeitos("proxima_resistencia")   # "próximo teste de resistência" é gasto ao rolar
 	# Premonição (magia do conjurador): uma vez por rodada, rola de novo um teste que falhou; vale a nova rolagem.
@@ -60,6 +61,38 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 		sheet.praticar_aptidao(chave_apt, sucesso)   # só o sucesso gera progresso
 	return {"allowed": true, "skill": skill_name, "d20": d20, "mod": mod, "total": total, "cd": cd,
 		"success": sucesso, "margin": total - cd, "sorte": sorte, "falha_automatica": falha_auto}
+
+
+## Comunhão com a Natureza: em área natural, se o teste falharia e os dados de auxílio podem salvá-lo, gasta-os
+## (2d4, +2d4 por círculo acima do 3º) e soma o resultado. Sem dados, a magia termina.
+static func _auxilio_natural(sheet: CharacterSheet, total: int, cd: int, rng: RngStreams, stream: String) -> int:
+	var pool := sheet.efeito_bonus("auxilio_dados")
+	if pool <= 0 or total >= cd or sheet.efeito_bonus("area_natural") <= 0:
+		return 0
+	var lado := 4
+	var gasto := 2
+	for e in sheet.efeitos:
+		if e.stat == "auxilio_dados":
+			lado = int(e.tipo)
+		elif e.stat == "auxilio_gasto":
+			gasto = int(e.bonus)
+	var n := mini(pool, gasto)
+	if total + n * lado < cd:
+		return 0   # nem o máximo dos dados salvaria: guarda-os
+	var soma := 0
+	for i in n:
+		soma += int(rng.roll(stream, 1, lado)[0])
+	sheet.add_efeito("magia.comunhao_com_a_natureza", "auxilio_dados", pool - n, "dia", str(lado), int(_ate_auxilio(sheet)))
+	if pool - n <= 0:
+		sheet.remove_efeito("magia.comunhao_com_a_natureza")
+	return soma
+
+
+static func _ate_auxilio(sheet: CharacterSheet) -> int:
+	for e in sheet.efeitos:
+		if e.stat == "auxilio_dados":
+			return int(e.ate)
+	return -1
 
 
 static func attribute(sheet: CharacterSheet, attr: String, cd: int, rules: RuleRegistry, rng: RngStreams, stream: String = "world") -> Dictionary:
