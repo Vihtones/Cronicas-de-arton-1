@@ -1202,6 +1202,56 @@ func _cupula_rompe(id: String, out: Array) -> void:
 				return
 
 
+## Controlar Terra (universal 3): 9 cubos de 1,5m (+2) numa linha a partir do quadrado. Amolecer: na cripta ou dentro de
+## construção derruba o teto (10d6 de impacto, Reflexos metade); no chão, terreno difícil. Modelar: "parede" (cobertura total,
+## RD 8 e 50 PV a cada 3m) ou "passagem" (abre a parede nos cubos). Solidificar: lama e areia (solo macio) endurecem e quem
+## está nelas fica agarrado (ação padrão e Atletismo para se soltar). Aprimoramento: fundir-se à pedra ao lado por um dia.
+func _controlar_terra(id: String, a: Dictionary, sh: CharacterSheet) -> Array:
+	var out: Array = []
+	var apr: Array = a.get("aprimoramentos", [])
+	var cd := spell_dc(sh, a)
+	if apr.has(1):
+		(sim.c(id).flags as Array).append("na_pedra")
+		sh.add_efeito("magia.controlar_terra", "mesclado", 1, "dia", "", world.day_index() + 1)
+		out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "controlar_terra", "efeito": "fundir", "tags": ["magia"]}, [id]))
+		return out
+	var dir_v: Array = a.get("direcao", [1, 0])
+	var cubos := SpellRules.cubos_terra(a.get("tile", sim.c(id).tile), Vector2i(int(dir_v[0]), int(dir_v[1])), 9 + 2 * apr.count(0))
+	match str(a.efeito):
+		"amolecer":
+			var teto := cubos.any(func(t): return world.db.zone_at(t) == "cripta" or bool(world.db.location(world.db.location_at(t)).get("indoor", false)))
+			if teto:
+				for cid in sim.combatants.keys():
+					if cubos.has(sim.c(cid).tile) and not sim.c(cid).sheet.is_dead():
+						out.append_array(_dano_de_energia(id, cid, "10d6", cd, "reflexos", "impacto", "Desabamento"))
+			else:
+				sim.add_zona("terra_mole_%s_%d" % [id, sim.round_no], cubos, "terreno_dificil", -1, "controlar_terra", {"conjurador": id})
+		"parede":
+			var seg: Dictionary = {}
+			var pvs: Dictionary = {}
+			var livres: Array = cubos.filter(func(t): return sim.walk_fn.call(t) and sim.occupant(t, "") == "")
+			for i in livres.size():
+				seg["%d,%d" % [livres[i].x, livres[i].y]] = i / 2
+				pvs[str(i / 2)] = 50
+			sim.add_zona("parede_terra_%s_%d" % [id, sim.round_no], livres, "muralha", -1, "controlar_terra",
+				{"conjurador": id, "cd": cd, "segmento": seg, "pv": pvs, "animada": false, "rd": 8, "rd_tipos": []})
+		"passagem":
+			sim.add_zona("passagem_%s_%d" % [id, sim.round_no], cubos.filter(func(t): return world.db.tile_char(t) == "#"), "passagem", -1, "controlar_terra", {"conjurador": id})
+		"solidificar":
+			for z in sim.zonas.duplicate(true):
+				if str(z.fonte) == "controlar_terra" and str(z.tipo) == "terreno_dificil" and _alguma_em(z.tiles, cubos):
+					sim.remove_zona(str(z.id))
+			for cid in sim.combatants.keys():
+				var t_c: Vector2i = sim.c(cid).tile
+				if cubos.has(t_c) and world.db.solo(t_c) == "macio" and not sim.c(cid).sheet.is_dead():
+					sim.c(cid).sheet.add_efeito("magia.controlar_terra", "preso_muralha", cd, "cena")
+					sim.c(cid).sheet.add_efeito("magia.controlar_terra", "condicao", 0, "cena", "agarrado")
+					sim.c(cid).sheet.add_condition("agarrado", world.rules)
+					out.append(fact("CONDITION_APPLIED", {"target": cid, "condition": "agarrado", "tags": ["magia"]}, [cid]))
+	out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "controlar_terra", "efeito": str(a.efeito), "tags": ["magia", "area"]}, [id]))
+	return out
+
+
 ## Terremoto ------------------------------------------------------------------------------------------------------
 func _terremoto_no_terreno(conj: String, cid: String, cd: int) -> Array:
 	var out: Array = []
@@ -1327,8 +1377,9 @@ func _atacar_muralha(id: String, t: Vector2i) -> Array:
 		out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": "muralha", "weapon": atk.nome, "hit": false, "damage": 0, "tags": ["muralha"]}, [id]))
 		return out
 	var dano := int(Dice.roll(str(atk.dano), world.rng, "combat", 1, int(s.attrs["for"]) if atk.get("for_no_dano", false) else 0).total)
-	if ["corte", "frio", "perfuracao"].has(str(atk.get("tipo", ""))):
-		dano = maxi(0, dano - 10)
+	var rd_tipos: Array = z.dados.get("rd_tipos", ["corte", "frio", "perfuracao"])
+	if rd_tipos.is_empty() or rd_tipos.has(str(atk.get("tipo", ""))):
+		dano = maxi(0, dano - int(z.dados.get("rd", 10)))   # parede de pedra (Controlar Terra): RD 8 contra tudo
 	var seg := str(z.dados.segmento["%d,%d" % [t.x, t.y]])
 	z.dados.pv[seg] = int(z.dados.pv[seg]) - dano
 	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": "muralha", "weapon": atk.nome, "hit": true, "damage": dano, "pv_after": int(z.dados.pv[seg]), "tags": ["muralha"]}, [id]))
@@ -1916,8 +1967,8 @@ func _santuario_quebra(id: String, a: Dictionary, out: Array) -> void:
 
 ## A IA não mira quem não percebe nem quem já não consegue atacar (Santuário).
 func _pode_mirar(id: String, alvo: String) -> bool:
-	if (sim.c(alvo).flags as Array).has("na_arvore"):
-		return false   # Viagem Arbórea: dentro da árvore, ninguém o alcança
+	if (sim.c(alvo).flags as Array).has("na_arvore") or (sim.c(alvo).flags as Array).has("na_pedra"):
+		return false   # Viagem Arbórea, Controlar Terra (fundido): ninguém o alcança
 	var m := _santuario_de(alvo)
 	if m.is_empty():
 		return true
@@ -3687,7 +3738,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var z_e := _zona_muralha_em(a.tile)
 			var alturas := 3 + (1 if (z_e.tiles as Array).size() > Area.quadrados(15.0) else 0)
 			if Checks.skill(sim.c(id).sheet, "atletismo", 15, world.rules, world.rng, "combat").get("success", false):
-				for _i in alturas:
+				for _i in (alturas if str(z_e.fonte) == "muralha_de_ossos" else 0):
 					out.append_array(_dano_de_energia(id, id, "4d8", 0, "", "corte", "Muralha de Ossos"))
 				var de_e: Vector2i = sim.c(id).tile
 				var outro: Vector2i = a.tile + (a.tile - de_e)
@@ -3698,6 +3749,10 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": "escalar_muralha"}, [id]))
 		"atacar_muralha":
 			out.append_array(_atacar_muralha(id, a.tile))
+		"sair_pedra":
+			(sim.c(id).flags as Array).erase("na_pedra")
+			sim.c(id).sheet.remove_efeito("magia.controlar_terra")
+			out.append(fact("SPELL_ENDED", {"spell": "controlar_terra", "target": id, "reason": "saiu"}, [id]))
 		"sair_arvore":
 			var de_ar: Vector2i = sim.c(id).tile
 			var saida := SpellRules.saida_da_arvore(world.db, a.arvore, func(x): return sim.occupant(x, id) != "")
@@ -4489,6 +4544,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"controlar_terra":
+			out.append_array(_controlar_terra(id, a, sh))
 		"viagem_arborea":
 			# Viagem Arbórea (divina 3): entra na árvore ao lado; lá dentro percebe tudo, mas não age nem é alcançado. Uma ação de
 			# movimento ("sair_arvore") o tira desta ou de outra árvore a até 1km.

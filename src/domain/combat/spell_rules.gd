@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"controlar_terra": {"aprimoramentos": [0, 1]},   # amolecer, modelar (parede ou passagem), solidificar; +2 cubos; fundir-se à pedra por um dia
 	"viagem_arborea": {"aprimoramentos": [0]},   # entra numa árvore ao lado e sai de qualquer outra a até 1km; com o grupo, até outra planta a 100km
 	"globo_da_verdade": {"aprimoramentos": [0, 1, 2, 3]},   # cena vista por você ou por quem tocar (semana; mês; ano); cadáver; 10 globos em alcance longo
 	"missao_divina": {"aprimoramentos": [0, 1]},   # fora de combate: NPC deve ir a um lugar; recusou, Vontade por dia ou –2 cumulativo; marca; um ano
@@ -123,7 +124,7 @@ const REACAO_APR := {"armadura_arcana": [0], "protecao_divina": [1], "premonicao
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
-const ALVO_QUADRADO := ["terremoto", "muralha_de_ossos", "buraco_negro", "furia_do_panteao", "conjurar_mortos_vivos", "dissipar_magia", "controlar_madeira", "tempestade_divina", "enxame_de_pestes", "miasma_mefitico", "circulo_da_justica", "criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
+const ALVO_QUADRADO := ["controlar_terra", "terremoto", "muralha_de_ossos", "buraco_negro", "furia_do_panteao", "conjurar_mortos_vivos", "dissipar_magia", "controlar_madeira", "tempestade_divina", "enxame_de_pestes", "miasma_mefitico", "circulo_da_justica", "criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
 const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
@@ -189,6 +190,17 @@ static func saida_da_arvore(db: ContentDB, arvore: Vector2i, ocupado: Callable) 
 			if (dx != 0 or dy != 0) and db.static_walkable(t) and not ocupado.call(t):
 				return t
 	return Vector2i(-1, -1)
+
+
+const EFEITOS_TERRA := ["amolecer", "parede", "passagem", "solidificar"]
+
+
+## Controlar Terra: os cubos de 1,5m (9, +2 por aprimoramento) numa linha a partir do quadrado, na direção dada.
+static func cubos_terra(origem: Vector2i, direcao: Vector2i, n: int) -> Array:
+	var r: Array = []
+	for i in n:
+		r.append(origem + direcao * i)
+	return r
 
 
 const OPCOES_INTERVENCAO := ["curar", "dissipar", "item", "duplicar", "proteger", "ressuscitar"]

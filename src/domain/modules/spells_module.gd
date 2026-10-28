@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"controlar_terra": [1],   # fora de combate, só fundir-se à pedra ao lado (um dia)
 	"viagem_arborea": [],   # de uma árvore ao lado para outra no mapa; com o aprimoramento, o grupo, até uma planta a 100km
 	"globo_da_verdade": [],   # o que você (ou um NPC tocado) viu sobre um assunto; aprimoramentos: mês, ano, cadáver, 10 globos
 	"missao_divina": [],   # num NPC aqui: ir a um lugar (uma semana, ou um ano); ou a marca (aprimoramento)
@@ -82,7 +83,7 @@ var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim
 
 
 func module_id() -> String: return "magia"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune", "TreeHop"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune", "TreeHop", "LeaveStone"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -91,6 +92,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return PackedStringArray(["em combate: use as ações de combate"])
 	if cmd.type == "CollectMessenger":
 		return PackedStringArray() if mensageiros.any(func(m): return str(m.destino) == str(cmd.payload.get("destino", ""))) else PackedStringArray(["nenhum mensageiro lá"])
+	if cmd.type == "LeaveStone":
+		return PackedStringArray() if world.player_sheet != null and world.player_sheet.efeito_bonus("mesclado") > 0 else PackedStringArray(["você não está fundido à pedra"])
 	if cmd.type == "TreeHop":
 		if world.clock.tick >= arborea_ate:
 			return PackedStringArray(["a Viagem Arbórea não está ativa"])
@@ -222,6 +225,14 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"controlar_terra":
+			var t_ct := _tile_jogador()
+			var pedra := false
+			for dx in [-1, 0, 1]:
+				for dy in [-1, 0, 1]:
+					pedra = pedra or ["#", "B"].has(world.db.tile_char(t_ct + Vector2i(dx, dy)))
+			if not pedra:
+				return PackedStringArray(["é preciso pedra ou terra ao seu lado"])
 		"viagem_arborea":
 			var err_va := _valida_arvores(cmd.payload)
 			if not err_va.is_empty():
@@ -425,6 +436,9 @@ func execute(cmd: GameCommand) -> Array:
 	var sh: CharacterSheet = world.player_sheet
 	if cmd.type == "CollectMessenger":
 		return _coletar_mensageiro(str(cmd.payload.get("destino", "")))
+	if cmd.type == "LeaveStone":
+		world.player_sheet.remove_efeito("magia.controlar_terra")
+		return [fact("SPELL_ENDED", {"spell": "controlar_terra", "target": "player", "reason": "saiu"}, ["player"])]
 	if cmd.type == "TreeHop":
 		world.player_sheet.pm -= 1
 		return _viajar_pela_arvore(cmd.payload)
@@ -583,6 +597,9 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"controlar_terra":
+			sh.add_efeito("magia.controlar_terra", "mesclado", 1, "dia", "", world.day_index() + 1)
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "controlar_terra", "efeito": "fundir", "tags": ["magia"]}, ["player"]))
 		"viagem_arborea":
 			var combat_va = world.module("combat")
 			if not (cmd.payload.get("aprimoramentos", []) as Array).has(0):

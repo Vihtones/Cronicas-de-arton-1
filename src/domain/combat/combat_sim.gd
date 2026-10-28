@@ -332,7 +332,8 @@ static func tiles_entre(a: Vector2i, b: Vector2i) -> Array:
 
 func passable(t: Vector2i, mover: String) -> bool:
 	var atravessa: bool = combatants.has(mover) and c(mover).sheet.efeito_bonus("manto_sombras") > 0   # Manto de Sombras
-	if not walk_fn.call(t) and not _swims_into(t, mover) and not _flies_over(t, mover) and not atravessa:
+	var aberto := zona_em(t, "passagem")   # Controlar Terra (modelar): passagem aberta numa parede
+	if not walk_fn.call(t) and not _swims_into(t, mover) and not _flies_over(t, mover) and not atravessa and not aberto:
 		return false
 	if zona_em(t, "muralha") and not atravessa and not (combatants.has(mover) and c(mover).tile == t):
 		return false   # Muralha de Ossos: só destruindo um trecho ou escalando

@@ -29,6 +29,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 	var t: String = a.get("type", "")
 	if A.sheet.efeito_bonus("arvore") > 0:
 		return {"ok": false, "reason": "na forma de árvore não pode falar nem fazer ações físicas"}
+	if (A.flags as Array).has("na_pedra") and t != "sair_pedra":
+		return {"ok": false, "reason": "fundido à pedra, você não fala nem age; saia dela (ação livre)"}
 	if (A.flags as Array).has("na_arvore") and t != "sair_arvore":
 		return {"ok": false, "reason": "dentro da árvore você só percebe os arredores; saia dela (ação de movimento)"}
 	match t:
@@ -196,6 +198,13 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "controlar_terra":
+				if apr.has(1):
+					if not SpellRules.arvore_ao_lado(sim.db, A.tile) and not _pedra_ao_lado(sim, A.tile): return {"ok": false, "reason": "é preciso pedra ou terra ao seu lado para se fundir"}
+				else:
+					if not SpellRules.EFEITOS_TERRA.has(str(a.get("efeito", ""))): return {"ok": false, "reason": "efeito: amolecer, parede, passagem ou solidificar"}
+					if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "viagem_arborea":
 				if apr.has(0): return {"ok": false, "reason": "a viagem de 100km é fora de combate"}
 				if not SpellRules.arvore_ao_lado(sim.db, A.tile): return {"ok": false, "reason": "é preciso uma árvore ao seu lado"}
@@ -694,6 +703,9 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if not A.sheet.efeito_tipo_existe("preso_muralha", ""): return {"ok": false, "reason": "você não está preso na muralha"}
 			elif not sim.zona_em(t_mu, "muralha") or CombatSim.cheb(A.tile, t_mu) > 1: return {"ok": false, "reason": "escolha um trecho da muralha ao seu lado"}
 			return {"ok": true, "kind": kind_mu}
+		"sair_pedra":
+			if not (A.flags as Array).has("na_pedra"): return {"ok": false, "reason": "você não está fundido à pedra"}
+			return {"ok": true, "kind": "livre"}
 		"sair_arvore":
 			# Viagem Arbórea: ação de movimento para sair desta árvore ou de qualquer outra a até 1km (todo o mapa).
 			if not (A.flags as Array).has("na_arvore"): return {"ok": false, "reason": "você não está numa árvore"}
@@ -848,6 +860,15 @@ static func spell_rule(rules: RuleRegistry, sp_id: String) -> Dictionary:
 
 
 ## `sheet` (opcional): o parceiro adepto tira 1 PM das magias de até 1º (ou 2º) círculo.
+## Controlar Terra (fundir-se): parede, chão duro ou terra ao lado.
+static func _pedra_ao_lado(sim: CombatSim, t: Vector2i) -> bool:
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			if (dx != 0 or dy != 0) and ["#", "B"].has(sim.db.tile_char(t + Vector2i(dx, dy))):
+				return true
+	return false
+
+
 static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary, sheet: CharacterSheet = null) -> int:
 	if a.get("truque", false):
 		return 0   # Truque: custo zero
