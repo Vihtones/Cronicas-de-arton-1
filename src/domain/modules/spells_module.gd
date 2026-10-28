@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"lendas_e_historias": [0],   # NPC, objeto ou lugar tocado; com o aprimoramento, qualquer um conhecido (um dia, T$ 1.000)
 	"controlar_o_clima": [],   # fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas
 	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
 	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
@@ -186,6 +187,29 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"lendas_e_historias":
+			var tipo_lh := str(cmd.payload.get("alvo_tipo", ""))
+			var alvo_lh := str(cmd.payload.get("alvo", ""))
+			if not ["criatura", "objeto", "local"].has(tipo_lh):
+				return PackedStringArray(["alvo_tipo: criatura, objeto ou local"])
+			if tipo_lh == "criatura" and world.db.npc_def(alvo_lh).is_empty():
+				return PackedStringArray(["criatura desconhecida"])
+			if tipo_lh == "objeto" and world.db.object_def(alvo_lh).is_empty():
+				return PackedStringArray(["objeto desconhecido"])
+			if tipo_lh == "local" and world.db.location(alvo_lh).is_empty():
+				return PackedStringArray(["lugar desconhecido"])
+			if apr.has(0):
+				if int(world.player.gold) < 1000:
+					return PackedStringArray(["falta a cuba de ouro com ingredientes (T$ 1.000)"])
+			elif tipo_lh == "criatura" and not _no_mesmo_lugar(alvo_lh):
+				return PackedStringArray(["%s não está aqui para ser tocado" % alvo_lh])
+			elif tipo_lh == "objeto":
+				var od_lh := world.db.object_def(alvo_lh)
+				var t_lh := Vector2i(int(od_lh.tile[0]), int(od_lh.tile[1]))
+				if maxi(absi(t_lh.x - _tile_jogador().x), absi(t_lh.y - _tile_jogador().y)) > 1:
+					return PackedStringArray(["chegue perto do objeto para tocá-lo"])
+			elif tipo_lh == "local" and world.db.location_at(_tile_jogador()) != alvo_lh:
+				return PackedStringArray(["você precisa estar no lugar"])
 		"controlar_o_clima":
 			if not WeatherModule.CONDITIONS.has(str(cmd.payload.get("clima", ""))):
 				return PackedStringArray(["escolha o clima: " + ", ".join(PackedStringArray(WeatherModule.CONDITIONS))])
@@ -413,6 +437,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"lendas_e_historias":
+			out.append_array(lendas_e_historias(cmd.payload))
 		"controlar_o_clima":
 			var clima_cc: WeatherModule = world.module("weather")
 			var horas_cc := int(Dice.roll("4d12", world.rng, "world").total)
@@ -647,6 +673,43 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Lendas e Histórias fora de combate: tudo sobre um NPC (ficha, ofício, facção, devoção, onde está), um objeto ou um lugar
+## (quem e o que há nele). Com o aprimoramento, à distância: um dia de execução e T$ 1.000 da cuba de ouro.
+func lendas_e_historias(payload: Dictionary) -> Array:
+	var out: Array = []
+	var apr: Array = payload.get("aprimoramentos", [])
+	if apr.has(0):
+		out.append(fact("GOLD_CHANGED", {"delta": -1000, "reason": "cuba de ouro (Lendas e Histórias)"}))
+		out.append_array(world.advance_ticks(24 * 60 / world.clock.tick_minutes))
+	var tipo := str(payload.alvo_tipo)
+	var alvo := str(payload.alvo)
+	var info := {}
+	match tipo:
+		"criatura":
+			var d := world.db.npc_def(alvo)
+			var npcs = world.module("npcs")
+			var estado: Dictionary = npcs.npc(alvo) if npcs != null else {}
+			info = SpellRules.info_ficha(_ficha_npc(alvo), world.rules)
+			for k in ["name", "age", "profession", "home", "work", "family", "faction", "devotion", "traits", "beliefs"]:
+				info[k] = d.get(k, null)
+			info["onde_esta"] = str(estado.get("location", ""))
+			info["vivo"] = bool(estado.get("alive", true))
+		"objeto":
+			info = world.db.object_def(alvo).duplicate(true)
+		"local":
+			info = world.db.location(alvo).duplicate(true)
+			var npcs_l = world.module("npcs")
+			var presentes: Array = []
+			if npcs_l != null:
+				for n in world.db.all_npc_ids():
+					if str(npcs_l.npc(n).get("location", "")) == alvo and bool(npcs_l.npc(n).get("alive", true)):
+						presentes.append(n)
+			info["presentes"] = presentes
+			info["objetos"] = world.db.all_objects().filter(func(o): return world.db.location_at(Vector2i(int(o.tile[0]), int(o.tile[1]))) == alvo).map(func(o): return o.id)
+	out.append(fact("LORE_REVEALED", {"caster": "player", "alvo_tipo": tipo, "alvo": alvo, "info": info}, ["player"]))
+	return out
 
 
 func augurio(payload: Dictionary) -> Array:

@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Lendas e Histórias (universal, 3º círculo): ao tocar uma criatura, objeto ou lugar, revela tudo (estatísticas, magias, resistências, imunidades, magias ativas; ofício, facção e paradeiro de NPCs; quem e o que há num lugar). Com o aprimoramento, à distância, em um dia e com T$ 1.000 de componente.
+
 - Buraco Negro (universal, 5º círculo): por três turnos do conjurador, quem está a até alcance longo faz Fortitude ou cai e é puxado 30m; quem começa o turno no buraco tenta se arrastar para fora; quem termina o turno nele é sugado. Ação de se segurar (+2). Com o aprimoramento, o conjurador não é afetado.
 
 - Manto de Sombras (universal, 3º círculo): sustentada; incorpóreo (só armas mágicas e magias o ferem, não ataca criaturas normais, atravessa obstáculos), 1 de dano por rodada na luz e salto de uma sombra a outra em alcance médio (movimento e 1 PM); toque numa criatura voluntária no 4º círculo.

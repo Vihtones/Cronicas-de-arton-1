@@ -190,6 +190,9 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "lendas_e_historias":
+				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
+				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
 			if sp_id == "buraco_negro":
 				var tile_bn: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tile_bn) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}

@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"lendas_e_historias": {"aprimoramentos": [0]},   # tudo sobre criatura, objeto ou lugar tocado; à distância por um dia (T$ 1.000)
 	"buraco_negro": {"aprimoramentos": [0]},   # 3 turnos puxando 30m (Fortitude); quem termina o turno nele é sugado; você não é afetado
 	"manto_de_sombras": {"aprimoramentos": [0]},   # sustentada: incorpóreo, 1 de dano por rodada na luz, salto entre sombras; toque (4º)
 	"selo_de_mana": {"aprimoramentos": [0]},   # ações que gastam PM exigem Vontade; falhou, sem efeito (PM gastos); curto e vários alvos (4º)
@@ -115,6 +116,24 @@ const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica":
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]], "conjurar_mortos_vivos": [[1, 2]], "pele_de_pedra": [[1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]}
 ## Escolas de magia (LB, Proteção contra Magia): minúsculas, sem acento na comparação (ver `escola_valida`).
+## Lendas e Histórias: tudo o que a ficha diz de uma criatura (estatísticas, magias, resistências e magias ativas).
+static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
+	var imunes: Array = []
+	var rd: Dictionary = sh.dr.duplicate()
+	var ativas: Array = []
+	for e in sh.efeitos:
+		if e.stat == "imune" and not imunes.has(str(e.tipo)):
+			imunes.append(str(e.tipo))
+		elif e.stat == "rd":
+			rd[str(e.tipo)] = int(rd.get(str(e.tipo), 0)) + int(e.bonus)
+		if str(e.id).begins_with("magia.") and not ativas.has(str(e.id).trim_prefix("magia.")):
+			ativas.append(str(e.id).trim_prefix("magia."))
+	return {"nome": sh.name, "raca": sh.race_id, "classe": sh.class_id, "nivel": sh.level, "tipo": sh.creature_type, "atributos": sh.attrs.duplicate(),
+		"pv": sh.pv, "pv_max": sh.pv_max, "pm": sh.pm, "pm_max": sh.pm_max,
+		"resistencias": {"fortitude": sh.skill_value("fortitude", rules), "reflexos": sh.skill_value("reflexos", rules), "vontade": sh.skill_value("vontade", rules)},
+		"magias": Array(sh.spells), "poderes": sh.powers.keys(), "imunidades": imunes, "reducao_de_dano": rd, "magias_ativas": ativas, "condicoes": Array(sh.conditions)}
+
+
 const ESCOLAS := ["abjuração", "adivinhação", "convocação", "encantamento", "evocação", "ilusão", "necromancia", "transmutação"]
 
 

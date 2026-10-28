@@ -4055,6 +4055,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"lendas_e_historias":
+			# Lendas e Histórias (universal 3): toca a criatura e descobre tudo de uma vez (estatísticas, magias, resistências e
+			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
+			var tg_lh: String = a.get("target", "")
+			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
 		"buraco_negro":
 			# Buraco Negro (universal 5): puxa por três turnos do conjurador (`_buraco_negro_do_conjurador`); quem termina o
 			# turno no espaço é sugado (`_buraco_negro_fim_de_turno`). Com o aprimoramento, o conjurador não é afetado.
