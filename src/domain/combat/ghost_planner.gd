@@ -190,6 +190,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "buraco_negro":
+				var tile_bn: Vector2i = a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, tile_bn) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
+				if sim.occupant(tile_bn, "") != "" or not sim.walk_fn.call(tile_bn): return {"ok": false, "reason": "escolha um espaço desocupado"}
+				targets = [actor]
 			if sp_id == "manto_de_sombras":
 				if apr.has(0):
 					if targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.is_enemy(actor, targets[0]): return {"ok": false, "reason": "escolha 1 criatura voluntária"}
@@ -597,6 +602,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var para_e: Vector2i = a.get("tile", Vector2i(-1, -1))
 			if CombatSim.cheb(ze[0].tiles[0], para_e) > Area.quadrados(12.0): return {"ok": false, "reason": "o enxame anda até 12m"}
 			if sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes" and z != ze[0] and (z.tiles as Array).has(para_e)): return {"ok": false, "reason": "já há um enxame lá"}
+			return {"ok": true, "kind": "movimento"}
+		"segurar":
+			# Buraco Negro: ação de movimento para se segurar num objeto fixo (+2 nos testes de resistência até o próximo turno).
+			if not sim.zonas.any(func(z): return str(z.tipo) == "buraco_negro"): return {"ok": false, "reason": "nada puxando você"}
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
 			return {"ok": true, "kind": "movimento"}
 		"salto_sombra":
 			# Manto de Sombras: ação de movimento e 1 PM, de uma sombra para outra em alcance médio.

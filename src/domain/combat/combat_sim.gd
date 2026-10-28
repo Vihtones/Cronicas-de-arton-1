@@ -487,6 +487,24 @@ func empurrar(id: String, origem: Vector2i, quadrados: int) -> Array:
 	return caminho
 
 
+## Puxão (Buraco Negro): leva `id` até `quadrados` na direção de `destino`, parando em obstáculo ou criatura.
+func puxar(id: String, destino: Vector2i, quadrados: int) -> Array:
+	if c(id).sheet.efeito_bonus("libertacao") > 0:
+		return []
+	var pos: Vector2i = c(id).tile
+	var caminho: Array = []
+	for _i in quadrados:
+		if pos == destino:
+			break
+		var nx := pos + Vector2i(signi(destino.x - pos.x), signi(destino.y - pos.y))
+		if not walk_fn.call(nx) or occupant(nx, id) != "":
+			break
+		pos = nx
+		caminho.append(pos)
+	c(id).tile = pos
+	return caminho
+
+
 func flanking(attacker: String, target: String) -> bool:
 	var a: Vector2i = c(attacker).tile
 	var t: Vector2i = c(target).tile

@@ -531,6 +531,7 @@ func _run_until_player() -> Array:
 				out.append_array(end)
 				return out
 		_zonas_fim_de_turno(id, out)
+		_buraco_negro_fim_de_turno(id, out)
 		_enxames_fim_de_turno(id, out)
 		out.append(fact("TURN_ENDED", {"actor": id}))
 		sim.next_turn()
@@ -1063,6 +1064,59 @@ func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
 		if tiles_b.has(t):
 			return true
 	return false
+
+
+## Buraco Negro, no início do turno do conjurador: todos a até alcance longo (o conjurador também, sem o aprimoramento)
+## fazem Fortitude; falhou, caído e puxado 30m. Depois de três turnos, o buraco se fecha.
+func _buraco_negro_do_conjurador(id: String, facts: Array) -> void:
+	for z in sim.zonas.duplicate(true):
+		if str(z.tipo) != "buraco_negro" or str(z.dados.conjurador) != id:
+			continue
+		var centro: Vector2i = z.tiles[0]
+		for cid in sim.combatants.keys():
+			if sim.c(cid).sheet.is_dead() or (cid == id and bool(z.dados.poupa)) or sim.c(cid).tile == centro:
+				continue
+			if CombatSim.cheb(sim.c(cid).tile, centro) > int(world.rules.value("alcance.quadrados", {}).get("longo", 60)):
+				continue
+			if _resiste(cid, "fortitude", int(z.dados.cd), facts):
+				continue
+			sim.c(cid).sheet.add_condition("caido", world.rules)
+			var de: Vector2i = sim.c(cid).tile
+			var caminho := sim.puxar(cid, centro, Area.quadrados(30.0))
+			if not caminho.is_empty():
+				facts.append(fact("COMBAT_MOVED", {"actor": cid, "from": [de.x, de.y], "path": caminho.map(func(t): return [t.x, t.y]), "forced": true}, [cid]))
+		for zz in sim.zonas:
+			if str(zz.id) == str(z.id):
+				zz.dados.turnos = int(zz.dados.turnos) - 1
+				if int(zz.dados.turnos) <= 0:
+					sim.remove_zona(str(z.id))
+					facts.append(fact("SPELL_ENDED", {"caster": id, "spell": "buraco_negro", "reason": "duracao"}, [id]))
+				break
+
+
+## Quem começa o turno no espaço do buraco gasta a ação de movimento e faz Fortitude: passou, arrasta-se 1,5m para fora.
+func _buraco_negro_inicio_de_turno(id: String, facts: Array) -> void:
+	for z in sim.zonas:
+		if str(z.tipo) == "buraco_negro" and (z.tiles as Array).has(sim.c(id).tile):
+			sim.budget.move = 0
+			if _resiste(id, "fortitude", int(z.dados.cd), facts):
+				var livre := _tile_livre_na_sim(sim.c(id).tile, sim.combatants.keys().map(func(x): return sim.c(x).tile))
+				sim.c(id).tile = livre
+			return
+
+
+## Quem termina o turno no espaço do buraco é sugado e desaparece para sempre.
+func _buraco_negro_fim_de_turno(id: String, facts: Array) -> void:
+	if not sim.combatants.has(id):
+		return
+	for z in sim.zonas:
+		if str(z.tipo) == "buraco_negro" and (z.tiles as Array).has(sim.c(id).tile):
+			facts.append(fact("SPELL_EFFECT", {"spell": "buraco_negro", "efeito": "sugado", "target": id}, [id]))
+			if id == "player":
+				sim.c(id).sheet.pv = sim.c(id).sheet.death_threshold()
+			else:
+				sim.remove_combatant(id)
+			return
 
 
 ## Início do turno do conjurador: as nuvens dele afetam quem está dentro.
@@ -2972,6 +3026,8 @@ func _begin_turn_base(id: String) -> Dictionary:
 			(x.flags as Array).erase(f_ae)   # Arma Espiritual: a arma que atacou volta a poder contra-atacar
 	_manto_inicio_de_turno(id, facts)
 	_nuvens_do_conjurador(id, facts)
+	_buraco_negro_do_conjurador(id, facts)
+	_buraco_negro_inicio_de_turno(id, facts)
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
@@ -3222,6 +3278,9 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if str(z.id) == zid_e:
 					z.tiles = [para_e]
 			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "mover", "tile": [para_e.x, para_e.y]}, [id]))
+		"segurar":
+			sim.c(id).sheet.add_efeito("segurando", "resistencia", 2, "turno")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "segurando", "tags": []}, [id]))
 		"salto_sombra":
 			var de_s: Vector2i = sim.c(id).tile
 			sim.c(id).sheet.pm -= 1
@@ -3996,6 +4055,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"buraco_negro":
+			# Buraco Negro (universal 5): puxa por três turnos do conjurador (`_buraco_negro_do_conjurador`); quem termina o
+			# turno no espaço é sugado (`_buraco_negro_fim_de_turno`). Com o aprimoramento, o conjurador não é afetado.
+			var tile_bn: Vector2i = a.get("tile", sim.c(id).tile)
+			sim.add_zona("buraco_negro_" + id, [tile_bn], "buraco_negro", -1, "buraco_negro", {"conjurador": id, "cd": spell_dc(sh, a), "turnos": 3,
+				"poupa": (a.get("aprimoramentos", []) as Array).has(0)})
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "buraco_negro", "tile": [tile_bn.x, tile_bn.y], "tags": ["magia", "area"]}, [id]))
 		"manto_de_sombras":
 			# Manto de Sombras (universal 3): sustentada. Incorpóreo (só armas mágicas e magias o afetam; não ataca criaturas
 			# normais; atravessa obstáculos), 1 de dano por rodada na luz (`_begin_turn_base`), salto entre sombras ("salto_sombra").
