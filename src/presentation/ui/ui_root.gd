@@ -840,6 +840,7 @@ func _build_combat_bar(root: Control) -> void:
 			["allihanna", "Y", "Armadura de Allihanna (1 PM)", func(): combat_view.use_allihanna(), "@dahllan"],
 			["aura", "S", "Aura Sagrada (1 PM ao ligar; liga/desliga)", func(): combat_view.use_aura(), "@paladino"],
 			["egide", "E", "Égide Sagrada (2 PM, até o fim da cena)", func(): combat_view.use_egide(), "egide_sagrada"],
+			["ordem", "J", "Ordens de magias e parceiros (J troca; clique no mapa)", func(): combat_view.cycle_ordem(), "@ordens"],
 			["desfazer", "⌫", "Desfazer", func(): combat_view.undo(), ""], ["confirmar", "↵", "Confirmar plano", func(): combat_view.confirm(), ""], ["fim", "␣", "Fim do turno", func(): combat_view.end_turn(), ""]]:
 		var b := HotSlot.new().setup(spec[0], spec[1], spec[2], spec[3])
 		b.set_meta("needs", spec[4])
@@ -874,6 +875,7 @@ func update_combat_bar() -> void:
 			"@paladino": b.visible = sh.class_id == "paladino"
 			"@medusa": b.visible = sh.race_id == "medusa"
 			"@dahllan": b.visible = sh.race_id == "dahllan"
+			"@ordens": b.visible = not combat_view.ordens_disponiveis().is_empty()
 			_: b.visible = sh.has_power(need)
 		var ic := b.icon_id
 		b.active = (ic == "especial" and combat_view.special) or (ic == "raspao" and combat_view.raspao) or (ic == "pungente" and combat_view.get("pungente") == true)

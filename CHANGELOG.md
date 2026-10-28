@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Interface: botão e tecla J de "Ordens" no combate, que mostra só as ações disponíveis no momento (mortos-vivos, Fúria do Panteão, enxame, chama, labareda, resfriar, raio da tempestade, salto de sombra, segurar-se, muralha, terremoto, sair da árvore ou da pedra, gelo, parceiros destruidor, médico e combatente); um clique no mapa executa.
+
 - Controlar Água (divina, 3º círculo): congelar (gelo atravessável; quem nadava fica preso), derreter, enchente (a água sobe para a margem), evaporar (10d8 de fogo, +2d8, em quem é imune a frio; metade nos outros vivos) e partir (caminho seco).
 
 - Controlar Terra (divina, 3º círculo): amolecer (o teto desaba na cripta ou em construções; no chão, terreno difícil), levantar parede de pedra (RD 8, 50 PV a cada 3m) ou abrir passagem numa parede, solidificar lama e areia prendendo quem está nelas, ou fundir-se à pedra por um dia (aprimoramento).

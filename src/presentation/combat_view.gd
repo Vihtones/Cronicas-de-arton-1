@@ -25,6 +25,7 @@ var energia_tipo := "fogo"    # tipo de energia da Resistência a Energia (tecla
 var truque := false          # truque da magia em foco (tecla T): 0 PM, sem aprimoramentos
 var comando_ordem := "pare"   # ordem do Comando (tecla T)
 var elemento := "fogo"         # elemento de Criar Elementos (tecla T)
+var ordem := ""   # ordem de magia ou parceiro escolhida com J (clique no mapa executa)
 var escola_pc := "abjuração"   # escola escolhida na Proteção contra Magia (tecla T); com 2 escolas, a seguinte da lista
 var raspao := true   # C20: usar Golpe de Raspão neste turno (padrão vem da política)
 var cura_passos := 0        # Cura pelas Mãos: passos extras (+1 PM cada, a cada 4 níveis) no próximo toque (tecla N)
@@ -243,6 +244,9 @@ func candidate_actions(t: Vector2i) -> Array:
 			if target == "":
 				return []
 			return [{"type": "ouvir_pensamentos" if Game.world.player_sheet.efeito_bonus("visao_mistica") <= 0 else "analisar_aura", "target": target}]
+		"ordem":
+			var acao_o := acao_da_ordem(ordem, t, target)
+			return [] if acao_o.is_empty() else [acao_o]
 		"conversar", "adestrar":
 			if target == "" or not gs.is_enemy("player", target):
 				return []
@@ -446,6 +450,74 @@ func set_mode(m: String) -> void:
 	_update_preview()
 
 
+## Ordens disponíveis agora (magias sustentadas, efeitos em você, parceiros). Nomes de ação de GhostPlanner.
+const ORDENS_NOME := {"mover_mortos": "mortos-vivos: andar até o quadrado", "atacar_mortos": "mortos-vivos: atacar (clique no alvo preferido)",
+	"furia_nevasca": "Fúria: nevasca", "furia_raios": "Fúria: raios (clique num inimigo ou no chão para todos)", "furia_siroco": "Fúria: siroco",
+	"furia_trovoes": "Fúria: trovões", "mover_enxame": "enxame: levar ao quadrado", "mover_chama": "chama: mover ao quadrado",
+	"labareda": "labareda no alvo", "resfriar": "resfriar o objeto", "raio_tempestade": "raio da tempestade no alvo",
+	"salto_sombra": "saltar até a sombra", "segurar": "segurar-se (Buraco Negro)", "atacar_muralha": "golpear o trecho da muralha",
+	"escalar_muralha": "escalar a muralha", "soltar_muralha": "soltar-se da muralha", "soltar_terremoto": "soltar-se (ou soltar o aliado)",
+	"sair_da_fenda": "sair da fenda", "sair_arvore": "sair pela árvore clicada", "sair_pedra": "sair da pedra", "soltar_gelo": "soltar-se do gelo",
+	"parceiro_destruidor": "parceiro destruidor no alvo", "parceiro_medico": "parceiro médico (clique em quem curar)", "ataque_parceiro": "ataque do parceiro combatente"}
+
+
+func ordens_disponiveis() -> Array:
+	var gs: CombatSim = Game.world.modules.combat.sim
+	var P: Dictionary = gs.c("player")
+	var s: CharacterSheet = P.sheet
+	var sust := str(gs.sustentadas.get("player", ""))
+	var lista: Array = []
+	if sust == "conjurar_mortos_vivos": lista.append_array(["mover_mortos", "atacar_mortos"])
+	if sust == "furia_do_panteao": lista.append_array(["furia_nevasca", "furia_raios", "furia_siroco", "furia_trovoes"])
+	if sust == "enxame_de_pestes": lista.append("mover_enxame")
+	if gs.zonas.any(func(z): return str(z.id) == "chama_modelada_player"): lista.append("mover_chama")
+	if gs.marcas.any(func(m): return m.alvo == "player" and m.tipo == "labaredas"): lista.append("labareda")
+	if gs.marcas.any(func(m): return m.alvo == "player" and m.tipo == "esquentar"): lista.append("resfriar")
+	if gs.zonas.any(func(z): return str(z.id) == "tempestade_player" and int(z.dados.get("raios", 0)) > 0): lista.append("raio_tempestade")
+	if s.efeito_bonus("manto_sombras") > 0: lista.append("salto_sombra")
+	if gs.zonas.any(func(z): return str(z.tipo) == "buraco_negro"): lista.append("segurar")
+	if gs.zonas.any(func(z): return str(z.tipo) == "muralha"): lista.append_array(["atacar_muralha", "escalar_muralha"])
+	if s.efeito_bonus("preso_muralha") > 0: lista.append("soltar_muralha")
+	if gs.combatants.keys().any(func(c): return gs.c(c).sheet.efeito_bonus("preso_terremoto") > 0): lista.append("soltar_terremoto")
+	if s.efeito_bonus("na_fenda") > 0: lista.append("sair_da_fenda")
+	if (P.flags as Array).has("na_arvore"): lista.append("sair_arvore")
+	if (P.flags as Array).has("na_pedra"): lista.append("sair_pedra")
+	if s.efeito_bonus("preso_gelo") > 0: lista.append("soltar_gelo")
+	if s.efeito_bonus("parceiro_destruidor") > 0: lista.append("parceiro_destruidor")
+	if s.efeito_bonus("parceiro_medico") > 0: lista.append("parceiro_medico")
+	if s.efeito_bonus("parceiro_ataque_extra") > 0: lista.append("ataque_parceiro")
+	return lista
+
+
+func cycle_ordem() -> void:
+	var lista := ordens_disponiveis()
+	if lista.is_empty():
+		message.emit("Nenhuma ordem disponível agora (magias sustentadas, efeitos e parceiros).")
+		return
+	ordem = lista[(lista.find(ordem) + 1) % lista.size()]
+	mode = "ordem"
+	message.emit("Ordem: %s (J troca; clique no mapa)." % ORDENS_NOME.get(ordem, ordem))
+	_update_preview()
+
+
+## Ação da ordem para o quadrado clicado (ou a criatura nele). {} se o clique não serve.
+func acao_da_ordem(o: String, t: Vector2i, target: String) -> Dictionary:
+	match o:
+		"mover_mortos", "mover_enxame", "mover_chama", "salto_sombra", "atacar_muralha", "escalar_muralha":
+			return {"type": o, "tile": t}
+		"atacar_mortos", "raio_tempestade", "labareda", "parceiro_destruidor", "ataque_parceiro":
+			if target == "" and o != "atacar_mortos":
+				return {}
+			return {"type": o, "target": target, "attack": 0, "tile": t}
+		"parceiro_medico", "soltar_terremoto":
+			return {"type": o, "target": target if target != "" else "player"}
+		"sair_arvore":
+			return {"type": o, "arvore": t}
+		"furia_nevasca", "furia_raios", "furia_siroco", "furia_trovoes":
+			return {"type": "furia", "efeito": o.trim_prefix("furia_"), "targets": [target] if target != "" else []}
+	return {"type": o}
+
+
 func cycle_cura_passos() -> void:
 	var maxp := int(Game.world.player_sheet.level) / 4
 	cura_passos = (cura_passos + 1) % (maxp + 1)
@@ -573,6 +645,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_X: extra_attack()
 			KEY_A: cycle_policy("ataque_poderoso")
 			KEY_D: cycle_policy("combate_defensivo")
+			KEY_J: cycle_ordem()
 			_: return
 		get_viewport().set_input_as_handled()
 
