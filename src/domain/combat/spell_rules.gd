@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"runa_de_protecao": {"aprimoramentos": [0, 1, 2]},   # runa no chão que explode (+2d6); runa no corpo com magia de 1º (ou 2º) círculo como reação
 	"comunhao_com_a_natureza": {"aprimoramentos": [0, 1, 2, 3]},   # dados de auxílio em áreas naturais; informações da região; +2 dados; d6; d8
 	"despertar_consciencia": {"aprimoramentos": [0, 1]},   # animal, planta ou parceiro vira parceiro veterano por um dia; escultura; permanente (–3 PM)
 	"servo_morto_vivo": {"aprimoramentos": [0, 1, 2]},   # cadáver vira parceiro morto-vivo (esqueleto/zumbi, carniçal, sombra, múmia)
@@ -118,7 +119,7 @@ const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "c
 const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "potencia_divina": {2: "toque"}, "pele_de_pedra": {0: "toque", 3: "toque", 4: "toque"}, "toque_da_morte": {0: "curto", 1: "curto"}, "visao_da_verdade": {0: "toque"}, "selo_de_mana": {0: "curto"}, "manto_de_sombras": {0: "toque"}, "segunda_chance": {1: "curto"}, "dispersar_as_trevas": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
-const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]], "conjurar_mortos_vivos": [[1, 2]], "servo_morto_vivo": [[0, 1], [0, 2], [1, 2]], "pele_de_pedra": [[1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]}
+const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]], "conjurar_mortos_vivos": [[1, 2]], "servo_morto_vivo": [[0, 1], [0, 2], [1, 2]], "runa_de_protecao": [[0, 1], [0, 2], [1, 2]], "pele_de_pedra": [[1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]}
 ## Escolas de magia (LB, Proteção contra Magia): minúsculas, sem acento na comparação (ver `escola_valida`).
 ## Lendas e Histórias: tudo o que a ficha diz de uma criatura (estatísticas, magias, resistências e magias ativas).
 static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
@@ -139,6 +140,10 @@ static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
 
 
 ## Servo Morto-Vivo: por aprimoramento (-1 = sem), a criatura, o poder de parceiro, os tipos possíveis e o componente (T$).
+## Runa de Proteção no corpo: magias que precisam de escolhas na hora (quadrado, ordem, tipo) não cabem na runa.
+const RUNA_SEM := ["comando", "orientacao", "arma_magica", "fisico_divino", "mente_divina", "controlar_madeira", "controlar_fogo",
+	"rogar_maldicao", "criar_elementos", "aliado_animal", "augurio", "condicao", "circulo_da_justica", "luz", "escuridao", "nevoa",
+	"controlar_plantas", "enxame_de_pestes", "miasma_mefitico", "tempestade_divina", "resistencia_a_energia"]
 const TIPOS_DESPERTAR := ["ajudante", "combatente", "fortao", "guardiao", "medico", "perseguidor", "vigilante"]
 
 

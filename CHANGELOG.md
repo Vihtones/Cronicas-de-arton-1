@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Runa de Proteção (universal, 2º círculo): runa no chão (1 hora, T$ 200) que explode com 6d6 (+2d6) do tipo escolhido em quem entra, só para um tipo de criatura se quiser, com palavra mágica para o conjurador passar; procurar runas (Investigação) e desarmá-las (Ladinagem); ou runa no corpo com uma magia de 1º (ou 2º) círculo lançada como reação quando você é alvo de um ataque ou de uma magia.
+
 - Comunhão com a Natureza (divina, 3º círculo): 6d4 dados de auxílio pelo dia (+2, d6 ou d8 com os aprimoramentos), gastos sozinhos quando um teste em área natural falharia e os dados podem salvá-lo; com o aprimoramento de 1 minuto, informações sobre a região (terreno, animais, vegetação, minerais, água e criaturas antinaturais).
 
 - Despertar Consciência (divina, 3º círculo): um animal ou planta ao lado vira parceiro veterano por um dia (ajudante, combatente, fortão, guardião, médico, perseguidor ou vigilante); num parceiro seu, ele sobe um passo de poder (mestre ganha o bônus iniciante de outro tipo); escultura com o aprimoramento; permanente com –3 PM. Mapa: Estátua de Lena no templo.

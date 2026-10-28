@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"runa_de_protecao": [],   # no chão onde você está (1 hora, pó de diamante T$ 200) ou no próprio corpo (aprimoramentos)
 	"comunhao_com_a_natureza": [],   # dados de auxílio pelo dia, ou (aprimoramento) informações da região
 	"despertar_consciencia": [],   # animal ou planta ao lado, escultura (aprimoramento) ou um parceiro seu
 	"servo_morto_vivo": [],   # cadáver de humanoide, animal ou monstro vira parceiro morto-vivo permanente
@@ -61,6 +62,7 @@ var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [..
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
 var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de combate: {ate: tick}
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
+var runas: Array = []   # Runa de Proteção no chão: {id, centro:[x,y], raio, tipo, dados, gatilho, palavra, cd, conj, dentro, achada}
 var videncia: Dictionary = {}   # Vidência ativa: {alvo, ate: tick}; enquanto dura, `videncia_ver` mostra o alvo e os arredores
 var luz_carregada: Dictionary = {}   # luz que o jogador carrega fora de combate: {raio: quadrados, ate: tick}
 var abencoados: Dictionary = {}  # item -> {n: porções abençoadas, ate: tick do fim da cena}
@@ -69,7 +71,7 @@ var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim
 
 
 func module_id() -> String: return "magia"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -78,6 +80,17 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return PackedStringArray(["em combate: use as ações de combate"])
 	if cmd.type == "CollectMessenger":
 		return PackedStringArray() if mensageiros.any(func(m): return str(m.destino) == str(cmd.payload.get("destino", ""))) else PackedStringArray(["nenhum mensageiro lá"])
+	if cmd.type == "SearchRunes":
+		return PackedStringArray()
+	if cmd.type == "DisarmRune":
+		var rr := _runa(str(cmd.payload.get("id", "")))
+		if rr.is_empty() or not (bool(rr.achada) or str(rr.conj) == "player"):
+			return PackedStringArray(["nenhuma runa encontrada com esse id"])
+		if _dist(rr, _tile_jogador()) > 1:
+			return PackedStringArray(["chegue perto da runa"])
+		if world.player_sheet == null or not world.player_sheet.can_use_skill("ladinagem", world.rules):
+			return PackedStringArray(["Ladinagem é somente treinada"])
+		return PackedStringArray()
 	if cmd.type == "DetectMagic":
 		if world.player_sheet == null or not world.player_sheet.can_use_skill("misticismo", world.rules):
 			return PackedStringArray(["Misticismo é somente treinada"])
@@ -192,6 +205,22 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"runa_de_protecao":
+			if int(world.player.gold) < 200:
+				return PackedStringArray(["falta o pó de diamante (T$ 200)"])
+			if apr.has(1) or apr.has(2):
+				var sp_r := str(cmd.payload.get("magia", ""))
+				var regra_r := GhostPlanner.spell_rule(world.rules, sp_r)
+				if not sh.spells.has(sp_r) or not SpellRules.COMPLETAS.has(sp_r) or SpellRules.RUNA_SEM.has(sp_r):
+					return PackedStringArray(["escolha uma magia que você conhece e que cabe na runa"])
+				if int(regra_r.get("circulo", 9)) > (2 if apr.has(2) else 1):
+					return PackedStringArray(["a magia da runa vai até o %dº círculo" % (2 if apr.has(2) else 1)])
+				if not ["padrão", "movimento", "livre", "reação"].has(str(regra_r.get("execucao", ""))):
+					return PackedStringArray(["só magias de execução padrão ou menor"])
+				if not ["ataque", "magia"].has(str(cmd.payload.get("gatilho", ""))):
+					return PackedStringArray(["condição: ataque (quando for alvo de um ataque) ou magia (de uma magia)"])
+			elif not SpellRules.TIPOS_ENERGIA.has(str(cmd.payload.get("tipo_energia", ""))):
+				return PackedStringArray(["tipo de dano: " + ", ".join(PackedStringArray(SpellRules.TIPOS_ENERGIA))])
 		"comunhao_com_a_natureza":
 			if not world.db.is_natural(_tile_jogador()):
 				return PackedStringArray(["é preciso estar numa área natural"])
@@ -316,6 +345,10 @@ func execute(cmd: GameCommand) -> Array:
 	var sh: CharacterSheet = world.player_sheet
 	if cmd.type == "CollectMessenger":
 		return _coletar_mensageiro(str(cmd.payload.get("destino", "")))
+	if cmd.type == "SearchRunes":
+		return _procurar_runas()
+	if cmd.type == "DisarmRune":
+		return _desarmar_runa(str(cmd.payload.id))
 	if cmd.type == "DetectMagic":
 		# Misticismo, Detectar Magia (LB p.121): ação completa, CD 15; presença e intensidade em alcance curto.
 		var r := Checks.skill(sh, "misticismo", 15, world.rules, world.rng, "world")
@@ -467,6 +500,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"runa_de_protecao":
+			out.append_array(runa_de_protecao(cmd.payload, sh))
 		"comunhao_com_a_natureza":
 			out.append_array(comunhao_com_a_natureza(cmd.payload, sh))
 		"despertar_consciencia":
@@ -713,6 +748,103 @@ func _ha_tesouro(loc: String) -> bool:
 	return false
 
 
+## Runa de Proteção (universal 2). No chão: 1 hora e T$ 200; esfera de 6m; quem entra dispara 6d6 (+2d6) do tipo escolhido.
+## Pode valer só para um tipo de criatura ou raça ("gatilho") e ter palavra mágica (o conjurador não a dispara).
+## No corpo (aprimoramentos): a magia escolhida é lançada como reação quando a condição acontece (CombatModule._runa_corporal).
+func runa_de_protecao(p: Dictionary, sh: CharacterSheet) -> Array:
+	var apr: Array = p.get("aprimoramentos", [])
+	var out: Array = [fact("GOLD_CHANGED", {"delta": -200, "reason": "pó de diamante (Runa de Proteção)"})]
+	var combat = world.module("combat")
+	var cd: int = combat.spell_dc(sh, {"spell": "runa_de_protecao"}) if combat != null else 15
+	if apr.has(1) or apr.has(2):
+		sh.remove_efeito("magia.runa_de_protecao")   # uma runa no corpo de cada vez
+		sh.add_efeito("magia.runa_de_protecao", "runa_corporal", 1, "permanente", str(p.magia))
+		sh.add_efeito("magia.runa_de_protecao", "runa_gatilho", 1, "permanente", str(p.gatilho))
+		out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "runa_de_protecao", "magia": str(p.magia), "gatilho": str(p.gatilho), "tags": ["magia"]}, ["player"]))
+		return out
+	out.append_array(world.advance_ticks(60 / world.clock.tick_minutes))
+	var t := _tile_jogador()
+	var nova := {"id": "runa_%d" % (runas.size() + world.clock.tick), "centro": [t.x, t.y], "raio": Area.quadrados(6.0), "tipo": str(p.tipo_energia),
+		"dados": "%dd6" % (6 + 2 * apr.count(0)), "gatilho": str(p.get("gatilho", "")), "palavra": bool(p.get("palavra", false)), "cd": cd, "conj": "player",
+		"dentro": true, "achada": false}
+	runas.append(nova)
+	out.append(fact("RUNE_PLACED", {"rune": nova.id, "tile": [t.x, t.y], "tipo": nova.tipo}, ["player"]))
+	return out
+
+
+func _runa(id: String) -> Dictionary:
+	for r in runas:
+		if str(r.id) == id:
+			return r
+	return {}
+
+
+## A runa dispara para esta criatura? Gatilho vazio: qualquer uma; senão, o tipo ou a raça. Com palavra mágica, o
+## conjurador passa sem dispará-la.
+func _runa_dispara(r: Dictionary, tipo: String, raca: String, eh_jogador: bool) -> bool:
+	if bool(r.palavra) and eh_jogador and str(r.conj) == "player":
+		return false
+	var g := str(r.gatilho)
+	return g == "" or g == tipo or g == raca
+
+
+## Combate: a criatura foi de `de` a `para`; se entrou na área de uma runa que dispara para ela, a runa se descarrega.
+func runa_disparada(de: Vector2i, para: Vector2i, tipo: String, raca: String, eh_jogador: bool) -> Dictionary:
+	for r in runas.duplicate(true):
+		if _dist(r, para) <= int(r.raio) and _dist(r, de) > int(r.raio) and _runa_dispara(r, tipo, raca, eh_jogador):
+			runas = runas.filter(func(x): return str(x.id) != str(r.id))
+			return r
+	return {}
+
+
+## Exploração: o jogador entrou na área de uma runa. Quem dispara não resiste; criaturas do mundo na área fazem Reflexos.
+func _runas_ao_mover(t: Vector2i) -> Array:
+	var out: Array = []
+	var sh: CharacterSheet = world.player_sheet
+	for r in runas.duplicate(true):
+		var dentro: bool = _dist(r, t) <= int(r.raio)
+		if dentro and not bool(r.dentro) and _runa_dispara(r, sh.creature_type, sh.race_id, true):
+			runas = runas.filter(func(x): return str(x.id) != str(r.id))
+			var dano := sh.dano_por_tipo(str(r.tipo), int(Dice.roll(str(r.dados), world.rng, "world").total))
+			sh.pv -= dano
+			out.append(fact("RUNE_EXPLODED", {"rune": str(r.id), "trigger": "player", "damage": dano, "pv_after": sh.pv, "tipo": str(r.tipo)}, ["player"]))
+			var combat = world.module("combat")
+			if combat != null:
+				for cid in combat.creature_state:
+					if bool(combat.creature_state[cid].get("alive", false)) and _dist(r, combat.creature_tile(cid)) <= int(r.raio):
+						var fc := CharacterSheet.from_dict(combat.creature_state[cid].sheet)
+						var d_c := fc.dano_por_tipo(str(r.tipo), int(Dice.roll(str(r.dados), world.rng, "world").total))
+						if Checks.skill(fc, "reflexos", int(r.cd), world.rules, world.rng, "world").get("success", false):
+							d_c = d_c / 2
+						combat.ferir_fora(cid, d_c)
+			continue
+		for x in runas:
+			if str(x.id) == str(r.id):
+				x.dentro = dentro
+	return out
+
+
+## Investigação contra a CD de cada runa que não é sua, a até alcance curto. Achada, pode ser desarmada.
+func _procurar_runas() -> Array:
+	var achadas: Array = []
+	for r in runas:
+		if str(r.conj) == "player" or bool(r.achada) or _dist(r, _tile_jogador()) > int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
+			continue
+		if Checks.skill(world.player_sheet, "investigacao", int(r.cd), world.rules, world.rng, "world").get("success", false):
+			r.achada = true
+			achadas.append(str(r.id))
+	return [fact("RUNES_FOUND", {"runas": achadas}, ["player"])]
+
+
+## Ladinagem contra a CD da runa: passou, ela se desfaz.
+func _desarmar_runa(id: String) -> Array:
+	var r := _runa(id)
+	if Checks.skill(world.player_sheet, "ladinagem", int(r.cd), world.rules, world.rng, "world").get("success", false):
+		runas = runas.filter(func(x): return str(x.id) != id)
+		return [fact("RUNE_DISARMED", {"rune": id}, ["player"])]
+	return [fact("RUNE_DISARM_FAILED", {"rune": id}, ["player"])]
+
+
 ## Comunhão com a Natureza: 6d4 dados de auxílio pelo dia (+2 por aprimoramento; d6 ou d8), gastos 2 por vez (+2 por
 ## círculo acima do 3º) em testes em área natural (Checks._auxilio_natural). Com o aprimoramento de 1 minuto, em vez disso,
 ## 1d4+1 informações sobre a região: terreno, animais, vegetais, minerais, cursos d'água e criaturas antinaturais.
@@ -781,7 +913,7 @@ func ao_mover() -> Array:
 	sh.remove_efeito_stat("area_natural")
 	if sh.efeito_bonus("auxilio_dados") > 0 and world.db.is_natural(_tile_jogador()):
 		sh.add_efeito("comunhao.area", "area_natural", 1, "dia", "", world.day_index() + 1)
-	return []
+	return _runas_ao_mover(_tile_jogador())
 
 
 ## Despertar Consciência: alvo_tipo "animal" (criatura viva ao lado), "planta" (vegetação ao lado), "escultura" (objeto com
@@ -1373,7 +1505,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1385,6 +1517,7 @@ func from_dict(d: Dictionary) -> void:
 	abencoados = (d.get("abencoados", {}) as Dictionary).duplicate(true)
 	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()
 	videncia = (d.get("videncia", {}) as Dictionary).duplicate()
+	runas = (d.get("runas", []) as Array).duplicate(true)
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()

@@ -1457,6 +1457,59 @@ func _acalmar_pela_pericia(id: String, alvo: String) -> Array:
 
 
 ## Fora de combate (SpellsModule): a criatura fica com a atitude `valor` por `ticks` (a cena).
+## Fora de combate: dano numa criatura do mundo (Runa de Proteção). Com PV abaixo do limite de morte, morre.
+## Runa de Proteção no chão, em combate: quem entra na área (vindo de fora) dispara a explosão. Quem a ativou não resiste;
+## os outros na área fazem Reflexos para metade.
+func _runa_no_combate(id: String, de: Vector2i, para: Vector2i) -> Array:
+	var magia = world.module("magia")
+	if magia == null:
+		return []
+	var s: CharacterSheet = sim.c(id).sheet
+	var runa: Dictionary = magia.runa_disparada(de, para, s.creature_type, s.race_id, id == "player")
+	if runa.is_empty():
+		return []
+	var out: Array = [fact("RUNE_EXPLODED", {"rune": str(runa.id), "trigger": id}, [id])]
+	var centro := Vector2i(int(runa.centro[0]), int(runa.centro[1]))
+	for cid in sim.combatants.keys():
+		if sim.c(cid).sheet.is_dead() or CombatSim.cheb(sim.c(cid).tile, centro) > int(runa.raio):
+			continue
+		out.append_array(_dano_de_energia(str(runa.conj), cid, str(runa.dados), int(runa.cd), "" if cid == id else "reflexos", str(runa.tipo), "Runa de Proteção"))
+	return out
+
+
+## Runa de Proteção no corpo: quando o portador é alvo de um ataque (ou de uma magia), a magia gravada é lançada como
+## reação, pagando os PM dela. Magia pessoal vale para o portador; as outras vão para quem provocou.
+func _runa_corporal(portador: String, provocador: String, gatilho: String) -> Array:
+	if not sim.combatants.has(portador):
+		return []
+	var s: CharacterSheet = sim.c(portador).sheet
+	if not s.efeito_tipo_existe("runa_gatilho", gatilho):
+		return []
+	var sp_id := ""
+	for e in s.efeitos:
+		if e.stat == "runa_corporal":
+			sp_id = str(e.tipo)
+	var sp: Dictionary = GhostPlanner.spell_rule(world.rules, sp_id)
+	var custo := GhostPlanner.spell_cost(world.rules, sp, {"spell": sp_id}, s)
+	if sp.is_empty() or s.pm < custo:
+		return []
+	s.remove_efeito("magia.runa_de_protecao")   # a runa se descarrega
+	var alvo := portador if str(sp.get("alcance", "")) == "pessoal" else provocador
+	var out: Array = [fact("RUNE_EXPLODED", {"rune": "corpo_" + portador, "trigger": provocador, "spell": sp_id}, [portador])]
+	out.append_array(_cast(portador, {"type": "cast", "spell": sp_id, "target": alvo, "targets": [alvo], "aprimoramentos": []}, {"cost": custo}))
+	return out
+
+
+func ferir_fora(id: String, dano: int) -> void:
+	if not creature_state.has(id):
+		return
+	var s := CharacterSheet.from_dict(creature_state[id].sheet)
+	s.pv -= dano
+	creature_state[id].sheet = s.to_dict()
+	if s.is_dead():
+		creature_state[id].alive = false
+
+
 func acalmar_fora(id: String, valor: String, ticks: int) -> void:
 	if creature_state.has(id):
 		creature_state[id].atitude_temp = {"valor": valor, "ate": world.clock.tick + ticks}
@@ -3148,6 +3201,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			sim.c(id).tile = v.end
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y])}, [id]))
 			out.append_array(_dano_vegetacao_afiada(id, path))
+			out.append_array(_runa_no_combate(id, from, v.end))
 			out.append_array(_aura_divina_entrada(id, from, path))
 			for r_id in reactors:
 				if CombatSim.cheb(sim.c(r_id).tile, v.end) > 1:
@@ -3488,6 +3542,9 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 		out.append(fact("SPELL_FAILED", fail, [id]))
 		out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm, "failed": true}, [id]))
 		return out
+	for tg_r in a.get("targets", [a.get("target", "")]):
+		if str(tg_r) != id and sim.combatants.has(str(tg_r)):
+			out.append_array(_runa_corporal(str(tg_r), id, "magia"))
 	match str(a.spell):
 		"armadura_arcana":
 			# Armadura Arcana (arcana 1, LB p.183): +5 na Defesa pela cena; acumula com magias, não com armadura.
@@ -4792,6 +4849,7 @@ func _dano_elemental_arma(sh: CharacterSheet) -> Array:
 
 
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
+	var out_runa := _runa_corporal(target, attacker, "ataque")
 	var A := sim.c(attacker)
 	var T := sim.c(target)
 	var atk: Dictionary = v.atk
@@ -4910,7 +4968,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			dmg = maxi(1, int(Dice.roll(atk.dano, world.rng, "combat", 1, extra2).total) / 2)
 			tags.append("raspao")
 			tags.append_array(sim.apply_damage(target, dmg))
-	var out: Array = [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": atk.nome, "d20": d20, "mod": v.mod,
+	var out: Array = out_runa + [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": atk.nome, "d20": d20, "mod": v.mod,
 		"mods": v.mods, "total": total, "defense": v.defense, "camo_roll": camo_roll, "hit": hit, "crit": crit, "damage": dmg,
 		"rolls": rolls, "pv_after": T.sheet.pv, "special": special, "ranged": v.ranged, "tags": tags}, [attacker, target])]
 	if hit and attacker == "player" and T.side == "enemy":

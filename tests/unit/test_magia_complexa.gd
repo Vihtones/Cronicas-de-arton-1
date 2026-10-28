@@ -3781,3 +3781,19 @@ func test_comunhao_com_a_natureza_dados_de_auxilio_salvam_o_teste() -> void:
 		Checks.skill(sh, "sobrevivencia", 18, r, rng, "world")
 		gastou = gastou or sh.efeito_bonus("auxilio_dados") < antes
 	check(gastou, "em algum teste perto da CD, os dados foram gastos")
+
+
+func test_runa_de_protecao_explode_quando_o_jogador_entra_e_runa_no_corpo() -> void:
+	var w = _clerigo_mundo(["runa_de_protecao", "bencao"])[0]
+	w.player.gold = 1000
+	var t: Vector2i = w.db.world_to_tile(w.player.position)
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "runa_de_protecao", "tipo_energia": "fogo"}).accepted, "runa no chão")
+	var mg = w.module("magia")
+	eq(mg.runas.size(), 1, "uma runa")
+	mg.runas[0].dentro = false   # como se o jogador tivesse saído da área
+	var pv0: int = w.player_sheet.pv
+	var fatos: Array = mg._runas_ao_mover(t)
+	check(w.player_sheet.pv < pv0 and fatos.size() > 0, "explodiu no jogador")
+	eq(mg.runas.size(), 0, "a runa se descarregou")
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "runa_de_protecao", "aprimoramentos": [1], "magia": "bencao", "gatilho": "ataque"}).accepted, "runa no corpo")
+	check(w.player_sheet.efeito_tipo_existe("runa_corporal", "bencao"), "Bênção gravada na runa")
