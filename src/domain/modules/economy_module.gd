@@ -12,10 +12,16 @@ const SHORTAGE_END_AT := 0.7    # só acaba acima de 70% (histerese: não oscila
 const GOOD_NAMES := {"comida": "comida", "bebida": "bebida", "ferramentas": "ferramentas", "remedio": "remédios", "madeira": "madeira"}
 var shortage: Dictionary = {}   # bem -> true enquanto a vila está em falta (Fase 4)
 var routes: Dictionary = {}  # id -> {from, to, open}: rota comercial entre regiões (Arton Viva, Fase 4)
+## Lojas vivas (ORIGINAL_DO_JOGO): cada vendedor tem bolsa (limita o que compra de você e volta ao normal de dia),
+## revende o que você vendeu e lembra da pechincha do dia.
+const BOLSA_PADRAO := 120
+var bolsas: Dictionary = {}      # npc -> ouro
+var revenda: Dictionary = {}     # npc -> {item: qtd}
+var pechincha: Dictionary = {}   # npc -> {"dia": int, "mod": float}
 
 
 func module_id() -> String: return "economy"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy", "Sell", "Haggle"])
 func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "WORK_DONE", "TOOL_BOUGHT", "MEAL_SERVED", "TORMENTA_DAY", "BUILDING_DONE"])
 
 
@@ -30,6 +36,9 @@ func price(item_id: String, region: String = "vila", seller: String = "") -> int
 	_ensure()
 	var it: Dictionary = world.db.items.get(item_id, {})
 	var base := int(it.get("price", 0))
+	var pch: Dictionary = pechincha.get(seller, {})
+	if seller != "" and int(pch.get("dia", -1)) == world.day_index():
+		base = maxi(1, int(round(base * float(pch.mod))))
 	var mem = world.module("memory")
 	if seller != "" and mem != null and mem.bias(seller, "player") < 0:
 		base = int(ceil(base * 1.2))  # vendedor desconfiado cobra mais de estranhos (ORIGINAL)
@@ -51,11 +60,39 @@ func price(item_id: String, region: String = "vila", seller: String = "") -> int
 	return maxi(1, int(round(base * clampf(ratio, float(lim[0]), float(lim[1])))))
 
 
+func estoque(npc: String) -> Array:
+	var out: Array = world.db.economy.get("shops", {}).get(npc, []).duplicate()
+	for it in revenda.get(npc, {}):
+		if int(revenda[npc][it]) > 0 and not out.has(it):
+			out.append(it)
+	return out
+
+
+func bolsa(npc: String) -> int:
+	return int(bolsas.get(npc, BOLSA_PADRAO))
+
+
+## Preço que o vendedor paga: metade do preço base (regra usual de revenda do LB, cap. 3).
+func preco_venda(item_id: String) -> int:
+	return int(floor(int(world.db.items.get(item_id, {}).get("price", 0)) / 2.0))
+
+
 func validate(cmd: GameCommand) -> PackedStringArray:
 	_ensure()
 	var npc: String = cmd.payload.get("npc_id", "")
 	var item: String = cmd.payload.get("item", "")
-	if not world.db.economy.get("shops", {}).get(npc, []).has(item):
+	if cmd.type == "Haggle":
+		if not world.db.economy.get("shops", {}).has(npc): return PackedStringArray(["não é vendedor"])
+		if int(pechincha.get(npc, {}).get("dia", -1)) == world.day_index(): return PackedStringArray(["já pechinchou hoje com este vendedor"])
+		return _vendedor_aqui(npc)
+	if cmd.type == "Sell":
+		if not world.db.economy.get("shops", {}).has(npc): return PackedStringArray(["não é vendedor"])
+		if not world.module("state").has_item(item): return PackedStringArray(["você não tem isso"])
+		var d_it: Dictionary = world.db.items.get(item, {})
+		if preco_venda(item) <= 0 or d_it.has("owner"): return PackedStringArray(["ninguém compra isso"])
+		if bolsa(npc) < preco_venda(item): return PackedStringArray(["o vendedor não tem ouro para isso hoje"])
+		return _vendedor_aqui(npc)
+	if not estoque(npc).has(item):
 		return PackedStringArray(["não vende isso"])
 	var region := "vila"
 	if npc == "valkaria_mercado":
@@ -70,28 +107,67 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			if npcs.npc(npc).get("location", "") != loc:
 				return PackedStringArray(["o vendedor não está aqui"])
 	var good: String = world.db.items[item].get("good", "")
-	if good != "" and int(regions[region].stock[good]) <= 0:
+	var de_revenda := int(revenda.get(npc, {}).get(item, 0)) > 0
+	if good != "" and not de_revenda and int(regions[region].stock[good]) <= 0:
 		return PackedStringArray(["em falta"])
 	if int(world.player.gold) < price(item, region, npc):
 		return PackedStringArray(["ouro insuficiente"])
 	return PackedStringArray()
 
 
+func _vendedor_aqui(npc: String) -> PackedStringArray:
+	var npcs = world.module("npcs")
+	if npcs != null and npc != "valkaria_mercado":
+		var loc := world.db.location_at(world.db.world_to_tile(world.player.position))
+		if npcs.npc(npc).get("location", "") != loc:
+			return PackedStringArray(["o vendedor não está aqui"])
+	return PackedStringArray()
+
+
 func execute(cmd: GameCommand) -> Array:
+	if cmd.type == "Haggle":
+		return _pechinchar(str(cmd.payload.npc_id))
+	if cmd.type == "Sell":
+		var it_v: String = cmd.payload.item
+		var v := preco_venda(it_v)
+		var npc_v: String = cmd.payload.npc_id
+		bolsas[npc_v] = bolsa(npc_v) - v
+		if not revenda.has(npc_v):
+			revenda[npc_v] = {}
+		revenda[npc_v][it_v] = int(revenda[npc_v].get(it_v, 0)) + 1
+		return [fact("GOLD_CHANGED", {"delta": v, "reason": "venda"}), fact("ITEM_LOST", {"item": it_v}, ["player"]),
+			fact("ITEM_SOLD", {"item": it_v, "price": v, "buyer": npc_v}, ["player", npc_v])]
 	var item: String = cmd.payload.item
 	var region := "valkaria" if cmd.payload.npc_id == "valkaria_mercado" else "vila"
 	var p := price(item, region, cmd.payload.npc_id)
 	var good: String = world.db.items[item].get("good", "")
-	if good != "":
+	var npc_c: String = cmd.payload.npc_id
+	bolsas[npc_c] = bolsa(npc_c) + p
+	if int(revenda.get(npc_c, {}).get(item, 0)) > 0:
+		revenda[npc_c][item] = int(revenda[npc_c][item]) - 1
+	elif good != "":
 		regions[region].stock[good] = int(regions[region].stock[good]) - 1
 	return [fact("GOLD_CHANGED", {"delta": -p, "reason": "compra"}), fact("ITEM_GAINED", {"item": item, "qty": 1}, ["player"]),
 		fact("ITEM_BOUGHT", {"item": item, "price": p, "seller": cmd.payload.npc_id}, ["player", cmd.payload.npc_id])]
+
+
+## Pechinchar (ORIGINAL_DO_JOGO, baseado em Diplomacia, LB p.118): CD 10 + Intuição do vendedor. Passou: 10% de
+## desconto no dia (20% se passar por 10). Falhou por 5 ou mais: o vendedor se irrita e cobra 10% a mais no dia.
+func _pechinchar(npc: String) -> Array:
+	var cd := 10 + NpcStats.skill(world.rules, world.npc_def(npc), "intuicao", 0)
+	var rr := Checks.skill(world.player_sheet, "diplomacia", cd, world.rules, world.rng, "world")
+	var tot := int(rr.get("total", 0))
+	var mod := 0.8 if tot >= cd + 10 else (0.9 if tot >= cd else (1.1 if tot <= cd - 5 else 1.0))
+	pechincha[npc] = {"dia": world.day_index(), "mod": mod}
+	return [fact("HAGGLED", {"npc": npc, "total": tot, "cd": cd, "mod": mod}, ["player", npc])]
 
 
 func on_tick(tick: int) -> Array:
 	_ensure()
 	if tick % (24 * 60 / world.clock.tick_minutes) != 0:
 		return []
+	for n in bolsas.keys():
+		bolsas[n] = int(round(lerpf(float(bolsas[n]), float(BOLSA_PADRAO), 0.5)))   # a bolsa volta ao normal aos poucos
 	for rid in regions:
 		var r: Dictionary = regions[rid]
 		for g in r.stock:
@@ -232,7 +308,8 @@ func _route_open(from_region: String) -> bool:
 
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"regions": regions.duplicate(true), "treasury": treasury, "routes": routes.duplicate(true), "shortage": shortage.duplicate()}
+	return {"regions": regions.duplicate(true), "treasury": treasury, "routes": routes.duplicate(true), "shortage": shortage.duplicate(),
+		"bolsas": bolsas.duplicate(), "revenda": revenda.duplicate(true), "pechincha": pechincha.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -240,6 +317,9 @@ func from_dict(d: Dictionary) -> void:
 	treasury = int(d.get("treasury", 0))
 	routes = d.get("routes", {}).duplicate(true)
 	shortage = d.get("shortage", {}).duplicate()
+	bolsas = d.get("bolsas", {}).duplicate()
+	revenda = d.get("revenda", {}).duplicate(true)
+	pechincha = d.get("pechincha", {}).duplicate(true)
 	for id in routes:
 		routes[id].open = bool(routes[id].get("open", true))
 	for rid in regions:

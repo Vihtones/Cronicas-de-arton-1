@@ -148,6 +148,24 @@ func test_equipamento_compra_e_equipa_com_vendedor_desconfiado() -> void:
 	eq(w.player_sheet.defense(w.rules), 10 + 3, "sem armadura")
 
 
+func test_loja_viva_vende_revende_e_pechincha() -> void:
+	var w := _w("equipamento")
+	var eco: EconomyModule = w.modules.economy
+	w.modules.state.inventory["espada_curta"] = 1
+	var ouro := int(w.player.gold)
+	var bolsa := eco.bolsa("garrick")
+	var r := WorldHelpers.cmd(w, "Sell", {"npc_id": "garrick", "item": "espada_curta"})
+	check(r.accepted, "vendeu: %s" % str(r.errors))
+	eq(int(w.player.gold), ouro + 5, "metade do preço (T$ 10)")
+	eq(eco.bolsa("garrick"), bolsa - 5, "sai da bolsa do vendedor")
+	check(eco.estoque("garrick").has("espada_curta"), "o vendedor revende o que comprou")
+	check(not WorldHelpers.cmd(w, "Sell", {"npc_id": "garrick", "item": "dizimo_lena"}).accepted, "não vende o que não tem / não é seu")
+	r = WorldHelpers.cmd(w, "Haggle", {"npc_id": "garrick"})
+	check(r.accepted, "pechinchou")
+	check(not WorldHelpers.cmd(w, "Haggle", {"npc_id": "garrick"}).accepted, "uma pechincha por dia")
+	check(eco.pechincha.garrick.mod in [0.8, 0.9, 1.0, 1.1], "resultado da pechincha")
+
+
 func test_viagem_leva_dias_e_chega_a_valkaria() -> void:
 	var w := _w("viagem")
 	var tr: TravelModule = w.modules.travel

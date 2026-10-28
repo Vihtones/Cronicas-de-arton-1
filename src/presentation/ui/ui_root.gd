@@ -780,30 +780,17 @@ func refresh_journal() -> void:
 
 # --- Loja --------------------------------------------------------------------------------------
 func _build_shop(root: Control) -> void:
-	panel_shop = _panel(root, Control.PRESET_CENTER)
-	panel_shop.position = Vector2(200, 80)
-	panel_shop.custom_minimum_size = Vector2(240, 0)
-	var v := VBoxContainer.new()
-	panel_shop.add_child(v)
-	v.add_child(_h("Comprar"))
-	shop_list = VBoxContainer.new()
-	v.add_child(shop_list)
-	v.add_child(_button("Fechar", func(): panel_shop.visible = false))
-	panel_shop.visible = false
+	var sp := ShopPanel.new()
+	panel_shop = sp
+	root.add_child(sp)
+	sp.position = Vector2(40, 30)
+	sp.visible = false
+	sp.command.connect(func(t: String, p: Dictionary): _cmd_log(t, p))
 
 
 func open_shop(npc: String) -> void:
 	shop_npc = npc
-	for c in shop_list.get_children():
-		c.queue_free()
-	var eco: EconomyModule = Game.world.modules.economy
-	for it in Game.db.economy.get("shops", {}).get(npc, []):
-		var price: int = eco.price(it) if eco.enabled else int(Game.db.items[it].price)
-		shop_list.add_child(_button("%s — T$ %d" % [Game.db.items[it].name, price], func():
-			var r := Game.send("Buy", {"npc_id": npc, "item": it})
-			if not r.accepted: log_msg("✘ " + "; ".join(r.errors))
-			open_shop(npc)))
-	panel_shop.visible = true
+	(panel_shop as ShopPanel).open(npc)
 
 
 # --- Barra de combate -------------------------------------------------------------------------

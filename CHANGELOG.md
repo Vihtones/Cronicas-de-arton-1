@@ -2,6 +2,7 @@
 
 ## 0.7.1 (em andamento)
 
+- Lojas vivas: comprar e vender lado a lado com a ficha do item e a comparação com o equipado; vender por metade do preço (comando Sell), bolsa do vendedor que se recupera por dia, revenda do que você vendeu, pechincha diária por Diplomacia (Haggle: −10%/−20% ou +10% se irritar) e saudação conforme a relação.
 - Inventário (tecla I): equipado, mochila em grade, ficha do item com números de regra e comparação com o equipado; equipar, desequipar (novo comando Unequip) e usar.
 - Arcanas de 1º círculo (lote 2): Sono (fora de combate, o NPC dorme e não vê furtos), Teia, Hipnotismo, Imagem Espelhada, Primor Atlético e Concentração de Combate.
 - Arcanas de 1º círculo (lote 3): Área Escorregadia (zona com Acrobacia, arma escorregadia), Enfeitiçar (prestativo, sugestão, espíritos/monstros, todos no alcance) e Tranca Arcana (tranca +10/+15, abrir trancas). Disfarce Ilusório e Transmutar Objetos têm partes prontas (+10/+20 em Enganação; curar construto; restaurar objeto), mas ficam fora de COMPLETAS até haver disfarce de objetos/terceiros e criação de objetos.
