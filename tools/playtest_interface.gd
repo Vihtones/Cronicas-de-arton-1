@@ -110,5 +110,26 @@ func _run() -> void:
 	_confere("o turno passou e voltou ao jogador (ou a luta acabou)", main.combat_view.my_turn() or not c.active)
 	print("pv do alvo: ", antes, " -> ", (c.sim.c(alvo).sheet.pv if c.active and c.sim.combatants.has(alvo) else "fim"))
 	await _shot("i6_depois")
+	# guilda: inscreve, aceita uma caça e vê o quadro
+	G.new_game(false, 8)
+	await _frames(10)
+	G.world.player.position = G.db.tile_to_world(G.db.location_spot("taverna"))
+	G.world.player.gold = 200
+	main.player.sync_from_world()
+	await _frames(3)
+	_confere("inscrição", G.send("JoinGuild", {}).accepted)
+	var cacas: Array = G.world.modules.quests.contratos().filter(func(x): return str(x.tipo) == "cacar")
+	_confere("aceita caça", G.send("AcceptQuest", {"quest_id": cacas[0].id}).accepted)
+	main.ui.toggle_guild()
+	await _shot("i7_guilda")
+	main.ui.close_panels()
+	var q = G.world.modules.quests
+	var cid: String = q.ativas.values()[0].criaturas[0]
+	G.world.player.position = G.db.tile_to_world(G.world.modules.combat.creature_tile(cid) + Vector2i(3, 0))
+	main.player.sync_from_world()
+	main.npc_layer.sync_all()
+	await _frames(5)
+	_confere("criatura do contrato tem vista", main.npc_layer.creature_views.has(cid))
+	await _shot("i8_cacada")
 	print("falhas: ", falhas)
 	quit(falhas)

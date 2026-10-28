@@ -105,5 +105,35 @@
   "price": 10,
   "agua_benta": true,
   "fonte": "LB p.159-160"
+ },
+ "rabo_de_rato": {
+  "name": "Rabo de rato gigante",
+  "price": 1,
+  "trofeu": true
+ },
+ "pele_de_lobo": {
+  "name": "Pele de lobo",
+  "price": 4,
+  "trofeu": true
+ },
+ "seda_de_aranha": {
+  "name": "Seda de aranha gigante",
+  "price": 12,
+  "trofeu": true
+ },
+ "pacote_remedios": {
+  "name": "Pacote de remédios (entrega)",
+  "price": 0,
+  "owner": "guilda"
+ },
+ "carta_lacrada": {
+  "name": "Carta lacrada (entrega)",
+  "price": 0,
+  "owner": "guilda"
+ },
+ "caixa_ferramentas": {
+  "name": "Caixa de ferramentas (entrega)",
+  "price": 0,
+  "owner": "guilda"
  }
 }

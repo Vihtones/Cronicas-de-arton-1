@@ -194,6 +194,8 @@ func build_actions() -> Array:
 			var rd: Dictionary = TravelModule.ROUTES[route]
 			out.append({"label": "Viajar: %s (%d km, ~%.1f dias)" % [str(rd.to).replace("_", " ").capitalize(), rd.km, float(rd.km) / tr.km_per_day(rd)],
 				"cmd": "Travel", "payload": {"route": route}})
+	if loc == str(w.modules.quests.guilda().get("sede", "")):
+		out.push_front({"label": "Quadro da Guilda dos Aventureiros", "ui": "toggle_guild"})
 	var c: CombatModule = w.modules.combat
 	var foes: Array = []
 	for id in c.visible_creatures():
@@ -255,6 +257,8 @@ func _explore_key(k: int) -> void:
 			ui.toggle_tree()
 		KEY_I:
 			ui.toggle_inv()
+		KEY_L:
+			ui.toggle_guild()
 		KEY_E:
 			ui.show_interact(build_actions())
 		KEY_J:

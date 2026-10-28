@@ -317,6 +317,2139 @@
    "pdf_page": 211,
    "status": "ADAPTADA",
    "nota": "O livro deixa o tipo de criatura a cargo do mestre; estes valores são do jogo, para a tarefa de lutar ao lado do conjurador."
+  },
+  {
+   "id": "criatura.glop",
+   "valor": {
+    "nome": "Glop",
+    "nd": "1/4",
+    "tipo": "monstro",
+    "tamanho": "pequeno",
+    "iniciativa": 0,
+    "percepcao": 0,
+    "sentidos": [
+     "percepção_às_cegas"
+    ],
+    "defesa": 10,
+    "fort": 0,
+    "ref": 2,
+    "von": -5,
+    "pv": 10,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Pancada",
+      "bonus": 7,
+      "dano": "1d4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 0,
+     "con": 0,
+     "int": 0,
+     "sab": -5,
+     "car": -5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 286,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.rato_gigante",
+   "valor": {
+    "nome": "Rato Gigante",
+    "nd": "1/4",
+    "tipo": "animal",
+    "tamanho": "pequeno",
+    "iniciativa": 5,
+    "percepcao": 4,
+    "sentidos": [
+     "faro",
+     "visão_na_penumbra"
+    ],
+    "defesa": 12,
+    "fort": 0,
+    "ref": 3,
+    "von": -2,
+    "pv": 3,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 7,
+      "dano": "1d4+3",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 2,
+     "con": 1,
+     "int": -4,
+     "sab": 1,
+     "car": -3
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 286,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Doença."
+  },
+  {
+   "id": "criatura.orc_combatente",
+   "valor": {
+    "nome": "Orc combatente",
+    "nd": "1/2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 1,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 14,
+    "fort": 5,
+    "ref": 3,
+    "von": 0,
+    "pv": 8,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Maça",
+      "bonus": 9,
+      "dano": "1d8+7",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 4,
+     "des": 1,
+     "con": 2,
+     "int": -1,
+     "sab": -1,
+     "car": -1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 286,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Sensibilidade a Luz."
+  },
+  {
+   "id": "criatura.orc_chefe",
+   "valor": {
+    "nome": "Orc Chefe",
+    "nd": "2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 3,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 19,
+    "fort": 13,
+    "ref": 7,
+    "von": 2,
+    "pv": 66,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Machado de batalha",
+      "bonus": 11,
+      "dano": "1d8+12",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 2,
+     "con": 4,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {
+     "intimidacao": 4,
+     "sobrevivencia": 5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 286,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Urro Selvagem."
+  },
+  {
+   "id": "criatura.orc_mutante",
+   "valor": {
+    "nome": "Orc mutante",
+    "nd": "5",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 8,
+    "percepcao": 5,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 22,
+    "fort": 15,
+    "ref": 11,
+    "von": 7,
+    "pv": 55,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Machado de guerra",
+      "bonus": 20,
+      "dano": "1d12+18",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Mor-dida",
+      "bonus": 20,
+      "dano": "1d6+18",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 2,
+     "con": 4,
+     "int": -2,
+     "sab": -2,
+     "car": -2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 286,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Terceiro Braço, Sensibilidade a Luz."
+  },
+  {
+   "id": "criatura.aranha_gigante",
+   "valor": {
+    "nome": "Aranha Gigante",
+    "nd": "2",
+    "tipo": "monstro",
+    "tamanho": "grande",
+    "iniciativa": 7,
+    "percepcao": 3,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 19,
+    "fort": 8,
+    "ref": 11,
+    "von": 3,
+    "pv": 77,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 12,
+      "dano": "2d6+8",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 4,
+     "con": 1,
+     "int": -5,
+     "sab": 0,
+     "car": -4
+    },
+    "pericias": {
+     "furtividade": 9
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 287,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Veneno."
+  },
+  {
+   "id": "criatura.gargula",
+   "valor": {
+    "nome": "Gárgula",
+    "nd": "2",
+    "tipo": "construto",
+    "tamanho": "medio",
+    "iniciativa": 3,
+    "percepcao": 3,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 19,
+    "fort": 13,
+    "ref": 7,
+    "von": 2,
+    "pv": 65,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Duas garras",
+      "bonus": 12,
+      "dano": "1d6+6",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 2,
+     "con": 4,
+     "int": -2,
+     "sab": 1,
+     "car": -2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 287,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Imobilidade."
+  },
+  {
+   "id": "criatura.manticora",
+   "valor": {
+    "nome": "Mantícora",
+    "nd": "6",
+    "tipo": "monstro",
+    "tamanho": "grande",
+    "iniciativa": 7,
+    "percepcao": 8,
+    "sentidos": [
+     "faro",
+     "visão_no_escuro"
+    ],
+    "defesa": 26,
+    "fort": 18,
+    "ref": 7,
+    "von": 12,
+    "pv": 240,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 18,
+      "dano": "1d10+12",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 7,
+     "des": 2,
+     "con": 5,
+     "int": -2,
+     "sab": 1,
+     "car": -1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 287,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Espinhos."
+  },
+  {
+   "id": "criatura.golem_de_ferro",
+   "valor": {
+    "nome": "Golem de Ferro",
+    "nd": "10",
+    "tipo": "construto",
+    "tamanho": "grande",
+    "iniciativa": 4,
+    "percepcao": 9,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 36,
+    "fort": 24,
+    "ref": 14,
+    "von": 11,
+    "pv": 400,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Duas pancadas",
+      "bonus": 30,
+      "dano": "2d10+25",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 12,
+     "des": -1,
+     "con": 10,
+     "int": 0,
+     "sab": 0,
+     "car": -5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 288,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Imunidade a Magia, Sopro."
+  },
+  {
+   "id": "criatura.guarda_de_cidade",
+   "valor": {
+    "nome": "Guarda de Cidade",
+    "nd": "1/2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 3,
+    "defesa": 15,
+    "fort": 5,
+    "ref": 2,
+    "von": 1,
+    "pv": 8,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Maça",
+      "bonus": 7,
+      "dano": "1d8+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 2,
+     "des": 1,
+     "con": 2,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {
+     "atletismo": 5
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 289,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.sargento_da_guarda",
+   "valor": {
+    "nome": "Sargento da Guarda",
+    "nd": "1",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 4,
+    "defesa": 17,
+    "fort": 9,
+    "ref": 4,
+    "von": 3,
+    "pv": 28,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Maça",
+      "bonus": 10,
+      "dano": "1d8+10",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Besta leve",
+      "bonus": 9,
+      "dano": "1d8+5",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 1,
+     "con": 2,
+     "int": 0,
+     "sab": 0,
+     "car": 1
+    },
+    "pericias": {
+     "atletismo": 7,
+     "intuicao": 4
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 289,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Ordens."
+  },
+  {
+   "id": "criatura.lobo",
+   "valor": {
+    "nome": "Lobo",
+    "nd": "1/2",
+    "tipo": "animal",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 6,
+    "sentidos": [
+     "faro",
+     "visão_na_penumbra"
+    ],
+    "defesa": 14,
+    "fort": 6,
+    "ref": 3,
+    "von": 1,
+    "pv": 14,
+    "deslocamento_m": 15,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 7,
+      "dano": "1d6+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 3,
+     "con": 3,
+     "int": -4,
+     "sab": 2,
+     "car": -2
+    },
+    "pericias": {
+     "sobrevivencia": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 290,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Táticas de Alcateia."
+  },
+  {
+   "id": "criatura.centauro_combatente",
+   "valor": {
+    "nome": "Centauro combatente",
+    "nd": "1",
+    "tipo": "humanoide",
+    "tamanho": "grande",
+    "iniciativa": 3,
+    "percepcao": 3,
+    "defesa": 16,
+    "fort": 9,
+    "ref": 2,
+    "von": 5,
+    "pv": 35,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Tacape",
+      "bonus": 9,
+      "dano": "1d12+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Cascos",
+      "bonus": 9,
+      "dano": "1d8+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Arco longo",
+      "bonus": 7,
+      "dano": "1d10+5",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 2,
+     "con": 3,
+     "int": -2,
+     "sab": 1,
+     "car": -2
+    },
+    "pericias": {
+     "sobrevivencia": 5
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 290,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Investida Poderosa, Medo de Altura."
+  },
+  {
+   "id": "criatura.gnoll_saqueador",
+   "valor": {
+    "nome": "Gnoll saqueador",
+    "nd": "1",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 4,
+    "sentidos": [
+     "faro"
+    ],
+    "defesa": 15,
+    "fort": 7,
+    "ref": 7,
+    "von": 1,
+    "pv": 15,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Lança",
+      "bonus": 10,
+      "dano": "1d6+4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Mordida",
+      "bonus": 10,
+      "dano": "1d6+4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Arco curto",
+      "bonus": 9,
+      "dano": "1d6+3",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 2,
+     "con": 3,
+     "int": -2,
+     "sab": 1,
+     "car": -1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 290,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.gnoll_filibusteiro",
+   "valor": {
+    "nome": "Gnoll Filibusteiro",
+    "nd": "2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 9,
+    "percepcao": 4,
+    "sentidos": [
+     "faro"
+    ],
+    "defesa": 19,
+    "fort": 7,
+    "ref": 11,
+    "von": 4,
+    "pv": 60,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Espada curta",
+      "bonus": 11,
+      "dano": "1d6+4",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Mordida",
+      "bonus": 11,
+      "dano": "1d6+4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Mosquete",
+      "bonus": 12,
+      "dano": "2d8+9",
+      "margem": 19,
+      "mult": 3,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 4,
+     "con": 3,
+     "int": -1,
+     "sab": 2,
+     "car": -1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 291,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Recarga Rápida."
+  },
+  {
+   "id": "criatura.cao_do_inferno",
+   "valor": {
+    "nome": "Cão do Inferno",
+    "nd": "3",
+    "tipo": "espirito",
+    "tamanho": "grande",
+    "iniciativa": 6,
+    "percepcao": 4,
+    "sentidos": [
+     "faro",
+     "visão_no_escuro"
+    ],
+    "defesa": 21,
+    "fort": 11,
+    "ref": 9,
+    "von": 7,
+    "pv": 95,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 14,
+      "dano": "2d6+6",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 3,
+     "con": 4,
+     "int": -2,
+     "sab": 1,
+     "car": -2
+    },
+    "pericias": {
+     "atletismo": 9
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 292,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.grifo",
+   "valor": {
+    "nome": "Grifo",
+    "nd": "3",
+    "tipo": "monstro",
+    "tamanho": "grande",
+    "iniciativa": 9,
+    "percepcao": 7,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 19,
+    "fort": 9,
+    "ref": 15,
+    "von": 4,
+    "pv": 110,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 14,
+      "dano": "2d6+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Duas garras",
+      "bonus": 14,
+      "dano": "1d6+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 4,
+     "con": 3,
+     "int": -4,
+     "sab": 2,
+     "car": -1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 292,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Bote."
+  },
+  {
+   "id": "criatura.basilisco",
+   "valor": {
+    "nome": "Basilisco",
+    "nd": "4",
+    "tipo": "monstro",
+    "tamanho": "medio",
+    "iniciativa": 6,
+    "percepcao": 5,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 23,
+    "fort": 10,
+    "ref": 9,
+    "von": 9,
+    "pv": 145,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 16,
+      "dano": "2d8+12",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 4,
+     "des": 2,
+     "con": 4,
+     "int": -4,
+     "sab": 1,
+     "car": 0
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 293,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Olhar Petrificante, Veneno."
+  },
+  {
+   "id": "criatura.ogro",
+   "valor": {
+    "nome": "Ogro",
+    "nd": "4",
+    "tipo": "humanoide",
+    "tamanho": "grande",
+    "iniciativa": 3,
+    "percepcao": 1,
+    "sentidos": [
+     "visão_na_penumbra"
+    ],
+    "defesa": 23,
+    "fort": 16,
+    "ref": 10,
+    "von": 0,
+    "pv": 130,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Tacape",
+      "bonus": 16,
+      "dano": "1d12+18",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 7,
+     "des": 0,
+     "con": 4,
+     "int": -3,
+     "sab": -2,
+     "car": -2
+    },
+    "pericias": {
+     "atletismo": 12,
+     "intuicao": -5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 293,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Burro."
+  },
+  {
+   "id": "criatura.urso_coruja",
+   "valor": {
+    "nome": "Urso-Coruja",
+    "nd": "4",
+    "tipo": "monstro",
+    "tamanho": "grande",
+    "iniciativa": 7,
+    "percepcao": 5,
+    "sentidos": [
+     "faro",
+     "visão_no_escuro"
+    ],
+    "defesa": 23,
+    "fort": 16,
+    "ref": 10,
+    "von": 5,
+    "pv": 145,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 16,
+      "dano": "1d8+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Duas garras",
+      "bonus": 15,
+      "dano": "1d6+5",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 7,
+     "des": 3,
+     "con": 5,
+     "int": -4,
+     "sab": 1,
+     "car": -2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 293,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Agarrar Aprimorado."
+  },
+  {
+   "id": "criatura.serpe",
+   "valor": {
+    "nome": "Serpe",
+    "nd": "5",
+    "tipo": "monstro",
+    "tamanho": "grande",
+    "iniciativa": 5,
+    "percepcao": 7,
+    "sentidos": [
+     "faro",
+     "visão_no_escuro"
+    ],
+    "defesa": 24,
+    "fort": 10,
+    "ref": 16,
+    "von": 5,
+    "pv": 200,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 17,
+      "dano": "2d6+12",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Ferrão",
+      "bonus": 17,
+      "dano": "1d8+12",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 1,
+     "con": 6,
+     "int": -2,
+     "sab": 1,
+     "car": -1
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 293,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Agarrar Aprimorado, Veneno."
+  },
+  {
+   "id": "criatura.recruta_purista",
+   "valor": {
+    "nome": "Recruta Purista",
+    "nd": "1/2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 3,
+    "percepcao": 0,
+    "defesa": 16,
+    "fort": 6,
+    "ref": 2,
+    "von": 0,
+    "pv": 10,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Alabarda",
+      "bonus": 8,
+      "dano": "1d10+5",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 2,
+     "des": 1,
+     "con": 2,
+     "int": -1,
+     "sab": -1,
+     "car": 0
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 294,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Lutar em Formação."
+  },
+  {
+   "id": "criatura.sargento_mor",
+   "valor": {
+    "nome": "Sargento-mor",
+    "nd": "3",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 3,
+    "defesa": 24,
+    "fort": 14,
+    "ref": 9,
+    "von": 5,
+    "pv": 105,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Espada bastarda",
+      "bonus": 14,
+      "dano": "1d12+15",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Besta pesada",
+      "bonus": 12,
+      "dano": "1d12+10",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 4,
+     "des": 1,
+     "con": 4,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 294,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Varrer."
+  },
+  {
+   "id": "criatura.capelao_de_guerra",
+   "valor": {
+    "nome": "Capelão de Guerra",
+    "nd": "4",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 7,
+    "defesa": 21,
+    "fort": 10,
+    "ref": 5,
+    "von": 16,
+    "pv": 105,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Martelo de guerra",
+      "bonus": 14,
+      "dano": "1d8+15",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 4,
+     "des": 0,
+     "con": 4,
+     "int": 1,
+     "sab": 3,
+     "car": -1
+    },
+    "pericias": {
+     "misticismo": 5,
+     "religiao": 7
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 295,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Magias."
+  },
+  {
+   "id": "criatura.sangrento",
+   "valor": {
+    "nome": "Sangrento",
+    "nd": "9",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 17,
+    "percepcao": 15,
+    "defesa": 36,
+    "fort": 21,
+    "ref": 11,
+    "von": 17,
+    "pv": 270,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Espada bastarda",
+      "bonus": 28,
+      "dano": "3d6+15",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 2,
+     "con": 4,
+     "int": 4,
+     "sab": 0,
+     "car": 2
+    },
+    "pericias": {
+     "furtividade": 8,
+     "intimidacao": 17,
+     "misticismo": 19
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 295,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Cavaleiro Místico."
+  },
+  {
+   "id": "criatura.zumbi",
+   "valor": {
+    "nome": "Zumbi",
+    "nd": "1/4",
+    "tipo": "morto-vivo",
+    "tamanho": "medio",
+    "iniciativa": -1,
+    "percepcao": -1,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 11,
+    "fort": 3,
+    "ref": -1,
+    "von": -1,
+    "pv": 20,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 7,
+      "dano": "1d6+6",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": -1,
+     "con": 2,
+     "int": 0,
+     "sab": -1,
+     "car": 0
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 297,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Fraqueza Zumbi."
+  },
+  {
+   "id": "criatura.esqueleto",
+   "valor": {
+    "nome": "Esqueleto",
+    "nd": "2",
+    "tipo": "morto-vivo",
+    "tamanho": "medio",
+    "iniciativa": 7,
+    "percepcao": 3,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 19,
+    "fort": 3,
+    "ref": 7,
+    "von": 12,
+    "pv": 14,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Espada longa",
+      "bonus": 14,
+      "dano": "2d8+12",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 3,
+     "con": 0,
+     "int": 0,
+     "sab": 0,
+     "car": -5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 297,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.falange",
+   "valor": {
+    "nome": "Falange",
+    "nd": "8",
+    "tipo": "morto-vivo",
+    "tamanho": "grande",
+    "iniciativa": 12,
+    "percepcao": 6,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 25,
+    "fort": 6,
+    "ref": 12,
+    "von": 18,
+    "pv": 300,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Espada longa",
+      "bonus": 28,
+      "dano": "4d8+30",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 4,
+     "con": 2,
+     "int": 0,
+     "sab": 0,
+     "car": -5
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 298,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Bando."
+  },
+  {
+   "id": "criatura.aparicao",
+   "valor": {
+    "nome": "Aparição",
+    "nd": "5",
+    "tipo": "morto-vivo",
+    "tamanho": "medio",
+    "iniciativa": 10,
+    "percepcao": 6,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 23,
+    "fort": 5,
+    "ref": 17,
+    "von": 11,
+    "pv": 110,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Toque drenante",
+      "bonus": 18,
+      "dano": "3d8+6",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 6,
+     "con": 0,
+     "int": 0,
+     "sab": 2,
+     "car": 2
+    },
+    "pericias": {
+     "furtividade": 15
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 298,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Vulnerabilidade à."
+  },
+  {
+   "id": "criatura.necromante",
+   "valor": {
+    "nome": "Necromante",
+    "nd": "7",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 9,
+    "percepcao": 9,
+    "sentidos": [
+     "visão_na_penumbra"
+    ],
+    "defesa": 23,
+    "fort": 7,
+    "ref": 14,
+    "von": 20,
+    "pv": 180,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Adaga",
+      "bonus": 22,
+      "dano": "1d4",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 2,
+     "con": 1,
+     "int": 5,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {
+     "conhecimento": 14,
+     "misticismo": 16
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 298,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Magias."
+  },
+  {
+   "id": "criatura.soldado",
+   "valor": {
+    "nome": "Soldado",
+    "nd": "2",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 4,
+    "percepcao": 1,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 19,
+    "fort": 12,
+    "ref": 7,
+    "von": 3,
+    "pv": 18,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Espada longa",
+      "bonus": 15,
+      "dano": "1d8+15",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Arco longo",
+      "bonus": 11,
+      "dano": "1d8+6",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 4,
+     "des": 2,
+     "con": 1,
+     "int": 0,
+     "sab": 0,
+     "car": -1
+    },
+    "pericias": {}
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 300,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.arauto_de_thwor",
+   "valor": {
+    "nome": "Arauto de Thwor",
+    "nd": "4",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 8,
+    "defesa": 23,
+    "fort": 10,
+    "ref": 4,
+    "von": 16,
+    "pv": 135,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Machado de guerra",
+      "bonus": 16,
+      "dano": "3d6+12",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 1,
+     "con": 3,
+     "int": 0,
+     "sab": 4,
+     "car": 0
+    },
+    "pericias": {
+     "intimidacao": 9,
+     "religiao": 8
+    },
+    "sentidos": []
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 301,
+   "status": "ADAPTADA",
+   "nota": "Números do livro."
+  },
+  {
+   "id": "criatura.mago_de_batalha",
+   "valor": {
+    "nome": "Mago de Batalha",
+    "nd": "5",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 4,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 17,
+    "fort": 11,
+    "ref": 5,
+    "von": 17,
+    "pv": 120,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Espada longa",
+      "bonus": 14,
+      "dano": "1d8+3",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 1,
+     "con": 3,
+     "int": 4,
+     "sab": 0,
+     "car": -1
+    },
+    "pericias": {
+     "guerra": 9,
+     "misticismo": 9
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 301,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Arcano de Batalha, Magias."
+  },
+  {
+   "id": "criatura.sombra_de_thwor",
+   "valor": {
+    "nome": "Sombra de Thwor",
+    "nd": "9",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 17,
+    "percepcao": 10,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 33,
+    "fort": 15,
+    "ref": 21,
+    "von": 9,
+    "pv": 295,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Duas machadinhas",
+      "bonus": 27,
+      "dano": "1d6+12",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Duas machadinhas",
+      "bonus": 27,
+      "dano": "1d6+12",
+      "margem": 20,
+      "mult": 3,
+      "alcance_q": 20,
+      "distancia": true
+     }
+    ],
+    "atributos": {
+     "for": 5,
+     "des": 5,
+     "con": 5,
+     "int": 2,
+     "sab": 2,
+     "car": 0
+    },
+    "pericias": {
+     "acrobacia": 15,
+     "atletismo": 13,
+     "furtividade": 18,
+     "intimidacao": 9,
+     "ladinagem": 15
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 303,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Assassinar, Ataque Furtivo, Evasão Aprimorada, Veneno."
+  },
+  {
+   "id": "criatura.cascavel",
+   "valor": {
+    "nome": "Cascavel",
+    "nd": "1/",
+    "tipo": "animal",
+    "tamanho": "minusculo",
+    "iniciativa": 5,
+    "percepcao": 3,
+    "sentidos": [
+     "faro",
+     "visão_na_penumbra"
+    ],
+    "defesa": 13,
+    "fort": 2,
+    "ref": 5,
+    "von": -1,
+    "pv": 2,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 7,
+      "dano": "1d4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": -2,
+     "des": 3,
+     "con": 0,
+     "int": -5,
+     "sab": 0,
+     "car": -4
+    },
+    "pericias": {
+     "furtividade": 12
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 304,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Veneno."
+  },
+  {
+   "id": "criatura.jiboia",
+   "valor": {
+    "nome": "Jiboia",
+    "nd": "1/2",
+    "tipo": "animal",
+    "tamanho": "medio",
+    "iniciativa": 5,
+    "percepcao": 3,
+    "sentidos": [
+     "faro",
+     "visão_na_penumbra"
+    ],
+    "defesa": 14,
+    "fort": 3,
+    "ref": 5,
+    "von": 0,
+    "pv": 14,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 9,
+      "dano": "1d6+4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 2,
+     "des": 3,
+     "con": 1,
+     "int": -5,
+     "sab": 1,
+     "car": -4
+    },
+    "pericias": {
+     "furtividade": 7
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 304,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Agarrar Aprimorado, Constrição."
+  },
+  {
+   "id": "criatura.naja",
+   "valor": {
+    "nome": "Naja",
+    "nd": "1",
+    "tipo": "animal",
+    "tamanho": "pequeno",
+    "iniciativa": 8,
+    "percepcao": 3,
+    "sentidos": [
+     "faro",
+     "visão_na_penumbra"
+    ],
+    "defesa": 17,
+    "fort": 5,
+    "ref": 10,
+    "von": 1,
+    "pv": 13,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 12,
+      "dano": "1d4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": -1,
+     "des": 4,
+     "con": 1,
+     "int": -5,
+     "sab": 0,
+     "car": -4
+    },
+    "pericias": {
+     "furtividade": 10
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 304,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Veneno."
+  },
+  {
+   "id": "criatura.sucuri",
+   "valor": {
+    "nome": "Sucuri",
+    "nd": "3",
+    "tipo": "animal",
+    "tamanho": "grande",
+    "iniciativa": 5,
+    "percepcao": 4,
+    "sentidos": [
+     "faro",
+     "visão_na_penumbra"
+    ],
+    "defesa": 19,
+    "fort": 9,
+    "ref": 15,
+    "von": 3,
+    "pv": 88,
+    "deslocamento_m": 6,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 18,
+      "dano": "2d6+14",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 2,
+     "con": 4,
+     "int": -5,
+     "sab": 1,
+     "car": -4
+    },
+    "pericias": {
+     "furtividade": 8
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 304,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Agarrar Aprimorado, Constrição."
+  },
+  {
+   "id": "criatura.nagah_guardiao",
+   "valor": {
+    "nome": "Nagah Guardião",
+    "nd": "3",
+    "tipo": "humanoide",
+    "tamanho": "medio",
+    "iniciativa": 6,
+    "percepcao": 3,
+    "sentidos": [
+     "visão_na_penumbra"
+    ],
+    "defesa": 21,
+    "fort": 6,
+    "ref": 11,
+    "von": 9,
+    "pv": 45,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Duas cimitarras",
+      "bonus": 14,
+      "dano": "1d6+6",
+      "margem": 18,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Cauda",
+      "bonus": 14,
+      "dano": "1d6+6",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 4,
+     "des": 3,
+     "con": 2,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {
+     "enganacao": 4,
+     "furtividade": 6
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 305,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Fraquezas Ofídias."
+  },
+  {
+   "id": "criatura.cultista_de_sszzaas",
+   "valor": {
+    "nome": "Cultista de Sszzaas",
+    "nd": "7",
+    "tipo": "monstro",
+    "tamanho": "medio",
+    "iniciativa": 11,
+    "percepcao": 12,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 29,
+    "fort": 7,
+    "ref": 14,
+    "von": 20,
+    "pv": 160,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Adaga",
+      "bonus": 22,
+      "dano": "1d4+4",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 2,
+     "con": 0,
+     "int": 4,
+     "sab": 4,
+     "car": 5
+    },
+    "pericias": {
+     "enganacao": 20,
+     "intuicao": 20,
+     "religiao": 17
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 306,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Magias, Olhar Atordoante, Veneno."
+  },
+  {
+   "id": "criatura.lagash",
+   "valor": {
+    "nome": "Lagash",
+    "nd": "13",
+    "tipo": "monstro",
+    "tamanho": "enorme",
+    "iniciativa": 19,
+    "percepcao": 11,
+    "sentidos": [
+     "faro",
+     "visão_no_escuro"
+    ],
+    "defesa": 41,
+    "fort": 26,
+    "ref": 20,
+    "von": 13,
+    "pv": 660,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 37,
+      "dano": "4d12+28",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 11,
+     "des": 4,
+     "con": 9,
+     "int": -3,
+     "sab": 2,
+     "car": -2
+    },
+    "pericias": {
+     "furtividade": 17
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 306,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Agarrar Aprimorado, Constrição, Veneno."
+  },
+  {
+   "id": "criatura.finntroll_feitor",
+   "valor": {
+    "nome": "Finntroll Feitor",
+    "nd": "6",
+    "tipo": "monstro",
+    "tamanho": "medio",
+    "iniciativa": 9,
+    "percepcao": 5,
+    "sentidos": [
+     "visão_no_escuro"
+    ],
+    "defesa": 20,
+    "fort": 8,
+    "ref": 12,
+    "von": 16,
+    "pv": 155,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Chicote",
+      "bonus": 18,
+      "dano": "1d3+10",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 3,
+     "con": 3,
+     "int": 4,
+     "sab": 0,
+     "car": 2
+    },
+    "pericias": {
+     "intimidacao": 9,
+     "misticismo": 11
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 307,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Açoitar, Natureza Vegetal, Regeneração Vegetal."
+  },
+  {
+   "id": "criatura.ganchador",
+   "valor": {
+    "nome": "Ganchador",
+    "nd": "5",
+    "tipo": "monstro",
+    "tamanho": "grande",
+    "iniciativa": 7,
+    "percepcao": 5,
+    "sentidos": [
+     "percepção_às_cegas"
+    ],
+    "defesa": 26,
+    "fort": 15,
+    "ref": 11,
+    "von": 7,
+    "pv": 210,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 17,
+      "dano": "2d6+8",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Duas garras",
+      "bonus": 17,
+      "dano": "1d8+8",
+      "margem": 19,
+      "mult": 3,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 6,
+     "des": 3,
+     "con": 5,
+     "int": -2,
+     "sab": 1,
+     "car": -2
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 308,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Dilacerar, Quebrar, Sensibilidade a Luz."
+  },
+  {
+   "id": "criatura.dragao_adulto",
+   "valor": {
+    "nome": "Dragão Adulto",
+    "nd": "11",
+    "tipo": "monstro",
+    "tamanho": "enorme",
+    "iniciativa": 12,
+    "percepcao": 15,
+    "sentidos": [
+     "percepção_às_cegas",
+     "visão_no_escuro"
+    ],
+    "defesa": 42,
+    "fort": 24,
+    "ref": 11,
+    "von": 18,
+    "pv": 600,
+    "deslocamento_m": 12,
+    "ataques": [
+     {
+      "nome": "Mordida",
+      "bonus": 35,
+      "dano": "4d10+25",
+      "margem": 18,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     },
+     {
+      "nome": "Duas garras",
+      "bonus": 35,
+      "dano": "3d10+25",
+      "margem": 18,
+      "mult": 2,
+      "alcance_q": 1,
+      "distancia": false
+     }
+    ],
+    "atributos": {
+     "for": 11,
+     "des": 1,
+     "con": 8,
+     "int": 4,
+     "sab": 4,
+     "car": 4
+    },
+    "pericias": {
+     "enganacao": 15,
+     "intimidacao": 15,
+     "misticismo": 15
+    }
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 311,
+   "status": "ADAPTADA",
+   "nota": "Números do livro. Habilidades especiais ainda sem efeito no jogo: Aura Aterradora, Magia, Sopro, Varrer."
   }
  ]
 }

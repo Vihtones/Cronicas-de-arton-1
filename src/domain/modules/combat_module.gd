@@ -49,15 +49,31 @@ func _ensure() -> void:
 	if not creature_state.is_empty():
 		return
 	for id in world.db.all_creature_ids():
-		var d := world.db.creature_def(id)
-		var sheet := CharacterSheet.from_creature(world.rules, d.rule, id)
-		sheet.name = d.name
-		sheet.faction = d.faction
-		sheet.is_important = bool(d.get("important", false))
-		for pw in d.get("poderes", []):
-			sheet.powers[str(pw)] = true
-		sheet.pm_max = int(d.get("pm", 0)); sheet.pm = sheet.pm_max
-		creature_state[id] = {"alive": true, "present": bool(d.get("start_present", true)), "tile": [int(d.spawn[0]), int(d.spawn[1])], "sheet": sheet.to_dict(), "woken_until": -1}
+		_estado_inicial(id)
+
+
+## Estado de uma criatura a partir da definição (início do jogo ou criatura de contrato nova).
+func registrar_criatura(id: String) -> void:
+	_ensure()
+	_estado_inicial(id)
+
+
+func esquecer_criatura(id: String) -> void:
+	creature_state.erase(id)
+	undetected_by.erase(id)
+	approach_rolled.erase(id)
+
+
+func _estado_inicial(id: String) -> void:
+	var d := world.db.creature_def(id)
+	var sheet := CharacterSheet.from_creature(world.rules, d.rule, id)
+	sheet.name = d.name
+	sheet.faction = d.faction
+	sheet.is_important = bool(d.get("important", false))
+	for pw in d.get("poderes", []):
+		sheet.powers[str(pw)] = true
+	sheet.pm_max = int(d.get("pm", 0)); sheet.pm = sheet.pm_max
+	creature_state[id] = {"alive": true, "present": bool(d.get("start_present", true)), "tile": [int(d.spawn[0]), int(d.spawn[1])], "sheet": sheet.to_dict(), "woken_until": -1}
 
 
 func creatures_of_faction(f: String, alive_only: bool = true) -> Array:

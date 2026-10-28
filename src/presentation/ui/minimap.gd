@@ -76,6 +76,16 @@ func _draw() -> void:
 		var a := 0.6 + 0.4 * sin(_t * 4.0)
 		draw_line(p2, p2 + Vector2(0, -8), Color(0.9, 0.85, 0.7, a), 1.0)
 		draw_colored_polygon(PackedVector2Array([p2 + Vector2(0, -8), p2 + Vector2(6, -6), p2 + Vector2(0, -4)]), Color(0.9, 0.25, 0.2, a))
+	# contratos ativos: alvo marcado em vermelho (caça), azul (entrega/exploração)
+	var qm: QuestModule = Game.world.modules.quests
+	for qid in qm.ativas:
+		var qa: Dictionary = qm.ativas[qid]
+		if not qa.has("alvo_tile") or bool(qa.progresso.feito) and str(qa.tipo) != "entregar":
+			continue
+		var at := Vector2(int(qa.alvo_tile[0]), int(qa.alvo_tile[1]))
+		var pq := (off + at * PX).clamp(Vector2(4, 4), size - Vector2(4, 4))
+		var cq := Color(1, 0.3, 0.25) if str(qa.tipo) == "cacar" else Color(0.4, 0.7, 1.0)
+		draw_circle(pq, 2.5 + 0.8 * sin(_t * 4.0), cq)
 	# jogador
 	var pc := size / 2.0
 	draw_colored_polygon(PackedVector2Array([pc + Vector2(0, -3), pc + Vector2(3, 2), pc + Vector2(-3, 2)]), Color(1.0, 0.85, 0.3))

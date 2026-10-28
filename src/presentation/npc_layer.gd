@@ -34,13 +34,32 @@ func rebuild() -> void:
 		add_child(v)
 		npc_views[id] = v
 	for id in Game.db.all_creature_ids():
-		var d := Game.db.creature_def(id)
-		var sheet := "hiena" if str(d.rule).contains("hiena") else ("kael" if id == "kael" else "bandido")
-		var v := ActorView.new()
-		v.setup(id, "res://assets/chars/%s.png" % sheet, d.name)
-		add_child(v)
-		creature_views[id] = v
+		_criar_vista(id)
 	sync_all()
+
+
+## Aparência pelo tipo do bestiário enquanto não há arte própria: animais e monstros usam a folha da hiena,
+## humanoides a do bandido; a cor separa as espécies (mortos-vivos pálidos, orcs esverdeados...).
+const TINTA := {"criatura.lobo": Color(0.75, 0.75, 0.8), "criatura.rato_gigante": Color(0.6, 0.5, 0.45), "criatura.zumbi": Color(0.7, 0.85, 0.7),
+	"criatura.esqueleto": Color(1.0, 1.0, 0.9), "criatura.orc_combatente": Color(0.6, 0.85, 0.55), "criatura.orc_chefe": Color(0.5, 0.8, 0.45),
+	"criatura.orc_mutante": Color(0.55, 0.7, 0.4), "criatura.glop": Color(0.4, 1.0, 0.4), "criatura.aranha_gigante": Color(0.35, 0.3, 0.35),
+	"criatura.gnoll_saqueador": Color(0.9, 0.75, 0.5), "criatura.gargula": Color(0.6, 0.6, 0.62), "criatura.aparicao": Color(0.7, 0.75, 1.0, 0.7),
+	"criatura.cascavel": Color(0.85, 0.7, 0.4), "criatura.ogro": Color(0.85, 0.7, 0.55), "criatura.urso_coruja": Color(0.6, 0.45, 0.3)}
+
+
+func _criar_vista(id: String) -> void:
+	var d := Game.db.creature_def(id)
+	var r: Dictionary = Game.world.rules.value(str(d.rule), {})
+	var tipo := str(r.get("tipo", "humanoide"))
+	var sheet := "hiena" if str(d.rule).contains("hiena") or tipo in ["animal", "monstro"] else ("kael" if id == "kael" else "bandido")
+	var v := ActorView.new()
+	v.setup(id, "res://assets/chars/%s.png" % sheet, d.name)
+	if TINTA.has(str(d.rule)):
+		v.sprite.self_modulate = TINTA[str(d.rule)]
+	if str(r.get("tamanho", "medio")) in ["grande", "enorme"]:
+		v.base_scale = 1.5
+	add_child(v)
+	creature_views[id] = v
 
 
 func _player_zone() -> String:
@@ -69,6 +88,13 @@ func sync_all() -> void:
 
 func sync_creatures() -> void:
 	var c: CombatModule = Game.world.modules.combat
+	for id in creature_views.keys():
+		if not c.creature_state.has(id):   # criatura de contrato encerrado
+			creature_views[id].queue_free()
+			creature_views.erase(id)
+	for id in c.creature_state:
+		if not creature_views.has(id) and not Game.db.creature_def(id).is_empty():
+			_criar_vista(id)
 	for id in creature_views:
 		var v: ActorView = creature_views[id]
 		var st: Dictionary = c.creature_state[id]
@@ -90,7 +116,7 @@ func _on_event(e: GameEvent) -> void:
 	match e.event_type:
 		"NPC_MOVED":
 			_walk_npc(e.payload.npc)
-		"NPC_RESCUED", "BANDITS_RELOCATED", "PLAYER_TELEPORTED", "CREATURE_DEFEATED", "COMBAT_ENDED", "PLAYER_CAPTURED":
+		"NPC_RESCUED", "BANDITS_RELOCATED", "PLAYER_TELEPORTED", "CREATURE_DEFEATED", "COMBAT_ENDED", "PLAYER_CAPTURED", "QUEST_ACCEPTED", "QUEST_COMPLETED", "QUEST_ABANDONED":
 			call_deferred("sync_all")
 
 

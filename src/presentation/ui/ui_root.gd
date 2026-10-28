@@ -60,6 +60,7 @@ func _ready() -> void:
 	_build_debug(root)
 	_build_tree(root)
 	_build_inv(root)
+	_build_guild(root)
 	_build_wheel(root)
 	_build_subida(root)
 	Game.event_published.connect(_on_event)
@@ -186,6 +187,7 @@ var _belt_slots: Dictionary = {}
 var _belt_key := ""
 var panel_tree: PowerTreePanel
 var panel_inv: InventoryPanel
+var panel_guild: GuildPanel
 var spell_wheel: SpellWheel
 var panel_cast: PanelContainer
 var _cast_row: HFlowContainer
@@ -313,6 +315,7 @@ func _build_hud(root: Control) -> void:
 			["diario", "J", "Diário [J]", func(): toggle_journal()],
 			["poderes", "K", "Árvore de poderes [K]", func(): toggle_tree()],
 			["inventario", "I", "Inventário [I]", func(): toggle_inv()],
+			["missoes", "L", "Missões e guilda [L]", func(): toggle_guild()],
 			["magia", "Tab", "Roda de magias [Tab]", func(): toggle_wheel()],
 			["furtivo", "C", "Furtividade [C]", func(): Game.send("SetStance", {"sneak": not Game.world.modules.combat.stance_sneak})],
 			["descansar", "R", "Descansar [R]", func(): get_parent().call("_explore_key", KEY_R)],
@@ -374,8 +377,8 @@ func update_hud() -> void:
 	if hud_portrait.expression != expr:
 		hud_portrait.set_expression(expr)
 	var busy := panel_journal.visible or panel_shop.visible or panel_pause.visible or panel_dialogue.visible
-	busy = busy or panel_tree.visible or panel_inv.visible or spell_wheel.visible or panel_cast.visible
-	log_box.visible = not panel_tree.visible and not panel_journal.visible and not panel_inv.visible
+	busy = busy or panel_tree.visible or panel_inv.visible or panel_guild.visible or spell_wheel.visible or panel_cast.visible
+	log_box.visible = not panel_tree.visible and not panel_journal.visible and not panel_inv.visible and not panel_guild.visible and not panel_shop.visible
 	hud_status.visible = Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT] and not busy
 	hud_clock.visible = Game.mode == Game.Mode.EXPLORE and not busy
 	belt.visible = Game.mode == Game.Mode.EXPLORE and not busy
@@ -440,6 +443,9 @@ func _do_interact(i: int) -> void:
 	if i < 0 or i >= _interact_actions.size():
 		return
 	var a: Dictionary = _interact_actions[i]
+	if a.has("ui"):
+		call(str(a.ui))
+		return
 	var r := Game.send(a.cmd, a.payload)
 	if not r.accepted:
 		log_msg("✘ " + "; ".join(r.errors))
@@ -1422,7 +1428,7 @@ func _refresh_mode() -> void:
 
 
 func any_panel_open() -> bool:
-	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible or panel_inv.visible or spell_wheel.visible or panel_cast.visible
+	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible or panel_inv.visible or panel_guild.visible or spell_wheel.visible or panel_cast.visible
 
 
 func close_panels() -> bool:
@@ -1436,6 +1442,7 @@ func close_panels() -> bool:
 	panel_xp.visible = false
 	panel_tree.visible = false
 	panel_inv.visible = false
+	panel_guild.visible = false
 	spell_wheel.visible = false
 	panel_cast.visible = false
 	return was
@@ -1492,6 +1499,20 @@ func _on_spell_picked(sp: String) -> void:
 	if _cast_row.get_child_count() == 0:
 		_cast_row.add_child(_label("Não há como lançar esta magia aqui fora de combate.", 9))
 	panel_cast.visible = true
+
+
+func _build_guild(root: Control) -> void:
+	panel_guild = GuildPanel.new()
+	root.add_child(panel_guild)
+	panel_guild.position = Vector2(40, 24)
+	panel_guild.visible = false
+	panel_guild.command.connect(func(t: String, p: Dictionary): _cmd_log(t, p))
+
+
+func toggle_guild() -> void:
+	panel_guild.visible = not panel_guild.visible
+	if panel_guild.visible:
+		panel_guild.refresh()
 
 
 func toggle_inv() -> void:
@@ -1598,6 +1619,14 @@ func _on_event(e: GameEvent) -> void:
 		"OPEN_SHOP":
 			var npc: String = Game.world.modules.dialogue.session.get("npc", "")
 			if npc != "": open_shop(npc)
+		"QUEST_ACCEPTED":
+			show_toast("Contrato aceito: " + str(e.payload.get("titulo", "")))
+		"QUEST_OBJECTIVE_DONE":
+			show_toast("Cumprido: %s. %s" % [str(e.payload.get("titulo", "")), str(e.payload.get("texto", ""))])
+		"QUEST_COMPLETED":
+			show_toast("Contrato concluído: +T$ %d" % int(e.payload.get("ouro", 0)))
+		"GUILD_RANK_UP":
+			show_toast("Novo rank na guilda: " + str(e.payload.get("rank", "")))
 		"FACT_REVEALED", "HYPOTHESIS_MARKED":
 			if panel_journal.visible: refresh_journal()
 		"XP_GAINED":

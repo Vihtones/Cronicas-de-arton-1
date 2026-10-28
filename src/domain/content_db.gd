@@ -9,6 +9,7 @@ var items: Dictionary = {}
 var economy: Dictionary = {}
 var laws: Dictionary = {}
 var distant: Dictionary = {}
+var quests: Dictionary = {}   # guilda e contratos (QuestModule)
 var dialogue: Dictionary = {}
 var ambient: Dictionary = {}  # falas ambiente dos figurantes e latidos (data/dialogue/ambient.json)
 var voices: Dictionary = {}   # vozes dos moradores (data/dialogue/voices.json)
@@ -49,6 +50,7 @@ func load_dir(dir: String) -> void:
 	economy = _read(dir.path_join("economy.json"))
 	laws = _read(dir.path_join("laws.json"))
 	distant = _read(dir.path_join("distant.json"))
+	quests = _read(dir.path_join("quests.json"))
 	mysteries = [mystery]
 	var extra := _read(dir.path_join("mysteries_extra.json"))
 	for m in extra.get("mysteries", []):
@@ -150,6 +152,21 @@ func npc_def(id: String) -> Dictionary: return _npc_by_id.get(id, {})
 func creature_def(id: String) -> Dictionary: return _creature_by_id.get(id, {})
 func all_npc_ids() -> Array: return _npc_by_id.keys()
 func all_creature_ids() -> Array: return _creature_by_id.keys()
+
+
+## Criaturas de contrato (QuestModule): entram e saem em tempo de jogo; o módulo dono guarda as definições no save.
+func add_creature(d: Dictionary) -> void:
+	_creature_by_id[str(d.id)] = d
+
+
+func remove_creature(id: String) -> void:
+	_creature_by_id.erase(id)
+
+
+func clear_dynamic_creatures() -> void:
+	for id in _creature_by_id.keys():
+		if _creature_by_id[id].has("contrato"):
+			_creature_by_id.erase(id)
 func all_locations() -> Array: return map.get("locations", [])
 func all_targets() -> Array: return map.get("targets", [])
 func all_objects() -> Array: return map.get("objects", [])

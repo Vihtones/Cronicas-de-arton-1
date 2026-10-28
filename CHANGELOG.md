@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Guilda dos Aventureiros e missões (QuestModule, data/world/quests.json): inscrição na sede (taverna), quadro com 5 contratos renovado a cada 3 dias — caçar (as criaturas surgem no mundo), entregar e explorar —, ranks Cobre → Platina por pontos, ND máximo por rank (contratos acima marcados como arriscados), pagamento em ouro, XP e pontos. Painel L (diário de missões / quadro), alvos no minimapa, avisos na tela.
+- Bestiário: 44 criaturas do capítulo 7 do Livro Básico extraídas do texto (tools/extrator_ameacas/), com os números do livro (status ADAPTADA; habilidades especiais listadas na nota até ganharem efeito).
 - Mirar e bater: na exploração, clicar numa criatura a até 8 quadrados começa a luta. Lutas com até 3 inimigos usam o modo ação (turno com relógio de 4s, mira com chance de acerto, clique golpeia ou anda na hora, inimigos agem rápido); as regras continuam as do combate tático. Opção na pausa (4s, 6s ou tático).
 - Roda de magias (Tab, em exploração e em combate): fatias coloridas por escola com custo, círculo e texto da magia; em combate escolhe a magia do turno, fora de combate abre as formas de lançá-la ali. O cinto da exploração ganhou Inventário e Magias.
 - Lojas vivas: comprar e vender lado a lado com a ficha do item e a comparação com o equipado; vender por metade do preço (comando Sell), bolsa do vendedor que se recupera por dia, revenda do que você vendeu, pechincha diária por Diplomacia (Haggle: −10%/−20% ou +10% se irritar) e saudação conforme a relação.

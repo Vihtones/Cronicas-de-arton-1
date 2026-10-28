@@ -80,6 +80,9 @@ func _icon(id: String, c: Vector2, ink: Color) -> void:
 				var a := i * PI / 2 + PI / 4
 				draw_line(c, c + Vector2(cos(a), sin(a)) * 7.0, ink, 1.0)
 			draw_circle(c, 3.0, Color(0.6, 0.7, 1.0) if id == "magia" else Color(1.0, 0.6, 0.9))
+		"missoes":
+			draw_rect(Rect2(c + Vector2(-5, -7), Vector2(10, 14)), ink, false, 1.5)
+			for i in 3: draw_line(c + Vector2(-3, -3 + i * 4), c + Vector2(3, -3 + i * 4), ink, 1.0)
 		"inventario":
 			draw_rect(Rect2(c + Vector2(-6, -3), Vector2(12, 10)), ink, false, 1.5)
 			draw_arc(c + Vector2(0, -3), 4.0, PI, TAU, 6, ink, 1.5)

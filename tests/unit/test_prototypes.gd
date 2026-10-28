@@ -318,3 +318,41 @@ func test_lab_poderes_guerreiro_nivel_3() -> void:
 func _sim_for(w: WorldState) -> CombatSim:
 	w.modules.combat._start(["bandido_1"], true, false)
 	return w.modules.combat.sim
+
+
+func test_guilda_contrato_de_caca_completo() -> void:
+	var w := _w("guilda")
+	var q: QuestModule = w.modules.quests
+	check(not WorldHelpers.cmd(w, "AcceptQuest", {"quest_id": "x"}).accepted, "não-membro não pega contrato")
+	w.player.position = w.db.tile_to_world(w.db.location_spot("taverna"))
+	w.player.gold = 100
+	check(WorldHelpers.cmd(w, "JoinGuild", {}).accepted, "inscreveu-se")
+	eq(str(q.rank().id), "cobre", "começa no cobre")
+	var cacas: Array = q.contratos().filter(func(c): return str(c.tipo) == "cacar")
+	check(not cacas.is_empty(), "há caças no quadro")
+	var c: Dictionary = cacas[0]
+	check(WorldHelpers.cmd(w, "AcceptQuest", {"quest_id": c.id}).accepted, "aceitou")
+	var a: Dictionary = q.ativas[c.id]
+	check(not (a.criaturas as Array).is_empty(), "criaturas surgiram")
+	var combat: CombatModule = w.modules.combat
+	for cid in a.criaturas:
+		check(combat.is_active_creature(cid), "criatura ativa no mundo: " + str(cid))
+		w.modules.quests.on_event(GameEvent.create("t", "CREATURE_DEFEATED", 0, {"creature": cid}))
+	check(bool(a.progresso.feito), "objetivo cumprido")
+	var ouro := int(w.player.gold)
+	check(WorldHelpers.cmd(w, "TurnInQuest", {"quest_id": c.id}).accepted, "recebeu")
+	eq(int(w.player.gold), ouro + int(c.ouro), "pagamento")
+	check(q.pontos > 0 and not combat.creature_state.has(a.criaturas[0]), "pontos e criaturas limpas")
+	var salvo := q.to_dict()
+	check(salvo.has("criaturas"), "vai no save")
+
+
+func test_todas_as_criaturas_do_livro_viram_ficha() -> void:
+	var w := _w("bestiario")
+	var n := 0
+	for id in w.rules.ids_with_prefix("criatura."):
+		if true:
+			var sh := CharacterSheet.from_creature(w.rules, id, "x")
+			check(sh.pv_max > 0 and (not sh.attacks.is_empty() or str(id).ends_with("_capanga") or id == "criatura.elemental_de_luz"), "ficha: " + str(id))
+			n += 1
+	check(n >= 50, "bestiário com %d criaturas" % n)
