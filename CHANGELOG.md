@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Vidência (universal, 3º círculo): fora de combate, vê e ouve um NPC a qualquer distância e quem está com ele, pela cena; o alvo resiste com Vontade (+10 se nunca viu o jogador, –5 se o conhece bem).
+
 - Lendas e Histórias (universal, 3º círculo): ao tocar uma criatura, objeto ou lugar, revela tudo (estatísticas, magias, resistências, imunidades, magias ativas; ofício, facção e paradeiro de NPCs; quem e o que há num lugar). Com o aprimoramento, à distância, em um dia e com T$ 1.000 de componente.
 
 - Buraco Negro (universal, 5º círculo): por três turnos do conjurador, quem está a até alcance longo faz Fortitude ou cai e é puxado 30m; quem começa o turno no buraco tenta se arrastar para fora; quem termina o turno nele é sugado. Ação de se segurar (+2). Com o aprimoramento, o conjurador não é afetado.
