@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3709,3 +3709,13 @@ func test_lendas_e_historias_revela_a_ficha_e_a_distancia_leva_um_dia() -> void:
 	var dia0: int = w2.day_index()
 	check(WorldHelpers.cmd(w2, "CastSpell", {"spell": "lendas_e_historias", "alvo_tipo": "criatura", "alvo": npc_id, "aprimoramentos": [0]}).accepted, "à distância")
 	check(w2.day_index() > dia0, "levou um dia")
+
+
+func test_videncia_mostra_o_npc_quando_ele_falha() -> void:
+	var w = _clerigo_mundo(["videncia"])[0]
+	var npc_id: String = w.db.all_npc_ids()[0]
+	var mg = w.module("magia")
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "videncia", "alvo": npc_id}).accepted, "Vidência aceita")
+	w.player_sheet.level = 99   # CD altíssima: o NPC falha
+	mg.lancar_videncia(npc_id, w.player_sheet)
+	eq(str(mg.videncia_ver().get("alvo", "")), npc_id, "a visão mostra o alvo")

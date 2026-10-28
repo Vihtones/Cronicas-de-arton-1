@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"videncia": [],   # um NPC a qualquer distância; a familiaridade muda a Vontade dele
 	"lendas_e_historias": [0],   # NPC, objeto ou lugar tocado; com o aprimoramento, qualquer um conhecido (um dia, T$ 1.000)
 	"controlar_o_clima": [],   # fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas
 	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
@@ -57,6 +58,7 @@ var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [..
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
 var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de combate: {ate: tick}
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
+var videncia: Dictionary = {}   # Vidência ativa: {alvo, ate: tick}; enquanto dura, `videncia_ver` mostra o alvo e os arredores
 var luz_carregada: Dictionary = {}   # luz que o jogador carrega fora de combate: {raio: quadrados, ate: tick}
 var abencoados: Dictionary = {}  # item -> {n: porções abençoadas, ate: tick do fim da cena}
 var podas: Dictionary = {}       # "x,y" -> true: vegetação podada por Controlar Plantas (instantânea, fica)
@@ -187,6 +189,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"videncia":
+			if world.db.npc_def(str(cmd.payload.get("alvo", ""))).is_empty():
+				return PackedStringArray(["escolha um NPC"])
 		"lendas_e_historias":
 			var tipo_lh := str(cmd.payload.get("alvo_tipo", ""))
 			var alvo_lh := str(cmd.payload.get("alvo", ""))
@@ -437,6 +442,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"videncia":
+			out.append_array(lancar_videncia(str(cmd.payload.alvo), sh))
 		"lendas_e_historias":
 			out.append_array(lendas_e_historias(cmd.payload))
 		"controlar_o_clima":
@@ -673,6 +680,38 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Vidência: o NPC faz Vontade com modificador pela familiaridade (pela memória que ele tem do jogador): nunca se viram
+## +10; já se encontraram +0; conhece bem (5 lembranças ou mais) –5. Falhou: o jogador vê e ouve o alvo e os arredores
+## pela cena. (Objetos de vínculo, como um pertence ou um fio de cabelo, ainda não existem no jogo.)
+func lancar_videncia(alvo: String, sh: CharacterSheet) -> Array:
+	var mem = world.module("memory")
+	var n_mem: int = mem.list(alvo).size() if mem != null else 0
+	var mod := 10 if n_mem == 0 else (-5 if n_mem >= 5 else 0)
+	var cd := 10 + sh.level / 2 + int(sh.attrs.get(sh.caster_attr, 0))
+	var r := Checks.skill(_ficha_npc(alvo), "vontade", cd, world.rules, world.rng, "world", mod)
+	if r.get("success", false):
+		return [fact("SPELL_MISSED", {"caster": "player", "target": alvo, "spell": "videncia", "reason": "resistiu", "mod": mod}, ["player"])]
+	var combat = world.module("combat")
+	videncia = {"alvo": alvo, "ate": world.clock.tick + (combat.TICKS_CENA if combat != null else 6)}
+	return [fact("SCRYING", {"caster": "player", "target": alvo, "visao": videncia_ver()}, ["player"])]
+
+
+## O que a Vidência mostra agora: onde o alvo está e quem está com ele. {} se não há Vidência ativa.
+func videncia_ver() -> Dictionary:
+	if videncia.is_empty() or world.clock.tick >= int(videncia.ate):
+		return {}
+	var npcs = world.module("npcs")
+	if npcs == null:
+		return {}
+	var alvo := str(videncia.alvo)
+	var lugar := str(npcs.npc(alvo).get("location", ""))
+	var com: Array = []
+	for n in world.db.all_npc_ids():
+		if n != alvo and str(npcs.npc(n).get("location", "")) == lugar and bool(npcs.npc(n).get("alive", true)):
+			com.append(n)
+	return {"alvo": alvo, "lugar": lugar, "com_ele": com, "vivo": bool(npcs.npc(alvo).get("alive", true))}
 
 
 ## Lendas e Histórias fora de combate: tudo sobre um NPC (ficha, ofício, facção, devoção, onde está), um objeto ou um lugar
@@ -1131,7 +1170,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1142,6 +1181,7 @@ func from_dict(d: Dictionary) -> void:
 	protecao_detectar = (d.get("protecao_detectar", {}) as Dictionary).duplicate()
 	abencoados = (d.get("abencoados", {}) as Dictionary).duplicate(true)
 	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()
+	videncia = (d.get("videncia", {}) as Dictionary).duplicate()
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()

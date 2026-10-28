@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"videncia": {"aprimoramentos": []},   # fora de combate: vê e ouve um NPC a qualquer distância (Vontade anula, com modificador por familiaridade)
 	"lendas_e_historias": {"aprimoramentos": [0]},   # tudo sobre criatura, objeto ou lugar tocado; à distância por um dia (T$ 1.000)
 	"buraco_negro": {"aprimoramentos": [0]},   # 3 turnos puxando 30m (Fortitude); quem termina o turno nele é sugado; você não é afetado
 	"manto_de_sombras": {"aprimoramentos": [0]},   # sustentada: incorpóreo, 1 de dano por rodada na luz, salto entre sombras; toque (4º)
