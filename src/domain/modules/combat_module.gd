@@ -2303,6 +2303,61 @@ func _encerrar_magia_dissipada(cand: Dictionary, out: Array) -> void:
 			sim.remove_marca(str(cand.id), str(cand.alvo))
 
 
+## Efeitos da Fúria do Panteão sobre os inimigos na nuvem. Nevasca: 10d6 de frio (Fortitude metade) e neve (terreno difícil).
+## Raios: até 6 inimigos, 10d8 de eletricidade (Reflexos metade). Siroco: 10d6 metade corte, metade fogo, e sangrando
+## (Fortitude metade e evita), derrete a neve. Trovões: 10d6 de impacto e desprevenido 1 rodada (Fortitude metade e evita).
+func _efeito_furia(id: String, efeito: String, escolhidos: Array) -> Array:
+	var out: Array = []
+	(sim.c(id).flags as Array).append("furia_%d" % sim.round_no)
+	var zona: Dictionary = sim.zonas.filter(func(z): return str(z.id) == "furia_" + id)[0]
+	var cd := int(zona.dados.cd)
+	var alvos: Array = []
+	for x in sim.combatants:
+		if sim.is_enemy(id, x) and not sim.c(x).sheet.is_dead() and (zona.tiles as Array).has(sim.c(x).tile):
+			alvos.append(x)
+	match efeito:
+		"nevasca":
+			for tg in alvos:
+				out.append_array(_dano_de_energia(id, tg, "10d6", cd, "fortitude", "frio", "Nevasca"))
+			sim.remove_zona("furia_neve_" + id)
+			sim.add_zona("furia_neve_" + id, zona.tiles, "terreno_dificil", -1, "furia_do_panteao", {"conjurador": id})
+		"raios":
+			var lista: Array = escolhidos.filter(func(x): return alvos.has(x)) if not escolhidos.is_empty() else alvos
+			for tg in lista.slice(0, 6):
+				out.append_array(_dano_de_energia(id, tg, "10d8", cd, "reflexos", "eletricidade", "Raios"))
+		"siroco":
+			sim.remove_zona("furia_neve_" + id)
+			for tg in alvos:
+				var ts: CharacterSheet = sim.c(tg).sheet
+				var passou := _resiste(tg, "fortitude", cd, out)
+				var total := int(Dice.roll("10d6", world.rng, "combat").total)
+				if passou:
+					total = total / 2
+				var corte := _dano_por_tipo(ts, "corte", total / 2)
+				var fogo := _dano_por_tipo(ts, "fogo", total - total / 2)
+				var tags: Array = ["magia", "corte", "fogo"]
+				tags.append_array(sim.apply_damage(tg, corte + fogo))
+				if not passou:
+					sim.add_condicao(tg, "sangrando", 0, "furia_do_panteao")
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Siroco", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": cd, "camo_roll": 0,
+					"hit": true, "crit": false, "damage": corte + fogo, "rolls": [], "pv_after": ts.pv, "special": false, "ranged": true, "spell": true, "save": "fortitude", "saved": passou, "tags": tags}, [id, tg]))
+		"trovoes":
+			for tg in alvos:
+				var ts_t: CharacterSheet = sim.c(tg).sheet
+				var passou_t := _resiste(tg, "fortitude", cd, out)
+				var dano_t := int(Dice.roll("10d6", world.rng, "combat").total)
+				if passou_t:
+					dano_t = dano_t / 2
+				dano_t = _dano_por_tipo(ts_t, "impacto", dano_t)
+				var tags_t: Array = ["magia", "impacto"]
+				tags_t.append_array(sim.apply_damage(tg, dano_t))
+				if not passou_t:
+					sim.add_condicao(tg, "desprevenido", 1, "furia_do_panteao")
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Trovões", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": cd, "camo_roll": 0,
+					"hit": true, "crit": false, "damage": dano_t, "rolls": [], "pv_after": ts_t.pv, "special": false, "ranged": true, "spell": true, "save": "fortitude", "saved": passou_t, "tags": tags_t}, [id, tg]))
+	return out
+
+
 ## Mortos-vivos conjurados (Conjurar Mortos-Vivos) ainda de pé que obedecem a `dono`.
 func _capangas_de(dono: String) -> Array:
 	var r: Array = []
@@ -2742,6 +2797,9 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
 					sim.remove_marca(str(m.id), id)
+		"furia_do_panteao":
+			sim.remove_zona("furia_" + id)
+			sim.remove_zona("furia_neve_" + id)
 		"conjurar_mortos_vivos":
 			for cid in sim.combatants.keys():
 				if (sim.c(cid).flags as Array).has("capanga_de_" + id):
@@ -3093,6 +3151,8 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if str(z.id) == zid_e:
 					z.tiles = [para_e]
 			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "mover", "tile": [para_e.x, para_e.y]}, [id]))
+		"furia":
+			out.append_array(_efeito_furia(id, str(a.efeito), a.get("targets", [])))
 		"mover_mortos":
 			for cid in _capangas_de(id):
 				var de_mv: Vector2i = sim.c(cid).tile
@@ -3205,6 +3265,13 @@ static func battle_bonus(sh: CharacterSheet) -> int:
 	return maxi(0, int(sh.attrs.get(sh.caster_attr, 0))) if sh.has_power("arcano_de_batalha") else 0
 
 
+func _ficha_em_zona(sh: CharacterSheet, tipo: String) -> bool:
+	for cid in sim.combatants:
+		if sim.c(cid).sheet == sh:
+			return sim.zona_em(sim.c(cid).tile, tipo)
+	return false
+
+
 ## CD dos testes de lançar (C5). Retorna {} se não há teste; senão o payload da falha (ou {} se passou).
 func casting_cd(sh: CharacterSheet, sp: Dictionary, cost: int) -> Dictionary:
 	var conc: Dictionary = world.rules.value("magia.concentracao")
@@ -3212,6 +3279,8 @@ func casting_cd(sh: CharacterSheet, sp: Dictionary, cost: int) -> Dictionary:
 	var why := ""
 	if sh.conditions.has("caido"):
 		cd = int(conc.condicao_ruim.cd_base) + cost; why = "caído"
+	elif _ficha_em_zona(sh, "furia"):
+		cd = int(conc.condicao_ruim.cd_base) + cost; why = "fúria do panteão"
 	elif world.modules.has("weather") and world.modules.weather.enabled and world.modules.weather.region.condition == "tempestade":
 		cd = int(conc.condicao_ruim.cd_base) + cost; why = "tempestade"
 	var arm := {}
@@ -3851,6 +3920,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"furia_do_panteao":
+			# Fúria do Panteão (divina 5): nuvem de 90m sustentada. Sem ataques à distância, condição terrível para lançar magia,
+			# visibilidade reduzida para os inimigos. A cada turno, uma ordem de movimento (`furia`): nevasca, raios, siroco, trovões.
+			var area_fp: Array = Area.esfera(a.get("tile", sim.c(id).tile), Area.quadrados(45.0))
+			sim.add_zona("furia_" + id, area_fp, "furia", -1, "furia_do_panteao", {"conjurador": id, "cd": spell_dc(sh, a)})
+			_iniciar_sustentada(id, "furia_do_panteao", out)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "furia_do_panteao", "tags": ["magia", "area"]}, [id]))
 		"toque_da_morte":
 			# Toque da Morte (universal 5): 10d8+10 de trevas. Abaixo da metade dos PV, Fortitude: falhou, PV a –10; passou, dano normal.
 			# Aprimoramentos: raio (curto); raios em todos os inimigos em alcance curto.

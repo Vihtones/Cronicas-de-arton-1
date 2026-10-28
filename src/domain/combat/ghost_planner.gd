@@ -189,6 +189,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "furia_do_panteao":
+				var tile_fp: Vector2i = a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, tile_fp) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "toque_da_morte" and apr.has(1):
 				targets = [actor]
 			if sp_id == "palavra_primordial":
@@ -570,6 +574,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var para_e: Vector2i = a.get("tile", Vector2i(-1, -1))
 			if CombatSim.cheb(ze[0].tiles[0], para_e) > Area.quadrados(12.0): return {"ok": false, "reason": "o enxame anda até 12m"}
 			if sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes" and z != ze[0] and (z.tiles as Array).has(para_e)): return {"ok": false, "reason": "já há um enxame lá"}
+			return {"ok": true, "kind": "movimento"}
+		"furia":
+			# Fúria do Panteão: uma ordem por turno (ação de movimento) enquanto a nuvem durar.
+			if str(sim.sustentadas.get(actor, "")) != "furia_do_panteao": return {"ok": false, "reason": "sem Fúria do Panteão ativa"}
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			if not ["nevasca", "raios", "siroco", "trovoes"].has(str(a.get("efeito", ""))): return {"ok": false, "reason": "efeito: nevasca, raios, siroco ou trovoes"}
+			if (A.flags as Array).has("furia_%d" % sim.round_no): return {"ok": false, "reason": "um efeito por turno"}
+			if str(a.efeito) == "raios" and (a.get("targets", []) as Array).size() > 6: return {"ok": false, "reason": "até 6 inimigos"}
 			return {"ok": true, "kind": "movimento"}
 		"mover_mortos", "atacar_mortos":
 			# Conjurar Mortos-Vivos: movimento (andam até 9m) ou ação padrão (ferem adjacentes). Só por ordem do conjurador.

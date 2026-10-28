@@ -262,6 +262,9 @@ func falha_nevoa(attacker: String, target: String) -> int:
 	var linha := tiles_entre(a_tile, t_tile)
 	var obscurece := false
 	for z in zonas:
+		if z.tipo == "furia" and is_enemy(attacker, str(z.dados.get("conjurador", ""))) and (z.tiles as Array).has(a_tile):
+			obscurece = true   # Fúria do Panteão: inimigos na área enxergam como na Névoa
+			break
 		if z.tipo != "nevoa" or (z.get("dados", {}).get("enxergam", []) as Array).has(attacker):
 			continue
 		for t in linha:
@@ -501,6 +504,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if not ranged and flanking(attacker, target): mods.append(["flanqueando", int(rules.value("situacao.flanquear").bonus_ataque)])
 	if charge: mods.append(["investida", int(rules.value("acao.investida").bonus_ataque)])
 	if ranged and (zona_em(A.tile, "tempestade") or zona_em(T.tile, "tempestade")): mods.append(["vendaval", -5])   # Tempestade Divina
+	if ranged and (zona_em(A.tile, "furia") or zona_em(T.tile, "furia")): return {"ok": false, "reason": "os ventos da Fúria do Panteão impedem ataques à distância"}
 	if special: mods.append(["ataque especial", int(rules.value("classe.guerreiro").ataque_especial.bonus) * special_tier(sheet)])
 	if sheet.has_power("valentao") and (T.sheet.has_effective_condition(rules, "caido") or T.sheet.has_effective_condition(rules, "desprevenido") \
 			or T.sheet.has_effective_condition(rules, "indefeso") or (not ranged and flanking(attacker, target))):
