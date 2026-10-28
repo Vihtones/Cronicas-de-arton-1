@@ -59,6 +59,7 @@ func _ready() -> void:
 	_build_hub(root)
 	_build_debug(root)
 	_build_tree(root)
+	_build_inv(root)
 	_build_subida(root)
 	Game.event_published.connect(_on_event)
 	Game.mode_changed.connect(func(_m): _refresh_mode())
@@ -183,6 +184,7 @@ var belt: PanelContainer
 var _belt_slots: Dictionary = {}
 var _belt_key := ""
 var panel_tree: PowerTreePanel
+var panel_inv: InventoryPanel
 var panel_subida: PanelContainer
 var lbl_clock: Label
 var lbl_place: Label
@@ -365,8 +367,8 @@ func update_hud() -> void:
 	if hud_portrait.expression != expr:
 		hud_portrait.set_expression(expr)
 	var busy := panel_journal.visible or panel_shop.visible or panel_pause.visible or panel_dialogue.visible
-	busy = busy or panel_tree.visible
-	log_box.visible = not panel_tree.visible and not panel_journal.visible
+	busy = busy or panel_tree.visible or panel_inv.visible
+	log_box.visible = not panel_tree.visible and not panel_journal.visible and not panel_inv.visible
 	hud_status.visible = Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT] and not busy
 	hud_clock.visible = Game.mode == Game.Mode.EXPLORE and not busy
 	belt.visible = Game.mode == Game.Mode.EXPLORE and not busy
@@ -1415,7 +1417,7 @@ func _refresh_mode() -> void:
 
 
 func any_panel_open() -> bool:
-	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible
+	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible or panel_inv.visible
 
 
 func close_panels() -> bool:
@@ -1428,7 +1430,23 @@ func close_panels() -> bool:
 	panel_credits.visible = false
 	panel_xp.visible = false
 	panel_tree.visible = false
+	panel_inv.visible = false
 	return was
+
+
+func _build_inv(root: Control) -> void:
+	panel_inv = InventoryPanel.new()
+	root.add_child(panel_inv)
+	panel_inv.position = Vector2(20, 14)
+	panel_inv.visibility_changed.connect(_on_panel_shown.bind(panel_inv))
+	panel_inv.visible = false
+	panel_inv.command.connect(func(t: String, p: Dictionary): _cmd_log(t, p))
+
+
+func toggle_inv() -> void:
+	panel_inv.visible = not panel_inv.visible
+	if panel_inv.visible:
+		panel_inv.refresh()
 
 
 func _build_tree(root: Control) -> void:

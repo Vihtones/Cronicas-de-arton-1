@@ -245,6 +245,8 @@ func _explore_key(k: int) -> void:
 	match k:
 		KEY_K:
 			ui.toggle_tree()
+		KEY_I:
+			ui.toggle_inv()
 		KEY_E:
 			ui.show_interact(build_actions())
 		KEY_J:

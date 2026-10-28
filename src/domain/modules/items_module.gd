@@ -11,7 +11,7 @@ const EQUIPPABLE := {
 
 
 func module_id() -> String: return "items"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["Equip", "UseItem"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["Equip", "Unequip", "UseItem"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -29,6 +29,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			if rel != null and EQUIPPABLE[it] == "armor":
 				var why: String = rel.forbids_armor(it)
 				if why != "": return PackedStringArray([why])
+		"Unequip":
+			var sl: String = cmd.payload.get("slot", "")
+			if str(world.player_sheet.equipment.get(sl, "")) == "": return PackedStringArray(["nada equipado aí"])
 		"UseItem":
 			var it: String = cmd.payload.get("item", "")
 			if not st.has_item(it): return PackedStringArray(["você não tem " + it])
@@ -51,6 +54,12 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(fact("ITEM_GAINED", {"item": old}, ["player"]))
 			out.append(fact("EQUIPPED", {"item": it, "slot": slot, "previous": old, "defense": s.defense(world.rules)}, ["player"]))
 			return out
+		"Unequip":
+			var sl: String = cmd.payload.slot
+			var tirado: String = s.equipment.get(sl, "")
+			s.equipment[sl] = ""
+			CharacterBuilder.apply_equipment(world.rules, s)
+			return [fact("ITEM_GAINED", {"item": tirado}, ["player"]), fact("UNEQUIPPED", {"item": tirado, "slot": sl, "defense": s.defense(world.rules)}, ["player"])]
 		"UseItem":
 			if bool(world.db.items.get(str(cmd.payload.item), {}).get("alimento", false)):
 				return _comer(str(cmd.payload.item), str(cmd.payload.get("bonus", "pv")))
@@ -92,3 +101,53 @@ func _comer(item: String, bonus: String) -> Array:
 			s.pv_temp = maxi(s.pv_temp, 5)
 		out.append(fact("FOOD_BONUS", {"item": item, "bonus": bonus}, ["player"]))
 	return out
+
+
+## Ficha legível de um item (inventário e lojas): tipo, números de regra e preço.
+static func info(rules: RuleRegistry, db: ContentDB, id: String) -> Dictionary:
+	var d: Dictionary = db.items.get(id, {})
+	var out := {"id": id, "nome": str(d.get("name", id.capitalize())), "preco": int(d.get("price", 0)), "slot": str(EQUIPPABLE.get(id, "")), "linhas": []}
+	var a: Dictionary = rules.value("arma." + id, {})
+	if not a.is_empty():
+		out.tipo = "Arma"
+		out.dano = str(a.dano)
+		out.linhas = ["Dano %s (%s)" % [a.dano, a.tipo], "Crítico %s/x%d" % [str(a.margem) if int(a.margem) < 20 else "20", int(a.mult)],
+			("Distância (%s)" % a.get("alcance", "médio")) if bool(a.get("disparo", false)) else "Corpo a corpo",
+			"%d mão(s)%s" % [int(a.get("maos", 1)), " · leve" if bool(a.get("leve", false)) else ""]]
+	var ar: Dictionary = rules.value("armadura." + id, {})
+	if not ar.is_empty():
+		out.tipo = "Armadura"
+		out.defesa = int(ar.defesa)
+		out.linhas = ["Defesa +%d" % int(ar.defesa), "Penalidade de armadura %d" % int(ar.get("penalidade", 0)), "Metal" if bool(ar.get("metal", false)) else "Sem metal"]
+	if not out.has("tipo"):
+		out.tipo = "Alimento" if bool(d.get("alimento", false)) else ("Poção" if id.begins_with("pocao") else ("Luz" if bool(d.get("fonte_luz", false)) else "Item"))
+		if id == "pocao_cura":
+			out.linhas = ["Cura %s PV" % str(rules.value("magia.curar_ferimentos", {}).get("cura", "2d8+2"))]
+		if bool(d.get("alimento", false)):
+			out.linhas = ["Comer: bônus de alimentação do dia"]
+		if bool(d.get("fonte_luz", false)):
+			out.linhas = ["Ilumina 9m por uma cena"]
+	out.usavel = id == "pocao_cura" or bool(d.get("alimento", false)) or bool(d.get("fonte_luz", false))
+	return out
+
+
+## Diferença em relação ao que está equipado no mesmo espaço ("+2 Defesa", "dano médio +1.0").
+static func comparar(rules: RuleRegistry, db: ContentDB, id: String, sheet: CharacterSheet) -> String:
+	var sl: String = EQUIPPABLE.get(id, "")
+	if sl == "":
+		return ""
+	var atual: String = sheet.equipment.get(sl, "")
+	if atual == id:
+		return "equipado"
+	var novo := info(rules, db, id)
+	var velho := info(rules, db, atual) if atual != "" else {}
+	if sl == "armor":
+		return "%+d Defesa em relação a %s" % [int(novo.get("defesa", 0)) - int(velho.get("defesa", 0)), velho.get("nome", "nenhuma")]
+	return "dano médio %+.1f em relação a %s" % [_media(str(novo.get("dano", "0"))) - _media(str(velho.get("dano", "0"))), velho.get("nome", "mãos vazias")]
+
+
+static func _media(dado: String) -> float:
+	var p := dado.split("d")
+	if p.size() != 2:
+		return 0.0
+	return float(p[0]) * (float(p[1]) + 1.0) / 2.0

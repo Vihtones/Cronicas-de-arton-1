@@ -141,6 +141,11 @@ func test_equipamento_compra_e_equipa_com_vendedor_desconfiado() -> void:
 	check(r.accepted, "equipou")
 	eq(w.player_sheet.defense(w.rules), 10 + 3 + 6, "Defesa com cota de malha (+6, LB p.153)")
 	check(w.modules.state.has_item("couro_batido"), "armadura antiga volta ao inventário")
+	var cmp := ItemsModule.comparar(w.rules, w.db, "couro_batido", w.player_sheet)
+	check(cmp.begins_with("-3"), "comparação mostra a perda de Defesa: " + cmp)
+	r = WorldHelpers.cmd(w, "Unequip", {"slot": "armor"})
+	check(r.accepted and w.modules.state.has_item("cota_malha"), "desequipou e voltou à mochila")
+	eq(w.player_sheet.defense(w.rules), 10 + 3, "sem armadura")
 
 
 func test_viagem_leva_dias_e_chega_a_valkaria() -> void:
