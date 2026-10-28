@@ -59,6 +59,17 @@ Atualizado em 24/10/2026 para a versão 0.7.0 (Godot 4.7.2). Estado: 165 testes 
 | Poderes | Árvore de poderes com 8 poderes gerais do LB p.124-131 |
 | A4 | Blur seletivo já existia desde a 0.6.0 (`PostProcess`); parallax segue pendente |
 
+### Feitas na 0.7.1
+| # | Resultado |
+|---|---|
+| Desempenho | Simulação de 7 dias ~0,35 s (antes ~1,2 s): visitas entre moradores só pelas relações conhecidas; relações agrupam por local numa passada |
+| Mundo | Cresce só por acréscimo: Fronteira do Leste (x 160..287), Horizonte a leste (x 288..335), Vale do Sul ao sul (linhas 64..95); mapa 336×96; 67 NPCs |
+| Movimento | Corrida com Shift (1,8×); emboscada fora de combate (C furtivo, até 3 quadrados, sem ser visto) |
+| Combate | Modo ação a 0,7×; silhuetas distintas (lobo, esqueleto, aranha, cobra, orc, ogro) |
+| Economia | Preços e despensa por região (vila, valkaria, samburdia, fronteira); refeição debita a região da taverna |
+| IA local | Pacote Windows com a pasta "IA local": servidor llama.cpp e, se presente, `modelo.gguf` (o jogo sobe a IA ao ligar). Caminho de inicialização ainda não verificado no Windows |
+| Testes | Viagem aceita chegada ou emboscada tática na partida; farinha testa o mecanismo do evento semanal. 701 aprovados |
+
 ### Pendentes
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
