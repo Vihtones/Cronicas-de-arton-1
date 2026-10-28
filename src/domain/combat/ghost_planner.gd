@@ -189,6 +189,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "libertacao":
+				if targets.is_empty() or targets.size() > (5 if apr.has(3) else 1): return {"ok": false, "reason": "escolha até %d criatura(s)" % (5 if apr.has(3) else 1)}
+				for tg_lb in targets:
+					if not sim.combatants.has(tg_lb) or sim.c(tg_lb).sheet.is_dead(): return {"ok": false, "reason": "alvo inválido"}
 			if sp_id == "marca_da_obediencia":
 				if not SpellRules.ORDENS_MARCA.has(str(a.get("ordem", ""))): return {"ok": false, "reason": "ordem: " + ", ".join(PackedStringArray(SpellRules.ORDENS_MARCA))}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]) or targets[0] == actor: return {"ok": false, "reason": "escolha 1 criatura"}

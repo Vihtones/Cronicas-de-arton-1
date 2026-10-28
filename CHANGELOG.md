@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Libertação (universal, 4º círculo): o alvo ignora terreno difícil e empurrões e fica imune a agarrado, enredado, imóvel, lento e paralisado; anda na água, escolhe 20 em Atletismo e em Acrobacia (também sem treino) e até 5 alvos com os aprimoramentos.
+
 - Marca da Obediência (universal, 2º círculo): toque, Vontade anula; ordens "não ataque", "siga-me" e "fique" que gastam o turno do alvo; Vontade a cada rodada para se livrar; um dia de duração e 3d6 de dano psíquico a cada falha com os aprimoramentos.
 
 - Controlar o Clima (divina, 4º círculo): fora de combate, fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas; o estado fica no save. O jogo só tem esses cinco climas.

@@ -158,7 +158,7 @@ func can_use_skill(skill: String, rules: RuleRegistry) -> bool:
 	if flat_skills.has(skill):
 		return true
 	var info: Dictionary = rules.value("pericia.tabela", {}).get(skill, {})
-	return not info.get("somente_treinada", false) or trained.has(skill)
+	return not info.get("somente_treinada", false) or trained.has(skill) or efeito_tipo_existe("sem_treino", skill)   # Libertação: Acrobacia sem treino
 
 
 func remove_condition(c: String) -> void:

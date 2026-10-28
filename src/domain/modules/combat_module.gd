@@ -3950,6 +3950,25 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"libertacao":
+			# Libertação (universal 4): imune a efeitos de movimento e a condições que prendem; ignora terreno difícil (custo_meio)
+			# e empurrões. Aprimoramentos: anda na água; escolhe 20 em Atletismo; em Acrobacia (também sem treino); até 5 alvos;
+			# Aprisionamento (magia que o jogo ainda não tem).
+			var apr_lb: Array = a.get("aprimoramentos", [])
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts_lb: CharacterSheet = sim.c(tg).sheet
+				ts_lb.add_efeito("magia.libertacao", "libertacao", 1, "cena", "", -1, id)
+				for cond_lb in ["agarrado", "enredado", "imovel", "lento", "paralisado"]:
+					ts_lb.add_efeito("magia.libertacao", "imune", 1, "cena", cond_lb, -1, id)
+					ts_lb.remove_condition(cond_lb)
+				if apr_lb.has(0):
+					ts_lb.add_efeito("magia.libertacao", "anda_na_agua", 1, "cena", "", -1, id)
+				if apr_lb.has(1):
+					ts_lb.add_efeito("magia.libertacao", "escolher_20", 1, "cena", "atletismo", -1, id)
+				if apr_lb.has(2):
+					ts_lb.add_efeito("magia.libertacao", "escolher_20", 1, "cena", "acrobacia", -1, id)
+					ts_lb.add_efeito("magia.libertacao", "sem_treino", 1, "cena", "acrobacia", -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "libertacao", "tags": ["magia"]}, [id, tg]))
 		"marca_da_obediencia":
 			# Marca da Obediência (universal 2): Vontade anula. A marca fica na ficha (dura a cena, ou um dia com o aprimoramento) e,
 			# a cada rodada, o alvo faz Vontade (`_begin_turn_base`): passou, a marca se dissipa; falhou, gasta o turno obedecendo

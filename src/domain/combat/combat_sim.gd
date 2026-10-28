@@ -243,6 +243,8 @@ func arma_espiritual_livre(id: String) -> int:
 ## Custo de um passo em meios-quadrados de deslocamento. Na Névoa espessa (1º círculo, aprimoramento de 5 PM) quem
 ## está dentro tem deslocamento 3m, seja qual for o normal: cada quadrado ali vale metade do deslocamento da criatura.
 func custo_meio(mover: String, from: Vector2i, to: Vector2i) -> int:
+	if mover != "" and combatants.has(mover) and c(mover).sheet.efeito_bonus("libertacao") > 0:
+		return 2   # Libertação: nada restringe o deslocamento (terreno difícil, névoa espessa)
 	if nevoa_espessa_em(from) or nevoa_espessa_em(to):
 		return step_cost(from, to, mover) * maxi(1, speed_squares(mover))
 	return step_cost(from, to, mover) * 2
@@ -323,7 +325,7 @@ func passable(t: Vector2i, mover: String) -> bool:
 
 ## Nadar (Heróis: deslocamento de natação igual ao base): quem nada atravessa a água sem custo extra.
 func _swims_into(t: Vector2i, mover: String) -> bool:
-	return db.is_water(t) and c(mover).sheet.can_swim()
+	return db.is_water(t) and (c(mover).sheet.can_swim() or c(mover).sheet.efeito_bonus("anda_na_agua") > 0)
 
 
 ## Voo sobre desnível (barranco): quem voa atravessa sem custo extra (Heróis, Voo).
@@ -451,6 +453,8 @@ func alcance_corpo(id: String) -> int:
 ## Empurrão: afasta `id` de `origem` até `quadrados`, quadrado a quadrado, parando antes de obstáculo ou criatura.
 ## Devolve o caminho percorrido (vazio se não se moveu).
 func empurrar(id: String, origem: Vector2i, quadrados: int) -> Array:
+	if c(id).sheet.efeito_bonus("libertacao") > 0:
+		return []   # Libertação: imune a efeitos de movimento
 	var pos: Vector2i = c(id).tile
 	var d := Vector2i(signi(pos.x - origem.x), signi(pos.y - origem.y))
 	if d == Vector2i.ZERO:

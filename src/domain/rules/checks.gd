@@ -27,6 +27,8 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 	# indefeso falha automaticamente em Reflexos (LB p.394)
 	var falha_auto := skill_name == "reflexos" and sheet.has_condition_flag(rules, "falha_reflexos")
 	var d20: int = rng.roll(stream, 1, 20)[0]
+	if sheet.efeito_tipo_existe("escolher_20", skill_name):
+		d20 = 20   # Libertação: escolhe 20 em Atletismo ou Acrobacia
 	# Orientação (LB p.193): em teste de perícia, rola dois dados e fica com o melhor. A vantagem geral é gasta
 	# no próximo teste; a de atributo (aprimoramento) vale até o fim da cena para as perícias daquele atributo.
 	if not eh_resistencia and not falha_auto:
