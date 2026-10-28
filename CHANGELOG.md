@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Catálogo: as 92 magias arcanas do Livro Básico que faltavam estão cadastradas (texto, execução, alcance, alvo, duração, resistência e aprimoramentos), extraídas do livro por `tools/extrator_magias/`. Ainda não aparecem no jogo: entram uma a uma, completas.
+
 - Projetar Consciência (universal, 5º círculo): a consciência vai a um lugar já visitado ou para junto de um NPC; vê quem e o que há lá e conversa mentalmente com quem vê; com o aprimoramento, lança magias sem componente material e não sustentadas nos NPCs de lá.
 
 - Interface: botão e tecla J de "Ordens" no combate, que mostra só as ações disponíveis no momento (mortos-vivos, Fúria do Panteão, enxame, chama, labareda, resfriar, raio da tempestade, salto de sombra, segurar-se, muralha, terremoto, sair da árvore ou da pedra, gelo, parceiros destruidor, médico e combatente); um clique no mapa executa.
