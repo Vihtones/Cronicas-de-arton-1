@@ -22,6 +22,8 @@ const EVENT_MEMORY := {
 	"CREATURE_DEFEATED": {"fact": "derrotou", "valence": 5, "emotion": "respeito", "durable": false},
 	"OBLIGATION_VIOLATED": {"fact": "violou_obrigacao", "valence": -15, "emotion": "decepcao", "durable": false},
 	"PLAYER_CAPTURED": {"fact": "capturou_forasteiro", "valence": 0, "emotion": "desprezo", "durable": false},
+	"PLAYER_INSULTED": {"fact": "insultou", "valence": -8, "emotion": "raiva", "durable": false},
+	"PLAYER_THREATENED": {"fact": "ameacou", "valence": -20, "emotion": "medo", "durable": true},
 	"FINE_PAID": {"fact": "pagou_multa", "valence": 10, "emotion": "neutro", "durable": false},
 	"DOMAIN_UNREST": {"fact": "impostos_altos", "valence": -15, "emotion": "raiva", "durable": false},
 	"NPC_DIED": {"fact": "luto", "valence": 0, "emotion": "tristeza", "durable": true},
@@ -147,6 +149,8 @@ func _describe(type: String, actor: String, subject: String, p: Dictionary) -> S
 		"NPC_MARRIED": return "%s e %s se casaram." % [_name(str(p.a)), _name(str(p.b))]
 		"DOMAIN_UNREST": return "Os impostos do moinho estão pesados demais."
 		"FINE_PAID": return "%s pagou sua multa." % who.capitalize()
+		"PLAYER_INSULTED": return "%s me insultou." % who.capitalize()
+		"PLAYER_THREATENED": return "%s me ameaçou." % who.capitalize()
 	return type
 
 

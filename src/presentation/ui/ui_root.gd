@@ -31,6 +31,9 @@ var combat_info: Label
 var _log_lines: Array[String] = []
 var _interact_actions: Array = []
 var _dlg_shown_text := ""
+var _dlg_livre := false
+var dlg_input: LineEdit
+var dlg_hist: Label
 var combat_view: CombatView
 
 
@@ -485,7 +488,7 @@ var _type_tween: Tween
 
 func _build_dialogue(root: Control) -> void:
 	panel_dialogue = _panel(root, Control.PRESET_BOTTOM_WIDE)
-	panel_dialogue.offset_top = -132
+	panel_dialogue.offset_top = -190
 	panel_dialogue.offset_left = 12
 	panel_dialogue.offset_right = -12
 	panel_dialogue.offset_bottom = -6
@@ -507,9 +510,19 @@ func _build_dialogue(root: Control) -> void:
 	dlg_text = _label("", 9)
 	dlg_text.custom_minimum_size = Vector2(500, 30)
 	v.add_child(dlg_text)
+	dlg_hist = _label("", 8)
+	dlg_hist.add_theme_color_override("font_color", Color(0.7, 0.7, 0.75))
+	dlg_hist.visible = false
+	v.add_child(dlg_hist)
 	dlg_opts = VBoxContainer.new()
 	dlg_opts.add_theme_constant_override("separation", 1)
 	v.add_child(dlg_opts)
+	dlg_input = LineEdit.new()
+	dlg_input.placeholder_text = "Digite o que quer dizer e aperte Enter (ou escolha acima)…"
+	dlg_input.max_length = FreeTalk.MAX_CHARS
+	dlg_input.add_theme_font_size_override("font_size", 9)
+	dlg_input.text_submitted.connect(_say)
+	v.add_child(dlg_input)
 	panel_dialogue.visible = false
 
 
@@ -532,6 +545,8 @@ func refresh_dialogue() -> void:
 	if view.is_empty():
 		panel_dialogue.visible = false
 		return
+	if not panel_dialogue.visible:
+		dlg_input.call_deferred("grab_focus")
 	panel_dialogue.visible = true
 	dlg_name.text = view.name
 	if dlg_portrait.actor_id != view.npc:
@@ -543,9 +558,22 @@ func refresh_dialogue() -> void:
 		_typewrite(dlg_text, base)
 		dlg_portrait.set_expression(_tone_expression(base))
 		var d := Game.world.npc_def(view.npc)
-		Game.dialogue_provider.verbalize_async(view.npc, base, {"name": d.get("name", ""), "profession": d.get("profession", ""),
-			"allowed_names": ["Tomas", "Hilda", "Otto", "Lena", "Valkaria", "Khalmyr", "Kael", "Dorn", "Elsa", "Rosana"]},
-			func(t: String): if _dlg_shown_text == base: dlg_text.text = t)
+		if _dlg_livre:
+			_dlg_livre = false
+			var f: Dictionary = (view.ficha as Dictionary).duplicate()
+			f["chat"] = (view.chat as Array).slice(0, -1)
+			if Game.dialogue_provider.gera_texto():
+				dlg_text.text = "…"
+			Game.dialogue_provider.converse_async(view.npc, f, func(t: String): if _dlg_shown_text == base: dlg_text.text = t)
+		else:
+			Game.dialogue_provider.verbalize_async(view.npc, base, {"name": d.get("name", ""), "profession": d.get("profession", ""),
+				"allowed_names": ["Tomas", "Hilda", "Otto", "Lena", "Valkaria", "Khalmyr", "Kael", "Dorn", "Elsa", "Rosana"]},
+				func(t: String): if _dlg_shown_text == base: dlg_text.text = t)
+	var hist := ""
+	for h in (view.chat as Array).slice(0, -1):
+		hist += "Você: %s\n" % h.q
+	dlg_hist.text = hist.strip_edges()
+	dlg_hist.visible = hist != ""
 	for c in dlg_opts.get_children():
 		c.queue_free()
 	for o in view.options:
@@ -560,6 +588,20 @@ func _tone_expression(txt: String) -> String:
 	if t.contains("fora") or t.contains("suma") or t.contains("ladr") or t.contains("estranho"): return "furioso"
 	if t.contains("?"): return "concentrado"
 	return "neutro"
+
+
+func _say(t: String) -> void:
+	if t.strip_edges() == "":
+		return
+	dlg_input.clear()
+	_dlg_livre = true
+	var r := Game.send("Say", {"text": t})
+	if not r.accepted:
+		_dlg_livre = false
+		log_msg("✘ " + "; ".join(r.errors))
+	refresh_dialogue()
+	_dlg_livre = false
+	dlg_input.grab_focus()
 
 
 func _choose(i: int) -> void:
@@ -986,6 +1028,11 @@ func _refresh_pause() -> void:
 	v.add_child(_button("Reduzir flashes: " + ("sim" if Game.settings.reduce_flashes else "não"), func():
 		Game.settings.reduce_flashes = not Game.settings.reduce_flashes; Game.save_settings(); _refresh_pause()))
 	v.add_child(_label("IA de diálogo: %s" % Game.dialogue_provider.provider_id(), 8))
+	if Game.dialogue_provider.gera_texto():
+		v.add_child(_button("Desligar IA local", func(): Game.desligar_ia(); _refresh_pause()))
+	else:
+		v.add_child(_button("Ligar IA local (servidor em 127.0.0.1:8080)", func():
+			Game.conectar_ia_local(func(ok: bool): log_msg("IA local ligada." if ok else "Servidor de IA local não encontrado — veja tools/ia_local/LEIA-ME.md."); _refresh_pause())))
 	v.add_child(_label("WASD mover · E interagir · J diário · C furtivo · R descansar · F5/F9 salvar/carregar", 8))
 	v.add_child(_button("Sair para o título", func(): panel_pause.visible = false; Game.world = null; Game.set_mode(Game.Mode.TITLE)))
 

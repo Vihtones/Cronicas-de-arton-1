@@ -12,6 +12,7 @@ var distant: Dictionary = {}
 var quests: Dictionary = {}   # guilda e contratos (QuestModule)
 var dialogue: Dictionary = {}
 var ambient: Dictionary = {}  # falas ambiente dos figurantes e latidos (data/dialogue/ambient.json)
+var livre: Dictionary = {}    # intenções e respostas da fala livre (data/dialogue/livre.json)
 var voices: Dictionary = {}   # vozes dos moradores (data/dialogue/voices.json)
 var mysteries: Array = []          # todos os mistérios (principal + secundários)
 
@@ -31,6 +32,7 @@ static func load_default() -> ContentDB:
 	db.load_dir("res://data/world")
 	db.dialogue = _read("res://data/dialogue/dialogue.json")
 	db.voices = _read("res://data/dialogue/voices.json")
+	db.livre = _read("res://data/dialogue/livre.json")
 	db.ambient = _read("res://data/dialogue/ambient.json")
 	return db
 

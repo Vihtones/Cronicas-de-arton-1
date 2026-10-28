@@ -11,7 +11,7 @@ var talks: Dictionary = {}
 
 
 func module_id() -> String: return "dialogue"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["StartDialogue", "ChooseOption", "EndDialogue"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["StartDialogue", "ChooseOption", "EndDialogue", "Say"])
 func subscribed_events() -> PackedStringArray: return PackedStringArray(["DIALOGUE_ENDED"])
 
 
@@ -49,6 +49,10 @@ func _dynamic_node(npc: String, node_id: String) -> Dictionary:
 	var again := "Já lhe falei disso hoje. " if bool(session.get("repeat", false)) else ""
 	var key := node_id.get_slice(":", 0)
 	match key:
+		"__livre":   # resposta da fala livre (texto montado em Say)
+			var fim: bool = bool(session.get("livre_fim", false))
+			return {"text": str(session.get("livre", "")), "options": [{"text": "Ir embora.", "next": "end"}] if fim else \
+				[{"text": "Mudar de assunto.", "next": "__papo"}, {"text": "Até mais.", "next": "end"}]}
 		"__generic":
 			var visit: Dictionary = session.get("visit", {"kind": "conhecido", "count": 1})
 			var text := DialogueVoice.greeting(world, npc, visit)
@@ -171,7 +175,8 @@ func view() -> Dictionary:
 		if o.has("test"):
 			label += "  [%s CD %d]" % [str(o.test.skill).capitalize(), int(o.test.cd)]
 		opts.append({"index": i, "text": label})
-	return {"npc": npc, "name": world.npc_def(npc).get("name", npc), "node": session.node, "text": node.get("text", ""), "options": opts}
+	return {"npc": npc, "name": world.npc_def(npc).get("name", npc), "node": session.node, "text": node.get("text", ""), "options": opts,
+		"chat": session.get("chat", []), "intent": str(session.get("intent", "")), "ficha": FreeTalk.ficha(world, npc, str(session.get("chat", [{}]).back().get("q", "")) if not (session.get("chat", []) as Array).is_empty() else "", str(node.get("text", "")))}
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -208,6 +213,11 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["ouro insuficiente"])
 		"EndDialogue":
 			if session.is_empty(): return PackedStringArray(["sem conversa"])
+		"Say":
+			if session.is_empty(): return PackedStringArray(["sem conversa"])
+			var fala := str(cmd.payload.get("text", "")).strip_edges()
+			if fala == "": return PackedStringArray(["diga alguma coisa"])
+			if fala.length() > FreeTalk.MAX_CHARS: return PackedStringArray(["frase longa demais (até %d letras)" % FreeTalk.MAX_CHARS])
 	return PackedStringArray()
 
 
@@ -226,6 +236,8 @@ func execute(cmd: GameCommand) -> Array:
 			var id: String = session.npc
 			session = {}
 			return [fact("DIALOGUE_ENDED", {"npc": id}, ["player", id])]
+		"Say":
+			return _dizer(str(cmd.payload.text).strip_edges().substr(0, FreeTalk.MAX_CHARS))
 		"ChooseOption":
 			var vis := visible_options(session.npc, session.node)
 			var o: Dictionary = vis[int(cmd.payload.index)]
@@ -255,6 +267,70 @@ func execute(cmd: GameCommand) -> Array:
 				session.node = next
 			return out
 	return []
+
+
+## Fala livre: entende a frase, escolhe o assunto e deixa o morador responder pelo estado do mundo.
+func _dizer(frase: String) -> Array:
+	var npc: String = session.npc
+	var e := FreeTalk.entender(world, npc, frase)
+	var intent := str(e.intent)
+	var out: Array = [fact("DIALOGUE_SAID", {"npc": npc, "text": frase, "intent": intent}, ["player", npc])]
+	var no := ""
+	var efeitos: Array = []
+	var fim := false
+	var salt := int(talks.get(npc, {}).get("count", 0)) + (session.get("chat", []) as Array).size()
+	match intent:
+		"rumor": no = "__rumor"
+		"trabalho": no = "__trabalho"
+		"tempo": no = "__tempo"
+		"bio": no = "__bio"
+		"gente": no = "__gente"
+		"evento":
+			if str(e.arg) != "":
+				no = "__evento:" + str(e.arg)
+			else:
+				session["livre"] = "Nada de especial na vila hoje."
+				no = "__livre"
+		"pessoa":
+			if str(e.arg) == "tomas" and _conds_ok(npc, [{"fact": "f_tomas_sumiu"}, {"mystery": "ativo"}]):
+				no = "g_tomas"
+			else:
+				no = "__opiniao:" + str(e.arg)
+		"loja":
+			session["livre"] = FreeTalk.resposta_direta(world, npc, e, salt)
+			no = "__livre"
+			if world.db.economy.get("shops", {}).has(npc):
+				efeitos.append({"event": "OPEN_SHOP"})
+		"multa":
+			if _conds_ok(npc, [{"warrant": true}, {"faction_member": "guarda_vila"}]):
+				efeitos.append({"pay_fine": true})
+				no = "g_multa_paga"
+			else:
+				session["livre"] = FreeTalk.resposta_direta(world, npc, e, salt)
+				no = "__livre"
+		_:
+			session["livre"] = FreeTalk.resposta_direta(world, npc, e, salt)
+			no = "__livre"
+			fim = intent == "despedida"
+	if intent == "insulto" or intent == "ameaca":
+		out.append(fact("PLAYER_INSULTED" if intent == "insulto" else "PLAYER_THREATENED", {"npc": npc, "witnesses": [npc], "actor": "player",
+			"location": world.db.location_at(world.db.world_to_tile(world.player.position))}, ["player", npc]))
+		fim = intent == "ameaca"
+	session["livre_fim"] = fim
+	out.append_array(_apply_effects(efeitos))
+	session["repeat"] = false
+	if no.begins_with("__") and no not in ["__generic", "__papo", "__gente", "__livre"]:
+		if not talks.has(npc):
+			talks[npc] = {"count": 1, "last_day": world.day_index(), "seen": {}}
+		var seen: Dictionary = talks[npc].seen
+		session["repeat"] = int(seen.get(no, -1)) == world.day_index()
+		seen[no] = world.day_index()
+	session.node = no
+	var chat: Array = session.get("chat", [])
+	chat.append({"q": frase, "r": str(_node(npc, no).get("text", ""))})
+	session["chat"] = chat.slice(-6)
+	session["intent"] = intent
+	return out
 
 
 func _apply_effects(effects: Array) -> Array:

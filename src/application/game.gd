@@ -106,6 +106,34 @@ func start_prologue_from_seed(p_seed: int) -> GameCommand.Result:
 	return start_prologue(Prologue.from_seed(p_seed))
 
 
+const IA_LOCAL := {"enabled": true, "endpoint": "http://127.0.0.1:8080/v1/chat/completions", "model": "local", "timeout_s": 12}
+
+
+## Procura o servidor de IA local (llama.cpp em 127.0.0.1:8080). `done.call(bool)` diz se ligou. Grava user://ai.json.
+func conectar_ia_local(done: Callable) -> void:
+	var http := HTTPRequest.new()
+	http.timeout = 2.0
+	add_child(http)
+	http.request_completed.connect(func(result, code, _h, _b):
+		http.queue_free()
+		var ok: bool = result == HTTPRequest.RESULT_SUCCESS and code == 200
+		if ok:
+			var f := FileAccess.open("user://ai.json", FileAccess.WRITE)
+			if f != null:
+				f.store_string(JSON.stringify(IA_LOCAL))
+			dialogue_provider = LlmDialogueProvider.new(IA_LOCAL, self)
+		done.call(ok))
+	if http.request("http://127.0.0.1:8080/health") != OK:
+		http.queue_free()
+		done.call(false)
+
+
+func desligar_ia() -> void:
+	dialogue_provider = DialogueProvider.new()
+	if FileAccess.file_exists("user://ai.json"):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://ai.json"))
+
+
 func start_prototype(id: String) -> Dictionary:
 	new_game(false, 7)
 	var info := Prototypes.apply(id, world)

@@ -243,3 +243,15 @@ func test_c25_criancas_crescem() -> void:
 	check(out.size() == 1 and out[0].type == "NPC_CAME_OF_AGE", "fato de maioridade")
 	eq(w.npc_def("nascido_teste").profession, "aprendiz de moleiro", "ofício do pai")
 	eq(w.npc_def("nascido_teste").work, "moinho")
+
+
+func test_ia_fala_livre_valida_e_cai_para_a_base() -> void:
+	var p := LlmDialogueProvider.new({"enabled": true, "max_calls": 5})
+	var ficha := {"name": "Hilda", "frase": "onde fica a ferraria", "base": "A Ferraria fica ao norte.", "allowed_names": ["Ferraria"], "chat": []}
+	var got := [""]
+	p.transport_override = func(_m): return "Ao norte, forasteiro, a Ferraria fica ao norte."
+	p.converse_async("hilda", ficha, func(t): got[0] = t)
+	eq(got[0], "Ao norte, forasteiro, a Ferraria fica ao norte.", "aceita texto fiel")
+	p.transport_override = func(_m): return "Fale com Zorbax no Castelo."
+	p.converse_async("hilda", ficha, func(t): got[0] = t)
+	eq(got[0], ficha.base, "rejeita nome inventado e usa a base")

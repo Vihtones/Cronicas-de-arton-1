@@ -1,0 +1,112 @@
+{
+ "schema_version": 1,
+ "status": "ORIGINAL_DO_JOGO",
+ "despedida": {
+  "seco": ["Vá em paz. E mantenha as mãos limpas.", "Até."],
+  "caloroso": ["Volte quando quiser, viu? A porta está sempre aberta.", "Vá com cuidado e volte inteiro!"],
+  "sereno": ["Que Lena guie seus passos.", "Vá em paz."],
+  "simples": ["Até mais, então.", "Passe bem."],
+  "idoso": ["Ah, já vai? Os velhos ficam, os jovens correm. Até logo.", "Vá, vá. Eu fico por aqui."],
+  "jovem": ["Tchau!", "Até! Volta depois!"],
+  "bebado": ["Hic... vá com... com os deuses, amigo.", "Tchau, tchau... volte para beber comigo."]
+ },
+ "saudacao": {
+  "seco": ["Já nos cumprimentamos. Algo mais?", "Ouvi. O que quer?"],
+  "caloroso": ["Olá de novo! Em que posso ajudar?", "Oi, oi! Diga lá."],
+  "sereno": ["Que a paz esteja com você. Diga o que busca.", "Estou ouvindo."],
+  "simples": ["Olá. Fale.", "Oi. Precisa de algo?"],
+  "idoso": ["Olá, olá. Fale mais alto, meus ouvidos já não são os de antes.", "Hã? Ah, é você. Diga."],
+  "jovem": ["Oi! Quer saber alguma coisa?", "Olá! Eu sei um monte de coisas, pergunta!"],
+  "bebado": ["Hic... olá, amigo!", "Opa! Você de novo... ou é outro?"]
+ },
+ "agradecimento": {
+  "seco": ["Não foi nada.", "Certo."],
+  "caloroso": ["Imagina! Foi um prazer.", "Ora, não precisa agradecer!"],
+  "sereno": ["Que seja para o bem.", "Lena abençoe."],
+  "simples": ["De nada.", "Não foi nada, não."],
+  "idoso": ["Hã? Ah, de nada, de nada.", "Os velhos servem para isso também."],
+  "jovem": ["De nada!", "Legal! Quando precisar, fala."],
+  "bebado": ["Hic... disponha.", "Tá tudo bem, amigo!"]
+ },
+ "insulto": {
+  "seco": ["Mais uma dessas e chamo a guarda.", "Cuidado com a língua, forasteiro."],
+  "caloroso": ["Ora essa! Isso é jeito de falar?", "Que grosseria. Eu esperava mais de você."],
+  "sereno": ["As palavras ferem mais do que a lâmina. Pense nisso.", "Não responderei a isso."],
+  "simples": ["Isso não se diz.", "Olha lá como fala comigo."],
+  "idoso": ["No meu tempo, isso dava briga. Hoje, só dá vergonha.", "Falta de educação."],
+  "jovem": ["Que feio! Vou contar pra todo mundo!", "Você é mau!"],
+  "bebado": ["Hic... quer briga, é?", "Olha o respeito, amigo."]
+ },
+ "ameaca": {
+  "seco": ["Tente. Guardas ouvem de longe.", "Isso foi uma ameaça? Vou lembrar."],
+  "caloroso": ["Meu Deus! Saia daqui!", "Você me assusta... por favor, vá embora."],
+  "sereno": ["Não temo o que a violência pode fazer ao meu corpo. Mas lamento por você.", "Vá. Antes que se arrependa."],
+  "simples": ["Não quero confusão.", "Sai daqui!"],
+  "idoso": ["Quer me ameaçar? Eu já vi coisa pior que você.", "Ah, é? Estou com medo... não estou."],
+  "jovem": ["Socorro!", "Para! Eu vou chamar a guarda!"],
+  "bebado": ["Hic... com essa cara? Duvido.", "Ameaça é coisa de quem não sabe beber."]
+ },
+ "ajuda": {
+  "seco": ["Pergunte do que sei: trabalho, tempo, a vila, o que se conta, onde fica algum lugar.", "Fale claro. Posso dizer do trabalho, do tempo, da gente e dos lugares."],
+  "caloroso": ["Pergunte à vontade! Sei da vila, do tempo, dos vizinhos, do que se conta por aí e de onde ficam as coisas.", "Eu converso sobre quase tudo: trabalho, gente, tempo, lugares..."],
+  "sereno": ["Posso falar do que vejo: a vila, o tempo, a gente, o que se conta e onde ficam as coisas.", "Pergunte, e responderei no que souber."],
+  "simples": ["Sei de pouca coisa. Do trabalho, do tempo, de gente e de onde fica o quê.", "Pergunte do que quiser, mas sei pouco."],
+  "idoso": ["Hã? Pergunte devagar. Sei da vila, da gente, do tempo e de onde fica cada coisa.", "Tenho muita história. Pergunte."],
+  "jovem": ["Eu sei de tudo! Pergunta da vila, do tempo, do pessoal, de onde fica as coisas...", "Pergunta qualquer coisa!"],
+  "bebado": ["Hic... pergunte... eu sei de tudo, principalmente das tavernas.", "Fale, amigo. Hic. Sei de... de muita coisa."]
+ },
+ "desconhecido": {
+  "seco": ["Não entendi. Fale claro.", "Isso não me diz respeito.", "Não sei do que fala."],
+  "caloroso": ["Hmm, não peguei bem essa. Pode falar de outro jeito?", "Ah, não sei responder isso, mas pergunte outra coisa!"],
+  "sereno": ["Não sei responder a isso.", "Perdoe, não compreendi. Diga de outro modo."],
+  "simples": ["Não sei dessas coisas.", "Hã? Não entendi."],
+  "idoso": ["Hã? Como? Não ouvi direito.", "Não sei, não, meu filho."],
+  "jovem": ["Hã? Não sei disso!", "Não entendi! Fala de novo?"],
+  "bebado": ["Hic... não... não entendi nada.", "O quê? Hic. Pergunta de novo."]
+ },
+ "sem_loja": {
+  "seco": ["Não vendo nada.", "Não sou comerciante."],
+  "caloroso": ["Ah, eu não vendo nada, mas a feira ou a loja da vila têm de tudo!", "Não tenho nada à venda, querido."],
+  "sereno": ["Não faço comércio.", "Não tenho nada a oferecer em troca de moedas."],
+  "simples": ["Não vendo nada.", "Não tenho nada pra vender, não."],
+  "idoso": ["Vender? Não tenho nada a vender, filho.", "Hã? Não, não vendo nada."],
+  "jovem": ["Eu não vendo nada!", "Vender? Eu só tenho brinquedos!"],
+  "bebado": ["Hic... só vendo histórias... e não são boas.", "Não... não vendo nada."]
+ },
+ "loja": {
+  "seco": ["Veja o que tenho.", "Tenho o que tenho. Dê uma olhada."],
+  "caloroso": ["Claro! Dê uma olhada, só coisa boa!", "Ora, com prazer! Veja à vontade."],
+  "sereno": ["Veja o que posso oferecer.", "Eis o que tenho."],
+  "simples": ["Pode olhar.", "Tem aqui o que tem."],
+  "idoso": ["Veja, veja. É pouca coisa, mas é boa.", "Hã? Ah, sim, olhe aqui."],
+  "jovem": ["Olha só o que tem!", "Dá uma olhada!"],
+  "bebado": ["Hic... olhe aqui...", "Tem... tem coisas, hic."]
+ },
+ "guilda": "A guilda fica na taverna: o quadro de contratos está lá, e pagam bem por trabalho honesto. Cada contrato cumprido sobe o seu rank.",
+ "guilda_membro": "Você já é da guilda, rank %s, com %d pontos. Vá ao quadro na taverna e pegue outro contrato.",
+ "sem_lugar": "Não conheço esse lugar por aqui.",
+ "lugar": "%s fica %s, a uns %d passos daqui.",
+ "aqui": "Já está em %s.",
+ "multa": {
+  "sem_multa": "Não há multa em seu nome, até onde sei.",
+  "nao_guarda": "Isso é com a guarda. Fale com a capitã Elsa no quartel."
+ },
+ "palavras": {
+  "despedida": ["tchau", "ate mais", "ate logo", "adeus", "preciso ir", "vou indo", "falou", "ate a proxima", "me vou", "fui"],
+  "saudacao": ["ola", "oi", "bom dia", "boa tarde", "boa noite", "salve", "e ai", "eae", "saudacoes"],
+  "agradecimento": ["obrigad", "valeu", "grato", "agradec"],
+  "insulto": ["idiota", "imbecil", "burro", "lixo", "maldito", "cala a boca", "estupido", "otario", "canalha", "inutil", "fdp", "desgracado"],
+  "ameaca": ["vou te matar", "te mato", "vou matar", "vou te bater", "vou te cortar", "pague ou", "sua vida", "vou quebrar", "te arrebento"],
+  "multa": ["multa", "mandado", "pagar minha", "pagar a divida", "pagar o que devo"],
+  "loja": ["comprar", "vender", "loja", "preco", "quanto custa", "mercadoria", "a venda", "estoque", "tem para vender"],
+  "guilda": ["guilda", "contrato", "missao", "missoes", "aventureiro", "bico", "recompensa", "trabalho para mim", "serviço para mim", "servico para mim"],
+  "rumor": ["novidade", "noticia", "rumor", "boato", "fofoca", "o que se conta", "acontec", "sabe de algo", "ouviu algo", "o que ha de novo", "o que anda"],
+  "trabalho": ["trabalho", "oficio", "profissao", "faz da vida", "negocio", "labuta", "seu servico", "o que faz", "vive de"],
+  "tempo": ["tempo", "chuva", "clima", "frio", "calor", "sol ", "neblina", "tempestade", "chover", "nublado"],
+  "bio": ["quem e voce", "quem voce", "fale de voce", "sobre voce", "sua historia", "de onde voce", "sua idade", "quantos anos", "sua familia", "seu nome", "como se chama"],
+  "gente": ["gente da vila", "moradores", "vizinhos", "o povo", "quem mora", "conhece alguem", "quem sao"],
+  "lugar": ["onde fica", "onde e a", "onde e o", "como chego", "como chegar", "onde esta a", "onde esta o", "caminho para", "como vou"],
+  "ajuda": ["ajuda", "o que voce sabe", "o que posso perguntar", "sobre o que", "o que pode me dizer"],
+  "evento": ["festa", "feira", "festival", "evento", "celebracao"]
+ }
+}

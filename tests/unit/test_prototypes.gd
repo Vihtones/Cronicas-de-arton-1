@@ -356,3 +356,32 @@ func test_todas_as_criaturas_do_livro_viram_ficha() -> void:
 			check(sh.pv_max > 0 and (not sh.attacks.is_empty() or str(id).ends_with("_capanga") or id == "criatura.elemental_de_luz"), "ficha: " + str(id))
 			n += 1
 	check(n >= 50, "bestiário com %d criaturas" % n)
+
+
+func test_fala_livre_entende_e_responde_pelo_mundo() -> void:
+	var w := _w("fala_livre")
+	check(FreeTalk.entender(w, "otto", "E aí, quais as novidades?").intent == "rumor", "rumor")
+	check(FreeTalk.entender(w, "otto", "Como vai o seu trabalho?").intent == "trabalho", "trabalho")
+	check(FreeTalk.entender(w, "otto", "Vai chover hoje?").intent == "tempo", "tempo")
+	check(FreeTalk.entender(w, "otto", "Valeu, muito obrigado!").intent == "agradecimento", "agradecimento")
+	check(FreeTalk.entender(w, "otto", "Você é um idiota").intent == "insulto", "insulto")
+	var pe := FreeTalk.entender(w, "otto", "O que acha da Hilda?")
+	check(pe.intent == "pessoa" and pe.arg == "hilda", "pessoa citada pelo nome")
+	var lu := FreeTalk.entender(w, "otto", "Onde fica a taverna?")
+	check(lu.intent == "lugar" and lu.arg == "taverna", "lugar citado")
+	check(FreeTalk.entender(w, "otto", "blablabla xyz").intent == "desconhecido", "desconhecido")
+	# conversa de verdade
+	var npcs: NpcModule = w.modules.npcs
+	w.player.position = w.db.tile_to_world(npcs.npc_tile("otto"))
+	check(WorldHelpers.cmd(w, "StartDialogue", {"npc_id": "otto"}).accepted, "começou a conversa")
+	check(not WorldHelpers.cmd(w, "Say", {"text": ""}).accepted, "frase vazia recusada")
+	var r := WorldHelpers.cmd(w, "Say", {"text": "Como vai o trabalho?"})
+	check(r.accepted, "Say aceito")
+	var v: Dictionary = w.modules.dialogue.view()
+	check(str(v.text) != "" and v.chat.size() == 1, "resposta e histórico")
+	r = WorldHelpers.cmd(w, "Say", {"text": "Onde fica a taverna?"})
+	check(str(w.modules.dialogue.view().text).contains("passos"), "a direção usa o mapa real")
+	var rep0: float = w.modules.memory.reputation("otto")
+	WorldHelpers.cmd(w, "Say", {"text": "Você é um idiota!"})
+	check(w.modules.memory.reputation("otto") < rep0, "insulto custa reputação")
+	check(WorldHelpers.cmd(w, "Say", {"text": "x".repeat(300)}).accepted == false, "frase longa recusada")
