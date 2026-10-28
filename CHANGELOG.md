@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Selo de Mana (universal, 3º círculo): o alvo selado faz Vontade sempre que for usar uma ação que gaste PM (magias, Ataque Especial, Golpe Divino, poderes); falhou, perde os PM e a ação. Com o aprimoramento (4º círculo), alcance curto e várias criaturas.
+
 - Libertação (universal, 4º círculo): o alvo ignora terreno difícil e empurrões e fica imune a agarrado, enredado, imóvel, lento e paralisado; anda na água, escolhe 20 em Atletismo e em Acrobacia (também sem treino) e até 5 alvos com os aprimoramentos.
 
 - Marca da Obediência (universal, 2º círculo): toque, Vontade anula; ordens "não ataque", "siga-me" e "fique" que gastam o turno do alvo; Vontade a cada rodada para se livrar; um dia de duração e 3d6 de dano psíquico a cada falha com os aprimoramentos.

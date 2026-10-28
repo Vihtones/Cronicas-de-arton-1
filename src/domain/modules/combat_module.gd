@@ -3026,9 +3026,44 @@ func _begin_turn_base(id: String) -> Dictionary:
 	return {"skip": false, "facts": facts}
 
 
+## PM que uma ação vai gastar (0 se nenhum): magias, Ataque Especial, Golpe Divino e poderes com custo.
+func _custo_pm_da_acao(id: String, a: Dictionary, v: Dictionary) -> int:
+	match str(a.type):
+		"cast":
+			return int(v.get("cost", 0))
+		"attack":
+			var n := sim.special_tier(sim.c(id).sheet) if a.get("special", false) else 0
+			if int(v.get("golpe_dados", 0)) > 0:
+				n += 1 + int(v.golpe_dados)
+			return n
+		"ataque_extra":
+			return int(world.rules.value("classe.guerreiro.ataque_extra").custo_pm)
+		"ataque_parceiro":
+			return 5
+		"olhar_atordoante":
+			return 1
+	return int(v.get("cost", 0))
+
+
+## Selo de Mana: quem está selado e vai gastar PM faz Vontade (CD gravada no efeito). Falhou: perde os PM e a ação.
+func _selo_impede(id: String, a: Dictionary, v: Dictionary, out: Array) -> bool:
+	var s: CharacterSheet = sim.c(id).sheet
+	var cd := s.efeito_bonus("selo_de_mana")
+	if cd <= 0:
+		return false
+	var custo := _custo_pm_da_acao(id, a, v)
+	if custo <= 0 or _resiste(id, "vontade", cd, out):
+		return false
+	s.pm = maxi(0, s.pm - custo)
+	out.append(fact("SPELL_FAILED", {"caster": id, "check": "vontade", "cd": cd, "reason": "selo_de_mana", "d20": 0, "total": 0}, [id]))
+	return true
+
+
 func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 	sim.spend(v.kind)
 	var out: Array = []
+	if _selo_impede(id, a, v, out):
+		return out   # Selo de Mana: falhou na Vontade, os PM se vão e a ação não tem efeito
 	if _santuario_impede(id, a, out):
 		return out   # Santuário: não consegue e perde a ação
 	_santuario_quebra(id, a, out)
@@ -3950,6 +3985,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"selo_de_mana":
+			# Selo de Mana (universal 3): pela cena, toda ação que gaste PM exige Vontade (`_selo_impede`).
+			for tg in a.get("targets", [a.get("target", "")]):
+				sim.c(tg).sheet.add_efeito("magia.selo_de_mana", "selo_de_mana", spell_dc(sh, a), "cena", "", -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "selo_de_mana", "tags": ["magia"]}, [id, tg]))
 		"libertacao":
 			# Libertação (universal 4): imune a efeitos de movimento e a condições que prendem; ignora terreno difícil (custo_meio)
 			# e empurrões. Aprimoramentos: anda na água; escolhe 20 em Atletismo; em Acrobacia (também sem treino); até 5 alvos;
