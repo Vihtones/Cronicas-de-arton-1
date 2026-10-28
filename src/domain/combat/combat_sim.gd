@@ -217,6 +217,8 @@ static func maxs_nivel(a: String, b: String) -> String:
 ## Falha por escuridão mágica entre atacante e alvo: total bloqueia a visão na área e através dela; leve, só no alvo.
 ## Quem está num globo de Luz (aprimoramento arcano) tem a silhueta visível: sem camuflagem por escuridão.
 func falha_escuridao(attacker: String, target: String) -> int:
+	if c(attacker).sheet.efeito_bonus("visao_verdade") > 0:
+		return 0   # Visão da Verdade enxerga através da escuridão
 	var t_tile: Vector2i = c(target).tile
 	if zona_em(t_tile, "globo_luz"):
 		return 0
@@ -257,6 +259,8 @@ func nevoa_espessa_em(t: Vector2i) -> bool:
 ## 1,5m há camuflagem leve e a partir de 3m, total. Quem foi escolhido no aprimoramento de 2 PM enxerga através dela.
 ## Faro (LB, habilidades de criaturas): contra alvo em alcance curto, a camuflagem total causa só 20% de chance de falha.
 func falha_nevoa(attacker: String, target: String) -> int:
+	if c(attacker).sheet.efeito_bonus("visao_verdade") > 0:
+		return 0   # Visão da Verdade enxerga através da camuflagem
 	var a_tile: Vector2i = c(attacker).tile
 	var t_tile: Vector2i = c(target).tile
 	var linha := tiles_entre(a_tile, t_tile)
@@ -550,7 +554,7 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if T.charge_turn >= 0 and T.charge_turn >= turn_counter - order.size():
 		defense += int(rules.value("acao.investida").penalidade_defesa)
 	var miss_chance := 0
-	if ranged and T.sheet.efeito_bonus("camuflagem") > 0:
+	if ranged and T.sheet.efeito_bonus("camuflagem") > 0 and sheet.efeito_bonus("visao_verdade") <= 0:
 		miss_chance = int(rules.value("situacao.camuflagem_leve").falha_pct)   # Escudo da Fé (camuflagem leve)
 	var env: Dictionary = env_fn.call(T.tile) if env_fn.is_valid() else {}
 	var as_cegas := sheet.has_power("percepcao_as_cegas")   # Percepção às Cegas: escuridão, névoa e fumaça não atrapalham

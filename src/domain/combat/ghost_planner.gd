@@ -189,6 +189,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "visao_da_verdade":
+				if apr.has(0):
+					if targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.is_enemy(actor, targets[0]): return {"ok": false, "reason": "escolha 1 aliado"}
+				else:
+					targets = [actor]
 			if sp_id == "furia_do_panteao":
 				var tile_fp: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tile_fp) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}

@@ -3920,6 +3920,21 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"visao_da_verdade":
+			# Visão da Verdade (universal 4): vê através de camuflagem e escuridão (efeito "visao_verdade", lido em falha_nevoa e
+			# falha_escuridao); +10 em Percepção; +10 em Intuição; paredes finas translúcidas (efeito marcado: o jogo ainda não tem
+			# linha de visão por paredes). Ilusões e transmutações: o jogo ainda não tem disfarces nem formas alteradas para revelar.
+			var apr_vv: Array = a.get("aprimoramentos", [])
+			var alvo_vv: String = a.get("target", id) if apr_vv.has(0) else id
+			var ts_vv: CharacterSheet = sim.c(alvo_vv).sheet
+			ts_vv.add_efeito("magia.visao_da_verdade", "visao_verdade", 1, "cena", "", -1, id)
+			if apr_vv.has(1):
+				ts_vv.add_efeito("magia.visao_da_verdade", "pericia_percepcao", 10, "cena", "", -1, id)
+			if apr_vv.has(2):
+				ts_vv.add_efeito("magia.visao_da_verdade", "pericia_intuicao", 10, "cena", "", -1, id)
+			if apr_vv.has(3):
+				ts_vv.add_efeito("magia.visao_da_verdade", "ve_paredes", 1, "cena", "", -1, id)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_vv, "buff": "visao_da_verdade", "tags": ["magia"]}, [id, alvo_vv]))
 		"furia_do_panteao":
 			# Fúria do Panteão (divina 5): nuvem de 90m sustentada. Sem ataques à distância, condição terrível para lançar magia,
 			# visibilidade reduzida para os inimigos. A cada turno, uma ordem de movimento (`furia`): nevasca, raios, siroco, trovões.

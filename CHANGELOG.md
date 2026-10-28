@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Visão da Verdade (universal, 4º círculo): ataques ignoram camuflagem e escuridão; toque em aliado; +10 em Percepção e em Intuição; paredes finas gravadas como efeito, ainda sem linha de visão no jogo para usá-lo.
+
 - Fúria do Panteão (divina, 5º círculo) completa: nuvem de 90m sustentada que impede ataques à distância, torna difícil lançar magia e reduz a visão dos inimigos; a cada turno uma ordem de movimento (nevasca, raios, siroco ou trovões). Catálogo: Fúria perdeu o texto do Globo da Verdade, que ganhou entrada própria (ainda sem efeito).
 
 - Toque da Morte, Palavra Primordial (universais, 5º círculo) e Segunda Chance (divina, 5º) completas. Toque da Morte: 10d8+10 de trevas, Fortitude ou PV a –10 abaixo da metade, com raio e raios em todos os inimigos no alcance curto. Palavra Primordial: atordoar, cegar ou matar, em alvo de nível menor. Segunda Chance: cura 200 PV (+20), tira 20 condições, até 5 alvos, ou revive quem morreu há até uma rodada.
