@@ -84,13 +84,16 @@ func on_tick(tick: int) -> Array:
 	var npcs = world.module("npcs")
 	if npcs == null:
 		return []
-	var seen := {}
+	# agrupa por local numa passada só (antes: uma varredura completa por local)
+	var seen: Dictionary = {}
 	for id in npcs.state:
-		var loc := str(npcs.npc(id).get("location", ""))
-		if loc == "" or not npcs.npc(id).get("alive", false):
+		var s: Dictionary = npcs.state[id]
+		var loc := str(s.get("location", ""))
+		if loc == "" or not s.get("alive", false):
 			continue
 		if not seen.has(loc):
-			seen[loc] = npcs.npcs_at(loc)
+			seen[loc] = []
+		seen[loc].append(id)
 	for loc in seen:
 		var here: Array = seen[loc]
 		for a in here:

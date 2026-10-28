@@ -203,6 +203,9 @@ func build_actions() -> Array:
 			foes.append(id)
 	if not foes.is_empty():
 		var surprised := foes.all(func(id): return c.undetected_by.has(id))
+		var perto := foes.filter(func(id): return CombatSim.cheb(pt, c.creature_tile(id)) <= CombatModule.EMBOSCADA_RAIO)
+		if c.stance_sneak and not perto.is_empty() and perto.all(func(id): return c.undetected_by.has(id)):
+			out.append({"label": "Emboscar (de surpresa, escondido)", "cmd": "StartCombat", "payload": {"enemies": perto, "emboscada": true}})
 		out.append({"label": "Atacar" + (" de surpresa!" if surprised else ""), "cmd": "StartCombat", "payload": {"enemies": foes}})
 	return out
 
@@ -280,7 +283,8 @@ func _atacar_mirando(t: Vector2i) -> bool:
 	var pt := Game.player_tile()
 	for id in c.visible_creatures():
 		if CombatSim.cheb(t, c.creature_tile(id)) <= 1 and CombatSim.cheb(pt, c.creature_tile(id)) <= 8:
-			var r := Game.send("StartCombat", {"enemies": [id]})
+			var emboscada := c.stance_sneak and c.undetected_by.has(id) and CombatSim.cheb(pt, c.creature_tile(id)) <= CombatModule.EMBOSCADA_RAIO
+			var r := Game.send("StartCombat", {"enemies": [id], "emboscada": emboscada})
 			if not r.accepted:
 				ui.log_msg("✘ " + "; ".join(r.errors))
 			return true

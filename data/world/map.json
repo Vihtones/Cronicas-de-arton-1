@@ -3,74 +3,106 @@
  "status": "ORIGINAL_DO_JOGO",
  "tile_px": 32,
  "size": [
-  160,
-  64
+  336,
+  96
  ],
  "grid": [
-  "..............................................~~..T,,T,,,,TT,,,T,T,,,T,T,,,,TT,T,,,T,,,,,,T,T,,,TTTTTTTTTTTTTTTTTBTBBBBTBBBBTBTBBBBBTBTTTTTTTTTTTTTTTTTTTTTTTTTT",
-  "..............................................~~..T,TTT,,,,,,,T,,TTT,T,,,T,TTT,,,T,T,,TT,,T,T,,T.,,,,.,,,,.,,,..BBTTBTBBBBBBBBBBBBBBTT.........................T",
-  "..............................................~~..T,T,,T,T,T,T,,,,,,,,,TTTT,T,,TTT,TT,,,,,,,T,T,,,,,,T,,,,,T,T..BBBBBBBBBBBBBBBBBBBBBB....................T....T",
-  "..............................................~~..,,TT,,T,,,TT,T,,,,,,,,,T,,T,,,TT,,,T,TT,,,,,,,,.,,,,,T,,.,T,.TBBTBTBBTTBBBBBBBBBBBBB.........................T",
-  "..............................................~~..,,,,,,,,,,BB,,,TTT,T,,T,,,,,,,###__#%###%##,,T,T.T,T,,T,T,,,..TTTBBBBBBBBBBBBBBBBBBB.........................T",
-  "..............................................~~..,TTT,,,,T,BBTTTT,,,,,,T,,,,TTT#___________#,,,T,.TT,,,T,,.,,..BBBTBBTBBTBBBBTBBBBBBT.........................T",
-  "..............................................~~..,,T,,,,TT,BB,,,TT,,TTT,T,TT,,,#%_____%____#T,,,,,,,T.,T.,,TT......T........:..T......T....T.......T..TTT.....T",
-  "..............................................~~..,,,T,,T,TTBB,,,,,,TT,T,,,,T,,,#__%_%_____%#T,,TT,,,,T,,,T,,,.T..........~..:............................T....T",
-  ".....................==.......................~~..,,,,,TT,,,BB,,T,T,,,,T,,,,T,,,#___________#T,TT,,,,,,T,TT.T,.......~~~~~~~~~~~.......T.......................T",
-  ".....................==..##########...........~~..,,,,,,,,T,ppT,,,,,,,,T,,,,,,T,#%____S____%#,TTT,T.,,,,,,T,.T.....~~~~~~~~~~~~~~~.............................T",
-  "......##########.....==..#________#..######...~~..TT,,T,,,,TBBT,TTT,,T,,T,,,,T,,#_____%__%%%#,,,.,T,TT,.T,T,,,....~~~~~~~~~~~~~~~~~............................T",
-  "......#________#.....==..#________#..#____#...~~..,T,,,T,,,,BB,,,,,T,,T,,TT,TTTT#___________#,,,TTTT,T.,,.,T,TT...~~~~~~~~~~~~~~~~~........................T...T",
-  "......#________#.....==..#________#..#____#...~~..TT,,T,,T,TBBT,,T,,,TT,T,,,,,T,#%%%______%__,TT,,T.,,.TTT,,,,...~~~~~~~~~~~~~~~~~~~...T.......................T",
-  "......#________#.....==..#________#..#____#...~~..,,T,,T,,,,BBTT,,,,,,,,T,TT,,,,#_____%_____#,TT,T,.,,,,,,.,,,....~~~~~~~~~~~~~~~~~~T..........................T",
-  "......#________#.....==..#________#..###D##...~~..TTTT,,T,,TBB,,,,T,T,,,,T,,TT,,#__%##_######,T,,.,TTT,,T,.,T,...T~~~~~~~~~p~~~~~~~~...........................T",
-  "......#________#.....==..#________#...........~~..TT,,T,,TT,BB,TTTTT,TT,T,,TTT,,,,,,,,:,,TT,,,,,T,,,,,,T,T,T,,.....~~~~~~~~p~~~~~~.~~..........................T",
-  "......#####D####.....==..#####D####...........~~..,,,TT,T,,,T,,T,,T,,,,,,,,,:::::::::::,T,,,TTTT,,,,TT,,,TT,,T....::.~~~~~~p~~~~...~~................T.........T",
-  ".....................==.......................~~..,,,,,T,,T,,,,,,TT,,T,,T,,:::::::::::,T,,,TT,TT,,,,T,,,.,,,,T............~p.......~~.....#########..#######...T",
-  ".....................==.......................~~..T,,,,,T,,TTT,,,,,,,,,T,,::T,,,T,T,TTT,,T,,,,T,,,,,,T,,,,TT,,...T.........p.......~~.....#_______#..#_____#...T",
-  "......########.......==..######.######........~~..,,,,,,,,,,,,,,,,,,,,T,,T::,,TTTT,,,,,,,,T,TT,,,,,,T,,,,T,T,,...T.........:T......~~.....#_______#.T#_____#...T",
-  "......#______#.......==..#____#.#____#........~~..,,,,,T,,,TTTT,,T,,,,,,,::,,T,,,,,,,TTT,T,,,,,T,,TT,,T,.,,,T,...:.........:......~~:.....#_______#..#_____#...T",
-  "......#______#.......==..#____#.#____#........~~..TT,,T,TT,,,T,T,,T,T,,,T::T,,TTT,T,T,,,TTT,,,,,,.,TTTTT,.,,,,.............:....T.~~......#_______#..#_____#...T",
-  "......#______#.......==..#____#.#____#........~~..,,,TT,TTTTT,,,T,,,,,,T::,,T,,,,,TTT,,TTT,,T,T,,T,TT,TTT,T,,,.........T...:...T..~~..T...####D####==###D###==.T",
-  "......####D###.......==..###D##.###D##........~~..,,,,,,,,T,,,,T,,T,,T,::,,T,,,T,,,,TT,,,,T,,,,T,,T,T,,,,,TTTT.............:......~~..........=.==============.T",
-  ".....................==o......................~~..,TTTT,,,T,,,T,,,,,,,::,,TT,,,T,T,TT,,,,,,,,,T,==============================================================.T",
-  "..============================================================================================================================================================.T",
-  "..==============================================================================================,,,TTT,,T,T,,,...........T...T.....~~...........==============.T",
-  ".....................==.......................~~..,,,,T,T,,,,,:T,,,,,,,T,T,T,,,,,,,T,,T,,,,,,T,T,,,,T.T,T,,,,,....T..:T..T........T~~.......=........To.T......T",
-  ".....................==.......::::::::::::::..~~..,,,TTTTT,T,T:,,T,TT,,T,,T,,,,T,,,,T,,T,,,T,T,,,,,.,,T,,,T,,,.....................~~.....##D###......=........T",
-  "......####D###.###D##==.......................~~..TT,T,,,T,,,T:TTT,,,,,,,T,T,,,TT,TT,TT,,,T,T,,,TTT,,,T,,,,,T,T..T................T~~.....#____#....##D##......T",
-  "......#______#.#____#==..###D##......###D###..~~..,,,,,,TTTT,,:,,,,T,TTT,,,,,,,TTT,,,T,,,T,,,,TT,T,,,,,,,,,,T,....T..........:....~~.T....#____#....#___#......T",
-  "......#______#.#____#==..#____#......#_____#..~~..,,,,T,,T,,T,:T,T,,T,,,T,,,TT,,,,T,,,,T,,T,T,,T,,.,,T,,,,TT,.....................~~......######....#___#......T",
-  "......#______#.#____#==..#____#......#_____#..~~..,,TT,,TT,TTT:,,,,T,,,TT,T,,T,,,,,,,,,,T,T,T,TT,,,,TTT,,,,,,,.........T...:......~~..........T.....#___#......T",
-  "......#______#.######==..#____#......#_____#..~~..,T,T,T,T,T,T:,TTT,,,,,,TT,T,,,,T,,,,,T,,,T,,,,,,TTTT,T,,,,,,...T..............T.~~..T....T........#___#......T",
-  "......########.......==..######......#_____#..~~..,,,T,,,,,T,T:T,,,,,T,T,TT,T,,T,,,,,,,,,,,T,,,,,,TTTT,,,,TT,,....T....T..........~~................#####......T",
-  ".....................==..............#_____#..~~..T,,,,,T,,,,,:T,T,,,,,,,TTT,T,,T,,,,T,,TT,,T,T,,,,T,,,,,,T,,T..........T..........~~..........................T",
-  ".....................==..............#######..~~..,T,TT,,,T,,T:T,,,,,T,,T,,,,,,TTT,,,,,,,,,T,,,,T,,,,,T,,T,,,T....T........T.......~~T.........................T",
-  "...............###D##==.......................~~..,,,T,,T,,,,,:TTT,T,,T,,TT,,,T,TT,,,,TTTT,,,T,TT,,,,,T,,,,TT,....:.T....T.........~~....cccccccccccccccccccc..T",
-  "...............#____#==...cccccccccccccccccc..~~..,T,,,,TTT,,,:,,TT,,,,T,T,,,,T,,,,,,,,T,,,,,,,,,T,,T,,TT,,,,T.....................~~....cccccccccccccccccccc..T",
-  "...............#____#==...cccccccccccccccccc..~~..,,T,,,,,TTTT:,,T,,,,T,,T,TT,T,,,TTT,TT,,,T,,,TT,,,T,,T,TTTT...........:..........~~....cccccccccccccccccccc..T",
-  "...............#____#==...cccccccccccccccccc..~~..,T,,T,,T,T##D###,,TTT,,,,,T,,,,T,,,,,,,,TTT,TT,,T,,,..,,,,T,...............T.TT.~~.....cccccccccccccccccccc..T",
-  "...............######==...cccccccccccccccccc..~~..,TT,,,,,,,#____#TT,,,,,,TTT,TT,,,T,T,,,,,,,,,,,,,,,,,,,,TT,,..BTTBBBBBBBBBBBBBBB~~TB...cccccccccccccccccccc..T",
-  ".....................==...cccccccccccccccccc..~~..T,,,,T,,,T#____#,T,,T,,,,T,,T,T,,,TTT,,,T,,,,,,,,,..,T,,,,T,..BBBBBBBTBBBBBBBBBB~~BB.T.cccccccccccccccccccc..T",
-  ".....................==...cccccccccccccccccc..~~..T,,,T,,T,,#____#,TTTT,,T,,,,,,T,TT,T,,,,T,,,,T,,T,,T,,T.,,T,..BBBTBBBBBBBBBBBBBB~~BB.TTcccccccccccccccccccc..T",
-  ".....................==...cccccccccccccccccc..~~..T,TTT,TT,T######,,,,T,,,T,,,,,,T,T,,T,,,,T,,,T,.,T,,,.T,,,TT..TBBBBTBBBBBTBBBBTB~~BT...cccccccccccccccccccc..T",
-  ".....................==...cccccccccccccccccc..~~..,,,,,,,TT,,,T,,T,,T,,T,TT,,,T,TT,,,,,,,T,TT,,,,,,,T,,,,,,,TT..BBBTBBBBBBBBBTBTBBB~~BT..cccccccccccccccccccc..T",
-  "..............................................~~..T,,T,,T,,,,T,,,T,TTTT,,TT,,,T,,,,,,T,T,,,,,,,TTTT,T,,TT,,TT,..BBTBBBBBBBBBTTBBBBB~~B....T...................TT",
-  "..............................................~~..,,T,T,,,TT,T,,T,,T,,,,,,,,T,TT,,,,,,,TTT,,T,,TTTTT,,TTTT,T,...BBTBBTBBTTTBBBBBBBB~~B.........................T",
-  "..............................................~~..,,,,TT,T,,,,,T,,,,,,T,,,T,T,,,,,,,,,,,,,,,,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX######################__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_________############__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_________############__%_______#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_________############__________#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_______________________________D______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_U_______________________%_____#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_______________________________#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_________############_______%__##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX#_________############__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX######################__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  "..............................................~~..T,,T,,,,TT,,,T,T,,,T,T,,,,TT,T,,,T,,,,,,T,T,,,TTTTTTTTTTTTTTTTTBTBBBBTBBBBTBTBBBBBTBTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTMMMMMMMMMTTTMMMMMMMMMMMTTTTTMMMMMMMMMMMMMMMTTTT........,.......T...........,M..,,..........T..TT",
+  "..............................................~~..T,TTT,,,,,,,T,,TTT,T,,,T,TTT,,,T,T,,TT,,T,T,,T.,,,,.,,,,.,,,..BBTTBTBBBBBBBBBBBBBBTT.........................T...~~~~~~~~~wT,TTwT~~~~~~~~~~~~wwT.,,.TwaaaaaaaaaaaaTaaaaaaaaaaaaaaaaaaaaaaaaaaaMMMMMMMMM.ggMMMMMMMMMM..gggMMMMMMMMMMMMMMMMTTTT.....MT..,M.TT.............M.,..M....,.M........T",
+  "..............................................~~..T,T,,T,T,T,T,,,,,,,,,TTTT,T,,TTT,TT,,,,,,,T,T,,,,,,T,,,,,T,T..BBBBBBBBBBBBBBBBBBBBBB....................T....T...~~~~~~~~ww..,T,,wwwTT~~~~~~~ww,T,..,,aTaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..aaaaaMMMMMMMMMggggMMMMMggggggggggggMMMMMMMMMMMMMTTTT....T.,..T.T.M......T...,.......,.......T..,...MT",
+  "..............................................~~..,,TT,,T,,,TT,T,,,,,,,,,T,,T,,,TT,,,T,TT,,,,,,,,.,,,,,T,,.,T,.TBBTBTBBTTBBBBBBBBBBBBB.........................T..Tw~~~~~~~wwT,T,..T.wwTwwwwwwwwwwwwT...aaaaaaa.aaaaaaTaaaaTaa################aaMMMMMMMMM:gggMMMMMgggggggggggggMMMMMMMMMMMMMTTT.T.TMT.........T....,M....T..,...M......T.,....,T",
+  "..............................................~~..,,,,,,,,,,BB,,,TTT,T,,T,,,,,,,###__#%###%##,,T,T.T,T,,T,T,,,..TTTBBBBBBBBBBBBBBBBBBB.........................T...w~~~~~~~w,..T.TT..,,.w%%wwwwwww%%..TTaaaaaaaaaaaaaaaa.aaaaa#____#_________#aaMMMMMMMMMggg:MMMMMgggggggggggggggMMMMMMMMMMMMTT..M....M.....TTTTTTTTTTTTTTTTTTM....M..........,T",
+  "..............................................~~..,TTT,,,,T,BBTTTT,,,,,,T,,,,TTT#___________#,,,T,.TT,,,T,,.,,..BBBTBBTBBTBBBBTBBBBBBT.........................TT..~~~~~T~~ww..T,.,..TTTwwwwwwwwwwwwTwwwaaaaaaaaaaaaaaaaaaTaaa#____#_%_______#aaMMMMMMMMMg.:gMMMMMggggggggggggggTTTTMMMMMMMMMMM.....M....M,.TTTTTTTTTTTTTTTTTT.,.M...,.......,.T",
+  "..............................................~~..,,T,,,,TT,BB,,,TT,,TTT,T,TT,,,#%_____%____#T,,,,,,,T.,T.,,TT......T........:..T......T....T.......T..TTT.....T...~~~~wTwwww..,,.T.,..Twwwwggggwwwwwwwwaaaaaa.aaaaaaa.aaaaaaa#__%_#______%__#aaMMMMMMMMggg..MMMMMggggggggggggg.gMMMMMMMMMMMMMM.T..,,,.MT...TTTTTTTTTTTTTTTTTT..,.............MT",
+  "..............................................~~..,,,T,,T,TTBB,,,,,,TT,T,,,,T,,,#__%_%_____%#T,,TT,,,,T,,,T,,,.T..........~..:............................T....T...~~~~wwwww....T.,T,TT,wwwwgoggwwwwwwwwaaaaaaaaaaaaaaaaaaaaaa#____#_________#TaMMMMMMMMgggggMMMMMMMMM:MMMMMMMMMMMMMMMMMMMMMMMM.TT......T...T,...........,......M.,.........M..T",
+  ".....................==.......................~~..,,,,,TT,,,BB,,T,T,,,,T,,,,T,,,#___________#T,TT,,,,,,T,TT.T,.......~~~~~~~~~~~.......T.......................T...:::::::::::::::::::::wwwwggggwwww,wTwaaaaaaaaaaaaaaaaaaaaaa#____#____#____Daaggggggg:gg.:gMMMMMMMMM:ggggggggggggggMMMMMMMMMM.,M..........T.~~~~~~~~~~~~~~.......M.......,T..T",
+  ".....................==..##########...........~~..,,,,,,,,T,ppT,,,,,,,,T,,,,,,T,#%____S____%#,TTT,T.,,,,,,T,.T.....~~~~~~~~~~~~~~~.............................T.T.:~~~wwww.,....T...,,,wwwwwwwwwwww.wwwaaaaaaaaaaaa.aaaaaaaaa####______#____%aagTggg.ggTT.gTMMMMMMMMM:g:.:ggggg.gggg.MMMMMMMMM....TM...TT....~~~~~~~~~~~~~~M.......TTM..,...M.T",
+  "......##########.....==..#________#..######...~~..TT,,T,,,,TBBT,TTT,,T,,T,,,,T,,#_____%__%%%#,,,.,T,TT,.T,T,,,....~~~~~~~~~~~~~~~~~............................T...:~~~wwww,.,.,,..,..,Tw%wwwwwwwww%wwwwaaaaaaaaaaaaaaaaTaaTaa%_______%_#____#aaggTggggggggggMMMMMMMMg:gg.T..gg..ggggTgMMMMMMMM.,.....,....T,T~~~~~~~~~~~~~~TT.MT.............TT",
+  "......#________#.....==..#________#..#____#...~~..,T,,,T,,,,BB,,,,,T,,T,,TT,TTTT#___________#,,,TTTT,T.,,.,T,TT...~~~~~~~~~~~~~~~~~........................T...T...:~wwwwwwwwwwwwT,.,TwwwwwwwwwwwwwwwTTwaaaaaa.aaaaaaaaaaaaaaa%_________#____#aa.g.gggg...g.gMMMMMMMM.:gTTgggg.gggg.gg.gg.gMMMM...,..M....M.TT~~~~~~~~~~~~~~T....TM,......,.M..T",
+  "......#________#.....==..#________#..#____#...~~..TT,,T,,T,TBBT,,T,,,TT,T,,,,,T,#%%%______%__,TT,,T.,,.TTT,,,,...~~~~~~~~~~~~~~~~~~~...T.......................TT..:~wwwwwwTww~wwwwwwwwww..wwwwwwwwwwwwwaaaaaaaaaaaaaaaaaaaaaa#_%_______#__%_#aa.gg.gggTg.gggMMMMMMMgT:gggggggggTg.ggg..g.ggMMM.....T.....,...~~~~~~~~~~~~~~,..........,..M,...T",
+  "......#________#.....==..#________#..#____#...~~..,,T,,T,,,,BBTT,,,,,,,,T,TT,,,,#_____%_____#,TT,T,.,,,,,,.,,,....~~~~~~~~~~~~~~~~~~T..........................T...:~wwTwwwwww~wwwwwwwwwww..wwwwwww~~~~waaaaaaaaaaaaTaa.aaaaaa#______________#gM.gg.ggggg.gg:MMMMMMMg::gggggggT.g.gg.g:gg:gggMM..T....M....M..~~~~~~~~~~~~~~M.T...,.....M...,..T",
+  "......#________#.....==..#________#..###D##...~~..TTTT,,T,,TBB,,,,T,T,,,,T,,TT,,#__%##_######,T,,.,TTT,,T,.,T,...T~~~~~~~~~p~~~~~~~~...........................T...:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~wwTaaaaaaaaaaaaaTaaaaaaa####%%%#########MM:..g.ggggggg:MMMMMMM.g:.gggg:gggggg..ggg.g...MM....,,T,..M.T..~~~~~~~~~~~~~~..........,.T...TT.T",
+  "......#________#.....==..#________#...........~~..TT,,T,,TT,BB,TTTTT,TT,T,,TTT,,,,,,,,:,,TT,,,,,T,,,,,,T,T,T,,.....~~~~~~~~p~~~~~~.~~..........................T...:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Twaaaaaaaaaaaaaaaaaaaaaaaaaaa:aaaaMMMMMMTMMMg.gg.gggTTgMMMMMM:gg:g.g.ggggggg.ggggggg.g..M...T..M.T,.....,,......M....T.M.T..M.,..M.,...T.T",
+  "......#####D####.....==..#####D####...........~~..,,,TT,T,,,T,,T,,T,,,,,,,,,:::::::::::,T,,,TTTT,,,,TT,,,TT,,T....::.~~~~~~p~~~~...~~................T.........T...:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TwaaaTaaaaaaaaaaaaaa.aaaaaaaa:.aaMTMMMMMMTMMggggggg:TTTMMMMMMggg:gT.gggggg..gggggggggTggM.......T.M.T...T.......,...TTT...M.,....T.......T",
+  ".....................==.......................~~..,,,,,T,,T,,,,,,TT,,T,,T,,:::::::::::,T,,,TT,TT,,,,T,,,.,,,,T............~p.......~~.....#########..#######...T...:~~~~~~~~#########~~#######~~~~~~~~wTMaaaa.aaa##########aaa#####:####MMTMMMMMMMg.:g:gTg##########gT:########.g########gggTgM....T....#########.M..#########,.T.########...M.T",
+  ".....................==.......................~~..T,,,,,T,,TTT,,,,,,,,,T,,::T,,,T,T,TTT,,T,,,,T,,,,,,T,,,,TT,,...T.........p.......~~.....#_______#..#_____#...T...:~~~~~~~~#_______#~~#_____#~~~~~~~~wwMaaaaaaaa#________#aaa#____:___#MTMMMMMMMMgggT.ggg#________#gg:_______#gT#______#g.:.gM.,.T.....#_______#.T..#_______#....#______#,.T..T",
+  "......########.......==..######.######........~~..,,,,,,,,,,,,,,,,,,,,T,,T::,,TTTT,,,,,,,,T,TT,,,,,,T,,,,T,T,,...T.........:T......~~.....#_______#.T#_____#...T...:~~~~~~~~#_______#~~#_____#~~~~~~~~wTMgaaaaaaa#________#a.a#____:___#MTMMMTMMMMMggggggg#________#gg:_______#..#______#ggggTM..TT.....#_______#..T.#_______#..T.#______#....MT",
+  "......#______#.......==..#____#.#____#........~~..,,,,,T,,,TTTT,,T,,,,,,,::,,T,,,,,,,TTT,T,,,,,T,,TT,,T,.,,,T,...:.........:......~~:.....#_______#..#_____#...T...:~~~~~~~~#_______#~~#_____#~~~~~~~~wwaaTaaaaaa#________#aaa#____:___#aMMTMMMMMMMggggggg#________#gg:_______#gg#______#gggggg.T.......#_______#....#_______#...T#______#.,...T",
+  "......#______#.......==..#____#.#____#........~~..TT,,T,TT,,,T,T,,T,T,,,T::T,,TTT,T,T,,,TTT,,,,,,.,TTTTT,.,,,,.............:....T.~~......#_______#..#_____#...T...:~~~~~~~~#_______#~~#_____#~~~~~~~~wwaaaaaaaaa#________#aaa#____:___#gaMMaMMMMMMgg.gggg#________#MM:_______#T.#______#g:g..g..M.T....#_______#....#_______#M...#______#....TT",
+  "......#______#.......==..#____#.#____#........~~..,,,TT,TTTTT,,,T,,,,,,T::,,T,,,,,TTT,,TTT,,T,T,,T,TT,TTT,T,,,.........T...:...T..~~..T...####D####==###D###====...:~~~~~~~~####D####~~###D###~~~~~~~~wwaaaa=====####D#####===####D#####==========M.g.g===####D#####==####D####==###D####==ggg...T....T.====================================.T.T",
+  "......####D###.......==..###D##.###D##........~~..,,,,,,,,T,,,,T,,T,,T,::,,T,,,T,,,,TT,,,,T,,,,T,,T,T,,,,,TTTT.............:......~~..........=.================...:wwwwppppppppppppppppppppppppppppppwwaaaa======================================gg.T.====================================g.gg.......TM====================================,T.T",
+  ".....................==o......................~~..,TTTT,,,T,,,T,,,,,,,::,,TT,,,T,T,TT,,,,,,,,,T,========================================================================pppppppppppppppppppppppppppppp=====================================================================================gTgg================================================T",
+  "..======================================================================================================================================================================pppppppppppppppppppppppppppppp=====================================================================================g.g.================================================T",
+  "..==============================================================================================,,,TTT,,T,T,,,...........T...T.....~~...........================TT,wwwwwppppppppppppppppppppppppppppppoTaaaa==============o=======================ggggg============o=======================gggg...,.....====================o===============.M.T",
+  ".....................==.......................~~..,,,,T,T,,,,,:T,,,,,,,T,T,T,,,,,,,T,,T,,,,,,T,T,,,,T.T,T,,,,,....T..:T..T........T~~.......=........To.T......T,,T.ww~~~~~~##D###~~##D###~~###D####~~w.aaaaaaaaa###D####aaa###D###aaa##D###aaaaMMMMgg.ggg###D###ggg###D####MMM###D####gggggg.g......T,.##D####.T.##D###M...........M......T...T",
+  ".....................==.......::::::::::::::..~~..,,,TTTTT,T,T:,,T,TT,,T,,T,,,,T,,,,T,,T,,,T,T,,,,,.,,T,,,T,,,.....................~~.....##D###......=........T...,ww~~~~~~#____#~~#____#~~#______#~~wwaaaaaaaa.#______#.aa#_____#aaT#____#aaaaMMMMg:ggTT#_____#gg.#______#MMM#______#....gggg......M..#_____#..M#____#..T....T.............,.T",
+  "......####D###.###D##==.......................~~..TT,T,,,T,,,T:TTT,,,,,,,T,T,,,TT,TT,TT,,,T,T,,,TTT,,,T,,,,,T,T..T................T~~.....#____#....##D##......T,...Tww~~~~~#____#~~#____#~~#______#~~wTaaaaaaaaa#______#aaa#_____#aaa#____#aaaaMMMMg:gggg#_____#ggg#______#MMM#______#gggggg.M.....,...#_____#..T#____#......M.,.........M....T",
+  "......#______#.#____#==..###D##......###D###..~~..,,,,,,TTTT,,:,,,,T,TTT,,,,,,,TTT,,,T,,,T,,,,TT,T,,,,,,,,,,T,....T..........:....~~.T....#____#....#___#......T...T..w~~~~~#____#~~#____#~~#______#~~~wa.a.aaaaa#______#aaa#_____#aaa#____#aaaaMMMMMg.ggT#_____#.:g#______#MMM#______#gggg..MM..T..T,..#_____#T..#____#cccccccccccccccc....TM.T",
+  "......#______#.#____#==..#____#......#_____#..~~..,,,,T,,T,,T,:T,T,,T,,,T,,,TT,,,,T,,,,T,,T,T,,T,,.,,T,,,,TT,.....................~~......######....#___#......T.,,,.,ww~~~~######~~######~~########~~~waaaaaa.aa#______#aaa#_____#aaa######aaaaMMMMM.g.gg#_____#g..#___S__#MMM#______#g.ggggMM.........#######.,T######cccccccccccccccc...MT..T",
+  "......#______#.#____#==..#____#......#_____#..~~..,,TT,,TT,TTT:,,,,T,,,TT,T,,T,,,,,,,,,,T,T,T,TT,,,,TTT,,,,,,,.........T...:......~~..........T.....#___#......T,...,www~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~waaaaaaaaa########aaa#######aaaaaaaaaaaTaMMMMMgggTg#######:gg########MMM########gg.Tg:MM....,T........T.,,MT..T.,cccccccccccccccc....,..T",
+  "......#______#.######==..#____#......#_____#..~~..,T,T,T,T,T,T:,TTT,,,,,,TT,T,,,,T,,,,,T,,,T,,,,,,TTTT,T,,,,,,...T..............T.~~..T....T........#___#......T.,..wwww~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~waaaaaaaaaaTaa.aa.aaaaaaaaaTaaTaaaaaaaaaaMMMMMTg:g:gggg.ggg.gMMMMMMMMMMMMMMMg.gggg:TggMM.TT.M..,T.....T.M.......,cccccccccccccccc..M.,.,T",
+  "......########.......==..######......#_____#..~~..,,,T,,,,,T,T:T,,,,,T,T,TT,T,,T,,,,,,,,,,,T,,,,,,TTTT,,,,TT,,....T....T..........~~................#####......T,..wwwww~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Taaaaaa.aaaTa.aaaaaaaaaaaaaaaaaaaaMMMaaaaMMMMMggggggggT.gggggMMMMMMMMMMMMMMMgggTggggg.MM.....T...T....,.....,..,Mcccccccccccccccc....T..T",
+  ".....................==..............#_____#..~~..T,,,,,T,,,,,:T,T,,,,,,,TTT,T,,T,,,,T,,TT,,T,T,,,,T,,,,,,T,,T..........T..........~~..........................T...wwwTw~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~wMgaaa.aaaaaaaaaaaaaaaaaaaaa~~~~~~~MMMaaaMMMMgggg.ggggg.gggggg.gggggMMMMMMMg.gggTgggggMM.,...M........,........TTccccccccccccccccT..MT..T",
+  ".....................==..............#######..~~..,T,TT,,,T,,T:T,,,,,T,,T,,,,,,TTT,,,,,,,,,T,,,,T,,,,,T,,T,,,T....T........T.......~~T.........................T...w~~wwwwwTww~~w..,..,,T.Twww~~~~~~~~~wMgaaaaaaaaaaaaaaaaaaaaaaa~~~~~~~~~~~aaaagg.Tgg.g.gg:...ggTg..g.gggg.gg.gggggg.gggggg:MM.M......M.,T.............cccccccccccccccc......MT",
+  "...............###D##==.......................~~..,,,T,,T,,,,,:TTT,T,,T,,TT,,,T,TT,,,,TTTT,,,T,TT,,,,,T,,,,TT,....:.T....T.........~~....cccccccccccccccccccc..T...w~~~wwwwwwwwwTw,T,TT,...wwww~~~~~~~~wagaaaaaaaaaTTaaaT.aT.aaa~~~~~~~~~~~~~aTa.:g..Tgggggg.gTT.gggg.T.gggg..TgggggggTggg.ggMM..,.M.....TM.TT.....,M...cccccccccccccccc....M..T",
+  "...............#____#==...cccccccccccccccccc..~~..,T,,,,TTT,,,:,,TT,,,,T,T,,,,T,,,,,,,,T,,,,,,,,,T,,T,,TT,,,,T.....................~~....cccccccccccccccccccc..T...w~~~~~wwwwwwwwTww..,wwwwwwwww~~~~~~~wgaaaaaaaaaaaaaaaTaaaTaa~~~~~~~~~~~~~~~aa....ggg.gggggMMMMgg..g.gggg.ggggg.ggggg:gg:g.MM...,,....,...,.....M....Mcccccccccccccccc..,.,.TT",
+  "...............#____#==...cccccccccccccccccc..~~..,,T,,,,,TTTT:,,T,,,,T,,T,TT,T,,,TTT,TT,,,T,,,TT,,,T,,T,TTTT...........:..........~~....cccccccccccccccccccc..TT..w~~~~~~www,,,wwwwwwwwww~~wwwww~~~~~~~aaaaaaaaaaaaaaaaaaaa.aa~~~~~~~~~~~~~~~aa.gggg..MMMMMMMMMM:TgggT.ggggg.TggggT.T.g.gg:gMM........T..,..T..M....M....M.,..T......M........T",
+  "...............#____#==...cccccccccccccccccc..~~..,T,,T,,T,T##D###,,TTT,,,,,T,,,,T,,,,,,,,TTT,TT,,T,,,..,,,,T,...............T.TT.~~.....cccccccccccccccccccc..TT.Tw~~~~~~~Tw,,T.wwwwww~~~~~~wwww~~~~~~~aaaaaaaaaaaaaaaaaaaaaaa~~~~~~~~~~~~~~~aag:ggT:gMMMMMMMMMMT.gTgggg.g.gg.ggggggggg..g.:MM..T..............,,...T.......M.T............,.MT",
+  "...............######==...cccccccccccccccccc..~~..,TT,,,,,,,#____#TT,,,,,,TTT,TT,,,T,T,,,,,,,,,,,,,,,,,,,,TT,,..BTTBBBBBBBBBBBBBBB~~TB...cccccccccccccccccccc..TTTT~~~~~~~~ww....,www~~~~~wwwww~~~~~~~~~aaaaaaaaaaaaaaaaggaTaTaa~~~~~~~~~~~~~aaagggTggggMMMMMMMTg.gggg.g:..:.ggggggggggTg.:.gMM.T.T,T.,.......T......,...T.......,......T....,,T",
+  ".....................==...cccccccccccccccccc..~~..T,,,,T,,,T#____#,T,,T,,,,T,,T,T,,,TTT,,,T,,,,,,,,,..,T,,,,T,..BBBBBBBTBBBBBBBBBB~~BB.T.cccccccccccccccccccc..TTTT~~~~~~~~wwwTTT,www~~~~wwwww~~~~~~~~~~aaaaaaaaaaaaagMMMMMaaaaa.~~~~~~~~~~~.Taagggg.ggggg..gggggggggggTgggg.:gg:..ggggg..gggMM.T.....T.MT.....,..M....T.M....M...,M....T,.T...T",
+  ".....................==...cccccccccccccccccc..~~..T,,,T,,T,,#____#,TTTT,,T,,,,,,T,TT,T,,,,T,,,,T,,T,,T,,T.,,T,..BBBTBBBBBBBBBBBBBB~~BB.TTcccccccccccccccccccc..TTTT~~~~~~~~www,.TTwww~~~~wwwwwT~~~~~~~~~aaaaaaaaaaaagMMTTMMMaaaaaaa~~~~~~~aaaaaaggg:g..ggg..g::gTggg.gggg.g.g.ggg:gggggg.ggggMM.....M....T,M....M..........T....T........,.....T",
+  ".....................==...cccccccccccccccccc..~~..T,TTT,TT,T######,,,,T,,,T,,,,,,T,T,,T,,,,T,,,T,.,T,,,.T,,,TT..TBBBBTBBBBBTBBBBTB~~BT...cccccccccccccccccccc..TTTTT~~~~~~~www.,,,,wwT~~wTwwwwwT~~~~~~~~TaaaaaaaaaaaaaMMMMMMgaaaaaaaaaaaaa.aaaaagg.g:gggTg:..g.gggggggT.gg.g.g.g:gg::gg:gggg.MM...M...,.T.,........M...T...,.,T.......T...T....T",
+  ".....................==...cccccccccccccccccc..~~..,,,,,,,TT,,,T,,T,,T,,T,TT,,,T,TT,,,,,,,T,TT,,,,,,,T,,,,,,,TT..BBBTBBBBBBBBBTBTBBB~~BT..cccccccccccccccccccc..TTTTTTT~~~~~ww.,.TT..wwwTww.T...wwwwww~~~aaaa.aaaaTTaMMMMMTMMaa.aaTaaa.aaTaaaaaaa:T.gT.g.g:Tgg.gggg:.ggg.T:ggg...g:gggg.gTggggMM..T......T.M.......,T....T..M,..T..MTT.....T.M..T",
+  "..............................................~~..T,,T,,T,,,,T,,,T,TTTT,,TT,,,T,,,,,,T,T,,,,,,,TTTT,T,,TT,,TT,..BBTBBBBBBBBBTTBBBBB~~B....T...................TTTTTTT~~~~~~ww.,.T.,.TwT~ww,..TTTwwTwwwwwaaa.aaaaaaaTaMMMMMMMaaaaaTaaaaaaaaaaaaaagg.g.Tgg.ggg:ggggggg.ggggTgT.TggggggggggggTggMM.,....,..M....MT,...,.T.,....T.........T...M....T",
+  "..............................................~~..,,T,T,,,TT,T,,T,,T,,,,,,,,T,TT,,,,,,,TTT,,T,,TTTTT,,TTTT,T,...BBTBBTBBTTTBBBBBBBB~~B.........................TTTTTT~~~~~~~w.,,...www~~wTw..,,..TwwwTww.aaaaaaaaaaaaMMMMMMM::aaaaaaaaaaaa.a.aaag..Tgg.gTggggg.gg.gg.gg.::.Tggg.gggg:gggggg:.MM....T........T.......,..M,..,....TM..,...M.,..M.T",
+  "..............................................~~..,,,,TT,T,,,,,T,,,,,,T,,,T,T,,,,,,,,,,,,,,,,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT::TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..,M..,......T..T...M...T,...T.......M.....T..T.T",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXM....T........T....MT..MTT.....T.,...TM..XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..,...T...T...T.M.T....T..T.T,.M.T.M...TX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX######################__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.....TM..TM........,.....M.T.M..,..T...TX###################__________#############XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_________############__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..T.MTT...,T......,..,.M.......,..T,T..TX#####________######__________###_________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_________############__%_______#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..,..,.......M,.,M......T....T.T.......TX#####________######___%______###_________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_________############__________#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.TT...,M...M..T.....,....,M..,M,......TTX#####___%____######__________###_________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_______________________________D______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.M...MT..T.T.,..TT...T.,M.,.,..........TX#####______________________________%_____#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_U_______________________%_____#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...,...T...T.,M.,.M....T......,..M,...,TX#####__U___________#####_####____________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_______________________________#______###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.....T..M...M...,...T......M.TTM.......TX#####____________________________________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_________############_______%__##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.....,M..T....########.T.M...,T....T...TX#####________######__________###______%__#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX#_________############__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTM.......,.....#TTTTTT#........TT...T...TX#####_____%__######__________###_________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX######################__________##########XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTT..#########.M#TTTTTT#..T.#########T,.,TX#####________######_______%__###_________#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTT,#_______#..#TTTTTT#....#_______#T..TTX###################__________#############XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...#_______#..#TTTTTT#,...#_______#...TTX##########################################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..,#_______#..###T####..,T#_______#T.T.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...#_______#..,.TT..,.T...#_______#.,..TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...####D####...,.M.......,####D####.M,TTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT........T.....TMT===...........,..M....TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...T.....M.......===....M...MT.T.,.T...TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.T.M......TT.....===...T......,......MTTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.TT,T.TT.....T...T...T.....,TT.....M...TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.,...,..T.M.......o....T.M...M..,......TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTM...M..........T..T.......TT..T.......MTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.....##D####T...TM,.,.T##D####..M...MT.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...,.#_____#,.......T..#_____#MT...T...TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTM...#_____#.....,..M..#_____#,.....,.TTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTTT.T#_____#T.M.....T..#_____#...M...M.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTT..,#######.T...T,.T.T#######.MT,.....TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTTM...M....,..TT.T..........T.T....T..,TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTM..,...........M...M.,.,.....,.,.T.....TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT....T.,T.M.......,..,,T.....M.T.M....T.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.TTMT..M..............M....T.........,,TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT,M....,...T~~~~~~~~~~~~~~~~........M.T.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.....T.....~~~~~~~~~~~~~~~~..M..,M....TTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..........,~~~~~~~~~~~~~~~~M..T........TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..M........~~~~~~~~~~~~~~~~.........M..TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT,,.........~~~~~~~~~~~~~~~~T..M.TTMT...TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT..,..M,..MT~~~~~~~~~~~~~~~~..T.,TT.....TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...M.TT..TT.......MT.T..T..T..TT.......TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.,..T.......M,.......T..,.....T.T,.....TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.......T..MT.,.,T.T...T..M...M..T.,....TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...T.,...........T.M.T.M...T.T..,..,...TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.............M...M.T...........T.....T.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.,......TT.............TT.M,......TT...TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT.MT,,M.,T.........,.M....T.T.,.........TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT...T.....,...,....M..T,..T...T...M...M.TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT",
+  "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
  ],
  "legend": {
   ".": {
@@ -184,6 +216,32 @@
    "walk": true,
    "natural": false,
    "solo": "duro"
+  },
+  "w": {
+   "name": "lama",
+   "walk": true,
+   "difficult": true,
+   "natural": true,
+   "solo": "macio"
+  },
+  "a": {
+   "name": "areia",
+   "walk": true,
+   "natural": true,
+   "solo": "macio"
+  },
+  "g": {
+   "name": "cascalho",
+   "walk": true,
+   "natural": true,
+   "solo": "comum"
+  },
+  "M": {
+   "name": "rocha",
+   "walk": false,
+   "cover": true,
+   "natural": true,
+   "solo": "comum"
   }
  },
  "zones": [
@@ -248,6 +306,78 @@
     0,
     24,
     49
+   ]
+  },
+  {
+   "id": "brejo",
+   "rect": [
+    160,
+    0,
+    40,
+    49
+   ]
+  },
+  {
+   "id": "deserto",
+   "rect": [
+    200,
+    0,
+    40,
+    49
+   ]
+  },
+  {
+   "id": "forte",
+   "rect": [
+    222,
+    3,
+    16,
+    12
+   ]
+  },
+  {
+   "id": "rocha",
+   "rect": [
+    240,
+    0,
+    48,
+    49
+   ]
+  },
+  {
+   "id": "pico",
+   "rect": [
+    256,
+    0,
+    30,
+    10
+   ]
+  },
+  {
+   "id": "cripta",
+   "rect": [
+    242,
+    50,
+    42,
+    13
+   ]
+  },
+  {
+   "id": "horizonte",
+   "rect": [
+    288,
+    0,
+    48,
+    49
+   ]
+  },
+  {
+   "id": "vale_sul",
+   "rect": [
+    200,
+    49,
+    41,
+    47
    ]
   }
  ],
@@ -806,6 +936,668 @@
     146,
     36
    ]
+  },
+  {
+   "id": "taberna_sapo",
+   "name": "Taberna do Sapo Manco",
+   "zone": "brejo",
+   "rect": [
+    173,
+    18,
+    7,
+    4
+   ],
+   "spot": [
+    176,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "cabana_curandeira",
+   "name": "Cabana da Curandeira",
+   "zone": "brejo",
+   "rect": [
+    184,
+    18,
+    5,
+    4
+   ],
+   "spot": [
+    186,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "casa_pescador",
+   "name": "Casa do Pescador",
+   "zone": "brejo",
+   "rect": [
+    173,
+    28,
+    4,
+    3
+   ],
+   "spot": [
+    175,
+    29
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "casa_cacador_croc",
+   "name": "Casa do Caçador de Crocodilos",
+   "zone": "brejo",
+   "rect": [
+    181,
+    28,
+    4,
+    3
+   ],
+   "spot": [
+    183,
+    29
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "palanque_anciao",
+   "name": "Palanque do Ancião",
+   "zone": "brejo",
+   "rect": [
+    189,
+    28,
+    6,
+    3
+   ],
+   "spot": [
+    192,
+    29
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "passarela_junco",
+   "name": "Passarelas de Junco Alto",
+   "zone": "brejo",
+   "rect": [
+    168,
+    23,
+    30,
+    4
+   ],
+   "spot": [
+    182,
+    24
+   ]
+  },
+  {
+   "id": "brejo_norte",
+   "name": "Trilha do Altar",
+   "zone": "brejo",
+   "rect": [
+    162,
+    8,
+    24,
+    16
+   ],
+   "spot": [
+    170,
+    8
+   ]
+  },
+  {
+   "id": "altar_submerso",
+   "name": "Altar Submerso",
+   "zone": "brejo",
+   "rect": [
+    184,
+    3,
+    12,
+    9
+   ],
+   "spot": [
+    190,
+    8
+   ]
+  },
+  {
+   "id": "pousada_camelo",
+   "name": "Pousada do Camelo",
+   "zone": "deserto",
+   "rect": [
+    210,
+    18,
+    8,
+    4
+   ],
+   "spot": [
+    214,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "bazar_tendas",
+   "name": "Bazar das Mil Tendas",
+   "zone": "deserto",
+   "rect": [
+    223,
+    18,
+    8,
+    4
+   ],
+   "spot": [
+    227,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "guilda_filial",
+   "name": "Filial da Guilda de Areia Dourada",
+   "zone": "deserto",
+   "rect": [
+    210,
+    28,
+    6,
+    4
+   ],
+   "spot": [
+    213,
+    30
+   ],
+   "indoor": true
+  },
+  {
+   "id": "armaria_deserto",
+   "name": "Armaria do Deserto",
+   "zone": "deserto",
+   "rect": [
+    221,
+    28,
+    5,
+    4
+   ],
+   "spot": [
+    223,
+    30
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_curandeira_d",
+   "name": "Tenda da Curandeira",
+   "zone": "deserto",
+   "rect": [
+    231,
+    28,
+    4,
+    3
+   ],
+   "spot": [
+    233,
+    29
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "praca_areia",
+   "name": "Posto Areia Dourada",
+   "zone": "deserto",
+   "rect": [
+    204,
+    22,
+    38,
+    5
+   ],
+   "spot": [
+    222,
+    24
+   ]
+  },
+  {
+   "id": "oasis",
+   "name": "Oásis Miragem",
+   "zone": "deserto",
+   "rect": [
+    222,
+    34,
+    16,
+    10
+   ],
+   "spot": [
+    230,
+    33
+   ]
+  },
+  {
+   "id": "forte_caido",
+   "name": "Forte Caído",
+   "zone": "forte",
+   "rect": [
+    223,
+    4,
+    14,
+    10
+   ],
+   "spot": [
+    230,
+    8
+   ],
+   "indoor": false
+  },
+  {
+   "id": "alojamento_mineiros",
+   "name": "Alojamento dos Mineiros",
+   "zone": "rocha",
+   "rect": [
+    251,
+    18,
+    8,
+    4
+   ],
+   "spot": [
+    255,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "taverna_picareta",
+   "name": "Taverna da Picareta",
+   "zone": "rocha",
+   "rect": [
+    263,
+    18,
+    7,
+    4
+   ],
+   "spot": [
+    266,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "forja_ana",
+   "name": "Forja Anã de Rocha Negra",
+   "zone": "rocha",
+   "rect": [
+    274,
+    18,
+    6,
+    4
+   ],
+   "spot": [
+    277,
+    20
+   ],
+   "indoor": true
+  },
+  {
+   "id": "posto_guarda_rn",
+   "name": "Posto da Guarda de Rocha Negra",
+   "zone": "rocha",
+   "rect": [
+    251,
+    28,
+    5,
+    4
+   ],
+   "spot": [
+    253,
+    30
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_mina",
+   "name": "Casa da Mina",
+   "zone": "rocha",
+   "rect": [
+    261,
+    28,
+    6,
+    4
+   ],
+   "spot": [
+    264,
+    30
+   ],
+   "indoor": true
+  },
+  {
+   "id": "capela_khalmyr",
+   "name": "Capela de Khalmyr",
+   "zone": "rocha",
+   "rect": [
+    272,
+    28,
+    6,
+    4
+   ],
+   "spot": [
+    275,
+    30
+   ],
+   "indoor": true,
+   "simbolo_divindade": "Khalmyr"
+  },
+  {
+   "id": "praca_rocha",
+   "name": "Praça de Rocha Negra",
+   "zone": "rocha",
+   "rect": [
+    247,
+    22,
+    36,
+    5
+   ],
+   "spot": [
+    264,
+    24
+   ]
+  },
+  {
+   "id": "pico_rubro",
+   "name": "Pico Rubro",
+   "zone": "pico",
+   "rect": [
+    258,
+    2,
+    12,
+    5
+   ],
+   "spot": [
+    264,
+    4
+   ]
+  },
+  {
+   "id": "mina_salao",
+   "name": "Salão de Entrada das Minas",
+   "zone": "cripta",
+   "rect": [
+    247,
+    52,
+    8,
+    9
+   ],
+   "spot": [
+    250,
+    56
+   ],
+   "indoor": true
+  },
+  {
+   "id": "mina_ninho",
+   "name": "Ninho das Minas",
+   "zone": "cripta",
+   "rect": [
+    261,
+    51,
+    10,
+    5
+   ],
+   "spot": [
+    265,
+    53
+   ],
+   "indoor": true
+  },
+  {
+   "id": "mina_poco",
+   "name": "Poço de Gosma",
+   "zone": "cripta",
+   "rect": [
+    261,
+    57,
+    10,
+    5
+   ],
+   "spot": [
+    265,
+    59
+   ],
+   "indoor": true
+  },
+  {
+   "id": "mina_feitor",
+   "name": "Câmara do Feitor",
+   "zone": "cripta",
+   "rect": [
+    274,
+    52,
+    9,
+    9
+   ],
+   "spot": [
+    278,
+    56
+   ],
+   "indoor": true
+  },
+  {
+   "id": "estalagem_horizonte",
+   "name": "Estalagem do Horizonte",
+   "zone": "horizonte",
+   "rect": [
+    297,
+    18,
+    7,
+    4
+   ],
+   "spot": [
+    300,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "armazem_horizonte",
+   "name": "Armazém do Horizonte",
+   "zone": "horizonte",
+   "rect": [
+    310,
+    18,
+    7,
+    4
+   ],
+   "spot": [
+    313,
+    20
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "oficina_carrocas",
+   "name": "Oficina de Carroças",
+   "zone": "horizonte",
+   "rect": [
+    323,
+    18,
+    6,
+    4
+   ],
+   "spot": [
+    325,
+    20
+   ],
+   "indoor": true
+  },
+  {
+   "id": "casa_guia",
+   "name": "Casa do Guia",
+   "zone": "horizonte",
+   "rect": [
+    297,
+    28,
+    5,
+    3
+   ],
+   "spot": [
+    299,
+    29
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "casa_ferreiro_estrada",
+   "name": "Casa do Ferreiro da Estrada",
+   "zone": "horizonte",
+   "rect": [
+    307,
+    28,
+    4,
+    3
+   ],
+   "spot": [
+    308,
+    29
+   ],
+   "indoor": true
+  },
+  {
+   "id": "praca_horizonte",
+   "name": "Praça do Horizonte",
+   "zone": "horizonte",
+   "rect": [
+    296,
+    22,
+    36,
+    5
+   ],
+   "spot": [
+    314,
+    24
+   ]
+  },
+  {
+   "id": "lago_horizonte",
+   "name": "Lago do Horizonte",
+   "zone": "horizonte",
+   "rect": [
+    302,
+    8,
+    14,
+    7
+   ],
+   "spot": [
+    309,
+    12
+   ]
+  },
+  {
+   "id": "taverna_vale",
+   "name": "Taverna do Vale Fundo",
+   "zone": "vale_sul",
+   "rect": [
+    205,
+    61,
+    7,
+    4
+   ],
+   "spot": [
+    208,
+    63
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "casa_anciao",
+   "name": "Casa da Anciã",
+   "zone": "vale_sul",
+   "rect": [
+    216,
+    59,
+    6,
+    4
+   ],
+   "spot": [
+    218,
+    61
+   ],
+   "indoor": true
+  },
+  {
+   "id": "armazem_vale",
+   "name": "Armazém da Aldeia",
+   "zone": "vale_sul",
+   "rect": [
+    228,
+    61,
+    7,
+    4
+   ],
+   "spot": [
+    231,
+    63
+   ],
+   "indoor": true,
+   "parede_madeira": true
+  },
+  {
+   "id": "casa_cacadores",
+   "name": "Casa dos Caçadores",
+   "zone": "vale_sul",
+   "rect": [
+    207,
+    73,
+    5,
+    3
+   ],
+   "spot": [
+    209,
+    74
+   ],
+   "indoor": true
+  },
+  {
+   "id": "ferreiro_vale",
+   "name": "Ferreiro do Vale",
+   "zone": "vale_sul",
+   "rect": [
+    225,
+    73,
+    5,
+    3
+   ],
+   "spot": [
+    227,
+    74
+   ],
+   "indoor": true
+  },
+  {
+   "id": "praca_vale",
+   "name": "Praça da Aldeia do Vale",
+   "zone": "vale_sul",
+   "rect": [
+    218,
+    66,
+    3,
+    3
+   ],
+   "spot": [
+    219,
+    67
+   ]
   }
  ],
  "objects": [
@@ -1184,6 +1976,620 @@
    ],
    "name": "Estátua de Lena",
    "escultura": true
+  },
+  {
+   "id": "porta_taberna_sapo",
+   "type": "door",
+   "tile": [
+    176,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Taberna do Sapo Manco)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_cabana_curandeira",
+   "type": "door",
+   "tile": [
+    186,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Cabana da Curandeira)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_casa_pescador",
+   "type": "door",
+   "tile": [
+    174,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa do Pescador)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_casa_cacador_croc",
+   "type": "door",
+   "tile": [
+    182,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa do Caçador de Crocodilos)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_palanque",
+   "type": "door",
+   "tile": [
+    191,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Palanque do Ancião)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_pousada_camelo",
+   "type": "door",
+   "tile": [
+    213,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Pousada do Camelo)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_bazar",
+   "type": "door",
+   "tile": [
+    226,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Bazar das Mil Tendas)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_guilda_filial",
+   "type": "door",
+   "tile": [
+    212,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Filial da Guilda)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_armaria",
+   "type": "door",
+   "tile": [
+    223,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Armaria do Deserto)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_curandeira_d",
+   "type": "door",
+   "tile": [
+    232,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Tenda da Curandeira)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_alojamento",
+   "type": "door",
+   "tile": [
+    254,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Alojamento dos Mineiros)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_picareta",
+   "type": "door",
+   "tile": [
+    266,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Taverna da Picareta)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_forja_ana",
+   "type": "door",
+   "tile": [
+    276,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Forja Anã)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_posto_rn",
+   "type": "door",
+   "tile": [
+    253,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Posto da Guarda)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_casa_mina",
+   "type": "door",
+   "tile": [
+    263,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa da Mina)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_capela",
+   "type": "door",
+   "tile": [
+    274,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Capela de Khalmyr)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "portao_forte",
+   "type": "door",
+   "tile": [
+    237,
+    8
+   ],
+   "open": false,
+   "locked": true,
+   "name": "Portão tabuado do Forte Caído",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 30,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira reforçada",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "poco_junco",
+   "type": "well",
+   "tile": [
+    198,
+    26
+   ],
+   "name": "Poço de Junco Alto"
+  },
+  {
+   "id": "poco_areia",
+   "type": "well",
+   "tile": [
+    218,
+    26
+   ],
+   "name": "Poço do Posto"
+  },
+  {
+   "id": "poco_rocha",
+   "type": "well",
+   "tile": [
+    259,
+    26
+   ],
+   "name": "Poço de Rocha Negra"
+  },
+  {
+   "id": "escada_mina",
+   "type": "stairs",
+   "tile": [
+    264,
+    31
+   ],
+   "to": [
+    250,
+    56
+   ],
+   "name": "Escada para as Minas"
+  },
+  {
+   "id": "escada_mina_sobe",
+   "type": "stairs",
+   "tile": [
+    249,
+    56
+   ],
+   "to": [
+    264,
+    30
+   ],
+   "name": "Escada para a superfície"
+  },
+  {
+   "id": "bau_altar",
+   "type": "chest",
+   "tile": [
+    190,
+    7
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Baú coberto de limo",
+   "contents": [
+    "amuleto_serpente",
+    "pocao_cura"
+   ]
+  },
+  {
+   "id": "bau_forte",
+   "type": "chest",
+   "tile": [
+    234,
+    12
+   ],
+   "open": false,
+   "locked": true,
+   "name": "Baú do intendente",
+   "contents": [
+    "espada_longa",
+    "pocao_cura",
+    "pocao_cura"
+   ]
+  },
+  {
+   "id": "bau_mina",
+   "type": "chest",
+   "tile": [
+    281,
+    54
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Baú do feitor",
+   "contents": [
+    "cota_malha",
+    "minerio_negro",
+    "minerio_negro"
+   ]
+  },
+  {
+   "id": "estatua_khalmyr",
+   "type": "prop",
+   "tile": [
+    275,
+    29
+   ],
+   "name": "Estátua de Khalmyr",
+   "escultura": true
+  },
+  {
+   "id": "porta_estalagem_horizonte",
+   "type": "door",
+   "tile": [
+    300,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Estalagem do Horizonte)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_armazem_horizonte",
+   "type": "door",
+   "tile": [
+    313,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Armazém do Horizonte)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_oficina",
+   "type": "door",
+   "tile": [
+    325,
+    22
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Oficina de Carroças)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_casa_guia",
+   "type": "door",
+   "tile": [
+    298,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa do Guia)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_ferreiro_estrada",
+   "type": "door",
+   "tile": [
+    308,
+    27
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Ferreiro da Estrada)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_taverna_vale",
+   "type": "door",
+   "tile": [
+    208,
+    65
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Taverna do Vale Fundo)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_casa_anciao",
+   "type": "door",
+   "tile": [
+    218,
+    63
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa da Anciã)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_armazem_vale",
+   "type": "door",
+   "tile": [
+    231,
+    65
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Armazém da Aldeia)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_casa_cacadores",
+   "type": "door",
+   "tile": [
+    208,
+    72
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Casa dos Caçadores)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "porta_ferreiro_vale",
+   "type": "door",
+   "tile": [
+    226,
+    72
+   ],
+   "open": false,
+   "locked": false,
+   "name": "Porta (Ferreiro do Vale)",
+   "break": {
+    "defesa": 8,
+    "rd": 5,
+    "pv": 20,
+    "rule": "LB p.239 Tabela 5-4 porta de madeira",
+    "tamanho": "Grande"
+   }
+  },
+  {
+   "id": "poco_horizonte",
+   "type": "well",
+   "tile": [
+    316,
+    26
+   ],
+   "name": "Poço do Horizonte"
+  },
+  {
+   "id": "poco_vale",
+   "type": "well",
+   "tile": [
+    219,
+    70
+   ],
+   "name": "Poço do Vale"
   }
  ],
  "targets": [

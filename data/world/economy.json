@@ -77,6 +77,36 @@
     "madeira": 3000
    }
   },
+  "fronteira": {
+   "stock": {
+    "comida": 300,
+    "bebida": 200,
+    "ferramentas": 120,
+    "remedio": 20,
+    "madeira": 40
+   },
+   "production": {
+    "comida": 25,
+    "bebida": 15,
+    "ferramentas": 8,
+    "remedio": 1,
+    "madeira": 0
+   },
+   "consumption": {
+    "comida": 24,
+    "bebida": 15,
+    "ferramentas": 6,
+    "remedio": 0,
+    "madeira": 0
+   },
+   "target": {
+    "comida": 300,
+    "bebida": 200,
+    "ferramentas": 120,
+    "remedio": 20,
+    "madeira": 40
+   }
+  },
   "samburdia": {
    "stock": {
     "comida": 800,
@@ -149,6 +179,131 @@
    "tocha",
    "corda"
   ],
+  "zeca": [
+   "pao",
+   "cerveja",
+   "ensopado_junco"
+  ],
+  "juta": [
+   "pao",
+   "ensopado_junco"
+  ],
+  "mirta": [
+   "pocao_cura",
+   "frasco_agua"
+  ],
+  "brutus": [
+   "gibao_peles",
+   "couro_batido",
+   "arco_curto",
+   "machadinha",
+   "adaga"
+  ],
+  "haziz": [
+   "pao",
+   "cerveja",
+   "vinho_de_cacto"
+  ],
+  "nadia": [
+   "pao",
+   "vinho_de_cacto"
+  ],
+  "kharim": [
+   "corda",
+   "tocha",
+   "pao",
+   "saco_de_dormir",
+   "pocao_cura",
+   "agua_benta",
+   "arco_longo",
+   "besta_leve",
+   "armadura_couro",
+   "armadura_acolchoada",
+   "escudo_leve",
+   "frasco_agua"
+  ],
+  "sulema": [
+   "espada_curta",
+   "espada_longa",
+   "cimitarra",
+   "florete",
+   "machado_batalha",
+   "martelo_guerra",
+   "tridente",
+   "mangual",
+   "brunea",
+   "escudo_leve",
+   "escudo_pesado",
+   "couro_batido"
+  ],
+  "dara": [
+   "pocao_cura",
+   "frasco_agua"
+  ],
+  "durin": [
+   "picareta",
+   "marreta",
+   "machado_guerra",
+   "alabarda",
+   "montante",
+   "martelo_guerra",
+   "cota_malha",
+   "loriga_segmentada",
+   "meia_armadura",
+   "escudo_pesado"
+  ],
+  "brenna": [
+   "pao",
+   "cerveja_ana",
+   "ensopado_junco"
+  ],
+  "hakon": [
+   "pao",
+   "cerveja_ana",
+   "cerveja"
+  ],
+  "gorm": [
+   "picareta",
+   "tocha",
+   "corda"
+  ],
+  "thyra": [
+   "pocao_cura",
+   "agua_benta"
+  ],
+  "lotte": [
+   "pao",
+   "cerveja",
+   "corda",
+   "tocha"
+  ],
+  "gorvo": [
+   "pao",
+   "cerveja",
+   "ensopado_junco"
+  ],
+  "hogan": [
+   "adaga",
+   "machadinha",
+   "espada_curta",
+   "cimitarra",
+   "escudo_leve",
+   "couro_batido",
+   "armadura_couro"
+  ],
+  "ilka": [
+   "corda",
+   "tocha",
+   "saco_de_dormir",
+   "pao",
+   "ferramenta_oficio"
+  ],
+  "teo": [
+   "picareta",
+   "tridente",
+   "escudo_pesado",
+   "armadura_acolchoada"
+  ],
   "garrick": [
    "adaga",
    "espada_curta",
@@ -158,6 +313,13 @@
    "couro_batido",
    "cota_malha"
   ]
+ },
+ "regioes_por_zona": {
+  "brejo": "fronteira",
+  "deserto": "fronteira",
+  "rocha": "fronteira",
+  "horizonte": "fronteira",
+  "vale_sul": "fronteira"
  },
  "producao_trabalho": {
   "_nota": "Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho (ORIGINAL_DO_JOGO).",

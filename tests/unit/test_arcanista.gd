@@ -106,3 +106,19 @@ func test_c5_concentracao_caido_e_armadura() -> void:
 	c.sim.c("player").sheet.equipment.armor = "couro_batido"
 	var ar: Dictionary = c.casting_cd(c.sim.c("player").sheet, sp, 1).armor
 	eq(int(ar.get("cd", 0)), 21, "arcana de armadura: Misticismo CD 20 + custo (LB p.171)")
+
+
+func test_emboscada_exige_furtividade_e_alcance() -> void:
+	var w := WorldHelpers.world(5)
+	var c: CombatModule = w.modules.combat
+	c._ensure()
+	WorldHelpers.put(w, 25, 57)
+	c.creature_state["bandido_1"].tile = [27, 57]
+	c.creature_state["bandido_1"].present = true
+	c.undetected_by["bandido_1"] = true
+	var sem := WorldHelpers.cmd(w, "StartCombat", {"enemies": ["bandido_1"], "emboscada": true})
+	check(not sem.accepted, "sem furtividade não há emboscada")
+	WorldHelpers.cmd(w, "SetStance", {"sneak": true})
+	c.undetected_by["bandido_1"] = true
+	var r := WorldHelpers.cmd(w, "StartCombat", {"enemies": ["bandido_1"], "emboscada": true})
+	check(r.accepted, "escondido e perto: emboscada aceita")

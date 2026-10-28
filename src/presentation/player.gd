@@ -3,6 +3,8 @@ extends CharacterBody2D
 ## Jogador: input -> movimento físico -> comando MovePlayer quando muda de tile.
 
 @export var speed: float = 80.0
+## Correr: segure Shift enquanto anda (não vale enquanto estiver furtivo). Só muda a velocidade na tela.
+const CORRIDA := 1.8
 ## Movimento responsivo (Dead Cells): acelera e freia rápido, sem "patinar"; poeira ao arrancar e virar.
 @export var accel: float = 900.0
 @export var decel: float = 1100.0
@@ -38,10 +40,11 @@ func _physics_process(_delta: float) -> void:
 	if input_enabled and Game.mode == Game.Mode.EXPLORE and Game.world.modules.travel.current_region == "vila":
 		dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var sneaking: bool = Game.world.modules.combat.stance_sneak
-	var target_v := dir * (speed * (0.5 if sneaking else 1.0))
+	var correndo := dir != Vector2.ZERO and not sneaking and Input.is_key_pressed(KEY_SHIFT)
+	var target_v := dir * (speed * (0.5 if sneaking else (CORRIDA if correndo else 1.0)))
 	var rate := accel if dir != Vector2.ZERO else decel
 	velocity = velocity.move_toward(target_v, rate * _delta)
-	if dir != Vector2.ZERO and (_last_dir == Vector2.ZERO or dir.dot(_last_dir) < 0.2) and not sneaking:
+	if dir != Vector2.ZERO and (_last_dir == Vector2.ZERO or dir.dot(_last_dir) < 0.2 or correndo) and not sneaking:
 		ImpactFx.dust(get_parent(), global_position, dir, 4)   # arrancar ou mudar de direção levanta poeira
 	_last_dir = dir
 	move_and_slide()

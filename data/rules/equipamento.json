@@ -329,6 +329,268 @@
    "pdf_page": 149,
    "status": "VERIFICADA",
    "nota": "Tabela 3-2: Dano de Armas"
+  },
+  {
+   "id": "arma.machadinha",
+   "valor": {
+    "dano": "1d6",
+    "margem": 20,
+    "mult": 3,
+    "alcance": "curto",
+    "tipo": "corte",
+    "maos": 1,
+    "leve": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.cimitarra",
+   "valor": {
+    "dano": "1d6",
+    "margem": 18,
+    "mult": 2,
+    "tipo": "corte",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.florete",
+   "valor": {
+    "dano": "1d6",
+    "margem": 18,
+    "mult": 2,
+    "tipo": "perfuracao",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.mangual",
+   "valor": {
+    "dano": "1d8",
+    "margem": 20,
+    "mult": 2,
+    "tipo": "impacto",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.martelo_guerra",
+   "valor": {
+    "dano": "1d8",
+    "margem": 20,
+    "mult": 3,
+    "tipo": "impacto",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.picareta",
+   "valor": {
+    "dano": "1d6",
+    "margem": 20,
+    "mult": 4,
+    "tipo": "perfuracao",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.tridente",
+   "valor": {
+    "dano": "1d8",
+    "margem": 20,
+    "mult": 2,
+    "alcance": "curto",
+    "tipo": "perfuracao",
+    "maos": 1
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.alabarda",
+   "valor": {
+    "dano": "1d10",
+    "margem": 20,
+    "mult": 3,
+    "tipo": "corte",
+    "maos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 145,
+   "pdf_page": 151,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.machado_guerra",
+   "valor": {
+    "dano": "1d12",
+    "margem": 20,
+    "mult": 3,
+    "tipo": "corte",
+    "maos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 145,
+   "pdf_page": 151,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.marreta",
+   "valor": {
+    "dano": "3d4",
+    "margem": 20,
+    "mult": 2,
+    "tipo": "impacto",
+    "maos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 145,
+   "pdf_page": 151,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.montante",
+   "valor": {
+    "dano": "2d6",
+    "margem": 19,
+    "mult": 2,
+    "tipo": "corte",
+    "maos": 2
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 145,
+   "pdf_page": 151,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.besta_leve",
+   "valor": {
+    "dano": "1d8",
+    "margem": 19,
+    "mult": 2,
+    "alcance": "medio",
+    "tipo": "perfuracao",
+    "maos": 1,
+    "disparo": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 144,
+   "pdf_page": 150,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "arma.arco_longo",
+   "valor": {
+    "dano": "1d8",
+    "margem": 20,
+    "mult": 3,
+    "alcance": "medio",
+    "tipo": "perfuracao",
+    "maos": 2,
+    "disparo": true,
+    "madeira": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 145,
+   "pdf_page": 151,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.acolchoada",
+   "valor": {
+    "defesa": 1,
+    "penalidade": 0,
+    "metal": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.couro",
+   "valor": {
+    "defesa": 2,
+    "penalidade": 0,
+    "metal": false
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.brunea",
+   "valor": {
+    "defesa": 5,
+    "penalidade": -2,
+    "metal": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.loriga_segmentada",
+   "valor": {
+    "defesa": 7,
+    "penalidade": -3,
+    "metal": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "armadura.meia_armadura",
+   "valor": {
+    "defesa": 8,
+    "penalidade": -4,
+    "metal": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
+  },
+  {
+   "id": "escudo.pesado",
+   "valor": {
+    "defesa": 2,
+    "penalidade": -2,
+    "madeira": true
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",
+   "pagina": 153,
+   "pdf_page": 159,
+   "status": "VERIFICADA"
   }
  ]
 }

@@ -5,43 +5,633 @@
   "sede": "taverna",
   "taxa": 10,
   "ranks": [
-   {"id": "cobre", "nome": "Cobre", "pontos": 0, "nd_max": 0.5},
-   {"id": "bronze", "nome": "Bronze", "pontos": 30, "nd_max": 2},
-   {"id": "prata", "nome": "Prata", "pontos": 100, "nd_max": 4},
-   {"id": "ouro", "nome": "Ouro", "pontos": 250, "nd_max": 8},
-   {"id": "platina", "nome": "Platina", "pontos": 500, "nd_max": 20}
+   {
+    "id": "cobre",
+    "nome": "Cobre",
+    "pontos": 0,
+    "nd_max": 0.5
+   },
+   {
+    "id": "bronze",
+    "nome": "Bronze",
+    "pontos": 30,
+    "nd_max": 2
+   },
+   {
+    "id": "prata",
+    "nome": "Prata",
+    "pontos": 100,
+    "nd_max": 4
+   },
+   {
+    "id": "ouro",
+    "nome": "Ouro",
+    "pontos": 250,
+    "nd_max": 8
+   },
+   {
+    "id": "platina",
+    "nome": "Platina",
+    "pontos": 500,
+    "nd_max": 20
+   }
   ],
   "contratos_por_quadro": 5,
   "renova_dias": 3
  },
  "cacas": [
-  {"rule": "criatura.rato_gigante", "grupo": [3, 5], "zonas": ["cripta", "vila"], "titulo": "Ratos no porão", "pedido": "Ratos do tamanho de cães tomaram um porão perto de %s. Acabe com o ninho.", "drop": "rabo_de_rato"},
-  {"rule": "criatura.lobo", "grupo": [2, 4], "zonas": ["floresta", "serra"], "titulo": "Alcateia faminta", "pedido": "Lobos atacaram o rebanho perto de %s. Os pastores querem a alcateia longe.", "drop": "pele_de_lobo"},
-  {"rule": "criatura.zumbi", "grupo": [2, 4], "zonas": ["ruina", "cripta"], "titulo": "Mortos que andam", "pedido": "Viajantes viram mortos caminhando perto de %s. Devolva-os ao chão."},
-  {"rule": "criatura.cascavel", "grupo": [2, 3], "zonas": ["serra", "estrada"], "titulo": "Serpentes na trilha", "pedido": "Cascavéis ninharam na trilha de %s; dois viajantes já foram picados."},
-  {"rule": "criatura.glop", "grupo": [2, 4], "zonas": ["cripta", "ruina"], "titulo": "Gosmas ácidas", "pedido": "Gosmas verdes estão dissolvendo o que encontram perto de %s."},
-  {"rule": "criatura.bandido_comum", "grupo": [3, 4], "zonas": ["estrada", "floresta"], "titulo": "Salteadores na estrada", "pedido": "Um bando assalta mercadores perto de %s. A guilda paga por estrada limpa."},
-  {"rule": "criatura.orc_combatente", "grupo": [2, 4], "zonas": ["serra", "floresta"], "titulo": "Batedores orcs", "pedido": "Batedores orcs foram vistos perto de %s. Encontre-os antes que tragam a tribo."},
-  {"rule": "criatura.esqueleto", "grupo": [3, 5], "zonas": ["ruina", "cripta"], "titulo": "Ossos inquietos", "pedido": "Esqueletos guardam %s e não deixam ninguém passar."},
-  {"rule": "criatura.gnoll_saqueador", "grupo": [2, 3], "zonas": ["estrada", "serra"], "titulo": "Saqueadores gnolls", "pedido": "Gnolls saqueiam carroças perto de %s."},
-  {"rule": "criatura.orc_chefe", "grupo": [1, 1], "acompanha": ["criatura.orc_combatente", 2], "zonas": ["serra"], "titulo": "O chefe orc", "pedido": "Um chefe orc reúne guerreiros perto de %s. Derrube o chefe."},
-  {"rule": "criatura.aranha_gigante", "grupo": [1, 2], "zonas": ["floresta"], "titulo": "Teias no bosque", "pedido": "Teias do tamanho de redes cobrem as árvores perto de %s.", "drop": "seda_de_aranha"},
-  {"rule": "criatura.gargula", "grupo": [1, 2], "zonas": ["ruina"], "titulo": "Pedras que voam", "pedido": "Estátuas em %s ganharam vida e atacam quem chega."},
-  {"rule": "criatura.urso_coruja", "grupo": [1, 1], "zonas": ["floresta", "serra"], "titulo": "A fera do bosque", "pedido": "Um urso-coruja ronda %s. Lenhadores não ousam entrar."},
-  {"rule": "criatura.ogro", "grupo": [1, 1], "zonas": ["serra", "estrada"], "titulo": "O ogro da ponte", "pedido": "Um ogro cobra pedágio em sangue perto de %s."},
-  {"rule": "criatura.basilisco", "grupo": [1, 1], "zonas": ["serra", "ruina"], "titulo": "Olhar de pedra", "pedido": "Viajantes viraram estátuas perto de %s. Algo vive lá."},
-  {"rule": "criatura.aparicao", "grupo": [1, 1], "zonas": ["cripta", "ruina"], "titulo": "A aparição", "pedido": "Uma aparição assombra %s à noite."},
-  {"rule": "criatura.orc_mutante", "grupo": [1, 1], "acompanha": ["criatura.orc_combatente", 3], "zonas": ["serra"], "titulo": "A abominação orc", "pedido": "Uma coisa de três braços lidera orcs perto de %s."},
-  {"rule": "criatura.manticora", "grupo": [1, 1], "zonas": ["serra"], "titulo": "Espinhos no céu", "pedido": "Uma mantícora caça nas encostas de %s."}
+  {
+   "rule": "criatura.rato_gigante",
+   "grupo": [
+    3,
+    5
+   ],
+   "zonas": [
+    "cripta",
+    "vila"
+   ],
+   "titulo": "Ratos no porão",
+   "pedido": "Ratos do tamanho de cães tomaram um porão perto de %s. Acabe com o ninho.",
+   "drop": "rabo_de_rato"
+  },
+  {
+   "rule": "criatura.lobo",
+   "grupo": [
+    2,
+    4
+   ],
+   "zonas": [
+    "floresta",
+    "serra"
+   ],
+   "titulo": "Alcateia faminta",
+   "pedido": "Lobos atacaram o rebanho perto de %s. Os pastores querem a alcateia longe.",
+   "drop": "pele_de_lobo"
+  },
+  {
+   "rule": "criatura.zumbi",
+   "grupo": [
+    2,
+    4
+   ],
+   "zonas": [
+    "ruina",
+    "cripta"
+   ],
+   "titulo": "Mortos que andam",
+   "pedido": "Viajantes viram mortos caminhando perto de %s. Devolva-os ao chão."
+  },
+  {
+   "rule": "criatura.cascavel",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "serra",
+    "estrada"
+   ],
+   "titulo": "Serpentes na trilha",
+   "pedido": "Cascavéis ninharam na trilha de %s; dois viajantes já foram picados."
+  },
+  {
+   "rule": "criatura.glop",
+   "grupo": [
+    2,
+    4
+   ],
+   "zonas": [
+    "cripta",
+    "ruina"
+   ],
+   "titulo": "Gosmas ácidas",
+   "pedido": "Gosmas verdes estão dissolvendo o que encontram perto de %s."
+  },
+  {
+   "rule": "criatura.bandido_comum",
+   "grupo": [
+    3,
+    4
+   ],
+   "zonas": [
+    "estrada",
+    "floresta"
+   ],
+   "titulo": "Salteadores na estrada",
+   "pedido": "Um bando assalta mercadores perto de %s. A guilda paga por estrada limpa."
+  },
+  {
+   "rule": "criatura.orc_combatente",
+   "grupo": [
+    2,
+    4
+   ],
+   "zonas": [
+    "serra",
+    "floresta"
+   ],
+   "titulo": "Batedores orcs",
+   "pedido": "Batedores orcs foram vistos perto de %s. Encontre-os antes que tragam a tribo."
+  },
+  {
+   "rule": "criatura.esqueleto",
+   "grupo": [
+    3,
+    5
+   ],
+   "zonas": [
+    "ruina",
+    "cripta"
+   ],
+   "titulo": "Ossos inquietos",
+   "pedido": "Esqueletos guardam %s e não deixam ninguém passar."
+  },
+  {
+   "rule": "criatura.gnoll_saqueador",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "estrada",
+    "serra"
+   ],
+   "titulo": "Saqueadores gnolls",
+   "pedido": "Gnolls saqueiam carroças perto de %s."
+  },
+  {
+   "rule": "criatura.orc_chefe",
+   "grupo": [
+    1,
+    1
+   ],
+   "acompanha": [
+    "criatura.orc_combatente",
+    2
+   ],
+   "zonas": [
+    "serra"
+   ],
+   "titulo": "O chefe orc",
+   "pedido": "Um chefe orc reúne guerreiros perto de %s. Derrube o chefe."
+  },
+  {
+   "rule": "criatura.aranha_gigante",
+   "grupo": [
+    1,
+    2
+   ],
+   "zonas": [
+    "floresta"
+   ],
+   "titulo": "Teias no bosque",
+   "pedido": "Teias do tamanho de redes cobrem as árvores perto de %s.",
+   "drop": "seda_de_aranha"
+  },
+  {
+   "rule": "criatura.gargula",
+   "grupo": [
+    1,
+    2
+   ],
+   "zonas": [
+    "ruina"
+   ],
+   "titulo": "Pedras que voam",
+   "pedido": "Estátuas em %s ganharam vida e atacam quem chega."
+  },
+  {
+   "rule": "criatura.urso_coruja",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "floresta",
+    "serra"
+   ],
+   "titulo": "A fera do bosque",
+   "pedido": "Um urso-coruja ronda %s. Lenhadores não ousam entrar."
+  },
+  {
+   "rule": "criatura.ogro",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "serra",
+    "estrada"
+   ],
+   "titulo": "O ogro da ponte",
+   "pedido": "Um ogro cobra pedágio em sangue perto de %s."
+  },
+  {
+   "rule": "criatura.basilisco",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "serra",
+    "ruina"
+   ],
+   "titulo": "Olhar de pedra",
+   "pedido": "Viajantes viraram estátuas perto de %s. Algo vive lá."
+  },
+  {
+   "rule": "criatura.aparicao",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "cripta",
+    "ruina"
+   ],
+   "titulo": "A aparição",
+   "pedido": "Uma aparição assombra %s à noite."
+  },
+  {
+   "rule": "criatura.orc_mutante",
+   "grupo": [
+    1,
+    1
+   ],
+   "acompanha": [
+    "criatura.orc_combatente",
+    3
+   ],
+   "zonas": [
+    "serra"
+   ],
+   "titulo": "A abominação orc",
+   "pedido": "Uma coisa de três braços lidera orcs perto de %s."
+  },
+  {
+   "rule": "criatura.manticora",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "serra"
+   ],
+   "titulo": "Espinhos no céu",
+   "pedido": "Uma mantícora caça nas encostas de %s."
+  },
+  {
+   "rule": "criatura.naja",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "brejo"
+   ],
+   "titulo": "Najas do brejo",
+   "pedido": "Najas tomaram as passarelas de %s. Ninguém atravessa sem ser mordido.",
+   "drop": "presa_de_serpente"
+  },
+  {
+   "rule": "criatura.glop",
+   "grupo": [
+    2,
+    4
+   ],
+   "zonas": [
+    "brejo",
+    "cripta"
+   ],
+   "titulo": "Gosmas da lama",
+   "pedido": "Gosmas verdes engoliram barcos perto de %s."
+  },
+  {
+   "rule": "criatura.nagah_guardiao",
+   "grupo": [
+    1,
+    2
+   ],
+   "acompanha": [
+    "criatura.cultista_de_sszzaas",
+    1
+   ],
+   "zonas": [
+    "brejo"
+   ],
+   "titulo": "O culto do altar",
+   "pedido": "Nagahs guardam um altar submerso perto de %s. Derrube os guardiões.",
+   "drop": "medalhao_do_culto"
+  },
+  {
+   "rule": "criatura.cascavel",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "deserto"
+   ],
+   "titulo": "Serpentes das dunas",
+   "pedido": "Cascavéis cercam a estrada de %s. As caravanas param de noite."
+  },
+  {
+   "rule": "criatura.gnoll_saqueador",
+   "grupo": [
+    3,
+    4
+   ],
+   "zonas": [
+    "deserto"
+   ],
+   "titulo": "Gnolls das dunas",
+   "pedido": "Gnolls atacam caravanas perto de %s.",
+   "drop": "dente_de_gnoll"
+  },
+  {
+   "rule": "criatura.esqueleto",
+   "grupo": [
+    3,
+    4
+   ],
+   "zonas": [
+    "forte"
+   ],
+   "titulo": "Guarda do forte",
+   "pedido": "Mortos patrulham o Forte Caído, a %s. Ninguém volta de lá."
+  },
+  {
+   "rule": "criatura.grifo",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "rocha",
+    "deserto"
+   ],
+   "titulo": "O grifo das rochas",
+   "pedido": "Um grifo caça ovelhas e mineiros perto de %s.",
+   "drop": "garra_de_grifo"
+  },
+  {
+   "rule": "criatura.orc_chefe",
+   "grupo": [
+    1,
+    1
+   ],
+   "acompanha": [
+    "criatura.orc_combatente",
+    3
+   ],
+   "zonas": [
+    "rocha"
+   ],
+   "titulo": "Skarg, o chefe orc",
+   "pedido": "Um bando orc acampa nas encostas de %s. Derrube o chefe.",
+   "drop": "presa_de_orc"
+  },
+  {
+   "rule": "criatura.aranha_gigante",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "cripta"
+   ],
+   "titulo": "Teias nas minas",
+   "pedido": "Aranhas gigantes tomaram os túneis de %s. Os mineiros não descem.",
+   "drop": "seda_de_aranha"
+  },
+  {
+   "rule": "criatura.finntroll_feitor",
+   "grupo": [
+    1,
+    1
+   ],
+   "acompanha": [
+    "criatura.orc_combatente",
+    2
+   ],
+   "zonas": [
+    "cripta"
+   ],
+   "titulo": "O feitor das minas",
+   "pedido": "Grubnak chicoteia mineiros nos túneis de %s. Quebre o feitor.",
+   "drop": "ordem_do_capataz"
+  },
+  {
+   "rule": "criatura.basilisco",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "deserto"
+   ],
+   "titulo": "Olhar de pedra no sul",
+   "pedido": "Viajantes viraram estátuas perto de %s. Traga a pedra de volta.",
+   "drop": "olho_de_basilisco"
+  },
+  {
+   "rule": "criatura.manticora",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "deserto",
+    "rocha"
+   ],
+   "titulo": "Espinhos do deserto",
+   "pedido": "Uma mantícora caça perto de %s.",
+   "drop": "ferrao_de_manticora"
+  },
+  {
+   "rule": "criatura.lobo",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "horizonte"
+   ],
+   "titulo": "Lobos do leste",
+   "pedido": "Lobos seguem as caravanas perto de %s.",
+   "drop": "pele_de_lobo"
+  },
+  {
+   "rule": "criatura.bandido_comum",
+   "grupo": [
+    2,
+    4
+   ],
+   "zonas": [
+    "horizonte"
+   ],
+   "titulo": "Salteadores do Horizonte",
+   "pedido": "Salteadores tomaram a estrada perto de %s. A guilda paga por estrada limpa."
+  },
+  {
+   "rule": "criatura.ogro",
+   "grupo": [
+    1,
+    1
+   ],
+   "zonas": [
+    "horizonte"
+   ],
+   "titulo": "O ogro da encosta",
+   "pedido": "Um ogro desce das colinas e ataca carroças perto de %s."
+  },
+  {
+   "rule": "criatura.aranha_gigante",
+   "grupo": [
+    1,
+    2
+   ],
+   "zonas": [
+    "vale_sul"
+   ],
+   "titulo": "Teias do vale",
+   "pedido": "Teias gigantes cobrem a mata de %s.",
+   "drop": "seda_de_aranha"
+  },
+  {
+   "rule": "criatura.hiena",
+   "grupo": [
+    2,
+    3
+   ],
+   "zonas": [
+    "vale_sul"
+   ],
+   "titulo": "Hienas do vale",
+   "pedido": "Hienas rondam os currais de %s à noite."
+  },
+  {
+   "rule": "criatura.orc_chefe",
+   "grupo": [
+    1,
+    1
+   ],
+   "acompanha": [
+    "criatura.orc_combatente",
+    2
+   ],
+   "zonas": [
+    "vale_sul"
+   ],
+   "titulo": "Garrok, o chefe do vale",
+   "pedido": "Garrok reúne orcs no vale de %s. Derrube o chefe."
+  }
  ],
  "entregas": [
-  {"titulo": "Remédios para o vau", "item": "pacote_remedios", "de": "taverna", "para": "estalagem", "pedido": "Leve este pacote de remédios até a estalagem do vau, sem abrir.", "ouro": 12, "pontos": 4},
-  {"titulo": "Carta para Pedrabranca", "item": "carta_lacrada", "de": "taverna", "para": "praca_pedrabranca", "pedido": "Uma carta lacrada para a praça de Pedrabranca.", "ouro": 18, "pontos": 6},
-  {"titulo": "Ferramentas para o moinho", "item": "caixa_ferramentas", "de": "taverna", "para": "moinho", "pedido": "O moleiro espera uma caixa de ferramentas.", "ouro": 6, "pontos": 2}
+  {
+   "titulo": "Remédios para o vau",
+   "item": "pacote_remedios",
+   "de": "taverna",
+   "para": "estalagem",
+   "pedido": "Leve este pacote de remédios até a estalagem do vau, sem abrir.",
+   "ouro": 12,
+   "pontos": 4
+  },
+  {
+   "titulo": "Carta para Pedrabranca",
+   "item": "carta_lacrada",
+   "de": "taverna",
+   "para": "praca_pedrabranca",
+   "pedido": "Uma carta lacrada para a praça de Pedrabranca.",
+   "ouro": 18,
+   "pontos": 6
+  },
+  {
+   "titulo": "Ferramentas para o moinho",
+   "item": "caixa_ferramentas",
+   "de": "taverna",
+   "para": "moinho",
+   "pedido": "O moleiro espera uma caixa de ferramentas.",
+   "ouro": 6,
+   "pontos": 2
+  },
+  {
+   "titulo": "Ervas para a curandeira",
+   "item": "ervas_curandeira",
+   "de": "taverna",
+   "para": "cabana_curandeira",
+   "pedido": "Leve este feixe de ervas à curandeira do brejo.",
+   "ouro": 14,
+   "pontos": 4
+  },
+  {
+   "titulo": "Carta para o oásis",
+   "item": "carta_areia",
+   "de": "taverna",
+   "para": "pousada_camelo",
+   "pedido": "Uma carta para a pousada do Camelo, em Areia Dourada.",
+   "ouro": 20,
+   "pontos": 6
+  },
+  {
+   "titulo": "Encomenda da armeira",
+   "item": "encomenda_armeira",
+   "de": "taverna",
+   "para": "armaria_deserto",
+   "pedido": "A armeira do deserto espera esta encomenda.",
+   "ouro": 18,
+   "pontos": 5
+  }
  ],
  "exploracoes": [
-  {"titulo": "Mapear a torre de vigia", "local": "torre_vigia", "pedido": "A guilda quer saber se a velha torre de vigia ainda está de pé.", "ouro": 10, "pontos": 4},
-  {"titulo": "Vigiar as ruínas", "local": "ruina", "pedido": "Vá até as ruínas e veja se há movimento.", "ouro": 8, "pontos": 3},
-  {"titulo": "O cais do lago", "local": "cais", "pedido": "Confirme se o cais do lago continua em uso.", "ouro": 6, "pontos": 2}
+  {
+   "titulo": "Mapear a torre de vigia",
+   "local": "torre_vigia",
+   "pedido": "A guilda quer saber se a velha torre de vigia ainda está de pé.",
+   "ouro": 10,
+   "pontos": 4
+  },
+  {
+   "titulo": "Vigiar as ruínas",
+   "local": "ruina",
+   "pedido": "Vá até as ruínas e veja se há movimento.",
+   "ouro": 8,
+   "pontos": 3
+  },
+  {
+   "titulo": "O cais do lago",
+   "local": "cais",
+   "pedido": "Confirme se o cais do lago continua em uso.",
+   "ouro": 6,
+   "pontos": 2
+  },
+  {
+   "titulo": "Medir o Altar Submerso",
+   "local": "altar_submerso",
+   "pedido": "A guilda quer saber o que há sob o altar do brejo.",
+   "ouro": 12,
+   "pontos": 5
+  },
+  {
+   "titulo": "Conferir o oásis",
+   "local": "oasis",
+   "pedido": "Confirme se o oásis do deserto ainda tem água.",
+   "ouro": 10,
+   "pontos": 4
+  },
+  {
+   "titulo": "Subir ao Pico Rubro",
+   "local": "pico_rubro",
+   "pedido": "Veja de cima o que se move nas montanhas.",
+   "ouro": 14,
+   "pontos": 6
+  },
+  {
+   "titulo": "Entrar no Forte Caído",
+   "local": "forte_caido",
+   "pedido": "Ninguém sabe o que restou do forte. Descubra.",
+   "ouro": 16,
+   "pontos": 7
+  }
  ]
 }

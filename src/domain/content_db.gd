@@ -46,6 +46,7 @@ static func _read(path: String) -> Dictionary:
 
 func load_dir(dir: String) -> void:
 	map = _read(dir.path_join("map.json"))
+	_grids_pronto = false
 	npcs = _read(dir.path_join("npcs.json"))
 	mystery = _read(dir.path_join("mystery.json"))
 	items = _read(dir.path_join("items.json"))
@@ -174,31 +175,45 @@ func all_targets() -> Array: return map.get("targets", [])
 func all_objects() -> Array: return map.get("objects", [])
 
 
-## Local mais específico (interno antes de externo) que contém o tile.
+## Local mais específico (interno antes de externo) que contém o tile. Consulta em tabela (ver _ensure_grids).
 func location_at(t: Vector2i) -> String:
-	var best := ""
-	var best_area := 1 << 30
-	for l in map.get("locations", []):
-		var r: Array = l.rect
-		if t.x >= r[0] and t.y >= r[1] and t.x < r[0] + r[2] and t.y < r[1] + r[3]:
-			var area: int = int(r[2]) * int(r[3])
-			if area < best_area:
-				best = l.id
-				best_area = area
-	return best
+	_ensure_grids()
+	return str(_loc_grid.get(t, ""))
 
 
 func zone_at(t: Vector2i) -> String:
-	var best := ""
-	var best_area := 1 << 30
-	for z in map.get("zones", []):
-		var r: Array = z.rect
-		if t.x >= r[0] and t.y >= r[1] and t.x < r[0] + r[2] and t.y < r[1] + r[3]:
-			var area: int = int(r[2]) * int(r[3])
-			if area < best_area:
-				best = z.id
-				best_area = area
-	return best
+	_ensure_grids()
+	return str(_zone_grid.get(t, ""))
+
+
+var _loc_grid: Dictionary = {}
+var _zone_grid: Dictionary = {}
+var _grids_pronto := false
+
+
+## Tabelas tile -> local/zona, montadas uma vez (o mapa não muda em tempo de jogo). Mesma regra de antes:
+## a área menor vence; em empate, vale o primeiro da lista.
+func _ensure_grids() -> void:
+	if _grids_pronto:
+		return
+	_grids_pronto = true
+	_loc_grid = _montar_grade(map.get("locations", []), "id")
+	_zone_grid = _montar_grade(map.get("zones", []), "id")
+
+
+func _montar_grade(itens: Array, chave: String) -> Dictionary:
+	var grade: Dictionary = {}
+	var area_de: Dictionary = {}
+	for it in itens:
+		var r: Array = it.rect
+		var area: int = int(r[2]) * int(r[3])
+		for y in range(int(r[1]), int(r[1]) + int(r[3])):
+			for x in range(int(r[0]), int(r[0]) + int(r[2])):
+				var t := Vector2i(x, y)
+				if not area_de.has(t) or area < int(area_de[t]):
+					area_de[t] = area
+					grade[t] = str(it[chave])
+	return grade
 
 
 func location_spot(id: String) -> Vector2i:

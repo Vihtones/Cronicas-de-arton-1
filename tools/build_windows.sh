@@ -23,6 +23,19 @@ cp build/windows/CronicasDeArton.exe "$PKG/"
 printf '@echo off\r\nrem Graficos minimos, 30 FPS, sem flashes. Comece por aqui.\r\nstart "" "%%~dp0CronicasDeArton.exe" --rendering-driver opengl3_angle -- --modo-seguro\r\n' > "$PKG/Jogar (modo seguro).bat"
 printf '@echo off\r\nrem Modo seguro gravando o registro do jogo em registro.txt (para diagnostico).\r\nstart "" "%%~dp0CronicasDeArton.exe" --verbose --log-file "%%~dp0registro.txt" -- --modo-seguro\r\n' > "$PKG/Diagnostico (gera registro.txt).bat"
 cp tools/LEIA-ME-WINDOWS.txt "$PKG/LEIA-ME.txt"
+mkdir -p "$PKG/IA local"
+cp tools/ia_local/LEIA-ME.md "$PKG/IA local/LEIA-ME.md"
+cp tools/ia_local/iniciar.bat "$PKG/IA local/iniciar.bat"
+# IA embutida (opcional): IA_SERVIDOR = llama-server.exe (build Vulkan do llama.cpp), IA_MODELO = modelo .gguf.
+# Com os dois, o jogo sobe a IA sozinho ao ligar "IA local". Sem eles, o pacote sai sem IA e avisa.
+if [ -n "${IA_SERVIDOR:-}" ] && [ -n "${IA_MODELO:-}" ]; then
+  cp "$IA_SERVIDOR" "$PKG/IA local/llama-server.exe"
+  cp "$IA_MODELO" "$PKG/IA local/modelo.gguf"
+  cp "$(dirname "$IA_SERVIDOR")"/*.dll "$PKG/IA local/" 2>/dev/null || true
+  echo "IA embutida: $(basename "$IA_MODELO")"
+else
+  echo "AVISO: pacote SEM IA embutida (defina IA_SERVIDOR e IA_MODELO para incluir)"
+fi
 ( cd "$PKG" && sha256sum CronicasDeArton.exe > SHA256.txt )
 ( cd "$TMP" && zip -qr "$OUT/CronicasDeArton-v$VER-Windows.zip" CronicasDeArton )
 echo "OK versão $VER"

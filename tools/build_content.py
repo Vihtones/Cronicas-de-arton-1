@@ -251,7 +251,28 @@ SCHED = {
  "comerciante_pb": [[0, 8, "home"], [8, 18, "work"], [18, 21, "estalagem"], [21, 24, "home"]],
  "vigia_dia":  [[0, 7, "home"], [7, 19, "work"], [19, 24, "home"]],
  "vigia_noite":[[0, 7, "work"], [7, 19, "home"], [19, 24, "work"]],
+ "anciao_vale": [[0, 8, "home"], [8, 11, "praca_vale"], [11, 18, "home"], [18, 20, "taverna_vale"], [20, 24, "home"]],
  "lavrador_pb":[[0, 5, "home"], [5, 12, "work"], [12, 13, "home"], [13, 18, "work"], [18, 24, "home"]],
+ # Fronteira do Leste: Junco Alto (brejo), Areia Dourada (deserto), Rocha Negra (montanha)
+ "pescador":   [[0, 5, "home"], [5, 12, "work"], [12, 13, "taberna_sapo"], [13, 17, "work"], [17, 21, "taberna_sapo"], [21, 24, "home"]],
+ "cacador_brejo": [[0, 5, "home"], [5, 12, "work"], [12, 14, "home"], [14, 18, "work"], [18, 21, "taberna_sapo"], [21, 24, "home"]],
+ "anciao_junco": [[0, 8, "home"], [8, 11, "passarela_junco"], [11, 18, "home"], [18, 21, "taberna_sapo"], [21, 24, "home"]],
+ "curandeira": [[0, 7, "home"], [7, 19, "work"], [19, 24, "home"]],
+ "taverneiro_junco": [[0, 2, "work"], [2, 9, "home"], [9, 24, "work"]],
+ "crianca_junco": [[0, 7, "home"], [7, 11, "passarela_junco"], [11, 13, "home"], [13, 17, "passarela_junco"], [17, 24, "home"]],
+ "estalajadeiro_d": [[0, 2, "work"], [2, 8, "home"], [8, 24, "work"]],
+ "comerciante_d": [[0, 8, "home"], [8, 18, "work"], [18, 21, "pousada_camelo"], [21, 24, "home"]],
+ "guarda_areia": [[0, 7, "home"], [7, 12, "praca_areia"], [12, 13, "pousada_camelo"], [13, 19, "praca_areia"], [19, 24, "home"]],
+ "atendente_guilda": [[0, 8, "home"], [8, 20, "work"], [20, 22, "pousada_camelo"], [22, 24, "home"]],
+ "erudito_oasis": [[0, 8, "home"], [8, 17, "oasis"], [17, 24, "pousada_camelo"]],
+ "crianca_d": [[0, 7, "home"], [7, 18, "praca_areia"], [18, 24, "home"]],
+ "artesao_rn": [[0, 7, "home"], [7, 12, "work"], [12, 13, "taverna_picareta"], [13, 18, "work"], [18, 21, "taverna_picareta"], [21, 24, "home"]],
+ "minerador": [[0, 6, "home"], [6, 12, "casa_mina"], [12, 13, "taverna_picareta"], [13, 18, "casa_mina"], [18, 22, "taverna_picareta"], [22, 24, "home"]],
+ "estalajadeiro_rn": [[0, 2, "work"], [2, 8, "home"], [8, 24, "work"]],
+ "capataz": [[0, 6, "home"], [6, 18, "work"], [18, 21, "taverna_picareta"], [21, 24, "home"]],
+ "sacerdote_rn": [[0, 12, "work"], [12, 13, "praca_rocha"], [13, 24, "work"]],
+ "guarda_rocha_dia": [[0, 7, "home"], [7, 12, "praca_rocha"], [12, 13, "taverna_picareta"], [13, 19, "praca_rocha"], [19, 24, "work"]],
+ "guarda_rocha_noite": [[0, 6, "praca_rocha"], [6, 14, "home"], [14, 18, "work"], [18, 24, "praca_rocha"]],
 }
 def npc(id, name, age, prof, sched, home, work=None, family=None, faction=None, devotion="", traits=None, beliefs=None, gold=5):
     return {"id": id, "name": name, "age": age, "profession": prof, "schedule": sched, "home": home, "work": work or home,
@@ -291,6 +312,45 @@ npcs = [
  npc("marta", "Marta Brisa", 41, "mercadora", "comerciante_pb", "entreposto", "entreposto", None, traits=["traz_noticias"], gold=70),
  npc("lia", "Lia Vento", 26, "vigia", "vigia_noite", "torre_vigia", "torre_vigia", None),
  npc("hesk", "Sargento Hesk", 50, "vigia", "vigia_dia", "torre_vigia", "torre_vigia", None, devotion="Khalmyr", traits=["exige_provas"]),
+ # --- Fronteira do Leste: Junco Alto (brejo) ---
+ npc("zeca", "Zeca Sapo", 48, "taverneiro", "taverneiro_junco", "taberna_sapo", "taberna_sapo", "sapo", traits=["fofoqueiro"], gold=35),
+ npc("juta", "Juta Sapo", 44, "cozinheira", "taverneiro_junco", "taberna_sapo", "taberna_sapo", "sapo", gold=15),
+ npc("nico", "Nico Sapo", 36, "pescador", "pescador", "casa_pescador", "passarela_junco", "sapo", traits=["calado"], gold=12),
+ npc("pipo", "Pipo Sapo", 10, "criança", "crianca_junco", "casa_pescador", None, "sapo", traits=["curioso"]),
+ npc("mirta", "Vovó Mirta", 71, "curandeira", "curandeira", "cabana_curandeira", "cabana_curandeira", None, devotion="Allihanna", traits=["recluso"], gold=60),
+ npc("tica", "Tica", 15, "aprendiz", "curandeira", "cabana_curandeira", "cabana_curandeira", None, traits=["curioso"]),
+ npc("brutus", "Brutus Garra", 52, "caçador", "cacador_brejo", "casa_cacador_croc", "brejo_norte", None, traits=["recluso", "desconfia_de_estrangeiros"], gold=45),
+ npc("jurandi", "Ancião Jurandi", 78, "ancião", "anciao_junco", "palanque_anciao", None, None, devotion="Allihanna", traits=["memoria_longa"], gold=20),
+ # --- Posto Areia Dourada (deserto) ---
+ npc("haziz", "Haziz Al-Dahab", 55, "estalajadeiro", "estalajadeiro_d", "pousada_camelo", "pousada_camelo", "dahab", traits=["fofoqueiro"], gold=80),
+ npc("nadia", "Nadia Al-Dahab", 30, "cozinheira", "estalajadeiro_d", "pousada_camelo", "pousada_camelo", "dahab", gold=20),
+ npc("yara", "Yara Al-Dahab", 11, "criança", "crianca_d", "pousada_camelo", None, "dahab", traits=["curioso"]),
+ npc("kharim", "Kharim Bazari", 47, "mercador", "comerciante_d", "bazar_tendas", "bazar_tendas", None, traits=["traz_noticias"], gold=200),
+ npc("sulema", "Sulema Forja-Vento", 40, "armeira", "artesao", "armaria_deserto", "armaria_deserto", None, traits=["exige_provas"], gold=150),
+ npc("dara", "Dara Ventania", 26, "curandeira", "curandeira", "casa_curandeira_d", "casa_curandeira_d", None, devotion="Lena", gold=50),
+ npc("iben", "Iben Caravaneiro", 33, "atendente da guilda", "atendente_guilda", "guilda_filial", "guilda_filial", "dahab", gold=40),
+ npc("zahir", "Capitão Zahir", 45, "capitão de caravana", "guarda_areia", "praca_areia", "praca_areia", None, "guarda_fronteira", "Khalmyr", ["exige_provas"], gold=60),
+ npc("ossian", "Ossian Vale", 58, "erudito", "erudito_oasis", "oasis", "oasis", None, traits=["memoria_longa", "curioso"], gold=40),
+ # --- Rocha Negra (montanha) ---
+ npc("durin", "Durin Martelo-Negro", 88, "ferreiro", "artesao_rn", "alojamento_mineiros", "forja_ana", "martelo_negro", traits=["teimoso"], gold=300),
+ npc("brenna", "Brenna Martelo-Negro", 80, "estalajadeira", "estalajadeiro_rn", "alojamento_mineiros", "alojamento_mineiros", "martelo_negro", gold=90),
+ npc("hakon", "Hakon Barba-Ruiva", 44, "taverneiro", "estalajadeiro_rn", "taverna_picareta", "taverna_picareta", None, traits=["observador"], gold=60),
+ npc("gorm", "Gorm Cinzento", 50, "capataz", "capataz", "casa_mina", "casa_mina", None, traits=["exige_provas"], gold=80),
+ npc("pedro_pa", "Pedro Pá", 38, "minerador", "minerador", "alojamento_mineiros", "casa_mina", None, gold=15),
+ npc("olga", "Olga Veio", 42, "mineradora", "minerador", "alojamento_mineiros", "casa_mina", None, traits=["calada"], gold=18),
+ npc("thyra", "Thyra Fiel-Martelo", 36, "sacerdotisa de Khalmyr", "sacerdote_rn", "capela_khalmyr", "capela_khalmyr", None, "templo_khalmyr", "Khalmyr", gold=60),
+ npc("rolf", "Capitão Rolf", 46, "capitão da guarda", "guarda_rocha_dia", "posto_guarda_rn", "posto_guarda_rn", None, "guarda_fronteira", "Khalmyr", ["exige_provas"], gold=50),
+ npc("ysa", "Ysa", 28, "guarda", "guarda_rocha_noite", "posto_guarda_rn", "posto_guarda_rn", None, "guarda_fronteira"),
+ # --- Horizonte (leste, além da Fronteira) ---
+ npc("bram", "Bram Estradeiro", 54, "guia", "viajante", "casa_guia", "praca_horizonte", "estradeiros", traits=["traz_noticias"], gold=40),
+ npc("lotte", "Lotte Estradeira", 36, "estalajadeira", "estalajadeiro", "estalagem_horizonte", "estalagem_horizonte", "estradeiros", traits=["fofoqueira"], gold=50),
+ npc("hogan", "Hogan Martelo", 47, "ferreiro", "artesao", "casa_ferreiro_estrada", "casa_ferreiro_estrada", None, traits=["exige_provas"], gold=120),
+ npc("ilka", "Ilka Carroceira", 31, "carroceira", "comerciante", "casa_guia", "armazem_horizonte", None, traits=["traz_noticias"], gold=90),
+ # --- Aldeia do Vale (sul, subindo do deserto) ---
+ npc("ancia", "Anciã Revas", 81, "anciã", "idoso", "casa_anciao", "casa_anciao", None, devotion="Allihanna", traits=["memoria_longa"], gold=10),
+ npc("gorvo", "Gorvo Fundo", 43, "taverneiro", "taverneiro", "taverna_vale", "taverna_vale", None, traits=["fofoqueiro"], gold=55),
+ npc("sela", "Sela Caçadora", 29, "caçador", "cacador", "casa_cacadores", "praca_vale", None, traits=["recluso"], gold=25),
+ npc("teo", "Teo Ferro-Vale", 22, "ferreiro", "artesao", "ferreiro_vale", "ferreiro_vale", None, gold=40),
 ]
 # Fichas de ameaça dos NPCs que agem com regras (LB Tabela 7-2). O ND e o foco são escolhas de design (ORIGINAL_DO_JOGO).
 NPC_FICHAS = {
@@ -308,6 +368,10 @@ families = [
  {"id": "aldren", "name": "Aldren", "members": ["joran", "celia", "pell", "ivi", "fenna"]},
  {"id": "corvo", "name": "Corvo", "members": ["elsa", "rurik", "teodoro"]},
  {"id": "pontes", "name": "Pontes", "members": ["berta", "caio", "tuco", "gunther"]},
+ {"id": "sapo", "name": "Sapo", "members": ["zeca", "juta", "nico", "pipo"]},
+ {"id": "dahab", "name": "Al-Dahab", "members": ["haziz", "nadia", "yara", "iben"]},
+ {"id": "martelo_negro", "name": "Martelo-Negro", "members": ["durin", "brenna"]},
+ {"id": "estradeiros", "name": "Estradeiros", "members": ["bram", "lotte", "ilka"]},
 ]
 factions = [
  {"id": "guarda_vila", "name": "Guarda da Vila", "goals": ["manter_ordem", "proteger_estrada"], "resources": {"soldados": 3, "ouro": 80},
@@ -316,7 +380,31 @@ factions = [
   "allies": ["guarda_vila"], "rivals": [], "status": "ORIGINAL_DO_JOGO"},
  {"id": "garras_de_cinza", "name": "Garras de Cinza", "goals": ["esconder_saque", "evitar_guarda"], "resources": {"membros": 3, "ouro": 120},
   "allies": [], "rivals": ["guarda_vila"], "hideout": "cripta_salao", "relocate_day": 12, "status": "ORIGINAL_DO_JOGO"},
+ {"id": "guarda_fronteira", "name": "Guarda da Fronteira", "goals": ["proteger_caravanas", "manter_ordem"], "resources": {"soldados": 4, "ouro": 150},
+  "allies": ["guarda_vila", "templo_khalmyr"], "rivals": [], "status": "ORIGINAL_DO_JOGO"},
+ {"id": "templo_khalmyr", "name": "Capela de Khalmyr", "goals": ["fazer_justica", "curar"], "resources": {"ouro": 30},
+  "allies": ["guarda_fronteira"], "rivals": [], "status": "ORIGINAL_DO_JOGO"},
 ]
+
+# Posições das criaturas da Fronteira: o ponto andável mais próximo do pedido, lido do mapa já ampliado (map.json é mantido à mão).
+_MAPA_ATUAL = json.loads((OUT / "map.json").read_text(encoding="utf-8")) if (OUT / "map.json").exists() else {"grid": [], "legend": {}}
+def ponto(x, y):
+    gr, lg = _MAPA_ATUAL["grid"], _MAPA_ATUAL["legend"]
+    if not gr or len(gr[0]) <= x:
+        return [x, y]
+    for r in range(0, 12):
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                if max(abs(dx), abs(dy)) != r:
+                    continue
+                xx, yy = x + dx, y + dy
+                if 0 <= yy < len(gr) and 0 <= xx < len(gr[0]) and lg.get(gr[yy][xx], {}).get("walk") and gr[yy][xx] not in "pDSU=":
+                    return [xx, yy]
+    return [x, y]
+def fera(id, nome, regra, fac, x, y, zona, **extra):
+    d = {"id": id, "name": nome, "rule": "criatura." + regra, "faction": fac, "spawn": ponto(x, y), "zone": zona}
+    d.update(extra)
+    return d
 creatures = [
  {"id": "kael", "name": "Kael Mão-Cinza", "rule": "criatura.bandido_ligeiro", "faction": "garras_de_cinza", "spawn": [29, 54], "zone": "cripta",
   "items": ["chave_cela"], "sleeps": [0, 6], "important": True,
@@ -335,6 +423,66 @@ creatures = [
  {"id": "hiena_5", "name": "Hiena da Serra", "rule": "criatura.hiena", "faction": "fauna", "spawn": [116, 31], "zone": "serra", "active_hours": [19, 5],
   "signal": "Um riso agudo desce das cristas da serra."},
  {"id": "hiena_6", "name": "Hiena da Serra", "rule": "criatura.hiena", "faction": "fauna", "spawn": [118, 33], "zone": "serra", "active_hours": [19, 5]},
+ # --- Fronteira do Leste -------------------------------------------------------------------------------------------
+ # Brejo da Névoa: répteis e gosmas fora da passarela; o Culto da Serpente no altar, ao norte
+ fera("naja_1", "Naja do Brejo", "naja", "fauna", 196, 40, "brejo", signal="Um chiado baixo vem da lama."),
+ fera("naja_2", "Naja do Brejo", "naja", "fauna", 190, 44, "brejo"),
+ fera("sucuri_1", "Sucuri Anciã", "sucuri", "fauna", 178, 11, "brejo", signal="A água parada se mexe devagar demais."),
+ fera("jiboia_1", "Jiboia", "jiboia", "fauna", 172, 38, "brejo"),
+ fera("glop_b1", "Gosma do Brejo", "glop", "gosmas_brejo", 170, 5, "brejo"),
+ fera("glop_b2", "Gosma do Brejo", "glop", "gosmas_brejo", 174, 7, "brejo"),
+ fera("glop_b3", "Gosma do Brejo", "glop", "gosmas_brejo", 172, 3, "brejo"),
+ fera("nagah_1", "Nagah Guardião", "nagah_guardiao", "culto_serpente", 187, 5, "brejo", signal="Sibilos ritmados vêm da ilha ao norte."),
+ fera("nagah_2", "Nagah Guardião", "nagah_guardiao", "culto_serpente", 192, 9, "brejo"),
+ fera("cultista_1", "Voz de Sszzaas", "cultista_de_sszzaas", "culto_serpente", 190, 9, "brejo", important=True),
+ # Terras Áridas
+ fera("cascavel_d1", "Cascavel do Deserto", "cascavel", "fauna", 207, 33, "deserto", signal="O guizo de uma cascavel corta o silêncio."),
+ fera("cascavel_d2", "Cascavel do Deserto", "cascavel", "fauna", 238, 31, "deserto"),
+ fera("gnoll_1", "Gnoll Saqueador", "gnoll_saqueador", "gnolls_deserto", 208, 8, "deserto", signal="Latidos que parecem riso vêm das dunas ao norte."),
+ fera("gnoll_2", "Gnoll Saqueador", "gnoll_saqueador", "gnolls_deserto", 211, 10, "deserto"),
+ fera("gnoll_3", "Gnoll Saqueador", "gnoll_saqueador", "gnolls_deserto", 206, 11, "deserto"),
+ fera("gnoll_chefe", "Dente-Torto, gnoll filibusteiro", "gnoll_filibusteiro", "gnolls_deserto", 209, 9, "deserto", important=True),
+ fera("grifo_1", "Grifo Faminto", "grifo", "fauna", 216, 4, "deserto", active_hours=[5, 20], signal="Um grito de ave de rapina ecoa nas rochas."),
+ fera("basilisco_1", "Basilisco das Pedras", "basilisco", "fauna", 205, 44, "deserto", signal="Estátuas de viajantes cercam um poço de pedra ao sul."),
+ fera("manticora_1", "Mantícora do Sul", "manticora", "fauna", 233, 45, "deserto", signal="Espinhos longos se cravam nas rochas ao sul."),
+ # Forte Caído: mortos sob um necromante
+ fera("esq_f1", "Esqueleto do Forte", "esqueleto", "mortos_forte", 226, 8, "forte"),
+ fera("esq_f2", "Esqueleto do Forte", "esqueleto", "mortos_forte", 232, 6, "forte"),
+ fera("esq_f3", "Esqueleto do Forte", "esqueleto", "mortos_forte", 231, 12, "forte"),
+ fera("zumbi_f1", "Zumbi do Forte", "zumbi", "mortos_forte", 229, 9, "forte"),
+ fera("zumbi_f2", "Zumbi do Forte", "zumbi", "mortos_forte", 224, 12, "forte"),
+ fera("necro_1", "Mestre Corvino, o necromante", "necromante", "mortos_forte", 235, 6, "forte", important=True, signal="Um frio estranho sai do forte em ruínas."),
+ # Rocha Negra
+ fera("lobo_r1", "Lobo da Montanha", "lobo", "fauna", 256, 40, "rocha", active_hours=[17, 7]),
+ fera("lobo_r2", "Lobo da Montanha", "lobo", "fauna", 259, 42, "rocha", active_hours=[17, 7]),
+ fera("urso_r1", "Urso-coruja", "urso_coruja", "fauna", 246, 10, "rocha", signal="Garras enormes arranharam os troncos ao norte."),
+ fera("orc_r1", "Orc Batedor", "orc_combatente", "orcs_rocha", 272, 41, "rocha", signal="Fumaça de fogueira orc sobe ao sul da vila."),
+ fera("orc_r2", "Orc Batedor", "orc_combatente", "orcs_rocha", 275, 43, "rocha"),
+ fera("orc_r3", "Orc Batedor", "orc_combatente", "orcs_rocha", 270, 44, "rocha"),
+ fera("orc_chefe_r", "Skarg, chefe orc", "orc_chefe", "orcs_rocha", 273, 42, "rocha", important=True),
+ fera("ogro_r1", "Ogro da Encosta", "ogro", "fauna", 282, 36, "rocha", signal="Passos pesados fazem a terra tremer a leste."),
+ # Minas de Rocha Negra (subsolo)
+ fera("aranha_m1", "Aranha-das-minas", "aranha_gigante", "aranhas_mina", 263, 53, "cripta", signal="Teias grossas cobrem a passagem."),
+ fera("aranha_m2", "Aranha-das-minas", "aranha_gigante", "aranhas_mina", 268, 52, "cripta"),
+ fera("glop_m1", "Gosma da Mina", "glop", "gosmas_mina", 263, 59, "cripta"),
+ fera("glop_m2", "Gosma da Mina", "glop", "gosmas_mina", 267, 60, "cripta"),
+ fera("glop_m3", "Gosma da Mina", "glop", "gosmas_mina", 269, 58, "cripta"),
+ fera("feitor_1", "Grubnak, feitor finntroll", "finntroll_feitor", "feitor_mina", 278, 56, "cripta", important=True, signal="Ecos de correntes e uma risada grave vêm do fundo."),
+ fera("orc_m1", "Capanga orc do feitor", "orc_combatente", "feitor_mina", 276, 54, "cripta"),
+ fera("orc_m2", "Capanga orc do feitor", "orc_combatente", "feitor_mina", 276, 58, "cripta"),
+ # Horizonte: estrada do leste
+ fera("lobo_h1", "Lobo do Horizonte", "lobo", "fauna", 300, 36, "horizonte", active_hours=[18, 6]),
+ fera("lobo_h2", "Lobo do Horizonte", "lobo", "fauna", 304, 38, "horizonte", active_hours=[18, 6]),
+ fera("salteador_h1", "Salteador da estrada", "bandido_comum", "salteadores_h", 320, 27, "horizonte", start_present=False),
+ fera("salteador_h2", "Salteador da estrada", "bandido_comum", "salteadores_h", 325, 29, "horizonte", start_present=False),
+ fera("ogro_h1", "Ogro do Horizonte", "ogro", "fauna", 330, 40, "horizonte", signal="Uma pedra rola na encosta a leste."),
+ # Vale do Sul: mata e minas que descem
+ fera("aranha_v1", "Aranha do Vale", "aranha_gigante", "fauna", 206, 84, "vale_sul", signal="Teias brilham entre as árvores do vale."),
+ fera("hiena_v1", "Hiena do Vale", "hiena", "fauna", 225, 88, "vale_sul", active_hours=[18, 6]),
+ fera("hiena_v2", "Hiena do Vale", "hiena", "fauna", 229, 90, "vale_sul", active_hours=[18, 6]),
+ fera("orc_v1", "Orc do Vale", "orc_combatente", "orcs_vale", 236, 62, "vale_sul", signal="Vozes guturais vêm das sombras do vale."),
+ fera("orc_v2", "Orc do Vale", "orc_combatente", "orcs_vale", 238, 66, "vale_sul"),
+ fera("orc_chefe_v", "Garrok, chefe orc do vale", "orc_chefe", "orcs_vale", 237, 70, "vale_sul", important=True),
 ]
 items = {
  "chave_cela": {"name": "Chave de ferro", "price": 0},
@@ -368,8 +516,28 @@ economy = {
  "shops": {"rosana": ["pao", "cerveja"], "mara": ["corda", "tocha", "pao", "saco_de_dormir"], "ysolde": ["pocao_cura"],
            "berta": ["pao", "cerveja"], "marta": ["corda", "tocha", "pao", "saco_de_dormir", "pocao_cura"],
            "valkaria_mercado": ["pocao_cura", "saco_de_dormir", "arco_curto", "cota_malha", "espada_longa", "tocha", "corda"],
+           "zeca": ["pao", "cerveja", "ensopado_junco"], "juta": ["pao", "ensopado_junco"],
+           "mirta": ["pocao_cura", "frasco_agua"], "brutus": ["gibao_peles", "couro_batido", "arco_curto", "machadinha", "adaga"],
+           "haziz": ["pao", "cerveja", "vinho_de_cacto"], "nadia": ["pao", "vinho_de_cacto"],
+           "kharim": ["corda", "tocha", "pao", "saco_de_dormir", "pocao_cura", "agua_benta", "arco_longo", "besta_leve", "armadura_couro", "armadura_acolchoada", "escudo_leve", "frasco_agua"],
+           "sulema": ["espada_curta", "espada_longa", "cimitarra", "florete", "machado_batalha", "martelo_guerra", "tridente", "mangual", "brunea", "escudo_leve", "escudo_pesado", "couro_batido"],
+           "dara": ["pocao_cura", "frasco_agua"],
+           "durin": ["picareta", "marreta", "machado_guerra", "alabarda", "montante", "martelo_guerra", "cota_malha", "loriga_segmentada", "meia_armadura", "escudo_pesado"],
+           "brenna": ["pao", "cerveja_ana", "ensopado_junco"], "hakon": ["pao", "cerveja_ana", "cerveja"],
+           "gorm": ["picareta", "tocha", "corda"], "thyra": ["pocao_cura", "agua_benta"],
+           "lotte": ["pao", "cerveja", "corda", "tocha"], "gorvo": ["pao", "cerveja", "ensopado_junco"],
+           "hogan": ["adaga", "machadinha", "espada_curta", "cimitarra", "escudo_leve", "couro_batido", "armadura_couro"],
+           "ilka": ["corda", "tocha", "saco_de_dormir", "pao", "ferramenta_oficio"],
+           "teo": ["picareta", "tridente", "escudo_pesado", "armadura_acolchoada"],
            "garrick": ["adaga", "espada_curta", "espada_longa", "machado_batalha", "arco_curto", "couro_batido", "cota_malha"]},
 }
+# Fronteira do Leste: estoque próprio (as lojas das três regiões não esvaziam a vila) e ligação por zona do mapa.
+economy["regions"]["fronteira"] = {
+ "stock": {"comida": 300, "bebida": 200, "ferramentas": 120, "remedio": 20, "madeira": 40},
+ "production": {"comida": 25, "bebida": 15, "ferramentas": 8, "remedio": 1, "madeira": 0},
+ "consumption": {"comida": 24, "bebida": 15, "ferramentas": 6, "remedio": 0, "madeira": 0},
+ "target": {"comida": 300, "bebida": 200, "ferramentas": 120, "remedio": 20, "madeira": 40}}
+economy["regioes_por_zona"] = {"brejo": "fronteira", "deserto": "fronteira", "rocha": "fronteira", "horizonte": "fronteira", "vale_sul": "fronteira"}
 # Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho.
 economy["producao_trabalho"] = {
  "_nota": "Arton Viva, Fase 1: bem que cada profissão produz ao completar um turno de trabalho (ORIGINAL_DO_JOGO).",

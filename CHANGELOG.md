@@ -2,6 +2,13 @@
 
 ## 0.7.1 (em andamento)
 
+- Desempenho: simulação de 7 dias ~0,35 s (antes ~1,2 s). Busca de visitas entre moradores passa a percorrer só as relações conhecidas (mesmo desempate), e o agrupamento por local das relações vira uma passada única.
+- Mundo cresce só por acréscimo (nenhuma coordenada deslocada): Fronteira do Leste (x 160..287), Horizonte a leste (x 288..335) e Vale do Sul ao sul (linhas 64..95); mapa 336×96. Moradores, lojas, economia, famílias, facções e criaturas novos (67 NPCs).
+- Corrida com Shift (1,8×) na exploração; emboscada fora de combate (C furtivo, a até 3 quadrados, sem ser visto) começa a luta já com surpresa.
+- Combate no modo ação mais lento (0,7×) e silhuetas distintas para lobo, esqueleto, aranha, cobra, orc e ogro.
+- Economia por região (vila, valkaria, samburdia, fronteira): a refeição na taverna debita a despensa da região onde é servida.
+- Pacote Windows com pasta "IA local" (guia). Se llama-server.exe e modelo.gguf estiverem nela, o jogo sobe a IA sozinho ao ligar "IA local" e a encerra ao sair. Build sem esses arquivos sai sem IA e avisa; o caminho de inicialização ainda não foi verificado de ponta a ponta.
+- Testes: viagem aceita os dois desfechos (chegada ou emboscada tática na partida); farinha testa o mecanismo do evento semanal em vez do saldo final. 701 aprovados.
 - Diálogo livre: o jogador digita e o morador responde pelo estado do mundo (lugares, pessoas, rumores, loja, guilda, tempo); insultos e ameaças ficam na memória. IA local opcional (llama.cpp, RX 580 ok) só reescreve a voz, com validador e fallback; botão no menu de pausa e guia em tools/ia_local.
 - Seleção de poderes (K) em cartões: filtros (disponíveis, da classe, gerais, que você tem, todos), busca, efeito, custo, pré-requisitos e o que falta; árvore desenhada em "Ver árvore". HUD: condições ativas e rastreador de contratos. Reprodução do combate descartada ao trocar de mundo.
 - Criação de personagem refeita em 5 etapas (Raça, Classe, Atributos, Perícias e magias, Resumo): descrição e números de cada raça e classe, compra de 10 pontos com + e − (LB p.17), escolha dos +1 do humano/lefou/osteon/sereia, escolha das magias iniciais entre todas as de 1º círculo completas (arcanista e clérigo; o mago agora começa com 4), nome livre e prévia constante. Janelas grandes com fundo opaco.

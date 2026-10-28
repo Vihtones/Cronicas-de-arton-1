@@ -27,7 +27,7 @@
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    640,
+    768,
     96
    ],
    "pivot": [
@@ -36,7 +36,7 @@
    ],
    "animacoes": [],
    "dependencias": [],
-   "hash": "98d3281e4f878a4c275703d49ce9b78656b7c562d96b6a2bd2276df5edb6f443",
+   "hash": "46f2c8ebf6c7c8ae60848232d482a2291e157954e47d1ebc65c2dab95e2a51b3",
    "caminho": "res://assets/tiles/tileset.png",
    "indice": {
     ".": {
@@ -118,6 +118,22 @@
     "B": {
      "col": 19,
      "name": "barranco"
+    },
+    "w": {
+     "col": 20,
+     "name": "lama"
+    },
+    "a": {
+     "col": 21,
+     "name": "areia"
+    },
+    "g": {
+     "col": 22,
+     "name": "cascalho"
+    },
+    "M": {
+     "col": 23,
+     "name": "rocha"
     }
    },
    "variantes": 3
@@ -125,17 +141,17 @@
   {
    "asset_id": "char_player",
    "tipo": "spritesheet_personagem",
-   "origem": "gerado_por_script:tools/gen_chars_lpc.py (camadas LPC, OGA-BY/CC-BY/CC0; créditos em assets/CREDITOS_PERSONAGENS.txt)",
-   "licenca": "OGA-BY 3.0 / CC-BY / CC0 (atribuição)",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
    "versao": 1,
    "estado": "prototype",
    "tamanho": [
-    192,
-    256
+    96,
+    128
    ],
    "pivot": [
-    32,
-    58
+    16,
+    28
    ],
    "animacoes": {
     "linhas": [
@@ -151,7 +167,7 @@
     ]
    },
    "dependencias": [],
-   "hash": "d713b5e93e0e4ee44dcd7f7fd6a4b33f91ec8d270b96a94cc4b4d11f520d21da",
+   "hash": "7210480dc53f546fd8f637f69cdad8ec190f94a106022983f1d07c9db77f381a",
    "caminho": "res://assets/chars/player.png"
   },
   {
@@ -1195,6 +1211,198 @@
    "dependencias": [],
    "hash": "7814bd1ec17451cd543cd711b3ed374ce38688a5c66114a807972c6a6acd1b50",
    "caminho": "res://assets/chars/mercadora.png"
+  },
+  {
+   "asset_id": "char_criatura_lobo",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "0bef3917e10cd3fdec07f75990070d3de1507cd9f231b6cafab16b38cda0baa0",
+   "caminho": "res://assets/chars/criatura_lobo.png"
+  },
+  {
+   "asset_id": "char_criatura_esqueleto",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "b5be0d4eb883d13bcf1ce96bb15947b60b28d9a77eb2eda493dcbe9915ea358f",
+   "caminho": "res://assets/chars/criatura_esqueleto.png"
+  },
+  {
+   "asset_id": "char_criatura_aranha",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "c5ad7047e767c3da40d57ccf950f8563e7ef265900cc8cdb9b64ea019b1871c4",
+   "caminho": "res://assets/chars/criatura_aranha.png"
+  },
+  {
+   "asset_id": "char_criatura_cobra",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "1f54becc00b248f82e565be00a05ad1568ac9ba1a51634ad3d2851820a41e5e2",
+   "caminho": "res://assets/chars/criatura_cobra.png"
+  },
+  {
+   "asset_id": "char_criatura_orc",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "020e12ee834c5e05d888a74e91e929aac48d506bddb7295022ffb22531525692",
+   "caminho": "res://assets/chars/criatura_orc.png"
+  },
+  {
+   "asset_id": "char_criatura_ogro",
+   "tipo": "spritesheet_personagem",
+   "origem": "gerado_por_script:tools/gen_placeholder_art.py",
+   "licenca": "original_do_projeto",
+   "versao": 1,
+   "estado": "prototype",
+   "tamanho": [
+    96,
+    128
+   ],
+   "pivot": [
+    16,
+    28
+   ],
+   "animacoes": {
+    "linhas": [
+     "baixo",
+     "esquerda",
+     "direita",
+     "cima"
+    ],
+    "quadros": [
+     "parado",
+     "passo_1",
+     "passo_2"
+    ]
+   },
+   "dependencias": [],
+   "hash": "c646934201e1049a4023e653a64b5a55a7fdb361e528d4e93c1c3cc7218b71d4",
+   "caminho": "res://assets/chars/criatura_ogro.png"
   }
  ]
 }

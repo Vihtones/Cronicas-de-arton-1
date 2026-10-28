@@ -94,7 +94,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return _vendedor_aqui(npc)
 	if not estoque(npc).has(item):
 		return PackedStringArray(["não vende isso"])
-	var region := "vila"
+	var region := regiao_da_loja(npc)
 	if npc == "valkaria_mercado":
 		var tr = world.module("travel")
 		if tr == null or tr.current_region != "valkaria":
@@ -113,6 +113,15 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	if int(world.player.gold) < price(item, region, npc):
 		return PackedStringArray(["ouro insuficiente"])
 	return PackedStringArray()
+
+
+## Região de estoque da loja: Valkaria, a Fronteira do Leste (zonas em economy.regioes_por_zona) ou a vila.
+func regiao_da_loja(npc: String) -> String:
+	if npc == "valkaria_mercado":
+		return "valkaria"
+	var d: Dictionary = world.npc_def(npc)
+	var z := str(world.db.location(str(d.get("work", d.get("home", "")))).get("zone", ""))
+	return str(world.db.economy.get("regioes_por_zona", {}).get(z, "vila"))
 
 
 func _vendedor_aqui(npc: String) -> PackedStringArray:
@@ -138,7 +147,7 @@ func execute(cmd: GameCommand) -> Array:
 		return [fact("GOLD_CHANGED", {"delta": v, "reason": "venda"}), fact("ITEM_LOST", {"item": it_v}, ["player"]),
 			fact("ITEM_SOLD", {"item": it_v, "price": v, "buyer": npc_v}, ["player", npc_v])]
 	var item: String = cmd.payload.item
-	var region := "valkaria" if cmd.payload.npc_id == "valkaria_mercado" else "vila"
+	var region := regiao_da_loja(str(cmd.payload.npc_id))
 	var p := price(item, region, cmd.payload.npc_id)
 	var good: String = world.db.items[item].get("good", "")
 	var npc_c: String = cmd.payload.npc_id
@@ -236,7 +245,10 @@ func on_event(e: GameEvent) -> Array:
 				regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 5 * (est - 2))
 		"MEAL_SERVED":
 			# refeição paga na taverna: consome comida da vila e leva o ouro ao tesouro local
-			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 1)
+			var reg_refeicao := str(e.payload.get("regiao", "vila"))
+			if not regions.has(reg_refeicao):
+				reg_refeicao = "vila"
+			regions[reg_refeicao].stock.comida = maxi(0, int(regions[reg_refeicao].stock.comida) - 1)
 			treasury += int(e.payload.get("cost", 0))
 		"SHEEP_KILLED":
 			regions.vila.stock.comida = maxi(0, int(regions.vila.stock.comida) - 4 * int(e.payload.get("count", 1)))

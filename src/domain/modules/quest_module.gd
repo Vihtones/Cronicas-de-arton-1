@@ -91,7 +91,7 @@ func _nd(rule: String) -> float:
 
 func _nome_zona(z: String) -> String:
 	return {"vila": "Vila Alvorada", "estrada": "a estrada do leste", "floresta": "o Bosque Sombrio", "ruina": "as ruínas", "cripta": "a cripta",
-		"serra": "a serra", "pedrabranca": "Pedrabranca"}.get(z, z)
+		"serra": "a serra", "pedrabranca": "Pedrabranca", "brejo": "o Brejo da Névoa", "deserto": "as Terras Áridas", "forte": "o Forte Caído", "rocha": "Rocha Negra"}.get(z, z)
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:

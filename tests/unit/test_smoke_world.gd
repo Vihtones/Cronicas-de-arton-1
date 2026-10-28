@@ -4,7 +4,7 @@ extends TestCase
 func test_mundo_completo_inicializa_e_avanca_um_dia() -> void:
 	var w := WorldFactory.create(1)
 	check(w.rules.errors.is_empty(), "regras sem erro: %s" % str(w.rules.errors))
-	check(w.db.npcs.npcs.size() == 33, "33 NPCs (inclui o mensageiro de Sambúrdia)")
+	check(w.db.npcs.npcs.size() == 67, "67 NPCs (33 da vila e Pedra Branca, 26 da Fronteira do Leste, 8 do Horizonte e do Vale)")
 	var r := w.apply_command(GameCommand.create("c1", "player", "AdvanceTime", {"ticks": 144}))
 	check(r.accepted, "avançou: %s" % str(r.errors))
 	eq(w.clock.tick, 144, "tick")

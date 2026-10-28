@@ -176,8 +176,8 @@ func on_tick(tick: int) -> Array:
 			s.tools = true
 			out.append(fact("TOOL_BOUGHT", {"npc": id, "price": tool_price()}, [id]))
 		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
-		if s.goal == "comer" and loc == "taverna" and eat(id):
-			out.append(fact("MEAL_SERVED", {"npc": id, "cost": meal_cost()}, [id]))
+		if s.goal == "comer" and loc == taverna_do_morador(id) and eat(id):
+			out.append(fact("MEAL_SERVED", {"npc": id, "cost": meal_cost(), "regiao": _regiao_da_taverna(id)}, [id]))
 	return out
 
 
@@ -208,28 +208,47 @@ func agenda_override(id: String, d: Dictionary, planned: String, h: int) -> Stri
 ## Morador de outra casa que o morador visitaria agora: o de maior afeto acima do limite, e que está em casa.
 ## "" se ninguém. Puro para quem consulta.
 func visit_target(id: String, d: Dictionary) -> String:
-	var rel = world.module("relations")
+	var relmod = world.module("relations")
 	var npcs = world.module("npcs")
-	if rel == null or npcs == null:
+	if relmod == null or npcs == null:
 		return ""
+	# Só percorre quem o morador já conhece (afeto > 0). Limiar > 0, então pares sem dados nunca valem.
+	# Empate de afeto: vence quem vem primeiro em all_npc_ids (igual à varredura completa de antes).
 	var best := ""
 	var best_affection := VISIT_MIN_AFFECTION
-	for other in world.all_npc_ids():
-		if other == id:
+	var casa := str(d.get("home", ""))
+	var conhecidos: Dictionary = relmod.rel.get(id, {})
+	for other in conhecidos:
+		var afeto := float(conhecidos[other].get("afeto", 0.0))
+		if afeto <= VISIT_MIN_AFFECTION:
 			continue
+		if other == id or not npcs.state.has(other) or world.npc_def(other).is_empty():
+			continue  # o jogador e ids fora do catálogo de moradores não entram
 		var od := world.npc_def(other)
-		if str(od.get("home", "")) == str(d.get("home", "")):
+		if str(od.get("home", "")) == casa:
 			continue  # mesma casa: não é visita
 		var st: Dictionary = npcs.state.get(other, {})
 		if not st.get("alive", true) or st.get("captive", false):
 			continue
 		if str(npcs.npc(other).location) != str(od.get("home", "")):
 			continue  # só visita quem está em casa
-		var afeto: float = rel.dims(id, other).afeto
-		if afeto > best_affection:
+		if afeto > best_affection or (afeto == best_affection and best != "" and _ordem(other) < _ordem(best)):
 			best_affection = afeto
 			best = other
 	return best
+
+
+var _ordem_cache: Dictionary = {}
+
+
+## Posição do morador na ordem do catálogo (desempate estável de visitas).
+func _ordem(id: String) -> int:
+	if _ordem_cache.is_empty():
+		var i := 0
+		for nid in world.all_npc_ids():
+			_ordem_cache[nid] = i
+			i += 1
+	return int(_ordem_cache.get(id, 1 << 30))
 
 
 ## Família: quem paga a refeição de uma criança sem ouro. Só adulto da mesma família, vivo e fora de cativeiro,
@@ -257,6 +276,21 @@ func family_payer(id: String) -> String:
 	return best
 
 
+## Taverna onde o morador come: a da própria região (Fronteira e Pedra Branca não atravessam a vila para comer).
+const TAVERNA_POR_ZONA := {"brejo": "taberna_sapo", "deserto": "pousada_camelo", "rocha": "taverna_picareta", "pedrabranca": "estalagem", "horizonte": "estalagem_horizonte", "vale_sul": "taverna_vale"}
+
+
+## Região cuja comida a refeição consome: a da taverna do morador (vila por padrão).
+func _regiao_da_taverna(id: String) -> String:
+	var z := str(world.db.location(str(world.npc_def(id).get("home", ""))).get("zone", ""))
+	return str(world.db.economy.get("regioes_por_zona", {}).get(z, "vila"))
+
+
+func taverna_do_morador(id: String) -> String:
+	var z := str(world.db.location(str(world.npc_def(id).get("home", ""))).get("zone", ""))
+	return str(TAVERNA_POR_ZONA.get(z, "taverna"))
+
+
 ## Bem que a profissão do morador produz num turno completo ("" se não produz nada). Vem de economy.json.
 func work_good(id: String) -> String:
 	var prof := str(world.npc_def(id).get("profession", ""))
@@ -270,7 +304,7 @@ func location_override(id: String, d: Dictionary) -> String:
 	var g := goal(id)
 	if g == "comer":
 		# só come fora se tiver ouro; sem ouro, segue a vida normal (fome vai subindo)
-		return "taverna" if gold(id) >= meal_cost() else ""
+		return taverna_do_morador(id) if gold(id) >= meal_cost() else ""
 	if g == "descansar":
 		return str(d.get("home", ""))
 	return ""

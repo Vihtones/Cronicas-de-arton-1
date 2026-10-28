@@ -13,6 +13,7 @@ const Atitudes := preload("res://src/domain/rules/atitudes.gd")
 const DETECT_AWAKE := 6
 const DETECT_ASLEEP := 3
 const SIGNAL_RADIUS := 12
+const EMBOSCADA_RAIO := 3   # emboscar: escondido (furtivo) e a até 3 quadrados de quem ainda não te notou
 const FLEE_DISTANCE := 10
 
 var active := false
@@ -166,6 +167,11 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			for id in ids:
 				if not creature_state.has(id) or not is_active_creature(id): return PackedStringArray(["alvo indisponível: " + str(id)])
 				if CombatSim.cheb(p, creature_tile(id)) > 8: return PackedStringArray(["alvo longe demais"])
+			if bool(cmd.payload.get("emboscada", false)):
+				if not stance_sneak: return PackedStringArray(["emboscar exige furtividade (C)"])
+				for id in ids:
+					if not undetected_by.has(id): return PackedStringArray(["%s já te notou" % str(id)])
+					if CombatSim.cheb(p, creature_tile(id)) > EMBOSCADA_RAIO: return PackedStringArray(["emboscar exige estar a até %d quadrados" % EMBOSCADA_RAIO])
 		"ExecutePlan":
 			if not active: return PackedStringArray(["sem combate"])
 			if sim.current_id() != "player": return PackedStringArray(["não é o seu turno"])
@@ -227,7 +233,7 @@ func execute(cmd: GameCommand) -> Array:
 			return [fact("STANCE_CHANGED", {"sneak": stance_sneak}, ["player"])]
 		"StartCombat":
 			var ids: Array = cmd.payload.enemies
-			var surprised := ids.all(func(id): return undetected_by.has(id))
+			var surprised := bool(cmd.payload.get("emboscada", false)) or ids.all(func(id): return undetected_by.has(id))
 			for id in ids:   # atacar quem foi acalmado por magia desfaz a magia (Acalmar Animal, Tranquilidade)
 				if creature_state.has(id):
 					creature_state[id].erase("atitude_temp")

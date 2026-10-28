@@ -120,11 +120,37 @@ def tile_abismo(img, x0, s):
         x, y = r.randrange(2, 28), r.randrange(2, 28)
         for k in range(r.randrange(4, 9)): img.putpixel((x0 + x + k // 2, y + k), hexc("#4a3d34"))
 
+def tile_mud(img, x0, s):
+    noise(img, x0, 0, ["#4b4a2c", "#55542f", "#3f3e25", "#62603a"], 1.1, s)
+    r = random.Random(s + 5)
+    for _ in range(3):
+        x, y = r.randrange(2, 26), r.randrange(3, 28)
+        for k in range(5): img.putpixel((x0 + x + k, y), hexc("#2c3a30")); img.putpixel((x0 + x + k, y + 1), hexc("#34463a"))
+def tile_sand(img, x0, s):
+    noise(img, x0, 0, ["#d8bf7a", "#e2cb8b", "#cdb26b", "#ebd79c"], 0.9, s)
+    r = random.Random(s + 11)
+    for _ in range(3):
+        y = r.randrange(4, 28); x = r.randrange(2, 20)
+        for k in range(8): img.putpixel((x0 + x + k, y + (1 if k % 4 > 1 else 0)), hexc("#bda25a"))
+def tile_gravel(img, x0, s):
+    noise(img, x0, 0, ["#7a7568", "#868072", "#6c675c", "#948e80"], 1.2, s)
+    r = random.Random(s + 21)
+    for _ in range(7):
+        x, y = r.randrange(2, 28), r.randrange(2, 28)
+        img.putpixel((x0 + x, y), hexc("#a8a294")); img.putpixel((x0 + x + 1, y), hexc("#5a564c")); img.putpixel((x0 + x, y + 1), hexc("#5a564c"))
+def tile_rock(img, x0, s):
+    tile_gravel(img, x0, s)
+    d = ImageDraw.Draw(img); r = random.Random(s + 31)
+    d.polygon([(x0 + 3, 28), (x0 + 6, 10), (x0 + 15, 3), (x0 + 25, 9), (x0 + 29, 27)], fill=hexc("#4a474d"), outline=hexc("#1c1a1f"))
+    d.polygon([(x0 + 8, 26), (x0 + 10, 13), (x0 + 16, 8), (x0 + 15, 20)], fill=hexc("#5f5b63"))
+    for _ in range(4): img.putpixel((x0 + r.randrange(6, 26), r.randrange(8, 26)), hexc("#2c2a30"))
+
 TILES = [(".", "grama", tile_grass), ("=", "estrada", tile_road), (":", "trilha", tile_path), (",", "chao_floresta", tile_forest),
  ("c", "plantacao", tile_crop), ("T", "arvore", tile_tree), ("~", "rio", tile_water), ("#", "parede", tile_wall), ("_", "piso", tile_floor),
  ("%", "entulho", tile_rubble), ("D", "porta_fechada", lambda i, x, s: tile_door(i, x, s, False)), ("d", "porta_aberta", lambda i, x, s: tile_door(i, x, s, True)),
  ("S", "escada_desce", lambda i, x, s: tile_stairs(i, x, s, False)), ("U", "escada_sobe", lambda i, x, s: tile_stairs(i, x, s, True)),
- ("o", "poco", tile_well), ("X", "vazio", tile_void), ("k", "piso_cripta", tile_crypt_floor), ("r", "piso_ruina", tile_ruin_floor), ("p", "ponte", tile_ponte), ("B", "barranco", tile_abismo)]
+ ("o", "poco", tile_well), ("X", "vazio", tile_void), ("k", "piso_cripta", tile_crypt_floor), ("r", "piso_ruina", tile_ruin_floor), ("p", "ponte", tile_ponte), ("B", "barranco", tile_abismo),
+ ("w", "lama", tile_mud), ("a", "areia", tile_sand), ("g", "cascalho", tile_gravel), ("M", "rocha", tile_rock)]
 VARIANTS = 3
 
 def build_tileset():
@@ -212,6 +238,115 @@ CHARS = {
  "hiena":     {"hyena": True},
 }
 
+def _sombra(d, ox, oy, w=18):
+    d.ellipse([ox + 16 - w // 2, oy + 27, ox + 16 + w // 2, oy + 31], fill=(0, 0, 0, 70))
+
+def draw_lobo(d, ox, oy, direction, frame, c):
+    pel, sombra, out = hexc("#8a8f99"), hexc("#5a5f6a"), hexc("#1a1418")
+    leg = [0, 2, -2][frame]
+    _sombra(d, ox, oy, 20)
+    if direction in (1, 2):
+        flip = direction == 1
+        def X(x): return ox + (31 - x if flip else x)
+        d.polygon([(X(7), oy + 14), (X(22), oy + 12), (X(25), oy + 20), (X(8), oy + 22)], fill=pel, outline=out)
+        for lx in (9, 13, 19, 23):
+            d.line([X(lx), oy + 21, X(lx), oy + 28 + (leg if lx in (9, 19) else -leg) // 2], fill=sombra, width=2)
+        d.polygon([(X(21), oy + 9), (X(27), oy + 11), (X(26), oy + 15), (X(20), oy + 14)], fill=pel, outline=out)
+        d.polygon([(X(22), oy + 8), (X(23), oy + 4), (X(25), oy + 9)], fill=pel, outline=out)
+        d.point([(X(25), oy + 12)], fill=hexc("#e8d040"))
+        d.line([X(7), oy + 15, X(2), oy + 12 + leg // 2], fill=pel, width=2)
+    else:
+        d.ellipse([ox + 9, oy + 11, ox + 23, oy + 25], fill=pel, outline=out)
+        d.ellipse([ox + 11, oy + 4, ox + 21, oy + 14], fill=pel, outline=out)
+        d.polygon([(ox + 11, oy + 5), (ox + 12, oy + 0), (ox + 14, oy + 5)], fill=pel, outline=out)
+        d.polygon([(ox + 18, oy + 5), (ox + 20, oy + 0), (ox + 21, oy + 5)], fill=pel, outline=out)
+        d.rectangle([ox + 11, oy + 24, ox + 13, oy + 29 + leg // 2], fill=sombra)
+        d.rectangle([ox + 19, oy + 24, ox + 21, oy + 29 - leg // 2], fill=sombra)
+        d.point([(ox + 14, oy + 9), (ox + 18, oy + 9)], fill=hexc("#e8d040"))
+
+def draw_esqueleto(d, ox, oy, direction, frame, c):
+    osso, out = hexc("#e6e0cc"), hexc("#2a2420")
+    leg = [0, 2, -2][frame]
+    _sombra(d, ox, oy, 14)
+    d.ellipse([ox + 12, oy + 3, ox + 20, oy + 11], fill=osso, outline=out)      # crânio
+    d.rectangle([ox + 14, oy + 9, ox + 18, oy + 10], fill=out)                    # mandíbula
+    for yy in (13, 16, 19):                                                       # costelas
+        d.line([ox + 11, oy + yy, ox + 21, oy + yy], fill=osso, width=1)
+    d.line([ox + 16, oy + 11, ox + 16, oy + 22], fill=osso, width=2)             # coluna
+    d.line([ox + 10, oy + 13, ox + 7, oy + 20 + leg // 2], fill=osso, width=2)  # braços
+    d.line([ox + 22, oy + 13, ox + 25, oy + 20 - leg // 2], fill=osso, width=2)
+    d.line([ox + 13, oy + 22, ox + 12, oy + 29 + leg // 2], fill=osso, width=2)  # pernas
+    d.line([ox + 19, oy + 22, ox + 20, oy + 29 - leg // 2], fill=osso, width=2)
+    if direction == 3:
+        d.rectangle([ox + 12, oy + 3, ox + 20, oy + 10], fill=osso)
+
+def draw_aranha(d, ox, oy, direction, frame, c):
+    corpo, perna, olho = hexc("#2e2a33"), hexc("#4a4352"), hexc("#d04030")
+    leg = [0, 2, -2][frame]
+    _sombra(d, ox, oy, 24)
+    for k, (dy, sx) in enumerate([(-4, 1), (-1, 1), (2, 1), (5, 1)]):   # pernas
+        yy = oy + 14 + dy + (leg if k % 2 else -leg) // 2
+        d.line([ox + 16, oy + 16, ox + 16 + 12 * sx, yy], fill=perna, width=2)
+        d.line([ox + 16, oy + 16, ox + 16 - 12 * sx, yy], fill=perna, width=2)
+    d.ellipse([ox + 9, oy + 13, ox + 23, oy + 26], fill=corpo, outline=hexc("#111111")) # abdômen
+    d.ellipse([ox + 12, oy + 6, ox + 20, oy + 14], fill=corpo, outline=hexc("#111111")) # cabeça
+    if direction != 3:
+        d.point([(ox + 14, oy + 9), (ox + 18, oy + 9)], fill=olho)
+
+def draw_cobra(d, ox, oy, direction, frame, c):
+    pele, faixa, out = hexc("#6f8f3a"), hexc("#3f5a20"), hexc("#1a1418")
+    fase = [0, 1, 2][frame]
+    _sombra(d, ox, oy, 20)
+    for k in range(8):                                   # corpo ondulado
+        xx = ox + 6 + k * 3
+        yy = oy + 22 - (k * 2 % 5) + (fase if k % 2 else -fase) // 2
+        d.ellipse([xx - 3, yy - 3, xx + 3, yy + 3], fill=pele if k % 2 == 0 else faixa, outline=out)
+    d.ellipse([ox + 25, oy + 15, ox + 30, oy + 20], fill=pele, outline=out)         # cabeça
+    d.point([(ox + 28, oy + 17)], fill=hexc("#e8d040"))
+    d.line([ox + 30, oy + 18, ox + 31, oy + 16 + fase // 2], fill=hexc("#d03030"), width=1)
+
+def draw_orc(d, ox, oy, direction, frame, c):
+    pele, roupa, dente, out = hexc("#5f8a3c"), hexc("#4a3a2a"), hexc("#f0ead0"), hexc("#1a1418")
+    leg = [0, 2, -2][frame]
+    _sombra(d, ox, oy, 18)
+    d.rectangle([ox + 10, oy + 14, ox + 22, oy + 23], fill=roupa, outline=out)     # torso largo
+    d.rectangle([ox + 8, oy + 15 + leg // 2, ox + 10, oy + 22], fill=pele, outline=out)
+    d.rectangle([ox + 22, oy + 15 - leg // 2, ox + 24, oy + 22], fill=pele, outline=out)
+    d.rectangle([ox + 11, oy + 23, ox + 15, oy + 29 + leg // 2], fill=roupa, outline=out)
+    d.rectangle([ox + 17, oy + 23, ox + 21, oy + 29 - leg // 2], fill=roupa, outline=out)
+    d.rectangle([ox + 10, oy + 5, ox + 22, oy + 14], fill=pele, outline=out)        # cabeça
+    if direction != 3:
+        d.point([(ox + 13, oy + 9), (ox + 19, oy + 9)], fill=hexc("#ffdf40"))
+        d.line([ox + 14, oy + 12, ox + 14, oy + 10], fill=dente)
+        d.line([ox + 18, oy + 12, ox + 18, oy + 10], fill=dente)
+    d.line([ox + 24, oy + 15, ox + 29, oy + 6 - leg // 2], fill=hexc("#6a5a40"), width=2)   # machado no ombro
+
+def draw_ogro(d, ox, oy, direction, frame, c):
+    pele, roupa, out = hexc("#9a7a5a"), hexc("#5a4030"), hexc("#1a1418")
+    leg = [0, 2, -2][frame]
+    _sombra(d, ox, oy, 26)
+    d.ellipse([ox + 6, oy + 9, ox + 26, oy + 27], fill=roupa, outline=out)          # corpo enorme
+    d.ellipse([ox + 9, oy + 1, ox + 23, oy + 13], fill=pele, outline=out)           # cabeça
+    d.rectangle([ox + 9, oy + 25, ox + 14, oy + 30 + leg // 2], fill=pele, outline=out)
+    d.rectangle([ox + 18, oy + 25, ox + 23, oy + 30 - leg // 2], fill=pele, outline=out)
+    if direction != 3:
+        d.point([(ox + 13, oy + 6), (ox + 19, oy + 6)], fill=hexc("#ffdf40"))
+        d.line([ox + 15, oy + 10, ox + 15, oy + 12], fill=hexc("#f0ead0"))
+
+FORMAS = {"lobo": draw_lobo, "esqueleto": draw_esqueleto, "aranha": draw_aranha, "cobra": draw_cobra, "orc": draw_orc, "ogro": draw_ogro}
+
+def build_criaturas():
+    out = {}
+    for name, fn in FORMAS.items():
+        img = Image.new("RGBA", (T * 3, T * 4), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        for direction in range(4):
+            for frame in range(3):
+                fn(d, frame * T, direction * T, direction, frame, {})
+        p = A / "chars" / f"criatura_{name}.png"; p.parent.mkdir(parents=True, exist_ok=True); img.save(p)
+        out[name] = p
+    return out
+
 def build_chars():
     out = {}
     for name, c in CHARS.items():
@@ -261,6 +396,7 @@ def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
     tp, index = build_tileset()
     chars = build_chars()
+    chars.update(build_criaturas())
     ip = build_icons()
     manifest = {"schema_version": 1, "art_bible": {"perspectiva": "top-down 3/4", "tile_px": 32, "char_canvas": [32, 32], "resolucao_interna": [640, 360],
         "pivot_personagem": [16, 28], "outline": "#1a1418", "status": "HIPOTESE — aprovar em cena real (§13, §20.2)"}, "assets": []}

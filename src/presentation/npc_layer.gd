@@ -40,6 +40,12 @@ func rebuild() -> void:
 
 ## Aparência pelo tipo do bestiário enquanto não há arte própria: animais e monstros usam a folha da hiena,
 ## humanoides a do bandido; a cor separa as espécies (mortos-vivos pálidos, orcs esverdeados...).
+## Silhueta própria por espécie (tools/gen_placeholder_art.py). Procurada pelo trecho do nome da regra.
+const FORMA_POR_REGRA := {"lobo": "lobo", "esqueleto": "esqueleto", "zumbi": "esqueleto", "necromante": "esqueleto", "aranha": "aranha",
+	"naja": "cobra", "jiboia": "cobra", "sucuri": "cobra", "cascavel": "cobra", "nagah": "cobra", "orc": "orc", "gnoll": "orc",
+	"finntroll": "orc", "ogro": "ogro", "golem": "ogro"}
+
+
 const TINTA := {"criatura.lobo": Color(0.75, 0.75, 0.8), "criatura.rato_gigante": Color(0.6, 0.5, 0.45), "criatura.zumbi": Color(0.7, 0.85, 0.7),
 	"criatura.esqueleto": Color(1.0, 1.0, 0.9), "criatura.orc_combatente": Color(0.6, 0.85, 0.55), "criatura.orc_chefe": Color(0.5, 0.8, 0.45),
 	"criatura.orc_mutante": Color(0.55, 0.7, 0.4), "criatura.glop": Color(0.4, 1.0, 0.4), "criatura.aranha_gigante": Color(0.35, 0.3, 0.35),
@@ -52,6 +58,10 @@ func _criar_vista(id: String) -> void:
 	var r: Dictionary = Game.world.rules.value(str(d.rule), {})
 	var tipo := str(r.get("tipo", "humanoide"))
 	var sheet := "hiena" if str(d.rule).contains("hiena") or tipo in ["animal", "monstro"] else ("kael" if id == "kael" else "bandido")
+	for forma in FORMA_POR_REGRA:
+		if str(d.rule).contains(forma):
+			sheet = "criatura_" + str(FORMA_POR_REGRA[forma])
+			break
 	var v := ActorView.new()
 	v.setup(id, "res://assets/chars/%s.png" % sheet, d.name)
 	if TINTA.has(str(d.rule)):

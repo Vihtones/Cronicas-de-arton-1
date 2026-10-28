@@ -713,6 +713,738 @@
     "classe": "guerreiro",
     "preset": 1
    }
+  },
+  {
+   "id": "zeca",
+   "name": "Zeca Sapo",
+   "age": 48,
+   "profession": "taverneiro",
+   "schedule": "taverneiro_junco",
+   "home": "taberna_sapo",
+   "work": "taberna_sapo",
+   "family": "sapo",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "fofoqueiro"
+   ],
+   "beliefs": {},
+   "gold": 35,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "juta",
+   "name": "Juta Sapo",
+   "age": 44,
+   "profession": "cozinheira",
+   "schedule": "taverneiro_junco",
+   "home": "taberna_sapo",
+   "work": "taberna_sapo",
+   "family": "sapo",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 15,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "nico",
+   "name": "Nico Sapo",
+   "age": 36,
+   "profession": "pescador",
+   "schedule": "pescador",
+   "home": "casa_pescador",
+   "work": "passarela_junco",
+   "family": "sapo",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "calado"
+   ],
+   "beliefs": {},
+   "gold": 12,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "pipo",
+   "name": "Pipo Sapo",
+   "age": 10,
+   "profession": "criança",
+   "schedule": "crianca_junco",
+   "home": "casa_pescador",
+   "work": "casa_pescador",
+   "family": "sapo",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "curioso"
+   ],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "mirta",
+   "name": "Vovó Mirta",
+   "age": 71,
+   "profession": "curandeira",
+   "schedule": "curandeira",
+   "home": "cabana_curandeira",
+   "work": "cabana_curandeira",
+   "family": null,
+   "faction": null,
+   "devotion": "Allihanna",
+   "traits": [
+    "recluso"
+   ],
+   "beliefs": {},
+   "gold": 60,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "tica",
+   "name": "Tica",
+   "age": 15,
+   "profession": "aprendiz",
+   "schedule": "curandeira",
+   "home": "cabana_curandeira",
+   "work": "cabana_curandeira",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "curioso"
+   ],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "brutus",
+   "name": "Brutus Garra",
+   "age": 52,
+   "profession": "caçador",
+   "schedule": "cacador_brejo",
+   "home": "casa_cacador_croc",
+   "work": "brejo_norte",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "recluso",
+    "desconfia_de_estrangeiros"
+   ],
+   "beliefs": {},
+   "gold": 45,
+   "combate": {
+    "raca": "humano",
+    "classe": "ladino",
+    "preset": 0
+   }
+  },
+  {
+   "id": "jurandi",
+   "name": "Ancião Jurandi",
+   "age": 78,
+   "profession": "ancião",
+   "schedule": "anciao_junco",
+   "home": "palanque_anciao",
+   "work": "palanque_anciao",
+   "family": null,
+   "faction": null,
+   "devotion": "Allihanna",
+   "traits": [
+    "memoria_longa"
+   ],
+   "beliefs": {},
+   "gold": 20,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "haziz",
+   "name": "Haziz Al-Dahab",
+   "age": 55,
+   "profession": "estalajadeiro",
+   "schedule": "estalajadeiro_d",
+   "home": "pousada_camelo",
+   "work": "pousada_camelo",
+   "family": "dahab",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "fofoqueiro"
+   ],
+   "beliefs": {},
+   "gold": 80,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "nadia",
+   "name": "Nadia Al-Dahab",
+   "age": 30,
+   "profession": "cozinheira",
+   "schedule": "estalajadeiro_d",
+   "home": "pousada_camelo",
+   "work": "pousada_camelo",
+   "family": "dahab",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 20,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "yara",
+   "name": "Yara Al-Dahab",
+   "age": 11,
+   "profession": "criança",
+   "schedule": "crianca_d",
+   "home": "pousada_camelo",
+   "work": "pousada_camelo",
+   "family": "dahab",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "curioso"
+   ],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "kharim",
+   "name": "Kharim Bazari",
+   "age": 47,
+   "profession": "mercador",
+   "schedule": "comerciante_d",
+   "home": "bazar_tendas",
+   "work": "bazar_tendas",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "traz_noticias"
+   ],
+   "beliefs": {},
+   "gold": 200,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "sulema",
+   "name": "Sulema Forja-Vento",
+   "age": 40,
+   "profession": "armeira",
+   "schedule": "artesao",
+   "home": "armaria_deserto",
+   "work": "armaria_deserto",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 150,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "dara",
+   "name": "Dara Ventania",
+   "age": 26,
+   "profession": "curandeira",
+   "schedule": "curandeira",
+   "home": "casa_curandeira_d",
+   "work": "casa_curandeira_d",
+   "family": null,
+   "faction": null,
+   "devotion": "Lena",
+   "traits": [],
+   "beliefs": {},
+   "gold": 50,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "iben",
+   "name": "Iben Caravaneiro",
+   "age": 33,
+   "profession": "atendente da guilda",
+   "schedule": "atendente_guilda",
+   "home": "guilda_filial",
+   "work": "guilda_filial",
+   "family": "dahab",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 40,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "zahir",
+   "name": "Capitão Zahir",
+   "age": 45,
+   "profession": "capitão de caravana",
+   "schedule": "guarda_areia",
+   "home": "praca_areia",
+   "work": "praca_areia",
+   "family": null,
+   "faction": "guarda_fronteira",
+   "devotion": "Khalmyr",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 60,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "ossian",
+   "name": "Ossian Vale",
+   "age": 58,
+   "profession": "erudito",
+   "schedule": "erudito_oasis",
+   "home": "oasis",
+   "work": "oasis",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "memoria_longa",
+    "curioso"
+   ],
+   "beliefs": {},
+   "gold": 40,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "durin",
+   "name": "Durin Martelo-Negro",
+   "age": 88,
+   "profession": "ferreiro",
+   "schedule": "artesao_rn",
+   "home": "alojamento_mineiros",
+   "work": "forja_ana",
+   "family": "martelo_negro",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "teimoso"
+   ],
+   "beliefs": {},
+   "gold": 300,
+   "combate": {
+    "raca": "anao",
+    "classe": "guerreiro",
+    "preset": 0
+   }
+  },
+  {
+   "id": "brenna",
+   "name": "Brenna Martelo-Negro",
+   "age": 80,
+   "profession": "estalajadeira",
+   "schedule": "estalajadeiro_rn",
+   "home": "alojamento_mineiros",
+   "work": "alojamento_mineiros",
+   "family": "martelo_negro",
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 90,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "hakon",
+   "name": "Hakon Barba-Ruiva",
+   "age": 44,
+   "profession": "taverneiro",
+   "schedule": "estalajadeiro_rn",
+   "home": "taverna_picareta",
+   "work": "taverna_picareta",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "observador"
+   ],
+   "beliefs": {},
+   "gold": 60,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "gorm",
+   "name": "Gorm Cinzento",
+   "age": 50,
+   "profession": "capataz",
+   "schedule": "capataz",
+   "home": "casa_mina",
+   "work": "casa_mina",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 80,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "pedro_pa",
+   "name": "Pedro Pá",
+   "age": 38,
+   "profession": "minerador",
+   "schedule": "minerador",
+   "home": "alojamento_mineiros",
+   "work": "casa_mina",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 15,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "olga",
+   "name": "Olga Veio",
+   "age": 42,
+   "profession": "mineradora",
+   "schedule": "minerador",
+   "home": "alojamento_mineiros",
+   "work": "casa_mina",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "calada"
+   ],
+   "beliefs": {},
+   "gold": 18,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "thyra",
+   "name": "Thyra Fiel-Martelo",
+   "age": 36,
+   "profession": "sacerdotisa de Khalmyr",
+   "schedule": "sacerdote_rn",
+   "home": "capela_khalmyr",
+   "work": "capela_khalmyr",
+   "family": null,
+   "faction": "templo_khalmyr",
+   "devotion": "Khalmyr",
+   "traits": [],
+   "beliefs": {},
+   "gold": 60,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "rolf",
+   "name": "Capitão Rolf",
+   "age": 46,
+   "profession": "capitão da guarda",
+   "schedule": "guarda_rocha_dia",
+   "home": "posto_guarda_rn",
+   "work": "posto_guarda_rn",
+   "family": null,
+   "faction": "guarda_fronteira",
+   "devotion": "Khalmyr",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 50,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "ysa",
+   "name": "Ysa",
+   "age": 28,
+   "profession": "guarda",
+   "schedule": "guarda_rocha_noite",
+   "home": "posto_guarda_rn",
+   "work": "posto_guarda_rn",
+   "family": null,
+   "faction": "guarda_fronteira",
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 5,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 0
+   }
+  },
+  {
+   "id": "bram",
+   "name": "Bram Estradeiro",
+   "age": 54,
+   "profession": "guia",
+   "schedule": "viajante",
+   "home": "casa_guia",
+   "work": "praca_horizonte",
+   "family": "estradeiros",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "traz_noticias"
+   ],
+   "beliefs": {},
+   "gold": 40,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "lotte",
+   "name": "Lotte Estradeira",
+   "age": 36,
+   "profession": "estalajadeira",
+   "schedule": "estalajadeiro",
+   "home": "estalagem_horizonte",
+   "work": "estalagem_horizonte",
+   "family": "estradeiros",
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "fofoqueira"
+   ],
+   "beliefs": {},
+   "gold": 50,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "hogan",
+   "name": "Hogan Martelo",
+   "age": 47,
+   "profession": "ferreiro",
+   "schedule": "artesao",
+   "home": "casa_ferreiro_estrada",
+   "work": "casa_ferreiro_estrada",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "exige_provas"
+   ],
+   "beliefs": {},
+   "gold": 120,
+   "combate": {
+    "raca": "anao",
+    "classe": "guerreiro",
+    "preset": 0
+   }
+  },
+  {
+   "id": "ilka",
+   "name": "Ilka Carroceira",
+   "age": 31,
+   "profession": "carroceira",
+   "schedule": "comerciante",
+   "home": "casa_guia",
+   "work": "armazem_horizonte",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "traz_noticias"
+   ],
+   "beliefs": {},
+   "gold": 90,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "ancia",
+   "name": "Anciã Revas",
+   "age": 81,
+   "profession": "anciã",
+   "schedule": "idoso",
+   "home": "casa_anciao",
+   "work": "casa_anciao",
+   "family": null,
+   "faction": null,
+   "devotion": "Allihanna",
+   "traits": [
+    "memoria_longa"
+   ],
+   "beliefs": {},
+   "gold": 10,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "gorvo",
+   "name": "Gorvo Fundo",
+   "age": 43,
+   "profession": "taverneiro",
+   "schedule": "taverneiro",
+   "home": "taverna_vale",
+   "work": "taverna_vale",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "fofoqueiro"
+   ],
+   "beliefs": {},
+   "gold": 55,
+   "combate": {
+    "raca": "humano",
+    "classe": "guerreiro",
+    "preset": 1
+   }
+  },
+  {
+   "id": "sela",
+   "name": "Sela Caçadora",
+   "age": 29,
+   "profession": "caçador",
+   "schedule": "cacador",
+   "home": "casa_cacadores",
+   "work": "praca_vale",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [
+    "recluso"
+   ],
+   "beliefs": {},
+   "gold": 25,
+   "combate": {
+    "raca": "humano",
+    "classe": "ladino",
+    "preset": 0
+   }
+  },
+  {
+   "id": "teo",
+   "name": "Teo Ferro-Vale",
+   "age": 22,
+   "profession": "ferreiro",
+   "schedule": "artesao",
+   "home": "ferreiro_vale",
+   "work": "ferreiro_vale",
+   "family": null,
+   "faction": null,
+   "devotion": "",
+   "traits": [],
+   "beliefs": {},
+   "gold": 40,
+   "combate": {
+    "raca": "anao",
+    "classe": "guerreiro",
+    "preset": 0
+   }
   }
  ],
  "schedule_templates": {
@@ -1187,6 +1919,33 @@
     "work"
    ]
   ],
+  "anciao_vale": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    11,
+    "praca_vale"
+   ],
+   [
+    11,
+    18,
+    "home"
+   ],
+   [
+    18,
+    20,
+    "taverna_vale"
+   ],
+   [
+    20,
+    24,
+    "home"
+   ]
+  ],
   "lavrador_pb": [
    [
     0,
@@ -1212,6 +1971,449 @@
     18,
     24,
     "home"
+   ]
+  ],
+  "pescador": [
+   [
+    0,
+    5,
+    "home"
+   ],
+   [
+    5,
+    12,
+    "work"
+   ],
+   [
+    12,
+    13,
+    "taberna_sapo"
+   ],
+   [
+    13,
+    17,
+    "work"
+   ],
+   [
+    17,
+    21,
+    "taberna_sapo"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "cacador_brejo": [
+   [
+    0,
+    5,
+    "home"
+   ],
+   [
+    5,
+    12,
+    "work"
+   ],
+   [
+    12,
+    14,
+    "home"
+   ],
+   [
+    14,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "taberna_sapo"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "anciao_junco": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    11,
+    "passarela_junco"
+   ],
+   [
+    11,
+    18,
+    "home"
+   ],
+   [
+    18,
+    21,
+    "taberna_sapo"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "curandeira": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    19,
+    "work"
+   ],
+   [
+    19,
+    24,
+    "home"
+   ]
+  ],
+  "taverneiro_junco": [
+   [
+    0,
+    2,
+    "work"
+   ],
+   [
+    2,
+    9,
+    "home"
+   ],
+   [
+    9,
+    24,
+    "work"
+   ]
+  ],
+  "crianca_junco": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    11,
+    "passarela_junco"
+   ],
+   [
+    11,
+    13,
+    "home"
+   ],
+   [
+    13,
+    17,
+    "passarela_junco"
+   ],
+   [
+    17,
+    24,
+    "home"
+   ]
+  ],
+  "estalajadeiro_d": [
+   [
+    0,
+    2,
+    "work"
+   ],
+   [
+    2,
+    8,
+    "home"
+   ],
+   [
+    8,
+    24,
+    "work"
+   ]
+  ],
+  "comerciante_d": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "pousada_camelo"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "guarda_areia": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    12,
+    "praca_areia"
+   ],
+   [
+    12,
+    13,
+    "pousada_camelo"
+   ],
+   [
+    13,
+    19,
+    "praca_areia"
+   ],
+   [
+    19,
+    24,
+    "home"
+   ]
+  ],
+  "atendente_guilda": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    20,
+    "work"
+   ],
+   [
+    20,
+    22,
+    "pousada_camelo"
+   ],
+   [
+    22,
+    24,
+    "home"
+   ]
+  ],
+  "erudito_oasis": [
+   [
+    0,
+    8,
+    "home"
+   ],
+   [
+    8,
+    17,
+    "oasis"
+   ],
+   [
+    17,
+    24,
+    "pousada_camelo"
+   ]
+  ],
+  "crianca_d": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    18,
+    "praca_areia"
+   ],
+   [
+    18,
+    24,
+    "home"
+   ]
+  ],
+  "artesao_rn": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    12,
+    "work"
+   ],
+   [
+    12,
+    13,
+    "taverna_picareta"
+   ],
+   [
+    13,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "taverna_picareta"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "minerador": [
+   [
+    0,
+    6,
+    "home"
+   ],
+   [
+    6,
+    12,
+    "casa_mina"
+   ],
+   [
+    12,
+    13,
+    "taverna_picareta"
+   ],
+   [
+    13,
+    18,
+    "casa_mina"
+   ],
+   [
+    18,
+    22,
+    "taverna_picareta"
+   ],
+   [
+    22,
+    24,
+    "home"
+   ]
+  ],
+  "estalajadeiro_rn": [
+   [
+    0,
+    2,
+    "work"
+   ],
+   [
+    2,
+    8,
+    "home"
+   ],
+   [
+    8,
+    24,
+    "work"
+   ]
+  ],
+  "capataz": [
+   [
+    0,
+    6,
+    "home"
+   ],
+   [
+    6,
+    18,
+    "work"
+   ],
+   [
+    18,
+    21,
+    "taverna_picareta"
+   ],
+   [
+    21,
+    24,
+    "home"
+   ]
+  ],
+  "sacerdote_rn": [
+   [
+    0,
+    12,
+    "work"
+   ],
+   [
+    12,
+    13,
+    "praca_rocha"
+   ],
+   [
+    13,
+    24,
+    "work"
+   ]
+  ],
+  "guarda_rocha_dia": [
+   [
+    0,
+    7,
+    "home"
+   ],
+   [
+    7,
+    12,
+    "praca_rocha"
+   ],
+   [
+    12,
+    13,
+    "taverna_picareta"
+   ],
+   [
+    13,
+    19,
+    "praca_rocha"
+   ],
+   [
+    19,
+    24,
+    "work"
+   ]
+  ],
+  "guarda_rocha_noite": [
+   [
+    0,
+    6,
+    "praca_rocha"
+   ],
+   [
+    6,
+    14,
+    "home"
+   ],
+   [
+    14,
+    18,
+    "work"
+   ],
+   [
+    18,
+    24,
+    "praca_rocha"
    ]
   ]
  },
@@ -1273,6 +2475,43 @@
     "tuco",
     "gunther"
    ]
+  },
+  {
+   "id": "sapo",
+   "name": "Sapo",
+   "members": [
+    "zeca",
+    "juta",
+    "nico",
+    "pipo"
+   ]
+  },
+  {
+   "id": "dahab",
+   "name": "Al-Dahab",
+   "members": [
+    "haziz",
+    "nadia",
+    "yara",
+    "iben"
+   ]
+  },
+  {
+   "id": "martelo_negro",
+   "name": "Martelo-Negro",
+   "members": [
+    "durin",
+    "brenna"
+   ]
+  },
+  {
+   "id": "estradeiros",
+   "name": "Estradeiros",
+   "members": [
+    "bram",
+    "lotte",
+    "ilka"
+   ]
   }
  ],
  "factions": [
@@ -1329,6 +2568,40 @@
    ],
    "hideout": "cripta_salao",
    "relocate_day": 12,
+   "status": "ORIGINAL_DO_JOGO"
+  },
+  {
+   "id": "guarda_fronteira",
+   "name": "Guarda da Fronteira",
+   "goals": [
+    "proteger_caravanas",
+    "manter_ordem"
+   ],
+   "resources": {
+    "soldados": 4,
+    "ouro": 150
+   },
+   "allies": [
+    "guarda_vila",
+    "templo_khalmyr"
+   ],
+   "rivals": [],
+   "status": "ORIGINAL_DO_JOGO"
+  },
+  {
+   "id": "templo_khalmyr",
+   "name": "Capela de Khalmyr",
+   "goals": [
+    "fazer_justica",
+    "curar"
+   ],
+   "resources": {
+    "ouro": 30
+   },
+   "allies": [
+    "guarda_fronteira"
+   ],
+   "rivals": [],
    "status": "ORIGINAL_DO_JOGO"
   }
  ],
@@ -1504,6 +2777,631 @@
     19,
     5
    ]
+  },
+  {
+   "id": "naja_1",
+   "name": "Naja do Brejo",
+   "rule": "criatura.naja",
+   "faction": "fauna",
+   "spawn": [
+    199,
+    37
+   ],
+   "zone": "brejo",
+   "signal": "Um chiado baixo vem da lama."
+  },
+  {
+   "id": "naja_2",
+   "name": "Naja do Brejo",
+   "rule": "criatura.naja",
+   "faction": "fauna",
+   "spawn": [
+    190,
+    44
+   ],
+   "zone": "brejo"
+  },
+  {
+   "id": "sucuri_1",
+   "name": "Sucuri Anciã",
+   "rule": "criatura.sucuri",
+   "faction": "fauna",
+   "spawn": [
+    178,
+    11
+   ],
+   "zone": "brejo",
+   "signal": "A água parada se mexe devagar demais."
+  },
+  {
+   "id": "jiboia_1",
+   "name": "Jiboia",
+   "rule": "criatura.jiboia",
+   "faction": "fauna",
+   "spawn": [
+    172,
+    38
+   ],
+   "zone": "brejo"
+  },
+  {
+   "id": "glop_b1",
+   "name": "Gosma do Brejo",
+   "rule": "criatura.glop",
+   "faction": "gosmas_brejo",
+   "spawn": [
+    171,
+    4
+   ],
+   "zone": "brejo"
+  },
+  {
+   "id": "glop_b2",
+   "name": "Gosma do Brejo",
+   "rule": "criatura.glop",
+   "faction": "gosmas_brejo",
+   "spawn": [
+    174,
+    7
+   ],
+   "zone": "brejo"
+  },
+  {
+   "id": "glop_b3",
+   "name": "Gosma do Brejo",
+   "rule": "criatura.glop",
+   "faction": "gosmas_brejo",
+   "spawn": [
+    172,
+    3
+   ],
+   "zone": "brejo"
+  },
+  {
+   "id": "nagah_1",
+   "name": "Nagah Guardião",
+   "rule": "criatura.nagah_guardiao",
+   "faction": "culto_serpente",
+   "spawn": [
+    187,
+    5
+   ],
+   "zone": "brejo",
+   "signal": "Sibilos ritmados vêm da ilha ao norte."
+  },
+  {
+   "id": "nagah_2",
+   "name": "Nagah Guardião",
+   "rule": "criatura.nagah_guardiao",
+   "faction": "culto_serpente",
+   "spawn": [
+    192,
+    9
+   ],
+   "zone": "brejo"
+  },
+  {
+   "id": "cultista_1",
+   "name": "Voz de Sszzaas",
+   "rule": "criatura.cultista_de_sszzaas",
+   "faction": "culto_serpente",
+   "spawn": [
+    190,
+    9
+   ],
+   "zone": "brejo",
+   "important": true
+  },
+  {
+   "id": "cascavel_d1",
+   "name": "Cascavel do Deserto",
+   "rule": "criatura.cascavel",
+   "faction": "fauna",
+   "spawn": [
+    207,
+    33
+   ],
+   "zone": "deserto",
+   "signal": "O guizo de uma cascavel corta o silêncio."
+  },
+  {
+   "id": "cascavel_d2",
+   "name": "Cascavel do Deserto",
+   "rule": "criatura.cascavel",
+   "faction": "fauna",
+   "spawn": [
+    238,
+    31
+   ],
+   "zone": "deserto"
+  },
+  {
+   "id": "gnoll_1",
+   "name": "Gnoll Saqueador",
+   "rule": "criatura.gnoll_saqueador",
+   "faction": "gnolls_deserto",
+   "spawn": [
+    208,
+    8
+   ],
+   "zone": "deserto",
+   "signal": "Latidos que parecem riso vêm das dunas ao norte."
+  },
+  {
+   "id": "gnoll_2",
+   "name": "Gnoll Saqueador",
+   "rule": "criatura.gnoll_saqueador",
+   "faction": "gnolls_deserto",
+   "spawn": [
+    211,
+    10
+   ],
+   "zone": "deserto"
+  },
+  {
+   "id": "gnoll_3",
+   "name": "Gnoll Saqueador",
+   "rule": "criatura.gnoll_saqueador",
+   "faction": "gnolls_deserto",
+   "spawn": [
+    206,
+    11
+   ],
+   "zone": "deserto"
+  },
+  {
+   "id": "gnoll_chefe",
+   "name": "Dente-Torto, gnoll filibusteiro",
+   "rule": "criatura.gnoll_filibusteiro",
+   "faction": "gnolls_deserto",
+   "spawn": [
+    209,
+    9
+   ],
+   "zone": "deserto",
+   "important": true
+  },
+  {
+   "id": "grifo_1",
+   "name": "Grifo Faminto",
+   "rule": "criatura.grifo",
+   "faction": "fauna",
+   "spawn": [
+    216,
+    4
+   ],
+   "zone": "deserto",
+   "active_hours": [
+    5,
+    20
+   ],
+   "signal": "Um grito de ave de rapina ecoa nas rochas."
+  },
+  {
+   "id": "basilisco_1",
+   "name": "Basilisco das Pedras",
+   "rule": "criatura.basilisco",
+   "faction": "fauna",
+   "spawn": [
+    205,
+    44
+   ],
+   "zone": "deserto",
+   "signal": "Estátuas de viajantes cercam um poço de pedra ao sul."
+  },
+  {
+   "id": "manticora_1",
+   "name": "Mantícora do Sul",
+   "rule": "criatura.manticora",
+   "faction": "fauna",
+   "spawn": [
+    233,
+    45
+   ],
+   "zone": "deserto",
+   "signal": "Espinhos longos se cravam nas rochas ao sul."
+  },
+  {
+   "id": "esq_f1",
+   "name": "Esqueleto do Forte",
+   "rule": "criatura.esqueleto",
+   "faction": "mortos_forte",
+   "spawn": [
+    226,
+    8
+   ],
+   "zone": "forte"
+  },
+  {
+   "id": "esq_f2",
+   "name": "Esqueleto do Forte",
+   "rule": "criatura.esqueleto",
+   "faction": "mortos_forte",
+   "spawn": [
+    232,
+    6
+   ],
+   "zone": "forte"
+  },
+  {
+   "id": "esq_f3",
+   "name": "Esqueleto do Forte",
+   "rule": "criatura.esqueleto",
+   "faction": "mortos_forte",
+   "spawn": [
+    231,
+    12
+   ],
+   "zone": "forte"
+  },
+  {
+   "id": "zumbi_f1",
+   "name": "Zumbi do Forte",
+   "rule": "criatura.zumbi",
+   "faction": "mortos_forte",
+   "spawn": [
+    229,
+    9
+   ],
+   "zone": "forte"
+  },
+  {
+   "id": "zumbi_f2",
+   "name": "Zumbi do Forte",
+   "rule": "criatura.zumbi",
+   "faction": "mortos_forte",
+   "spawn": [
+    224,
+    12
+   ],
+   "zone": "forte"
+  },
+  {
+   "id": "necro_1",
+   "name": "Mestre Corvino, o necromante",
+   "rule": "criatura.necromante",
+   "faction": "mortos_forte",
+   "spawn": [
+    235,
+    6
+   ],
+   "zone": "forte",
+   "important": true,
+   "signal": "Um frio estranho sai do forte em ruínas."
+  },
+  {
+   "id": "lobo_r1",
+   "name": "Lobo da Montanha",
+   "rule": "criatura.lobo",
+   "faction": "fauna",
+   "spawn": [
+    257,
+    39
+   ],
+   "zone": "rocha",
+   "active_hours": [
+    17,
+    7
+   ]
+  },
+  {
+   "id": "lobo_r2",
+   "name": "Lobo da Montanha",
+   "rule": "criatura.lobo",
+   "faction": "fauna",
+   "spawn": [
+    259,
+    42
+   ],
+   "zone": "rocha",
+   "active_hours": [
+    17,
+    7
+   ]
+  },
+  {
+   "id": "urso_r1",
+   "name": "Urso-coruja",
+   "rule": "criatura.urso_coruja",
+   "faction": "fauna",
+   "spawn": [
+    246,
+    10
+   ],
+   "zone": "rocha",
+   "signal": "Garras enormes arranharam os troncos ao norte."
+  },
+  {
+   "id": "orc_r1",
+   "name": "Orc Batedor",
+   "rule": "criatura.orc_combatente",
+   "faction": "orcs_rocha",
+   "spawn": [
+    272,
+    41
+   ],
+   "zone": "rocha",
+   "signal": "Fumaça de fogueira orc sobe ao sul da vila."
+  },
+  {
+   "id": "orc_r2",
+   "name": "Orc Batedor",
+   "rule": "criatura.orc_combatente",
+   "faction": "orcs_rocha",
+   "spawn": [
+    275,
+    43
+   ],
+   "zone": "rocha"
+  },
+  {
+   "id": "orc_r3",
+   "name": "Orc Batedor",
+   "rule": "criatura.orc_combatente",
+   "faction": "orcs_rocha",
+   "spawn": [
+    270,
+    44
+   ],
+   "zone": "rocha"
+  },
+  {
+   "id": "orc_chefe_r",
+   "name": "Skarg, chefe orc",
+   "rule": "criatura.orc_chefe",
+   "faction": "orcs_rocha",
+   "spawn": [
+    273,
+    42
+   ],
+   "zone": "rocha",
+   "important": true
+  },
+  {
+   "id": "ogro_r1",
+   "name": "Ogro da Encosta",
+   "rule": "criatura.ogro",
+   "faction": "fauna",
+   "spawn": [
+    282,
+    36
+   ],
+   "zone": "rocha",
+   "signal": "Passos pesados fazem a terra tremer a leste."
+  },
+  {
+   "id": "aranha_m1",
+   "name": "Aranha-das-minas",
+   "rule": "criatura.aranha_gigante",
+   "faction": "aranhas_mina",
+   "spawn": [
+    263,
+    53
+   ],
+   "zone": "cripta",
+   "signal": "Teias grossas cobrem a passagem."
+  },
+  {
+   "id": "aranha_m2",
+   "name": "Aranha-das-minas",
+   "rule": "criatura.aranha_gigante",
+   "faction": "aranhas_mina",
+   "spawn": [
+    268,
+    52
+   ],
+   "zone": "cripta"
+  },
+  {
+   "id": "glop_m1",
+   "name": "Gosma da Mina",
+   "rule": "criatura.glop",
+   "faction": "gosmas_mina",
+   "spawn": [
+    263,
+    59
+   ],
+   "zone": "cripta"
+  },
+  {
+   "id": "glop_m2",
+   "name": "Gosma da Mina",
+   "rule": "criatura.glop",
+   "faction": "gosmas_mina",
+   "spawn": [
+    267,
+    60
+   ],
+   "zone": "cripta"
+  },
+  {
+   "id": "glop_m3",
+   "name": "Gosma da Mina",
+   "rule": "criatura.glop",
+   "faction": "gosmas_mina",
+   "spawn": [
+    269,
+    58
+   ],
+   "zone": "cripta"
+  },
+  {
+   "id": "feitor_1",
+   "name": "Grubnak, feitor finntroll",
+   "rule": "criatura.finntroll_feitor",
+   "faction": "feitor_mina",
+   "spawn": [
+    278,
+    56
+   ],
+   "zone": "cripta",
+   "important": true,
+   "signal": "Ecos de correntes e uma risada grave vêm do fundo."
+  },
+  {
+   "id": "orc_m1",
+   "name": "Capanga orc do feitor",
+   "rule": "criatura.orc_combatente",
+   "faction": "feitor_mina",
+   "spawn": [
+    276,
+    54
+   ],
+   "zone": "cripta"
+  },
+  {
+   "id": "orc_m2",
+   "name": "Capanga orc do feitor",
+   "rule": "criatura.orc_combatente",
+   "faction": "feitor_mina",
+   "spawn": [
+    276,
+    58
+   ],
+   "zone": "cripta"
+  },
+  {
+   "id": "lobo_h1",
+   "name": "Lobo do Horizonte",
+   "rule": "criatura.lobo",
+   "faction": "fauna",
+   "spawn": [
+    300,
+    36
+   ],
+   "zone": "horizonte",
+   "active_hours": [
+    18,
+    6
+   ]
+  },
+  {
+   "id": "lobo_h2",
+   "name": "Lobo do Horizonte",
+   "rule": "criatura.lobo",
+   "faction": "fauna",
+   "spawn": [
+    304,
+    38
+   ],
+   "zone": "horizonte",
+   "active_hours": [
+    18,
+    6
+   ]
+  },
+  {
+   "id": "salteador_h1",
+   "name": "Salteador da estrada",
+   "rule": "criatura.bandido_comum",
+   "faction": "salteadores_h",
+   "spawn": [
+    320,
+    27
+   ],
+   "zone": "horizonte",
+   "start_present": false
+  },
+  {
+   "id": "salteador_h2",
+   "name": "Salteador da estrada",
+   "rule": "criatura.bandido_comum",
+   "faction": "salteadores_h",
+   "spawn": [
+    325,
+    29
+   ],
+   "zone": "horizonte",
+   "start_present": false
+  },
+  {
+   "id": "ogro_h1",
+   "name": "Ogro do Horizonte",
+   "rule": "criatura.ogro",
+   "faction": "fauna",
+   "spawn": [
+    330,
+    40
+   ],
+   "zone": "horizonte",
+   "signal": "Uma pedra rola na encosta a leste."
+  },
+  {
+   "id": "aranha_v1",
+   "name": "Aranha do Vale",
+   "rule": "criatura.aranha_gigante",
+   "faction": "fauna",
+   "spawn": [
+    206,
+    84
+   ],
+   "zone": "vale_sul",
+   "signal": "Teias brilham entre as árvores do vale."
+  },
+  {
+   "id": "hiena_v1",
+   "name": "Hiena do Vale",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    225,
+    88
+   ],
+   "zone": "vale_sul",
+   "active_hours": [
+    18,
+    6
+   ]
+  },
+  {
+   "id": "hiena_v2",
+   "name": "Hiena do Vale",
+   "rule": "criatura.hiena",
+   "faction": "fauna",
+   "spawn": [
+    229,
+    90
+   ],
+   "zone": "vale_sul",
+   "active_hours": [
+    18,
+    6
+   ]
+  },
+  {
+   "id": "orc_v1",
+   "name": "Orc do Vale",
+   "rule": "criatura.orc_combatente",
+   "faction": "orcs_vale",
+   "spawn": [
+    236,
+    62
+   ],
+   "zone": "vale_sul",
+   "signal": "Vozes guturais vêm das sombras do vale."
+  },
+  {
+   "id": "orc_v2",
+   "name": "Orc do Vale",
+   "rule": "criatura.orc_combatente",
+   "faction": "orcs_vale",
+   "spawn": [
+    238,
+    66
+   ],
+   "zone": "vale_sul"
+  },
+  {
+   "id": "orc_chefe_v",
+   "name": "Garrok, chefe orc do vale",
+   "rule": "criatura.orc_chefe",
+   "faction": "orcs_vale",
+   "spawn": [
+    237,
+    70
+   ],
+   "zone": "vale_sul",
+   "important": true
   }
  ]
 }

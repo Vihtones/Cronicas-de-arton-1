@@ -70,7 +70,7 @@ func refresh() -> void:
 	var itens: Array = eco.estoque(npc) if _modo == "comprar" else w.modules.state.inventory.keys().filter(func(i): return int(w.modules.state.inventory[i]) > 0)
 	for it in itens:
 		var i := ItemsModule.info(w.rules, w.db, it)
-		var preco: int = eco.price(it, "vila", npc) if _modo == "comprar" else eco.preco_venda(it)
+		var preco: int = eco.price(it, eco.regiao_da_loja(npc), npc) if _modo == "comprar" else eco.preco_venda(it)
 		var qtd: int = int(w.modules.state.inventory.get(it, 0))
 		var b := _btn("%s%s   T$ %d" % [i.nome, (" (você tem %d)" % qtd) if qtd > 0 else "", preco], func(): _sel = it; refresh())
 		b.add_theme_color_override("font_color", InventoryPanel.COR_TIPO.get(i.tipo, Color.WHITE))
@@ -97,7 +97,7 @@ func _detalhe_item(w: WorldState, eco: EconomyModule) -> void:
 		_detalhe.add_child(_lbl(cmp, 9, Color(0.5, 0.9, 0.5) if cmp.begins_with("+") else Color(0.95, 0.55, 0.45)))
 	var it := _sel
 	if _modo == "comprar":
-		var p := eco.price(it, "vila", npc)
+		var p := eco.price(it, eco.regiao_da_loja(npc), npc)
 		var b := _btn("Comprar por T$ %d" % p, func(): command.emit("Buy", {"npc_id": npc, "item": it}); refresh())
 		b.disabled = int(w.player.gold) < p
 		_detalhe.add_child(b)

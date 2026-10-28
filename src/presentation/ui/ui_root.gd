@@ -1033,7 +1033,7 @@ func _refresh_pause() -> void:
 	else:
 		v.add_child(_button("Ligar IA local (servidor em 127.0.0.1:8080)", func():
 			Game.conectar_ia_local(func(ok: bool): log_msg("IA local ligada." if ok else "Servidor de IA local não encontrado — veja tools/ia_local/LEIA-ME.md."); _refresh_pause())))
-	v.add_child(_label("WASD mover · E interagir · J diário · C furtivo · R descansar · F5/F9 salvar/carregar", 8))
+	v.add_child(_label("WASD mover · Shift correr · E interagir · J diário · C furtivo · R descansar · F5/F9 salvar/carregar", 8))
 	v.add_child(_button("Sair para o título", func(): panel_pause.visible = false; Game.world = null; Game.set_mode(Game.Mode.TITLE)))
 
 

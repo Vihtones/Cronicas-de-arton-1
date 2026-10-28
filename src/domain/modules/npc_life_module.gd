@@ -139,7 +139,7 @@ func activity(id: String) -> String:
 		return "vendendo na feira" if prof in ["mercadora", "mercadora viajante", "ferreiro", "fiandeira", "cozinheiro", "pastora"] else "olhando as barracas"
 	if prof == "criança":
 		return "brincando" if loc in ["praca", "campos", "mercado"] else ("estudando as preces" if loc == "templo" else "em casa")
-	if loc == "taverna" and str(d.work) != "taverna":
+	if loc in ["taverna", "taberna_sapo", "pousada_camelo", "taverna_picareta", "estalagem"] and str(d.work) != loc:
 		return "comendo" if h in [12, 13] else "bebendo e conversando"
 	if loc == str(d.work) or (loc == "praca" and prof in ["guarda", "capitã da guarda"]):
 		return str(WORK_VERB.get(prof, "trabalhando"))

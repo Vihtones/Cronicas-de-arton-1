@@ -167,11 +167,17 @@ func test_loja_viva_vende_revende_e_pechincha() -> void:
 
 
 func test_viagem_leva_dias_e_chega_a_valkaria() -> void:
-	var w := _w("viagem")
+	var w := _w("viagem", 8)
 	var tr: TravelModule = w.modules.travel
 	var t0 := w.clock.tick
 	var r := WorldHelpers.cmd(w, "Travel", {"route": "vila->valkaria"})
 	check(r.accepted, "partiu: %s" % str(r.errors))
+	# A partida pode ser cortada por uma emboscada tática (sorteio legítimo, LB): nesse caso a viagem não
+	# acontece e nenhum dia passa. Qualquer dos dois desfechos é válido; o teste confere cada um.
+	if tr.current_region == "vila":
+		check(not WorldHelpers.events_of(r, "TRAVEL_AMBUSH").is_empty(), "sem viagem, a emboscada tática explica a parada")
+		check(w.clock.tick == t0, "emboscada na partida não gasta tempo de viagem")
+		return
 	eq(tr.current_region, "valkaria", "chegou")
 	check(w.clock.tick - t0 >= 6 * 8 * 2, "90 km a 36 km/dia (LB p.270) leva mais de 2 dias de marcha")
 	r = WorldHelpers.cmd(w, "Travel", {"route": "valkaria->vila"})

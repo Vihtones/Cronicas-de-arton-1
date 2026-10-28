@@ -848,7 +848,7 @@ func _on_event(e: GameEvent) -> void:
 
 func _speed() -> float:
 	var s: float = float(Game.settings.combat_speed)
-	return 0.0 if s <= 0.0 else (1.0 / s) * (0.45 if acao else 1.0)
+	return 0.0 if s <= 0.0 else (1.0 / s) * (0.7 if acao else 1.0)   # modo ação: ritmo de luta mais legível
 
 
 func _wait(sec: float) -> void:
