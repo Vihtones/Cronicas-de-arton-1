@@ -2,6 +2,8 @@
 
 ## 0.7.2 (em andamento)
 
+- IA: moradores conversam entre si quando dividem o mesmo local (um sorteio por local por hora, tema rotina/ofício/vila/comida). A conversa aproxima os dois e fica guardada; a IA do jogo conhece as conversas recentes de cada morador.
+
 - HUD: registro de texto com moldura no mesmo estilo do painel de status.
 
 - HUD: barra de atalhos e cinto de combate movidos para o canto inferior direito, em duas linhas, sem sobrepor o painel de status (canto inferior esquerdo).

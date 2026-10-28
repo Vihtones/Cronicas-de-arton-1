@@ -3,7 +3,7 @@ extends RefCounted
 ## Fluxos de RNG separados e rastreáveis (§7): combate, clima, mundo, visual.
 ## O fluxo "visual" nunca deve ser usado para resultados mecânicos.
 
-const STREAMS := ["combat", "weather", "world", "visual"]
+const STREAMS := ["combat", "weather", "world", "visual", "conversa"]
 
 var world_seed: int
 var _rngs: Dictionary = {}

@@ -15,6 +15,7 @@ var ambient: Dictionary = {}  # falas ambiente dos figurantes e latidos (data/di
 var livre: Dictionary = {}    # intenções e respostas da fala livre (data/dialogue/livre.json)
 var voices: Dictionary = {}   # vozes dos moradores (data/dialogue/voices.json)
 var convicoes: Dictionary = {}  # opiniões pessoais por profissão e por fé (data/dialogue/convicoes.json)
+var conversas: Dictionary = {}  # falas entre moradores por tema (data/dialogue/conversas_npc.json)
 var mysteries: Array = []          # todos os mistérios (principal + secundários)
 
 var grid: PackedStringArray
@@ -36,6 +37,7 @@ static func load_default() -> ContentDB:
 	db.livre = _read("res://data/dialogue/livre.json")
 	db.ambient = _read("res://data/dialogue/ambient.json")
 	db.convicoes = _read("res://data/dialogue/convicoes.json")
+	db.conversas = _read("res://data/dialogue/conversas_npc.json")
 	return db
 
 

@@ -230,6 +230,11 @@ static func conhecimento(world: WorldState, npc: String) -> String:
 				break
 			presentes.append("%s (%s)" % [str(world.npc_def(id).get("name", id)), str(world.npc_def(id).get("profession", ""))])
 		partes.append("Aqui agora: %s." % ", ".join(PackedStringArray(presentes)))
+	var conv = world.module("conversa")
+	if conv != null:
+		var falas: Array = conv.resumo(npc)
+		if not falas.is_empty():
+			partes.append("Conversas recentes dele: %s" % " ".join(PackedStringArray(falas)))
 	var txt := " ".join(PackedStringArray(partes))
 	return txt.substr(0, CONHECIMENTO_MAX)
 

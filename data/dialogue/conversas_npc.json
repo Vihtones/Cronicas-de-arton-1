@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "rascunho",
+  "nota": "Falas curtas trocadas entre moradores. {a} e {b} são os nomes. Determinístico: o sorteio vem do RNG do mundo.",
+  "temas": {
+    "rotina": [
+      "{a} pergunta a {b} como foi o dia, e {b} reclama do cansaço.",
+      "{a} e {b} comentam que a vila anda mais movimentada que o normal.",
+      "{b} pede a {a} que avise se vir alguém estranho pela estrada."
+    ],
+    "oficio": [
+      "{a} pede a {b} uma opinião sobre um trabalho que está fazendo.",
+      "{b} conta a {a} que o preço das mercadorias subiu de novo.",
+      "{a} confessa a {b} que ainda não sabe bem como fazer o serviço de amanhã."
+    ],
+    "vila": [
+      "{a} e {b} falam baixo sobre o que ouviram na praça.",
+      "{b} diz a {a} que não confia totalmente em quem chegou há pouco.",
+      "{a} comenta com {b} que a guarda parece mais atenta esses dias."
+    ],
+    "comida": [
+      "{a} oferece um pedaço de pão a {b}, que agradece sem jeito.",
+      "{b} reclama com {a} que a taverna está cobrando caro pela refeição.",
+      "{a} e {b} trocam receitas e concordam que o inverno vai ser difícil."
+    ]
+  }
+}

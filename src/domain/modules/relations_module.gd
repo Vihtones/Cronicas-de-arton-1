@@ -104,6 +104,14 @@ func on_tick(tick: int) -> Array:
 	return []
 
 
+## Conversa entre dois moradores: familiaridade e um pouco de afeto nos dois sentidos.
+func registrar_conversa(a: String, b: String) -> void:
+	for pair in [[a, b], [b, a]]:
+		var r := _pair(pair[0], pair[1])
+		r.familiaridade = minf(MAX_VALUE, float(r.familiaridade) + 2.0)
+		r.afeto = _clamp(float(r.afeto) + 0.5)
+
+
 func _pair(who: String, about: String) -> Dictionary:
 	if not rel.has(who):
 		rel[who] = {}
