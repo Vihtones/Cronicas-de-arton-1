@@ -205,59 +205,58 @@ var lbl_place: Label
 func _bar(col: Color, h: float) -> ProgressBar:
 	var b := ProgressBar.new()
 	b.show_percentage = false
-	b.custom_minimum_size = Vector2(110, h)
-	var bg := StyleBoxFlat.new()
-	bg.bg_color = Color(0.05, 0.04, 0.05)
-	bg.border_color = Color(0.36, 0.28, 0.17)
-	bg.set_border_width_all(1)
-	var fg := StyleBoxFlat.new()
-	fg.bg_color = col
-	fg.border_color = col.lightened(0.35)
-	fg.border_width_top = 1
-	b.add_theme_stylebox_override("background", bg)
-	b.add_theme_stylebox_override("fill", fg)
+	b.custom_minimum_size = Vector2(150, h)
+	b.add_theme_stylebox_override("background", HudStyle.barra_fundo())
+	b.add_theme_stylebox_override("fill", HudStyle.barra_fill(col))
 	return b
 
 
 func _build_hud(root: Control) -> void:
 	# placa de estado (canto inferior direito): retrato com expressão, nome, PV, PM e XP
 	hud_status = _panel(root, Control.PRESET_TOP_LEFT)
-	hud_status.position = Vector2(4, 290)
-	hud_status.custom_minimum_size = Vector2(194, 0)
+	hud_status.add_theme_stylebox_override("panel", HudStyle.painel())
+	hud_status.position = Vector2(4, 268)
+	hud_status.custom_minimum_size = Vector2(300, 0)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
+	row.add_theme_constant_override("separation", 10)
 	hud_status.add_child(row)
+	# retrato em medalhão: moldura de bronze com fundo escuro (o Portrait desenha o rosto dentro)
+	var medalhao := PanelContainer.new()
+	medalhao.add_theme_stylebox_override("panel", HudStyle.moldura(Color(0.1, 0.08, 0.09), Color(0.03, 0.025, 0.03), Color(0.55, 0.42, 0.2), Color(0.9, 0.74, 0.42), 6))
+	medalhao.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(medalhao)
 	hud_portrait = Portrait.new()
-	hud_portrait.custom_minimum_size = Vector2(44, 44)
-	hud_portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(hud_portrait)
+	hud_portrait.custom_minimum_size = Vector2(60, 60)
+	medalhao.add_child(hud_portrait)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 1)
 	row.add_child(col)
-	hud_name = _label("", 8)
+	hud_name = _label("", 13)
 	hud_name.autowrap_mode = TextServer.AUTOWRAP_OFF
 	hud_name.add_theme_color_override("font_color", Color(0.98, 0.82, 0.45))
 	col.add_child(hud_name)
 	var pv_row := HBoxContainer.new()
-	bar_pv = _bar(Color(0.62, 0.12, 0.1), 7)
+	bar_pv = _bar(Color(0.72, 0.14, 0.12), 14)
+	bar_pv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pv_row.add_child(bar_pv)
-	lbl_pv = _label("", 7)
+	lbl_pv = _label("", 11)
 	lbl_pv.autowrap_mode = TextServer.AUTOWRAP_OFF
 	pv_row.add_child(lbl_pv)
 	col.add_child(pv_row)
 	var pm_row := HBoxContainer.new()
-	bar_pm = _bar(Color(0.16, 0.3, 0.62), 5)
+	bar_pm = _bar(Color(0.2, 0.38, 0.8), 10)
+	bar_pm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pm_row.add_child(bar_pm)
-	lbl_pm = _label("", 7)
+	lbl_pm = _label("", 11)
 	lbl_pm.autowrap_mode = TextServer.AUTOWRAP_OFF
 	pm_row.add_child(lbl_pm)
 	col.add_child(pm_row)
-	bar_xp = _bar(Color(0.75, 0.6, 0.25), 2)
+	bar_xp = _bar(Color(0.8, 0.64, 0.28), 4)
 	col.add_child(bar_xp)
-	hud_right = _label("", 7)
+	hud_right = _label("", 10)
 	hud_right.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(hud_right)
-	hud_cond = _label("", 7)
+	hud_cond = _label("", 10)
 	hud_cond.autowrap_mode = TextServer.AUTOWRAP_OFF
 	hud_cond.add_theme_color_override("font_color", Color(0.75, 0.85, 1.0))
 	col.add_child(hud_cond)
@@ -273,18 +272,19 @@ func _build_hud(root: Control) -> void:
 	root.add_child(hud_quests)
 	# placa de hora e lugar (canto superior direito)
 	hud_clock = _panel(root, Control.PRESET_TOP_LEFT)
-	hud_clock.position = Vector2(500, 4)
-	hud_clock.custom_minimum_size = Vector2(136, 0)
+	hud_clock.add_theme_stylebox_override("panel", HudStyle.painel())
+	hud_clock.position = Vector2(470, 4)
+	hud_clock.custom_minimum_size = Vector2(170, 0)
 	var cv := VBoxContainer.new()
 	cv.add_theme_constant_override("separation", 0)
 	hud_clock.add_child(cv)
 	minimap = Minimap.new()
 	cv.add_child(minimap)
-	lbl_clock = _label("", 8)
+	lbl_clock = _label("", 11)
 	lbl_clock.autowrap_mode = TextServer.AUTOWRAP_OFF
 	lbl_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	cv.add_child(lbl_clock)
-	lbl_place = _label("", 8)
+	lbl_place = _label("", 12)
 	lbl_place.autowrap_mode = TextServer.AUTOWRAP_OFF
 	lbl_place.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	lbl_place.add_theme_color_override("font_color", Color(0.98, 0.82, 0.45))
@@ -301,7 +301,7 @@ func _build_hud(root: Control) -> void:
 	log_box.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)   # ancorado acima do HUD e cresce para cima (não cobre o retrato)
 	log_box.offset_left = 6
 	log_box.offset_right = 306
-	log_box.offset_bottom = -78
+	log_box.offset_bottom = -112
 	log_box.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	log_box.add_theme_constant_override("separation", 0)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE

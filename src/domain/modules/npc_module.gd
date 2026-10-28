@@ -96,10 +96,11 @@ func desired_location(id: String) -> String:
 				return r.id
 	var sched: Array = _schedule_table(d.schedule)
 	var h := world.hour()
+	var dia := world.day_index()   # calculado uma vez: a agenda consulta o dia em cada entrada
 	var result: String = d.home
 	for entry in sched:
 		if h >= int(entry[0]) and h < int(entry[1]):
-			if entry.size() > 3 and world.day_index() % int(entry[3]) != 0:
+			if entry.size() > 3 and dia % int(entry[3]) != 0:
 				continue
 			result = _resolve_slot(str(entry[2]), d)
 	# utilidade da agenda: no horário de trabalho, quem junta ouro troca o lazer previsto pelo posto

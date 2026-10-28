@@ -2,6 +2,8 @@
 
 ## 0.7.2 (em andamento)
 
+- HUD redesenhado (inspirado em Baldur's Gate 3 e Stoneshard): retrato em medalhão de bronze, barras mais grossas com brilho e valor, painel de status maior, relógio com moldura, atalhos com bisel e selo de tecla. Registro de texto acima do painel.
+- Tela: a janela agora preenche a tela cheia (escala fracionária com aspecto expandido), em vez de escala inteira que deixava bordas.
 - A IA conhece a relação com o jogador (amizade, confiança, medo, mágoa), quantas vezes já conversaram e o humor do morador agora (medo ou bom humor). Esses fatos entram na conversa e na validação de números.
 - IA local no limite do mesmo modelo: contexto de 4096 com um slot só (-np 1), amostragem com temperatura 0,85, top_p 0,9 e penalidade de repetição, fala curta com parada em linha em branco, timeout de 30 s. Conhecimento do mundo ampliado (eventos, grupo e família do morador) e histórico limitado a 6 turnos; teste garante que o prompt cabe no contexto.
 - Conversa como gente: cada morador tem convicções pessoais (fé e ofício, em data/dialogue/convicoes.json) e pode opinar, concordar, discordar e perguntar de volta. Opiniões não viram fatos do mundo. O validador deixou de rejeitar palavras que começam frase.

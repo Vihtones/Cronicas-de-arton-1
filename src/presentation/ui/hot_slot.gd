@@ -11,7 +11,7 @@ var badge := ""              # texto curto no canto inferior (ex.: "auto")
 
 
 func _init() -> void:
-	custom_minimum_size = Vector2(30, 30)
+	custom_minimum_size = Vector2(36, 36)
 	focus_mode = Control.FOCUS_NONE
 	text = ""
 	clip_contents = true
@@ -34,8 +34,11 @@ func _draw() -> void:
 	var hover: bool = is_hovered() and not disabled
 	draw_rect(r, Color(0.06, 0.05, 0.06))
 	draw_rect(r.grow(-2), Color(0.13, 0.11, 0.12) if not hover else Color(0.2, 0.16, 0.15))
-	var edge := Color(0.86, 0.68, 0.36) if (hover or active) else Color(0.45, 0.35, 0.2)
-	draw_rect(r, edge, false, 1.0)
+	# bisel: luz no topo, sombra embaixo (quadrado em relevo, como os atalhos do Baldur's Gate 3)
+	draw_line(Vector2(2, 1), Vector2(size.x - 2, 1), Color(1, 0.9, 0.6, 0.22), 1.0)
+	draw_line(Vector2(2, size.y - 2), Vector2(size.x - 2, size.y - 2), Color(0, 0, 0, 0.6), 1.0)
+	var edge := Color(0.86, 0.68, 0.36) if (hover or active) else Color(0.5, 0.39, 0.22)
+	draw_rect(r, edge, false, 2.0 if (hover or active) else 1.0)
 	if active:
 		draw_rect(r.grow(-2), Color(0.95, 0.75, 0.3, 0.18))
 	var c := size / 2.0 + Vector2(0, 1)
@@ -43,7 +46,10 @@ func _draw() -> void:
 	_icon(icon_id, c, ink)
 	var font := get_theme_default_font()
 	if key_text != "":
-		draw_string(font, Vector2(2, 8), key_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(0.98, 0.82, 0.45))
+		# selo da tecla: placa escura com a letra em dourado
+		draw_rect(Rect2(Vector2(2, 2), Vector2(12, 11)), Color(0.03, 0.025, 0.03, 0.9))
+		draw_rect(Rect2(Vector2(2, 2), Vector2(12, 11)), Color(0.5, 0.39, 0.22), false, 1.0)
+		draw_string(font, Vector2(4, 11), key_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.98, 0.82, 0.45))
 	if cost > 0:
 		draw_string(font, Vector2(size.x - 9, size.y - 2), str(cost), HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(0.55, 0.7, 1.0))
 	if badge != "":
