@@ -60,6 +60,7 @@ func _ready() -> void:
 	_build_debug(root)
 	_build_tree(root)
 	_build_inv(root)
+	_build_wheel(root)
 	_build_subida(root)
 	Game.event_published.connect(_on_event)
 	Game.mode_changed.connect(func(_m): _refresh_mode())
@@ -185,6 +186,10 @@ var _belt_slots: Dictionary = {}
 var _belt_key := ""
 var panel_tree: PowerTreePanel
 var panel_inv: InventoryPanel
+var spell_wheel: SpellWheel
+var panel_cast: PanelContainer
+var _cast_row: HFlowContainer
+var _cast_title: Label
 var panel_subida: PanelContainer
 var lbl_clock: Label
 var lbl_place: Label
@@ -307,6 +312,8 @@ func _build_hud(root: Control) -> void:
 	for spec in [["interagir", "E", "Interagir [E]", func(): get_parent().call("_explore_key", KEY_E)],
 			["diario", "J", "Diário [J]", func(): toggle_journal()],
 			["poderes", "K", "Árvore de poderes [K]", func(): toggle_tree()],
+			["inventario", "I", "Inventário [I]", func(): toggle_inv()],
+			["magia", "Tab", "Roda de magias [Tab]", func(): toggle_wheel()],
 			["furtivo", "C", "Furtividade [C]", func(): Game.send("SetStance", {"sneak": not Game.world.modules.combat.stance_sneak})],
 			["descansar", "R", "Descansar [R]", func(): get_parent().call("_explore_key", KEY_R)],
 			["salvar", "F5", "Salvar [F5]", func(): log_msg("Jogo salvo." if Game.save_game() == OK else "Não é possível salvar agora.")]]:
@@ -367,7 +374,7 @@ func update_hud() -> void:
 	if hud_portrait.expression != expr:
 		hud_portrait.set_expression(expr)
 	var busy := panel_journal.visible or panel_shop.visible or panel_pause.visible or panel_dialogue.visible
-	busy = busy or panel_tree.visible or panel_inv.visible
+	busy = busy or panel_tree.visible or panel_inv.visible or spell_wheel.visible or panel_cast.visible
 	log_box.visible = not panel_tree.visible and not panel_journal.visible and not panel_inv.visible
 	hud_status.visible = Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT] and not busy
 	hud_clock.visible = Game.mode == Game.Mode.EXPLORE and not busy
@@ -813,7 +820,7 @@ func _build_combat_bar(root: Control) -> void:
 	# [ícone, tecla, dica, ação, poder exigido ("" = sempre visível)]
 	for spec in [["mover", "1", "Mover/Atacar", func(): combat_view.mode = "mover", ""], ["investida", "2", "Investida", func(): combat_view.mode = "investida", ""],
 			["misericordia", "3", "Golpe de misericórdia", func(): combat_view.mode = "misericordia", ""], ["especial", "Q", "Ataque Especial (+4, 1 PM)", func(): combat_view.special = not combat_view.special, "@guerreiro"],
-			["raspao", "R", "Golpe de Raspão", func(): combat_view.toggle_raspao(), "golpe_raspao"], ["magia", "4", "Magia (alternar)", func(): combat_view.cycle_spell(), "@magia"],
+			["raspao", "R", "Golpe de Raspão", func(): combat_view.toggle_raspao(), "golpe_raspao"], ["magia", "Tab", "Roda de magias", func(): toggle_wheel(), "@magia"],
 			["pocao", "5", "Beber poção", func(): combat_view.drink_potion(), ""], ["atirar", "6", "Atirar", func(): combat_view.mode = "atirar", ""],
 			["levantar", "L", "Levantar", func(): combat_view.stand_up(), ""], ["impeto", "I", "Ímpeto (1 PM)", func(): combat_view.use_power("impeto"), "impeto"],
 			["velocidade", "V", "Velocidade Ladina (2 PM)", func(): combat_view.use_power("velocidade_ladina"), "velocidade_ladina"], ["emboscar", "M", "Emboscar (2 PM)", func(): combat_view.use_power("emboscar"), "emboscar"],
@@ -1404,7 +1411,7 @@ func _refresh_mode() -> void:
 
 
 func any_panel_open() -> bool:
-	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible or panel_inv.visible
+	return panel_journal.visible or panel_pause.visible or panel_shop.visible or panel_interact.visible or panel_creation.visible or panel_xp.visible or panel_tree.visible or panel_inv.visible or spell_wheel.visible or panel_cast.visible
 
 
 func close_panels() -> bool:
@@ -1418,6 +1425,8 @@ func close_panels() -> bool:
 	panel_xp.visible = false
 	panel_tree.visible = false
 	panel_inv.visible = false
+	spell_wheel.visible = false
+	panel_cast.visible = false
 	return was
 
 
@@ -1428,6 +1437,50 @@ func _build_inv(root: Control) -> void:
 	panel_inv.visibility_changed.connect(_on_panel_shown.bind(panel_inv))
 	panel_inv.visible = false
 	panel_inv.command.connect(func(t: String, p: Dictionary): _cmd_log(t, p))
+
+
+func _build_wheel(root: Control) -> void:
+	spell_wheel = SpellWheel.new()
+	root.add_child(spell_wheel)
+	spell_wheel.visible = false
+	spell_wheel.picked.connect(_on_spell_picked)
+	panel_cast = _panel(root, Control.PRESET_CENTER)
+	panel_cast.position = Vector2(180, 120)
+	var v := VBoxContainer.new()
+	panel_cast.add_child(v)
+	_cast_title = _h("")
+	v.add_child(_cast_title)
+	_cast_row = HFlowContainer.new()
+	_cast_row.custom_minimum_size = Vector2(300, 0)
+	v.add_child(_cast_row)
+	v.add_child(_button("Fechar", func(): panel_cast.visible = false))
+	panel_cast.visible = false
+
+
+func toggle_wheel() -> void:
+	if spell_wheel.visible:
+		spell_wheel.visible = false
+	else:
+		panel_cast.visible = false
+		spell_wheel.open()
+
+
+func _on_spell_picked(sp: String) -> void:
+	if Game.mode == Game.Mode.COMBAT:
+		combat_view.select_spell(sp)
+		return
+	var w: WorldState = Game.world
+	var s := w.player_sheet
+	for c in _cast_row.get_children():
+		_cast_row.remove_child(c)
+		c.queue_free()
+	_cast_title.text = "Lançar " + str(GhostPlanner.spell_rule(w.rules, sp).get("nome", sp)) + " (fora de combate)"
+	if w.rules.value("magia." + sp, {}).has("cura"):
+		_cast_row.add_child(_button("Lançar em mim", func(): _cmd_log("CastSpell", {"spell": sp}); panel_cast.visible = false))
+	_botoes_magia_fora(w, s, _cast_row, sp)
+	if _cast_row.get_child_count() == 0:
+		_cast_row.add_child(_label("Não há como lançar esta magia aqui fora de combate.", 9))
+	panel_cast.visible = true
 
 
 func toggle_inv() -> void:
@@ -1578,16 +1631,16 @@ func show_loading(on: bool) -> void:
 
 
 ## Magias fora de combate (SpellsModule.FORA_DE_COMBATE): um botão por versão útil, com o alvo por perto.
-func _botoes_magia_fora(w: WorldState, s: CharacterSheet, row: HFlowContainer) -> void:
+func _botoes_magia_fora(w: WorldState, s: CharacterSheet, row: HFlowContainer, so: String = "") -> void:
 	var magia = w.module("magia")
 	if magia == null:
 		return
 	if s.can_use_skill("misticismo", w.rules):
-		row.add_child(_button("Detectar magia (Misticismo)", func(): _cmd_log("DetectMagic", {}); refresh_journal()))
+		if so == "": row.add_child(_button("Detectar magia (Misticismo)", func(): _cmd_log("DetectMagic", {}); refresh_journal()))
 	var p := w.db.world_to_tile(w.player.position)
 	var combat = w.module("combat")
 	for sp in s.spells:
-		if not magia.FORA_DE_COMBATE.has(sp):
+		if not magia.FORA_DE_COMBATE.has(sp) or (so != "" and sp != so):
 			continue
 		var nome := str(w.rules.value("magia." + sp, {}).get("nome", sp))
 		match sp:

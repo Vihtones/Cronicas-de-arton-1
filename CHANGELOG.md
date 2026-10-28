@@ -2,6 +2,7 @@
 
 ## 0.7.1 (em andamento)
 
+- Roda de magias (Tab, em exploração e em combate): fatias coloridas por escola com custo, círculo e texto da magia; em combate escolhe a magia do turno, fora de combate abre as formas de lançá-la ali. O cinto da exploração ganhou Inventário e Magias.
 - Lojas vivas: comprar e vender lado a lado com a ficha do item e a comparação com o equipado; vender por metade do preço (comando Sell), bolsa do vendedor que se recupera por dia, revenda do que você vendeu, pechincha diária por Diplomacia (Haggle: −10%/−20% ou +10% se irritar) e saudação conforme a relação.
 - Inventário (tecla I): equipado, mochila em grade, ficha do item com números de regra e comparação com o equipado; equipar, desequipar (novo comando Unequip) e usar.
 - Arcanas de 1º círculo (lote 2): Sono (fora de combate, o NPC dorme e não vê furtos), Teia, Hipnotismo, Imagem Espelhada, Primor Atlético e Concentração de Combate.

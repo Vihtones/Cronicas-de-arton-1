@@ -116,9 +116,14 @@ func cycle_spell() -> void:
 		message.emit("Você não conhece magias.")
 		return
 	if mode != "magia" or not known.has(spell):
-		spell = known[0]
+		select_spell(known[0])
 	else:
-		spell = known[(known.find(spell) + 1) % known.size()]
+		select_spell(known[(known.find(spell) + 1) % known.size()])
+
+
+## Escolhe a magia do turno (roda de magias ou tecla 4).
+func select_spell(p_spell: String) -> void:
+	spell = p_spell
 	mode = "magia"
 	spell_apr.clear()
 	spell_alvos.clear()

@@ -214,6 +214,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			ui.toggle_pause()
 		get_viewport().set_input_as_handled()
 		return
+	if k == KEY_TAB and Game.mode in [Game.Mode.EXPLORE, Game.Mode.COMBAT]:
+		ui.toggle_wheel()
+		get_viewport().set_input_as_handled()
+		return
 	if k == KEY_F3:
 		ui.toggle_debug()
 		return

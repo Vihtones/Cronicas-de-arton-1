@@ -111,7 +111,7 @@ static func info(rules: RuleRegistry, db: ContentDB, id: String) -> Dictionary:
 	if not a.is_empty():
 		out.tipo = "Arma"
 		out.dano = str(a.dano)
-		out.linhas = ["Dano %s (%s)" % [a.dano, a.tipo], "Crítico %s/x%d" % [str(a.margem) if int(a.margem) < 20 else "20", int(a.mult)],
+		out.linhas = ["Dano %s (%s)" % [a.dano, a.tipo], "Crítico %s/x%d" % [("%d-20" % int(a.margem)) if int(a.margem) < 20 else "20", int(a.mult)],
 			("Distância (%s)" % a.get("alcance", "médio")) if bool(a.get("disparo", false)) else "Corpo a corpo",
 			"%d mão(s)%s" % [int(a.get("maos", 1)), " · leve" if bool(a.get("leve", false)) else ""]]
 	var ar: Dictionary = rules.value("armadura." + id, {})
