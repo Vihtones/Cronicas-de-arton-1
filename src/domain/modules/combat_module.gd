@@ -4448,6 +4448,19 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"reanimacao_impura":
+			# Reanimação Impura (divina 5): a criatura volta (com os PV cheios, valor adotado: o livro não diz) como morto-vivo do lado
+			# do conjurador, mantendo habilidades e magias, e age pela IA aliada. No fim da cena volta a morrer (`_end_combat`); se for
+			# destruída antes, não pode ser reanimada de novo.
+			var tg_ri: String = a.target
+			var x_ri: Dictionary = sim.c(tg_ri)
+			x_ri.sheet.pv = x_ri.sheet.pv_max
+			x_ri.sheet.creature_type = "morto-vivo"
+			x_ri.side = sim.c(id).side
+			(x_ri.flags as Array).append("reanimado_impuro")
+			if not sim.order.has(tg_ri):
+				sim.order.insert(sim.order.find(id) + 1, tg_ri)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_ri, "buff": "reanimacao_impura", "tags": ["magia"]}, [id, tg_ri]))
 		"conceder_milagre":
 			# Conceder Milagre (divina 4): o companheiro tocado pode lançar a magia uma vez, sem pagar PM (`_milagre_do_companheiro`,
 			# no turno dele); até lá o conjurador fica com –3 PM (–6 no 3º círculo).
@@ -5687,6 +5700,14 @@ func _end_combat(outcome: String) -> Array:
 		if x.flags.has("fora"):   # banido por Banimento: volta ao mundo de origem, sem contar como derrota
 			creature_state[id].sheet = x.sheet.to_dict()
 			creature_state[id].present = false
+			continue
+		if (x.flags as Array).has("reanimado_impuro"):
+			# Reanimação Impura: no fim da cena a criatura volta a ficar morta (e não pode ser reanimada de novo se foi destruída)
+			if x.sheet.is_dead():
+				creature_state[id]["reanimacao_destruida"] = true
+			x.sheet.pv = mini(x.sheet.pv, x.sheet.death_threshold())
+			creature_state[id].sheet = x.sheet.to_dict()
+			creature_state[id].alive = false
 			continue
 		if x.side == "player":
 			# companheiro: não é criatura; se morreu, sai como NPC_DIED (a party reage)

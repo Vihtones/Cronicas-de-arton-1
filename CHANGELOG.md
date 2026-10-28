@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Reanimação Impura (divina, 5º círculo): uma criatura morta nesta cena volta como morto-vivo, com suas habilidades, e luta do seu lado até o fim da cena, quando volta a ficar morta; se for destruída, não pode ser reanimada de novo.
+
 - Conceder Milagre (divina, 4º círculo): um companheiro do grupo recebe uma magia sua de até 2º (3º) círculo e a lança uma vez, sem PM, no turno dele (curas e ajudas no aliado mais ferido, ataques no inimigo mais próximo); você fica com –3 PM (–6) até lá.
 
 - Cúpula de Repulsão (divina, 4º círculo): sustentada; criaturas do tipo ou raça escolhida que tentam se aproximar a menos de 3m (4,5m) fazem Vontade e, se falham, param e não atacam corpo a corpo na rodada; no 5º círculo também desvia ataques à distância; avançar sobre elas rompe a cúpula.

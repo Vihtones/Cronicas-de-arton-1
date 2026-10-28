@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"reanimacao_impura": {"aprimoramentos": []},   # quem morreu nesta cena volta como morto-vivo que obedece; volta a morrer no fim da cena
 	"conceder_milagre": {"aprimoramentos": [0]},   # um companheiro lança uma magia sua de até 2º (3º) círculo, uma vez, sem PM; –3 (–6) PM até lá
 	"cupula_de_repulsao": {"aprimoramentos": [0, 1]},   # sustentada: um tipo ou raça não se aproxima (Vontade); 4,5m; desvia ataques à distância (5º)
 	"terremoto": {"aprimoramentos": []},   # atordoa quem está no solo; efeito pelo terreno (teto, desabamento, fendas, desmoronamento, lamaçal)

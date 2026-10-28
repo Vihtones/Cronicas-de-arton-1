@@ -194,6 +194,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "reanimacao_impura":
+				var tg_ri: String = a.get("target", "")
+				if not sim.combatants.has(tg_ri) or not sim.c(tg_ri).sheet.is_dead() or not sim.c(tg_ri).has("morte_rodada"): return {"ok": false, "reason": "toque uma criatura morta nesta cena"}
+				if (sim.c(tg_ri).flags as Array).has("reanimacao_destruida") or str(tg_ri) == "player": return {"ok": false, "reason": "essa criatura não pode ser reanimada"}
 			if sp_id == "conceder_milagre":
 				var tg_cm: String = a.get("target", "")
 				if not sim.combatants.has(tg_cm) or tg_cm == actor or sim.is_enemy(actor, tg_cm) or str(tg_cm).begins_with("inv_"): return {"ok": false, "reason": "toque um companheiro"}
