@@ -254,6 +254,38 @@ static func convicoes(world: WorldState, npc: String) -> String:
 	return " ".join(PackedStringArray(partes)).substr(0, CONVICOES_MAX)
 
 
+const REACAO_FRASE := {
+	"amigavel": "você é um amigo para ele: ele fala com carinho e se preocupa com você",
+	"confia": "ele confia em você",
+	"teme": "ele tem medo de você",
+	"guarda_rancor": "ele guarda mágoa de você",
+	"respeita_mas_nao_confia": "ele te respeita, mas desconfia de você",
+	"indiferente": "ele ainda não tem uma opinião firme sobre você",
+}
+
+
+## Relação com o jogador e estado emocional do morador agora (fatos, que a IA pode expressar na fala).
+static func relacao(world: WorldState, npc: String) -> String:
+	var partes: Array = []
+	var rel = world.module("relations")
+	if rel != null:
+		partes.append("Com o forasteiro, %s." % REACAO_FRASE.get(rel.reaction(npc, "player"), REACAO_FRASE.indiferente))
+		var r: Dictionary = rel.dims(npc, "player")
+		if float(r.familiaridade) >= 20.0:
+			partes.append("Ele já conhece você bem.")
+	var di = world.module("dialogue")
+	var vezes := int(di.talks.get(npc, {}).get("count", 0)) if di != null else 0
+	if vezes > 0:
+		partes.append("Vocês já conversaram %d vez%s." % [vezes, "es" if vezes > 1 else ""])
+	var life = world.module("npc_life")
+	if life != null:
+		if life.fear(npc) >= 40.0:
+			partes.append("Agora ele está com medo.")
+		elif life.joy(npc) >= 40.0:
+			partes.append("Agora ele está de bom humor.")
+	return " ".join(PackedStringArray(partes)).substr(0, 400)
+
+
 ## Ficha de fatos para o modelo de linguagem: só o que o morador PODE saber, sem segredos do mistério.
 ## Pergunta aberta (intenção desconhecida): a IA responde pelo conhecimento do mundo, não pela resposta pronta.
 static func ficha(world: WorldState, npc: String, frase: String, base: String, intent: String = "") -> Dictionary:
@@ -271,6 +303,7 @@ static func ficha(world: WorldState, npc: String, frase: String, base: String, i
 		"weather": w.region.condition if w != null else "limpo", "lembrancas": lembrancas, "frase": frase, "base": base,
 		"aberta": intent == "desconhecido", "conhecimento": conhecimento(world, npc) if intent == "desconhecido" else "",
 		"convicoes": convicoes(world, npc) if intent == "desconhecido" else "",
+		"relacao": relacao(world, npc) if intent == "desconhecido" else "",
 		"allowed_names": _nomes_permitidos(world)}
 
 

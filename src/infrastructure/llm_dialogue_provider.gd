@@ -124,7 +124,7 @@ func build_chat(ficha: Dictionary) -> Array:
 		ficha.get("period", ""), ficha.get("weather", "")]
 	var aberta := bool(ficha.get("aberta", false))
 	if aberta:
-		sistema += "Converse como uma pessoa de verdade, com palavras simples e naturais: pode concordar, discordar, contar de si, reagir ao que o forasteiro disse e perguntar de volta. Não repita frases anteriores. Exemplo de tom (não copie as palavras): 'Ah, isso é coisa de estrada, forasteiro. Eu, no seu lugar, perguntaria antes ao guarda.' Suas convicções pessoais (opiniões suas, não fatos): " + str(ficha.get("convicoes", "")) + ". Para fatos do mundo, use SOMENTE os 'Fatos do mundo' abaixo; se a pergunta sobre o mundo não estiver neles, diga que não sabe do seu jeito, sem inventar. Fatos do mundo: " + str(ficha.get("conhecimento", "")) + ". "
+		sistema += "Converse como uma pessoa de verdade, com palavras simples e naturais: pode concordar, discordar, contar de si, reagir ao que o forasteiro disse e perguntar de volta. Não repita frases anteriores. Exemplo de tom (não copie as palavras): 'Ah, isso é coisa de estrada, forasteiro. Eu, no seu lugar, perguntaria antes ao guarda.' Suas convicções pessoais (opiniões suas, não fatos): " + str(ficha.get("convicoes", "")) + ". Sua relação com o forasteiro e como você está agora (fatos; deixe isso aparecer no tom): " + str(ficha.get("relacao", "")) + ". Para fatos do mundo, use SOMENTE os 'Fatos do mundo' abaixo; se a pergunta sobre o mundo não estiver neles, diga que não sabe do seu jeito, sem inventar. Fatos do mundo: " + str(ficha.get("conhecimento", "")) + ". "
 	else:
 		sistema += "Use SOMENTE os fatos da 'resposta de referência' e das lembranças; não invente nomes, lugares, preços, itens ou promessas. Se a referência diz que não sabe, diga que não sabe do seu jeito. "
 	if lemb != "":
@@ -146,7 +146,7 @@ func accept_livre(base: String, out: String, ficha: Dictionary) -> bool:
 	if t == "" or t.length() > 320 or t.contains("*") or t.contains("["):
 		return false
 	# números só valem se estiverem nos fatos (preços, dias, quantidades), na pergunta ou na referência
-	var fatos := str(ficha.get("conhecimento", "")) + " " + str(ficha.get("convicoes", "")) + " " + str(ficha.get("frase", "")) + " " + base
+	var fatos := str(ficha.get("conhecimento", "")) + " " + str(ficha.get("convicoes", "")) + " " + str(ficha.get("relacao", "")) + " " + str(ficha.get("frase", "")) + " " + base
 	var num := RegEx.create_from_string("\\b\\d+\\b")
 	for m in num.search_all(t):
 		if not fatos.contains(m.get_string()):

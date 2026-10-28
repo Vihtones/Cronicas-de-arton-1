@@ -316,3 +316,14 @@ func test_prompt_da_conversa_aberta_cabe_no_contexto_do_modelo_local() -> void:
 		total += str(m.content).length()
 	check(total < 6000, "prompt com %d caracteres (limite 6000 ≈ 2000 tokens)" % total)
 	check((p.build_chat(f).size() - 2) <= 12, "histórico limitado aos últimos 6 turnos")
+
+
+func test_relacao_e_humor_entram_na_conversa_aberta() -> void:
+	var w := WorldHelpers.world(5)
+	var r := FreeTalk.relacao(w, "hilda")
+	check(r.contains("forasteiro"), "relação com o forasteiro aparece (%s)" % r)
+	var nd = w.modules.npc_life
+	var f := FreeTalk.ficha(w, "hilda", "você é meu amigo?", "", "desconhecido")
+	check(str(f.relacao) != "", "ficha leva a relação")
+	var p := LlmDialogueProvider.new({"enabled": true, "max_calls": 5})
+	check(str(p.build_chat(f)[0].content).contains("Sua relação com o forasteiro"), "prompt leva a relação")

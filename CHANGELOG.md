@@ -2,6 +2,7 @@
 
 ## 0.7.2 (em andamento)
 
+- A IA conhece a relação com o jogador (amizade, confiança, medo, mágoa), quantas vezes já conversaram e o humor do morador agora (medo ou bom humor). Esses fatos entram na conversa e na validação de números.
 - IA local no limite do mesmo modelo: contexto de 4096 com um slot só (-np 1), amostragem com temperatura 0,85, top_p 0,9 e penalidade de repetição, fala curta com parada em linha em branco, timeout de 30 s. Conhecimento do mundo ampliado (eventos, grupo e família do morador) e histórico limitado a 6 turnos; teste garante que o prompt cabe no contexto.
 - Conversa como gente: cada morador tem convicções pessoais (fé e ofício, em data/dialogue/convicoes.json) e pode opinar, concordar, discordar e perguntar de volta. Opiniões não viram fatos do mundo. O validador deixou de rejeitar palavras que começam frase.
 - Conversa com a IA: perguntas fora dos 16 assuntos prontos são respondidas pela IA a partir de um resumo verificado do mundo (lugar, lojas, guilda, moradores presentes, mistérios já descobertos; nunca os não descobertos). Números e nomes que não estão nos fatos são rejeitados e cai na resposta do jogo.
