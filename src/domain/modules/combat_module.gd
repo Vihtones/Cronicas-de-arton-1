@@ -1068,6 +1068,72 @@ func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
 	return false
 
 
+## Terremoto ------------------------------------------------------------------------------------------------------
+func _terremoto_no_terreno(conj: String, cid: String, cd: int) -> Array:
+	var out: Array = []
+	var t: Vector2i = sim.c(cid).tile
+	var s: CharacterSheet = sim.c(cid).sheet
+	var loc := world.db.location(world.db.location_at(t))
+	var desaba := world.db.zone_at(t) == "cripta" or bool(loc.get("indoor", false))
+	var penhasco := false
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			penhasco = penhasco or world.db.is_chasm(t + Vector2i(dx, dy))
+	if desaba or penhasco:
+		var passou := _resiste(cid, "reflexos", cd, out)
+		var dano := _dano_por_tipo(s, "impacto", int(Dice.roll("12d6", world.rng, "combat").total))
+		if passou:
+			dano = dano / 2
+		sim.apply_damage(cid, dano)
+		out.append(fact("HAZARD", {"actor": cid, "hazard": "desabamento" if desaba else "desmoronamento", "damage": dano, "pv_after": s.pv, "tags": ["magia", "impacto"]}, [cid]))
+		if not passou:
+			_preso_no_terremoto(cid, cd, out)
+	elif world.db.is_water(t):
+		if not _resiste(cid, "reflexos", cd, out):
+			_preso_no_terremoto(cid, cd, out)
+	elif int(world.rng.roll("combat", 1, 6)[0]) % 2 == 1:
+		if not _resiste(cid, "reflexos", cd, out):
+			s.add_efeito("terremoto", "na_fenda", cd, "cena")
+			s.add_condition("caido", world.rules)
+			out.append(fact("HAZARD", {"actor": cid, "hazard": "fenda", "damage": 0, "pv_after": s.pv, "tags": ["magia"]}, [cid]))
+	return out
+
+
+func _preso_no_terremoto(cid: String, cd: int, out: Array) -> void:
+	var s: CharacterSheet = sim.c(cid).sheet
+	s.add_efeito("terremoto", "preso_terremoto", cd, "cena")
+	s.add_condition("agarrado", world.rules)
+	out.append(fact("CONDITION_APPLIED", {"target": cid, "condition": "agarrado", "tags": ["magia"]}, [cid]))
+
+
+## No turno de cada criatura: agarrada pelo Terremoto sofre 1d6 (e, se não é o jogador, tenta se soltar); na fenda, tenta
+## sair. No turno do conjurador, as fendas se fecham: quem ainda está nelas morre.
+func _terremoto_inicio_de_turno(id: String, facts: Array) -> void:
+	for z in sim.zonas.duplicate(true):
+		if str(z.tipo) == "terremoto" and str(z.dados.conjurador) == id:
+			for cid in sim.combatants.keys():
+				var sc: CharacterSheet = sim.c(cid).sheet
+				if sc.efeito_bonus("na_fenda") > 0:
+					sc.pv = mini(sc.pv, sc.death_threshold())
+					facts.append(fact("HAZARD", {"actor": cid, "hazard": "fenda_fechou", "damage": 0, "pv_after": sc.pv, "tags": ["magia"]}, [cid]))
+			sim.remove_zona(str(z.id))
+	var s: CharacterSheet = sim.c(id).sheet
+	if s.efeito_bonus("preso_terremoto") > 0:
+		var dano := int(Dice.roll("1d6", world.rng, "combat").total)
+		sim.apply_damage(id, dano)
+		facts.append(fact("HAZARD", {"actor": id, "hazard": "soterrado", "damage": dano, "pv_after": s.pv, "tags": ["impacto"]}, [id]))
+	if id == "player":
+		return
+	for stat in ["na_fenda", "preso_terremoto"]:
+		if s.efeito_bonus(stat) > 0:
+			sim.budget.std = 0
+			sim.budget.move = 0
+			if Checks.skill(s, "atletismo", s.efeito_bonus(stat), world.rules, world.rng, "combat").get("success", false):
+				s.remove_efeito_stat(stat)
+				s.remove_condition("agarrado")
+			return
+
+
 ## Muralha de Ossos ---------------------------------------------------------------------------------------------
 func _zona_muralha_em(t: Vector2i) -> Dictionary:
 	for z in sim.zonas:
@@ -3183,6 +3249,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	_buraco_negro_do_conjurador(id, facts)
 	_buraco_negro_inicio_de_turno(id, facts)
 	_muralha_inicio_de_turno(id, facts)
+	_terremoto_inicio_de_turno(id, facts)
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
@@ -3459,6 +3526,16 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			else:
 				var cura_md := ts_md.curar(int(Dice.roll(str(world.rules.value("parceiro.tipos", {}).medico.cura[nv_md]), world.rng, "combat").total))
 				out.append(fact("HEALED", {"actor": id, "target": a.get("target", id), "amount": cura_md, "pv_after": ts_md.pv, "source": "parceiro_medico"}, [id]))
+		"soltar_terremoto", "sair_da_fenda":
+			var quem_t: String = a.get("target", id)
+			var stat_t := "preso_terremoto" if str(a.type) == "soltar_terremoto" else "na_fenda"
+			var qs: CharacterSheet = sim.c(quem_t).sheet
+			if Checks.skill(sim.c(id).sheet, "atletismo", qs.efeito_bonus(stat_t), world.rules, world.rng, "combat").get("success", false):
+				qs.remove_efeito_stat(stat_t)
+				qs.remove_condition("agarrado")
+				out.append(fact("SPELL_ENDED", {"spell": "terremoto", "target": quem_t, "reason": "livre"}, [quem_t]))
+			else:
+				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": str(a.type)}, [id]))
 		"soltar_muralha":
 			out.append_array(_soltar_da_muralha(id))
 		"escalar_muralha":
@@ -4263,6 +4340,25 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"terremoto":
+			# Terremoto (divina 4): esfera de 30m por uma rodada. Quem está no solo fica atordoado (uma vez por cena). Pelo
+			# terreno de cada um: cripta ou dentro de construção (desaba) — 12d6 de impacto e agarrado, Reflexos metade e evita;
+			# junto a barranco — o mesmo (desmoronamento); na água — Reflexos ou agarrado na lama; ao ar livre — dado ímpar abre
+			# uma fenda e quem falha em Reflexos cai nela. No próximo turno do conjurador as fendas se fecham (quem está nelas morre)
+			# e as fissuras da água também. Agarrados sofrem 1d6 por rodada até se soltarem (ação completa e Atletismo).
+			var centro_tr: Vector2i = a.get("tile", sim.c(id).tile)
+			var area_tr: Array = Area.esfera(centro_tr, Area.quadrados(30.0))
+			var cd_tr := spell_dc(sh, a)
+			sim.add_zona("terremoto_" + id, area_tr, "terremoto", -1, "terremoto", {"conjurador": id, "cd": cd_tr})
+			for cid in sim.combatants.keys():
+				var x_tr: Dictionary = sim.c(cid)
+				if x_tr.sheet.is_dead() or not area_tr.has(x_tr.tile) or (x_tr.flags as Array).has("incorporeo"):
+					continue
+				if x_tr.sheet.efeito_bonus("terremoto_atordoou") == 0:
+					sim.add_condicao(cid, "atordoado", 1, "terremoto")
+					x_tr.sheet.add_efeito("terremoto", "terremoto_atordoou", 1, "cena")
+				out.append_array(_terremoto_no_terreno(id, cid, cd_tr))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "terremoto", "tags": ["magia", "area"]}, [id]))
 		"muralha_de_ossos":
 			# Muralha de Ossos (universal 4): muro de 15m (+15m) a partir do quadrado, na direção escolhida. Trechos de 3m com
 			# Defesa 8, 40 PV e RD 10 contra corte, frio e perfuração. Quem está nele ou ao lado sofre 4d8 de corte e faz Reflexos

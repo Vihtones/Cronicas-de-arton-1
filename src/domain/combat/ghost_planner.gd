@@ -194,6 +194,9 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "terremoto":
+				if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "muralha_de_ossos":
 				var tile_mo: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tile_mo) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 20)): return {"ok": false, "reason": "fora do alcance"}
@@ -635,6 +638,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.combatants.has(alvo_md) or sim.c(alvo_md).sheet.is_dead() or CombatSim.cheb(A.tile, sim.c(alvo_md).tile) > 1: return {"ok": false, "reason": "a criatura precisa estar adjacente"}
 			if str(a.get("condicao", "")) != "" and nv_m == "iniciante": return {"ok": false, "reason": "remover condição é do médico veterano"}
 			return {"ok": true, "kind": "livre"}
+		"soltar_terremoto", "sair_da_fenda":
+			# Terremoto: ação completa e Atletismo para se libertar (ou libertar um aliado adjacente) ou sair da fenda.
+			if not sim.can_spend("completa"): return {"ok": false, "reason": "exige ação completa"}
+			var quem_t: String = a.get("target", actor)
+			if not sim.combatants.has(quem_t) or CombatSim.cheb(A.tile, sim.c(quem_t).tile) > 1: return {"ok": false, "reason": "alvo inválido"}
+			var stat_t := "preso_terremoto" if str(a.type) == "soltar_terremoto" else "na_fenda"
+			if sim.c(quem_t).sheet.efeito_bonus(stat_t) <= 0: return {"ok": false, "reason": "não há o que fazer"}
+			if str(a.type) == "sair_da_fenda" and quem_t != actor: return {"ok": false, "reason": "só quem está na fenda sai dela"}
+			return {"ok": true, "kind": "completa"}
 		"atacar_muralha", "soltar_muralha", "escalar_muralha":
 			# Muralha de Ossos: atacar um trecho adjacente (padrão), soltar-se (padrão, Atletismo), escalar (completa, Atletismo).
 			var kind_mu := "completa" if str(a.type) == "escalar_muralha" else "padrao"

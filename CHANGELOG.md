@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Terremoto (divina, 4º círculo): esfera de 30m; quem está no solo fica atordoado; na cripta ou em construção o teto desaba (12d6 e agarrado), junto a barrancos o chão desmorona, na água forma-se lama que prende, e ao ar livre abrem-se fendas que se fecham no turno seguinte do conjurador, matando quem ficou nelas. Agarrados sofrem 1d6 por rodada até se soltarem.
+
 - Muralha de Ossos (universal, 4º círculo): muro de 15m (+15m) que bloqueia a passagem; quem está nele ou ao lado sofre 4d8 de corte e pode ficar preso; trechos de 3m com Defesa 8, 40 PV e RD 10 podem ser destruídos; escalar fere 4d8 a cada 3m; com o aprimoramento, esqueletos animados agarram quem começa o turno ao lado.
 
 - Runa de Proteção (universal, 2º círculo): runa no chão (1 hora, T$ 200) que explode com 6d6 (+2d6) do tipo escolhido em quem entra, só para um tipo de criatura se quiser, com palavra mágica para o conjurador passar; procurar runas (Investigação) e desarmá-las (Ladinagem); ou runa no corpo com uma magia de 1º (ou 2º) círculo lançada como reação quando você é alvo de um ataque ou de uma magia.
