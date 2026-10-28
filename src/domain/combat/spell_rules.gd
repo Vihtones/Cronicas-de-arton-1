@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"controlar_o_clima": {"aprimoramentos": []},   # fora de combate: fixa um dos climas do jogo por 4d12 horas
 	"visao_da_verdade": {"aprimoramentos": [0, 1, 2, 3]},   # ignora camuflagem e escuridão; toque; +10 Percepção; +10 Intuição; paredes finas
 	"furia_do_panteao": {"aprimoramentos": []},   # nuvem de 90m sustentada; ordens de movimento: nevasca, raios, siroco, trovões
 	"toque_da_morte": {"aprimoramentos": [0, 1]},   # 10d8+10 de trevas; abaixo da metade dos PV, Fortitude ou PV a –10; raio; todos os inimigos em curto

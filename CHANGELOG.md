@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Controlar o Clima (divina, 4º círculo): fora de combate, fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas; o estado fica no save. O jogo só tem esses cinco climas.
+
 - Visão da Verdade (universal, 4º círculo): ataques ignoram camuflagem e escuridão; toque em aliado; +10 em Percepção e em Intuição; paredes finas gravadas como efeito, ainda sem linha de visão no jogo para usá-lo.
 
 - Fúria do Panteão (divina, 5º círculo) completa: nuvem de 90m sustentada que impede ataques à distância, torna difícil lançar magia e reduz a visão dos inimigos; a cada turno uma ordem de movimento (nevasca, raios, siroco ou trovões). Catálogo: Fúria perdeu o texto do Globo da Verdade, que ganhou entrada própria (ainda sem efeito).

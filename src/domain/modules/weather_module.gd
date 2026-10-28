@@ -23,6 +23,7 @@ var region := {"condition": "limpo", "temp_c": 18, "precip": 0.0, "cloud": 0.1, 
 const RAMP_PER_TICK := 0.25
 const TARGET_INTENSITY := {"limpo": 0.0, "nublado": 0.0, "chuva": 0.6, "tempestade": 1.0, "neblina": 0.8}
 var wet_hours := 0
+var forcado := {}   # Controlar o Clima: {condicao, ate_tick}; o clima fica fixo até lá
 
 
 func module_id() -> String: return "weather"
@@ -96,6 +97,11 @@ func on_tick(tick: int) -> Array:
 		if r <= acc:
 			next = k
 			break
+	if not forcado.is_empty():
+		if world.clock.tick >= int(forcado.ate_tick):
+			forcado = {}
+		else:
+			next = str(forcado.condicao)
 	var base_temp: int = {"verao": 24, "outono": 17, "inverno": 9, "primavera": 16}[season()]
 	var h := world.hour()
 	region.temp_c = base_temp + (4 if h >= 11 and h <= 16 else -3 if h < 6 else 0) - (3 if next in ["chuva", "tempestade"] else 0)
@@ -131,7 +137,7 @@ func perception_cd_mod() -> int:
 	return 5 if region.condition in ["neblina", "tempestade"] else 0
 
 
-func to_dict() -> Dictionary: return {"region": region.duplicate(), "wet_hours": wet_hours, "testes_clima": testes_clima, "ultimo_dia_clima": ultimo_dia_clima}
+func to_dict() -> Dictionary: return {"region": region.duplicate(), "wet_hours": wet_hours, "testes_clima": testes_clima, "ultimo_dia_clima": ultimo_dia_clima, "forcado": forcado.duplicate()}
 func from_dict(d: Dictionary) -> void:
 	var base := region.duplicate()
 	region = d.get("region", region).duplicate()
@@ -140,3 +146,4 @@ func from_dict(d: Dictionary) -> void:
 	wet_hours = int(d.get("wet_hours", 0))
 	testes_clima = int(d.get("testes_clima", 0))
 	ultimo_dia_clima = int(d.get("ultimo_dia_clima", -1))
+	forcado = (d.get("forcado", {}) as Dictionary).duplicate()

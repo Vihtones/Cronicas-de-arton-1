@@ -3628,3 +3628,12 @@ func test_visao_da_verdade_ignora_camuflagem_e_da_bonus_de_pericia() -> void:
 	check(P.efeito_bonus("visao_verdade") > 0, "enxerga a verdade")
 	eq(P.efeito_bonus("pericia_percepcao"), 10, "+10 em Percepção")
 	eq(sim.falha_escuridao("player", "bandido_1"), 0, "sem falha por escuridão")
+
+
+func test_controlar_o_clima_fixa_o_clima_por_horas() -> void:
+	var m := _clerigo_mundo(["controlar_o_clima"])
+	var w = m[0]
+	var r := WorldHelpers.cmd(w, "CastSpell", {"spell": "controlar_o_clima", "clima": "tempestade"})
+	check(r.accepted, "Controlar o Clima aceito")
+	eq(w.module("weather").region.condition, "tempestade", "clima virou tempestade")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "controlar_o_clima", "clima": "granizo"}).accepted, "clima inexistente no jogo é recusado")

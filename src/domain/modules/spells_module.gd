@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"controlar_o_clima": [],   # fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas
 	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
 	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
 }
@@ -185,6 +186,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"controlar_o_clima":
+			if not WeatherModule.CONDITIONS.has(str(cmd.payload.get("clima", ""))):
+				return PackedStringArray(["escolha o clima: " + ", ".join(PackedStringArray(WeatherModule.CONDITIONS))])
 		"augurio":
 			var err_au := validar_augurio(cmd.payload)
 			if err_au != "":
@@ -409,6 +413,13 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"controlar_o_clima":
+			var clima_cc: WeatherModule = world.module("weather")
+			var horas_cc := int(Dice.roll("4d12", world.rng, "world").total)
+			clima_cc.forcado = {"condicao": str(cmd.payload.clima), "ate_tick": world.clock.tick + horas_cc * 60 / world.clock.tick_minutes}
+			var antes_cc: String = clima_cc.region.condition
+			clima_cc.region.condition = str(cmd.payload.clima)
+			out.append(fact("WEATHER_CHANGED", {"from": antes_cc, "to": clima_cc.region.condition, "temp_c": clima_cc.region.temp_c, "surface": clima_cc.region.surface, "horas": horas_cc}, ["player"]))
 		"augurio":
 			out.append_array(augurio(cmd.payload))
 		"circulo_da_justica":
