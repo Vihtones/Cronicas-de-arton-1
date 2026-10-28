@@ -1185,6 +1185,28 @@ func _efeito_magico_no_turno(id: String, dados: String, conj: String, origem: St
 
 ## Comando no início do turno de quem obedece: Pare (pasmo, uma vez por cena), Senta (caído, sem se levantar neste
 ## turno), Largue (solta o que segura; só pega de novo no próximo turno). Fuja e Venha tomam o turno (_turno_comando).
+## Marca da Obediência no início do turno do alvo: Vontade contra a CD gravada; passou, a marca se dissipa e ele age
+## normalmente; falhou, obedece a ordem neste turno (e sofre 3d6 de dano psíquico com o aprimoramento).
+func _marca_obediencia(id: String, facts: Array) -> Dictionary:
+	var s: CharacterSheet = sim.c(id).sheet
+	var marca := {}
+	for e in s.efeitos:
+		if e.stat == "marca_obediencia":
+			marca = e
+	if marca.is_empty():
+		return {}
+	if _resiste(id, "vontade", int(marca.bonus), facts):
+		s.anular_magia("magia.marca_da_obediencia")
+		facts.append(fact("SPELL_ENDED", {"spell": "marca_da_obediencia", "target": id, "reason": "resistiu"}, [id]))
+		return {}
+	if s.efeito_bonus("marca_dano") > 0:
+		var dano := _dano_por_tipo(s, "psiquico", int(Dice.roll("3d6", world.rng, "combat").total))
+		sim.apply_damage(id, dano)
+		facts.append(fact("HAZARD", {"actor": id, "hazard": "marca_da_obediencia", "damage": dano, "pv_after": s.pv, "tags": ["magia", "psiquico"]}, [id]))
+	facts.append(fact("COMMAND_OBEYED", {"actor": id, "ordem": str(marca.tipo), "caster": str(marca.get("conj", ""))}, [id]))
+	return {"ordem": "marca_" + str(marca.tipo), "conj": str(marca.get("conj", ""))}
+
+
 func _obedecer_comando(id: String, facts: Array) -> Dictionary:
 	var m := {}
 	for mk in sim.marcas:
@@ -1238,6 +1260,11 @@ func _devolver_arma(id: String) -> void:
 ## Fuja / Venha: o turno inteiro (todas as ações) afastando-se do conjurador ou indo até ele.
 func _turno_comando(id: String, ordem: String, conj: String) -> Array:
 	var out: Array = []
+	if ordem.begins_with("marca_"):
+		if ordem != "marca_siga" or not sim.combatants.has(conj):
+			sim.budget.std = 0   # Marca da Obediência: não ataque / fique — o turno inteiro é gasto obedecendo
+			return out
+		ordem = "venha"   # siga-me: vai até o conjurador
 	for i in 2:
 		if not sim.can_spend("movimento"):
 			break
@@ -2928,9 +2955,12 @@ func _begin_turn_base(id: String) -> Dictionary:
 		s.anular_magia("magia.imobilizar")   # Imobilizar: gasta a ação completa num novo teste e, passando, se liberta
 		facts.append(fact("SPELL_ENDED", {"spell": "imobilizar", "target": id, "reason": "resistiu"}, [id]))
 		libertou = true
+	var marca_turno := _marca_obediencia(id, facts)
 	var ordem_cmd := _obedecer_comando(id, facts)
 	if ["fuja", "venha"].has(str(ordem_cmd.get("ordem", ""))) and sim.combatants.has(str(ordem_cmd.conj)):
 		x["comando_turno"] = ordem_cmd
+	elif not marca_turno.is_empty():
+		x["comando_turno"] = marca_turno
 	for f_ae in (x.flags as Array).duplicate():
 		if str(f_ae).begins_with("ae_atk_"):
 			(x.flags as Array).erase(f_ae)   # Arma Espiritual: a arma que atacou volta a poder contra-atacar
@@ -3920,6 +3950,23 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"marca_da_obediencia":
+			# Marca da Obediência (universal 2): Vontade anula. A marca fica na ficha (dura a cena, ou um dia com o aprimoramento) e,
+			# a cada rodada, o alvo faz Vontade (`_begin_turn_base`): passou, a marca se dissipa; falhou, gasta o turno obedecendo
+			# (e sofre 3d6 de dano psíquico com o outro aprimoramento).
+			var apr_mo: Array = a.get("aprimoramentos", [])
+			var tg_mo: String = a.get("target", "")
+			var cd_mo := spell_dc(sh, a)
+			if _resiste(tg_mo, "vontade", cd_mo, out):
+				out.append(fact("SPELL_MISSED", {"caster": id, "target": tg_mo, "spell": "marca_da_obediencia", "reason": "resistiu"}, [id, tg_mo]))
+			else:
+				var ts_mo: CharacterSheet = sim.c(tg_mo).sheet
+				var fim_mo := "dia" if apr_mo.has(0) else "cena"
+				var ate_mo := world.day_index() + 1 if apr_mo.has(0) else -1
+				ts_mo.add_efeito("magia.marca_da_obediencia", "marca_obediencia", cd_mo, fim_mo, str(a.ordem), ate_mo, id)
+				if apr_mo.has(1):
+					ts_mo.add_efeito("magia.marca_da_obediencia", "marca_dano", 1, fim_mo, "", ate_mo, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_mo, "buff": "marca_da_obediencia", "ordem": str(a.ordem), "tags": ["magia"]}, [id, tg_mo]))
 		"visao_da_verdade":
 			# Visão da Verdade (universal 4): vê através de camuflagem e escuridão (efeito "visao_verdade", lido em falha_nevoa e
 			# falha_escuridao); +10 em Percepção; +10 em Intuição; paredes finas translúcidas (efeito marcado: o jogo ainda não tem

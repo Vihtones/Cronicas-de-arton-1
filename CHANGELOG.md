@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Marca da Obediência (universal, 2º círculo): toque, Vontade anula; ordens "não ataque", "siga-me" e "fique" que gastam o turno do alvo; Vontade a cada rodada para se livrar; um dia de duração e 3d6 de dano psíquico a cada falha com os aprimoramentos.
+
 - Controlar o Clima (divina, 4º círculo): fora de combate, fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas; o estado fica no save. O jogo só tem esses cinco climas.
 
 - Visão da Verdade (universal, 4º círculo): ataques ignoram camuflagem e escuridão; toque em aliado; +10 em Percepção e em Intuição; paredes finas gravadas como efeito, ainda sem linha de visão no jogo para usá-lo.

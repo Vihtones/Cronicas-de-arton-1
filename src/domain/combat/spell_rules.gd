@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"marca_da_obediencia": {"aprimoramentos": [0, 1]},   # ordem (não ataque, siga, fique); Vontade a cada rodada; um dia; 3d6 psíquico ao falhar
 	"controlar_o_clima": {"aprimoramentos": []},   # fora de combate: fixa um dos climas do jogo por 4d12 horas
 	"visao_da_verdade": {"aprimoramentos": [0, 1, 2, 3]},   # ignora camuflagem e escuridão; toque; +10 Percepção; +10 Intuição; paredes finas
 	"furia_do_panteao": {"aprimoramentos": []},   # nuvem de 90m sustentada; ordens de movimento: nevasca, raios, siroco, trovões
@@ -399,6 +400,7 @@ static func aplicar_caminhos(sh: CharacterSheet, apr: Array, truque: bool, ate_d
 
 
 const ORDENS_COMANDO := ["fuja", "largue", "pare", "senta", "venha"]
+const ORDENS_MARCA := ["nao_ataque", "siga", "fique"]   # Marca da Obediência: o alvo gasta o turno obedecendo
 
 
 ## Acalmar Animal: animal; monstro ou espírito com Int –5 ou –4 (1 PM); qualquer monstro ou espírito (5 PM).
