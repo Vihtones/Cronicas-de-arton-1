@@ -4,7 +4,7 @@ extends RefCounted
 ## Módulos são registrados; os opcionais podem ser desligados sem impedir o boot (§5).
 
 const SCHEMA_VERSION := 2
-const CONTENT_VERSION := "0.7.1"
+const CONTENT_VERSION := "0.7.2"
 const MAX_DERIVED_PER_COMMIT := 4096
 
 var revision: int = 0

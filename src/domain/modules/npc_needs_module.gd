@@ -26,8 +26,12 @@ const WORK_END := 18
 const LONG_TARGET_GOLD := 40    # longo prazo: depois de juntar, abrir o próprio negócio
 const VISIT_MIN_AFFECTION := 30.0  # afeto acima disso (de 100) vence o lazer da agenda e leva à visita
 const SHIFT_MIN_HOURS := 6      # horas no posto para cumprir o turno e produzir o bem da profissão
+const DESPENSA_MAX := 3         # refeições guardadas por casa (Fase 1: compras de moradores)
+const DESPENSA_INICIAL := 0     # casas começam sem comida guardada: o morador precisa comprar
+const COMIDA_DE_CASA := "pao"   # o que a família compra para guardar em casa
 
 var state: Dictionary = {}      # id -> {hunger, tired, gold, goal, medium, long, shift}
+var despensa: Dictionary = {}   # casa (id do local) -> refeições guardadas
 
 
 func module_id() -> String: return "npc_needs"
@@ -141,8 +145,8 @@ func on_tick(tick: int) -> Array:
 		var loc := str(npcs.npc(id).location)
 		var asleep := loc == str(d.get("home", "")) and (h < 6 or h >= 22)
 		# necessidades crescem com o tempo; dormir cansa menos
-		s.hunger = minf(1.0, float(s.hunger) + HUNGER_PER_HOUR)
-		s.tired = minf(1.0, float(s.tired) + (0.0 if asleep else TIRED_PER_HOUR))
+		s.hunger = snappedf(minf(1.0, float(s.hunger) + HUNGER_PER_HOUR), 0.0001)
+		s.tired = snappedf(minf(1.0, float(s.tired) + (0.0 if asleep else TIRED_PER_HOUR)), 0.0001)
 		if asleep:
 			s.tired = maxf(0.0, float(s.tired) - REST_RELIEF_PER_HOUR)
 		# decisão: a necessidade de maior utilidade vira objetivo de curto prazo
@@ -175,6 +179,21 @@ func on_tick(tick: int) -> Array:
 			s.gold = int(s.gold) - tool_price()
 			s.tools = true
 			out.append(fact("TOOL_BOUGHT", {"npc": id, "price": tool_price()}, [id]))
+		# despensa: no tempo livre, quem tem ouro compra comida para a casa onde há vendedor de pão
+		var home := str(d.get("home", ""))
+		if not at_work and despensa_de(home) < DESPENSA_MAX:
+			var vend := _vendedor_de_pao(loc)
+			if vend != "":
+				var preco := _preco_de_compra(vend)
+				if int(s.gold) >= preco:
+					s.gold = int(s.gold) - preco
+					despensa[home] = despensa_de(home) + 1
+					out.append(fact("FOOD_BOUGHT", {"npc": id, "home": home, "price": preco, "vendor": vend, "regiao": _regiao_do_vendedor(vend)}, [id]))
+		# comer em casa: com refeição guardada, a fome cai sem pagar taverna
+		if s.goal == "comer" and loc == home and despensa_de(home) > 0 and float(s.hunger) >= 0.1:
+			despensa[home] = despensa_de(home) - 1
+			s.hunger = snappedf(maxf(0.0, float(s.hunger) - MEAL_RELIEF), 0.0001)
+			out.append(fact("MEAL_AT_HOME", {"npc": id, "home": home}, [id]))
 		# ação: chegou à taverna querendo comer, come; a refeição paga vira fato da economia
 		if s.goal == "comer" and loc == taverna_do_morador(id) and eat(id):
 			out.append(fact("MEAL_SERVED", {"npc": id, "cost": meal_cost(), "regiao": _regiao_da_taverna(id)}, [id]))
@@ -303,7 +322,9 @@ func location_override(id: String, d: Dictionary) -> String:
 		return ""
 	var g := goal(id)
 	if g == "comer":
-		# só come fora se tiver ouro; sem ouro, segue a vida normal (fome vai subindo)
+		# com comida guardada, come em casa; senão, só come fora se tiver ouro (sem ouro, a fome sobe)
+		if despensa_de(str(d.get("home", ""))) > 0:
+			return str(d.get("home", ""))
 		return taverna_do_morador(id) if gold(id) >= meal_cost() else ""
 	if g == "descansar":
 		return str(d.get("home", ""))
@@ -317,16 +338,53 @@ func eat(id: String) -> bool:
 	if float(s.hunger) < 0.1 or int(s.gold) < meal_cost():
 		return false
 	s.gold = int(s.gold) - meal_cost()
-	s.hunger = maxf(0.0, float(s.hunger) - MEAL_RELIEF)
+	s.hunger = snappedf(maxf(0.0, float(s.hunger) - MEAL_RELIEF), 0.0001)
 	return true
+
+
+## Refeições guardadas numa casa (começa com DESPENSA_INICIAL).
+func despensa_de(home: String) -> int:
+	return int(despensa.get(home, DESPENSA_INICIAL))
+
+
+## Vendedor de pão que trabalha neste local ("" se nenhum). Tabela montada uma vez (o catálogo não muda).
+var _vendedores_pao: Dictionary = {}
+var _vendedores_montados := false
+
+
+func _vendedor_de_pao(loc: String) -> String:
+	if not _vendedores_montados:
+		_vendedores_montados = true
+		var lojas: Dictionary = world.db.economy.get("shops", {})
+		for vend in lojas:
+			if (lojas[vend] as Array).has(COMIDA_DE_CASA):
+				var l := str(world.npc_def(str(vend)).get("work", ""))
+				if l != "" and not _vendedores_pao.has(l):
+					_vendedores_pao[l] = str(vend)
+	return str(_vendedores_pao.get(loc, ""))
+
+
+func _preco_de_compra(vend: String) -> int:
+	var eco = world.module("economy")
+	if eco == null:
+		return 0
+	return int(eco.price(COMIDA_DE_CASA, eco.regiao_da_loja(vend), vend))
+
+
+func _regiao_do_vendedor(vend: String) -> String:
+	var eco = world.module("economy")
+	return str(eco.regiao_da_loja(vend)) if eco != null else "vila"
 
 
 func to_dict() -> Dictionary:
 	_ensure()
-	return {"state": state.duplicate(true)}
+	return {"state": state.duplicate(true), "despensa": despensa.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
+	despensa = {}
+	for k in d.get("despensa", {}):
+		despensa[str(k)] = int(d.despensa[k])
 	state = d.get("state", {}).duplicate(true)
 	for id in state:
 		state[id].hunger = float(state[id].hunger)

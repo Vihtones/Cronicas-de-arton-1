@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.2 (em andamento)
+
+- Despensa por casa (Arton Viva, Fase 1): no tempo livre, quem tem ouro compra pão para a casa onde há vendedor de pão (o ouro vai ao tesouro); com comida guardada, o morador come em casa sem pagar taverna. A despensa começa vazia, vai até 3 refeições e é salva com o jogo.
+- Fome e cansaço são arredondados a 4 casas ao gravar, para o save reproduzir a simulação com exatidão.
+
 ## 0.7.1
 
 - Desempenho: simulação de 7 dias ~0,35 s (antes ~1,2 s). Busca de visitas entre moradores passa a percorrer só as relações conhecidas (mesmo desempate), e o agrupamento por local das relações vira uma passada única.

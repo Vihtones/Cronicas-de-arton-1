@@ -22,7 +22,7 @@ var pechincha: Dictionary = {}   # npc -> {"dia": int, "mod": float}
 
 func module_id() -> String: return "economy"
 func handled_commands() -> PackedStringArray: return PackedStringArray(["Buy", "Sell", "Haggle"])
-func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "WORK_DONE", "TOOL_BOUGHT", "MEAL_SERVED", "TORMENTA_DAY", "BUILDING_DONE"])
+func subscribed_events() -> PackedStringArray: return PackedStringArray(["DISTANT_EVENT", "NPC_MOVED", "DOMAIN_WEEK", "SHEEP_KILLED", "TOWN_EVENT_STARTED", "CART_DELIVERED", "WORK_DONE", "TOOL_BOUGHT", "MEAL_SERVED", "FOOD_BOUGHT", "TORMENTA_DAY", "BUILDING_DONE"])
 
 
 func _ensure() -> void:
@@ -233,6 +233,9 @@ func on_event(e: GameEvent) -> Array:
 			# ferramenta comprada por morador: o ouro vai ao tesouro e sai uma unidade do estoque da vila
 			treasury += int(e.payload.get("price", 0))
 			regions.vila.stock.ferramentas = maxi(0, int(regions.vila.stock.ferramentas) - 1)
+		"FOOD_BOUGHT":
+			# comida comprada para a casa: o ouro vai ao tesouro (a despensa é do morador)
+			treasury += int(e.payload.get("price", 0))
 		"WORK_DONE":
 			# turno cumprido: o morador produz um bem da profissão (Arton Viva, Fase 1)
 			var g := str(e.payload.get("good", ""))

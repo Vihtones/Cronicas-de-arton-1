@@ -193,3 +193,69 @@ func test_morador_que_come_na_taverna_gera_fato_de_refeicao() -> void:
 		if f.type == "MEAL_SERVED":
 			achou = true
 	check(achou, "comer na taverna emite MEAL_SERVED")
+
+
+## Despensa por casa (Fase 1, compras de moradores): comprar pão no tempo livre, comer em casa sem taverna, salvar.
+func _tipo(evs: Array, tipo: String) -> bool:
+	for e in evs:
+		if str(e.get("type", "")) == tipo:
+			return true
+	return false
+
+
+func _residente_e_vendedor(w: WorldState) -> Array:
+	var lojas: Dictionary = w.db.economy.get("shops", {})
+	for vend in lojas:
+		if not (lojas[vend] as Array).has("pao"):
+			continue
+		var vloc := str(w.db.npc_def(str(vend)).get("work", ""))
+		for id in w.all_npc_ids():
+			if str(w.npc_def(id).get("home", "")) != vloc and str(w.npc_def(id).get("home", "")) != "":
+				return [id, vloc]
+	return ["", ""]
+
+
+func test_despensa_compra_pao_no_tempo_livre_e_salva() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var npcs = w.modules.npcs
+	var par := _residente_e_vendedor(w)
+	var id: String = par[0]
+	var vloc: String = par[1]
+	check(id != "" and vloc != "", "há um morador e um vendedor de pão")
+	var home := str(w.npc_def(id).get("home", ""))
+	npcs.state[id].location = vloc
+	npcs.state[id].alive = true
+	npcs.state[id].captive = false
+	nd.state[id].gold = 50
+	nd.state[id].goal = ""
+	var antes := nd.despensa_de(home)
+	var out: Array = nd.on_tick(w.clock.tick)
+	check(_tipo(out, "FOOD_BOUGHT"), "comprou comida para a casa no tempo livre")
+	eq(nd.despensa_de(home), antes + 1, "a despensa da casa ganhou uma refeição")
+	check(nd.gold(id) < 50, "pagou pelo pão")
+	var salvo: Dictionary = nd.to_dict()
+	var nd2 := NpcNeedsModule.new()
+	nd2.world = w
+	nd2.from_dict(salvo)
+	eq(nd2.despensa_de(home), antes + 1, "a despensa sobrevive ao salvar e carregar")
+
+
+func test_com_comida_guardada_come_em_casa_sem_pagar_taverna() -> void:
+	var w := _world()
+	var nd: NpcNeedsModule = w.modules.npc_needs
+	var npcs = w.modules.npcs
+	var par := _residente_e_vendedor(w)
+	var id: String = par[0]
+	var home := str(w.npc_def(id).get("home", ""))
+	npcs.state[id].location = home
+	npcs.state[id].alive = true
+	npcs.state[id].captive = false
+	nd.despensa[home] = 2
+	nd.state[id].gold = 0
+	nd.state[id].hunger = 0.9
+	var out: Array = nd.on_tick(w.clock.tick)
+	check(_tipo(out, "MEAL_AT_HOME"), "comeu da despensa em casa")
+	check(not _tipo(out, "MEAL_SERVED"), "não pagou refeição na taverna")
+	eq(nd.despensa_de(home), 1, "a despensa perdeu uma refeição")
+	check(nd.hunger(id) < 0.9, "a fome caiu")
