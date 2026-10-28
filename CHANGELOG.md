@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Servo Divino (divina, 3º círculo): pago o espírito (T$ 100, 500 ou 1.000), ele luta ao seu lado na cena ou, fora de combate, leva um item a um lugar para ser recolhido lá (no mesmo dia, em um dia ou em uma semana).
+
 - Intervenção Divina (divina, 5º círculo): cura total de até 10 criaturas, dissipar os efeitos de uma magia de até 4º círculo, e, com o sacrifício permanente de 2 PM, criar um item mundano de até T$ 30.000, duplicar uma magia de até 4º círculo, proteger o povoado do próximo terremoto ou tempestade, ou ressuscitar quem morreu há até uma rodada.
 
 - Reanimação Impura (divina, 5º círculo): uma criatura morta nesta cena volta como morto-vivo, com suas habilidades, e luta do seu lado até o fim da cena, quando volta a ficar morta; se for destruída, não pode ser reanimada de novo.

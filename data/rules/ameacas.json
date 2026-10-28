@@ -273,6 +273,50 @@
    "pdf_page": 241,
    "status": "ADAPTADA",
    "nota": "Capanga de Conjurar Mortos-Vivos (aprimoramento): incorpórea, causa 2d10 de trevas e perda de 1d4 PM (Fortitude)."
+  },
+  {
+   "id": "criatura.espirito_servo",
+   "valor": {
+    "nome": "Espírito Servo (Servo Divino)",
+    "nd": "—",
+    "tipo": "espirito",
+    "tamanho": "medio",
+    "iniciativa": 6,
+    "percepcao": 6,
+    "defesa": 20,
+    "fort": 8,
+    "ref": 8,
+    "von": 10,
+    "pv": 40,
+    "deslocamento_m": 18,
+    "ataques": [
+     {
+      "nome": "Toque radiante",
+      "bonus": 10,
+      "dano": "2d8+4",
+      "margem": 20,
+      "mult": 2,
+      "alcance_q": 1
+     }
+    ],
+    "atributos": {
+     "for": 3,
+     "des": 3,
+     "con": 2,
+     "int": 1,
+     "sab": 3,
+     "car": 2
+    },
+    "pericias": {},
+    "sentidos": [
+     "visao_penumbra"
+    ]
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano), Servo Divino (pág. 205)",
+   "pagina": 205,
+   "pdf_page": 211,
+   "status": "ADAPTADA",
+   "nota": "O livro deixa o tipo de criatura a cargo do mestre; estes valores são do jogo, para a tarefa de lutar ao lado do conjurador."
   }
  ]
 }

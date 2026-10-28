@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"servo_divino": [],   # tarefa "entregar": o espírito leva um item a um lugar, para ser recolhido lá no prazo
 	"intervencao_divina": [],   # curar o grupo, criar item, duplicar magia, proteger o povoado
 	"conceder_milagre": [],   # num companheiro do grupo (fora de combate a magia fica com ele para a próxima luta)
 	"runa_de_protecao": [],   # no chão onde você está (1 hora, pó de diamante T$ 200) ou no próprio corpo (aprimoramentos)
@@ -209,6 +210,17 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"servo_divino":
+			var apr_sd: Array = cmd.payload.get("aprimoramentos", [])
+			if str(cmd.payload.get("tarefa", "")) != "entregar":
+				return PackedStringArray(["fora de combate, a tarefa do espírito é entregar um item"])
+			var st_sd = world.module("state")
+			if st_sd == null or not st_sd.has_item(str(cmd.payload.get("item", ""))):
+				return PackedStringArray(["você não tem esse item"])
+			if not _local_existe(str(cmd.payload.get("destino", ""))):
+				return PackedStringArray(["escolha o lugar de entrega"])
+			if int(world.player.gold) < SpellRules.servo_divino_custo(apr_sd):
+				return PackedStringArray(["faltam T$ %d para pagar o espírito" % SpellRules.servo_divino_custo(apr_sd)])
 		"intervencao_divina":
 			var err_iv := SpellRules.erro_intervencao(world.rules, sh, cmd.payload)
 			if err_iv != "":
@@ -530,6 +542,12 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"servo_divino":
+			var apr_sd2: Array = cmd.payload.get("aprimoramentos", [])
+			out.append(fact("GOLD_CHANGED", {"delta": -SpellRules.servo_divino_custo(apr_sd2), "reason": "pagamento ao espírito (Servo Divino)"}))
+			out.append(fact("ITEM_LOST", {"item": str(cmd.payload.item), "reason": "servo_divino"}))
+			mensageiros.append({"item": str(cmd.payload.item), "destino": str(cmd.payload.destino), "chega_dia": world.day_index(), "ate_dia": world.day_index() + maxi(1, SpellRules.servo_divino_dias(apr_sd2)), "fonte": "servo_divino"})
+			out.append(fact("MESSENGER_SENT", {"item": str(cmd.payload.item), "destino": str(cmd.payload.destino), "fonte": "servo_divino"}, ["player"]))
 		"intervencao_divina":
 			out.append_array(intervencao_divina(cmd.payload, sh))
 		"conceder_milagre":

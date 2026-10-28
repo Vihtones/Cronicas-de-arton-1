@@ -194,6 +194,9 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "servo_divino":
+				if str(a.get("tarefa", "lutar")) != "lutar": return {"ok": false, "reason": "em combate, a tarefa do espírito é lutar"}
+				targets = [actor]
 			if sp_id == "intervencao_divina":
 				var err_id := SpellRules.erro_intervencao(sim.rules, A.sheet, a)
 				if err_id != "": return {"ok": false, "reason": err_id}

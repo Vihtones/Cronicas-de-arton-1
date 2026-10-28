@@ -163,6 +163,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 					return PackedStringArray(["você não tem água benta"])
 				if act.get("type", "") == "cast" and act.get("spell", "") == "luz" and (act.get("aprimoramentos", []) as Array).has(2) and int(world.player.gold) < 50:
 					return PackedStringArray(["faltam T$ 50 de pó de rubi"])
+				if act.get("type", "") == "cast" and act.get("spell", "") == "servo_divino" and int(world.player.gold) < SpellRules.servo_divino_custo(act.get("aprimoramentos", [])):
+					return PackedStringArray(["faltam T$ %d para pagar o espírito" % SpellRules.servo_divino_custo(act.get("aprimoramentos", []))])
 				if act.get("type", "") == "cast" and act.get("spell", "") == "oracao":
 					var custo_or := GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, "oracao"), act)
 					if int(world.player.gold) < 20 * custo_or:
@@ -4479,6 +4481,12 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"servo_divino":
+			# Servo Divino (divina 3): pago o espírito, ele luta ao seu lado até o fim da cena (tarefa "lutar"; o tipo de criatura,
+			# que o livro deixa ao mestre, é o espírito servo do bestiário do jogo).
+			out.append(fact("GOLD_CHANGED", {"delta": -SpellRules.servo_divino_custo(a.get("aprimoramentos", [])), "reason": "pagamento ao espírito (Servo Divino)"}))
+			var espirito := invocar(id, "criatura.espirito_servo", -1, "servo_divino", sim.c(id).tile)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": espirito, "buff": "servo_divino", "tags": ["magia"]}, [id, espirito]))
 		"intervencao_divina":
 			# Intervenção Divina (divina 5). Curar: todos os PV e condições de até 10 criaturas (cura mortos-vivos também).
 			# Dissipar: os efeitos de uma magia de até 4º círculo, em toda a cena. Com o sacrifício de 2 PM (–2 PM máximos para

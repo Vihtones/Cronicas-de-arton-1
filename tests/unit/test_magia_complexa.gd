@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos", "terremoto", "cupula_de_repulsao", "conceder_milagre", "reanimacao_impura", "intervencao_divina"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos", "terremoto", "cupula_de_repulsao", "conceder_milagre", "reanimacao_impura", "intervencao_divina", "servo_divino"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3883,3 +3883,16 @@ func test_intervencao_divina_cura_total_e_ressuscita_com_sacrificio() -> void:
 	check(_lanca(m, {"type": "cast", "spell": "intervencao_divina", "opcao": "ressuscitar", "target": "bandido_1"}).ok, "ressuscitar")
 	eq(b1.pv, 1, "volta com 1 PV")
 	eq(P.pm_max, pm_max0 - 2, "sacrifício de 2 PM")
+
+
+func test_servo_divino_espirito_luta_do_seu_lado() -> void:
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var antes := sim.combatants.size()
+	check(_lanca(m, {"type": "cast", "spell": "servo_divino", "tarefa": "lutar"}).ok, "Servo Divino")
+	eq(sim.combatants.size(), antes + 1, "um espírito a mais")
+	var novo := ""
+	for cid in sim.combatants:
+		if str(cid).begins_with("inv_servo_divino"):
+			novo = cid
+	check(novo != "" and not sim.is_enemy("player", novo), "do lado do conjurador")
