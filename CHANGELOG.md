@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Servo Morto-Vivo (universal, 3º círculo): um cadáver de humanoide, animal ou monstro vira parceiro morto-vivo permanente (esqueleto ou zumbi iniciante; carniçal ou sombra veteranos; múmia mestre), com o componente em T$; uma vez por rodada, o servo é sacrificado para evitar um dano. Lendas e Histórias de toque volta a funcionar fora de combate.
+
 - Parceiros: os sete tipos que faltavam estão no jogo (adepto, assassino, atirador, destruidor, magivocador, médico e vigilante), nos três níveis de poder do Livro Básico.
 
 - Vidência (universal, 3º círculo): fora de combate, vê e ouve um NPC a qualquer distância e quem está com ele, pela cena; o alvo resiste com Vontade (+10 se nunca viu o jogador, –5 se o conhece bem).

@@ -27,6 +27,7 @@ var rng: RngStreams                 # null em simulações do fantasma: sem rola
 var conjurando: Dictionary = {}     # conjurador -> {alvo, cd, apr, rodadas}: magia de execução longa (Banimento); 0 rodadas = pronta
 var dia := 0                        # dia do mundo (Mudar Atitude: uma vez por dia por alvo)
 var sustentadas: Dictionary = {}    # conjurador -> id da magia sustentada (uma por vez, LB p.227)
+var servos_sacrificados: Array = []   # Servo Morto-Vivo: parceiros destruídos para evitar dano (o módulo os tira do grupo)
 var pendencias: Array = []          # efeitos de ligação ocorridos, drenados pelo módulo para o registro
 
 
@@ -653,6 +654,15 @@ static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
 ## Dano com ligações: se `target` está ligado por Ligação Sombria, o alvo da ligação faz Fortitude e sofre o mesmo dano
 ## quando falha. A ligação acaba se o alvo cair a 0 PV (exceto com o aprimoramento de 5 PM).
 func apply_damage(target: String, amount: int) -> Array:
+	var alvo_sv: Dictionary = c(target)
+	if amount > 0 and alvo_sv.sheet.efeito_bonus("servo_sacrificio") > 0 and not (alvo_sv.flags as Array).has("servo_%d" % round_no):
+		for e in alvo_sv.sheet.efeitos:
+			if e.stat == "servo_sacrificio":
+				var pid := str(e.id).trim_prefix("parceiro.")
+				alvo_sv.sheet.remove_efeito(str(e.id))
+				servos_sacrificados.append(pid)
+				(alvo_sv.flags as Array).append("servo_%d" % round_no)   # uma vez por rodada
+				return ["servo_sacrificado"]
 	var ja_morto: bool = c(target).sheet.is_dead()
 	var tags := _dano_bruto(target, amount)
 	if not ja_morto and c(target).sheet.is_dead():

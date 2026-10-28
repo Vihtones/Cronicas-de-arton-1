@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"servo_morto_vivo": {"aprimoramentos": [0, 1, 2]},   # cadáver vira parceiro morto-vivo (esqueleto/zumbi, carniçal, sombra, múmia)
 	"videncia": {"aprimoramentos": []},   # fora de combate: vê e ouve um NPC a qualquer distância (Vontade anula, com modificador por familiaridade)
 	"lendas_e_historias": {"aprimoramentos": [0]},   # tudo sobre criatura, objeto ou lugar tocado; à distância por um dia (T$ 1.000)
 	"buraco_negro": {"aprimoramentos": [0]},   # 3 turnos puxando 30m (Fortitude); quem termina o turno nele é sugado; você não é afetado
@@ -115,7 +116,7 @@ const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "c
 const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
 	"protecao_divina": {1: "curto"}, "potencia_divina": {2: "toque"}, "pele_de_pedra": {0: "toque", 3: "toque", 4: "toque"}, "toque_da_morte": {0: "curto", 1: "curto"}, "visao_da_verdade": {0: "toque"}, "selo_de_mana": {0: "curto"}, "manto_de_sombras": {0: "toque"}, "segunda_chance": {1: "curto"}, "dispersar_as_trevas": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
-const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]], "conjurar_mortos_vivos": [[1, 2]], "pele_de_pedra": [[1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]}
+const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]], "conjurar_mortos_vivos": [[1, 2]], "servo_morto_vivo": [[0, 1], [0, 2], [1, 2]], "pele_de_pedra": [[1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]}
 ## Escolas de magia (LB, Proteção contra Magia): minúsculas, sem acento na comparação (ver `escola_valida`).
 ## Lendas e Histórias: tudo o que a ficha diz de uma criatura (estatísticas, magias, resistências e magias ativas).
 static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
@@ -133,6 +134,22 @@ static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
 		"pv": sh.pv, "pv_max": sh.pv_max, "pm": sh.pm, "pm_max": sh.pm_max,
 		"resistencias": {"fortitude": sh.skill_value("fortitude", rules), "reflexos": sh.skill_value("reflexos", rules), "vontade": sh.skill_value("vontade", rules)},
 		"magias": Array(sh.spells), "poderes": sh.powers.keys(), "imunidades": imunes, "reducao_de_dano": rd, "magias_ativas": ativas, "condicoes": Array(sh.conditions)}
+
+
+## Servo Morto-Vivo: por aprimoramento (-1 = sem), a criatura, o poder de parceiro, os tipos possíveis e o componente (T$).
+const SERVOS := {
+	-1: {"criatura": "", "nivel": "iniciante", "tipos": ["ajudante", "atirador", "combatente", "fortao", "guardiao", "montaria"], "custo": 100},
+	0: {"criatura": "carniçal", "nivel": "veterano", "tipos": ["ajudante", "atirador", "combatente", "fortao", "guardiao"], "custo": 500},
+	1: {"criatura": "sombra", "nivel": "veterano", "tipos": ["assassino", "combatente", "perseguidor"], "custo": 500},
+	2: {"criatura": "múmia", "nivel": "mestre", "tipos": ["ajudante", "destruidor", "guardiao", "medico"], "custo": 1000},
+}
+
+
+static func servo_de(apr: Array) -> Dictionary:
+	for i in [2, 1, 0]:
+		if apr.has(i):
+			return SERVOS[i]
+	return SERVOS[-1]
 
 
 const ESCOLAS := ["abjuração", "adivinhação", "convocação", "encantamento", "evocação", "ilusão", "necromancia", "transmutação"]

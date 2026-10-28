@@ -33,8 +33,9 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"servo_morto_vivo": [],   # cadáver de humanoide, animal ou monstro vira parceiro morto-vivo permanente
 	"videncia": [],   # um NPC a qualquer distância; a familiaridade muda a Vontade dele
-	"lendas_e_historias": [0],   # NPC, objeto ou lugar tocado; com o aprimoramento, qualquer um conhecido (um dia, T$ 1.000)
+	"lendas_e_historias": [],   # NPC, objeto ou lugar tocado; com o aprimoramento, qualquer um conhecido (um dia, T$ 1.000)
 	"controlar_o_clima": [],   # fixa o clima da região (limpo, nublado, chuva, tempestade ou neblina) por 4d12 horas
 	"augurio": [],   # sobre entrar ou explorar um lugar (felicidade, miséria, ambos ou nada); consultas a uma divindade
 	"circulo_da_justica": [],   # num ponto em alcance curto: os NPCs do lugar não mentem (nem distorcem boatos)   # companheiros e NPCs por perto; depois, a distância não importa   # conversar com qualquer criatura; interrogar cadáver; falar com plantas e rochas   # água no recipiente, chama na palma, terra; ar e fogo em quadrados só pesam numa cena
@@ -189,6 +190,21 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"servo_morto_vivo":
+			var alvo_sm := str(cmd.payload.get("target", ""))
+			var err_sm := _valida_cadaver(alvo_sm, "toque")
+			if not err_sm.is_empty():
+				return err_sm
+			var st_sm: Dictionary = world.module("combat").creature_state[alvo_sm]
+			if bool(st_sm.get("reanimado", false)):
+				return PackedStringArray(["esse corpo já foi reanimado"])
+			if not ["humanoide", "animal", "monstro"].has(str((st_sm.get("sheet", {}) as Dictionary).get("creature_type", ""))):
+				return PackedStringArray(["só cadáveres de humanoides, animais ou monstros"])
+			var servo := SpellRules.servo_de(apr)
+			if not (servo.tipos as Array).has(str(cmd.payload.get("tipo", ""))):
+				return PackedStringArray(["tipo de parceiro: " + ", ".join(PackedStringArray(servo.tipos))])
+			if int(world.player.gold) < int(servo.custo):
+				return PackedStringArray(["falta o componente (T$ %d)" % int(servo.custo)])
 		"videncia":
 			if world.db.npc_def(str(cmd.payload.get("alvo", ""))).is_empty():
 				return PackedStringArray(["escolha um NPC"])
@@ -442,6 +458,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"servo_morto_vivo":
+			out.append_array(servo_morto_vivo(cmd.payload))
 		"videncia":
 			out.append_array(lancar_videncia(str(cmd.payload.alvo), sh))
 		"lendas_e_historias":
@@ -680,6 +698,28 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Servo Morto-Vivo: o cadáver vira esqueleto ou zumbi (zumbi se o corpo está preservado), carniçal, sombra ou múmia,
+## e acompanha o jogador como parceiro permanente do tipo escolhido. Componente pago em T$.
+func servo_morto_vivo(payload: Dictionary) -> Array:
+	var out: Array = []
+	var apr: Array = payload.get("aprimoramentos", [])
+	var servo := SpellRules.servo_de(apr)
+	var alvo := str(payload.target)
+	var combat = world.module("combat")
+	var nome: String = str(servo.criatura) if str(servo.criatura) != "" else ("zumbi" if cadaver_preservado(alvo) else "esqueleto")
+	out.append(fact("GOLD_CHANGED", {"delta": -int(servo.custo), "reason": "componente (Servo Morto-Vivo)"}))
+	var novo := {"id": "servo_%s" % alvo, "tipo": str(payload.tipo), "nivel": str(servo.nivel), "nome": nome, "especie": nome, "fonte": "servo_morto_vivo", "ate_dia": -1}
+	if str(payload.tipo) == "ajudante":
+		novo["pericias"] = (payload.get("pericias", []) as Array).duplicate()
+	var party = world.module("party")
+	var err: String = party.adicionar_parceiro(novo) if party != null else "sem módulo de parceiros"
+	if err != "":
+		return [fact("SPELL_MISSED", {"caster": "player", "spell": "servo_morto_vivo", "reason": err}, ["player"])]
+	combat.marcar_reanimado(alvo)
+	out.append(fact("PARTNER_GAINED", {"partner": novo.id, "tipo": novo.tipo, "nivel": novo.nivel, "nome": nome}, ["player"]))
+	return out
 
 
 ## Vidência: o NPC faz Vontade com modificador pela familiaridade (pela memória que ele tem do jogador): nunca se viram

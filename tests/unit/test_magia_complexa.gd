@@ -3709,6 +3709,9 @@ func test_lendas_e_historias_revela_a_ficha_e_a_distancia_leva_um_dia() -> void:
 	var dia0: int = w2.day_index()
 	check(WorldHelpers.cmd(w2, "CastSpell", {"spell": "lendas_e_historias", "alvo_tipo": "criatura", "alvo": npc_id, "aprimoramentos": [0]}).accepted, "à distância")
 	check(w2.day_index() > dia0, "levou um dia")
+	var lugar: String = w2.db.location_at(w2.db.world_to_tile(w2.player.position))
+	if lugar != "":
+		check(WorldHelpers.cmd(w2, "CastSpell", {"spell": "lendas_e_historias", "alvo_tipo": "local", "alvo": lugar}).accepted, "toque no lugar, sem aprimoramento")
 
 
 func test_videncia_mostra_o_npc_quando_ele_falha() -> void:
@@ -3738,3 +3741,16 @@ func test_parceiros_novos_atirador_adepto_medico_e_vigilante() -> void:
 	check(v.ok, "médico cura")
 	m[1]._execute_action("player", {"type": "parceiro_medico", "target": "player"}, v)
 	check(P.pv > pv0, "curou")
+
+
+func test_servo_morto_vivo_vira_parceiro_e_e_sacrificado_para_evitar_dano() -> void:
+	var w = _clerigo_mundo(["servo_morto_vivo"])[0]
+	w.player.gold = 2000
+	var combat = w.module("combat")
+	var p: Vector2i = w.db.world_to_tile(w.player.position)
+	combat.creature_state["corpo_teste"] = {"alive": false, "tile": [p.x, p.y], "sheet": {"creature_type": "humanoide"}}
+	var r := WorldHelpers.cmd(w, "CastSpell", {"spell": "servo_morto_vivo", "target": "corpo_teste", "tipo": "guardiao"})
+	check(r.accepted, "Servo Morto-Vivo")
+	check(not w.module("party").parceiro("servo_corpo_teste").is_empty(), "virou parceiro")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "servo_morto_vivo", "target": "corpo_teste", "tipo": "guardiao"}).accepted, "o corpo não serve de novo")
+	check(w.player_sheet.efeito_bonus("servo_sacrificio") > 0, "pode ser sacrificado")

@@ -5202,6 +5202,12 @@ func _check_end() -> Array:
 	return []
 
 
+## Servo Morto-Vivo: o cadáver foi reanimado e não serve de novo.
+func marcar_reanimado(id: String) -> void:
+	if creature_state.has(id):
+		creature_state[id]["reanimado"] = true
+
+
 func _end_combat(outcome: String) -> Array:
 	var out: Array = []
 	for m in sim.marcas.duplicate(true):   # presos por efeitos da cena (Controlar Plantas) ficam livres com o fim da cena
@@ -5212,6 +5218,11 @@ func _end_combat(outcome: String) -> Array:
 	var loc := world.db.location_at(sim.c("player").tile)
 	var P := sim.c("player")
 	world.player_sheet = P.sheet
+	var party_s = world.module("party")
+	for pid in sim.servos_sacrificados:   # Servo Morto-Vivo: destruído, não pode ser reanimado
+		if party_s != null:
+			party_s.remover_parceiro(str(pid))
+		out.append(fact("PARTNER_LOST", {"partner": str(pid), "reason": "sacrificado"}, ["player"]))
 	world.player_sheet.remove_condition("surpreendido")
 	world.player_sheet.scene_defense = 0   # magias de duração "cena" terminam com o combate
 	world.player_sheet.limpar_efeitos("cena")

@@ -46,6 +46,8 @@ static func aplicar(sh: CharacterSheet, lista: Array, rules: RuleRegistry) -> vo
 		var t := tipo(rules, str(p.tipo))
 		var nv := str(p.nivel)
 		var eid := "parceiro." + str(p.id)
+		if str(p.get("fonte", "")) == "servo_morto_vivo":
+			sh.add_efeito(eid, "servo_sacrificio", 1, "parceiro")   # pode ser sacrificado para evitar um dano
 		match str(p.tipo):
 			"ajudante":
 				var bonus: int = int((t.pericias[nv] as Array)[1])
