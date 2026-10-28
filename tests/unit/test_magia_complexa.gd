@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3565,3 +3565,18 @@ func test_dissipar_magia_disjuncao_exige_5_circulo_e_dissipa_tudo_sem_teste() ->
 	sim.c("bandido_1").sheet.add_efeito("magia.circulo_da_restauracao", "defesa", 1, "cena")
 	check(_lanca(m, {"type": "cast", "spell": "dissipar_magia", "tile": sim.c("bandido_1").tile, "targets": ["player"], "aprimoramentos": [0]}).ok, "disjunção")
 	check(not sim.c("bandido_1").sheet.has_efeito("magia.circulo_da_restauracao"), "magia de 4º círculo caiu sem teste")
+
+
+func test_conjurar_mortos_vivos_conjura_seis_so_agem_por_ordem_e_somem_com_a_magia() -> void:
+	var m := _cena_grupo(5)
+	var sim: CombatSim = m[2]
+	check(_lanca(m, {"type": "cast", "spell": "conjurar_mortos_vivos", "tile": Vector2i(26, 57), "aprimoramentos": [0]}).ok, "Conjurar Mortos-Vivos")
+	eq(m[1]._capangas_de("player").size(), 7, "6 esqueletos + 1 do aprimoramento")
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "atacar_mortos", "target": "bandido_1"})
+	check(v.ok, "ordem de ataque válida")
+	var pv0: int = sim.c("bandido_1").sheet.pv
+	for cid in m[1]._capangas_de("player"):
+		m[1]._golpe_capanga("player", cid, "bandido_1")
+	check(sim.c("bandido_1").sheet.pv < pv0, "os mortos-vivos adjacentes feriram o bandido")
+	m[1]._encerrar_sustentada("player", [])
+	eq(m[1]._capangas_de("player").size(), 0, "somem quando a magia termina")

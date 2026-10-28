@@ -189,6 +189,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "conjurar_mortos_vivos":
+				var tile_cm: Vector2i = a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, tile_cm) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "dissipar_magia" and not apr.has(0) and not A.sheet.can_use_skill("misticismo", sim.rules): return {"ok": false, "reason": "Dissipar Magia exige Misticismo treinado"}
 			if sp_id == "dissipar_magia" and (apr.has(0) or a.get("no_chao", false) or a.get("area", false)):
 				var tile_dm: Vector2i = a.get("tile", A.tile)
@@ -541,6 +545,13 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if CombatSim.cheb(ze[0].tiles[0], para_e) > Area.quadrados(12.0): return {"ok": false, "reason": "o enxame anda até 12m"}
 			if sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes" and z != ze[0] and (z.tiles as Array).has(para_e)): return {"ok": false, "reason": "já há um enxame lá"}
 			return {"ok": true, "kind": "movimento"}
+		"mover_mortos", "atacar_mortos":
+			# Conjurar Mortos-Vivos: movimento (andam até 9m) ou ação padrão (ferem adjacentes). Só por ordem do conjurador.
+			if str(sim.sustentadas.get(actor, "")) != "conjurar_mortos_vivos": return {"ok": false, "reason": "sem mortos-vivos conjurados"}
+			var kind_mv := "movimento" if str(a.type) == "mover_mortos" else "padrao"
+			if not sim.can_spend(kind_mv): return {"ok": false, "reason": "sem a ação que a ordem exige"}
+			if str(a.type) == "mover_mortos" and a.get("tile", null) == null: return {"ok": false, "reason": "escolha o destino"}
+			return {"ok": true, "kind": kind_mv}
 		"resfriar":
 			# Controlar Fogo (Esquentar): ação completa para resfriar o objeto e cancelar o efeito.
 			if not sim.can_spend("completa"): return {"ok": false, "reason": "resfriar exige ação completa"}

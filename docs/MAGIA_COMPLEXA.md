@@ -106,7 +106,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Divinas de 4º círculo (4): conceder_milagre, controlar_o_clima, cupula_de_repulsao, terremoto.
 - Divinas de 5º círculo (4): furia_do_panteao, intervencao_divina, reanimacao_impura, segunda_chance.
 - Universais de 1º círculo: todas feitas.
-- Universais de 2º círculo (3 de 4 faltam): conjurar_mortos_vivos, marca_da_obediencia, runa_de_protecao. Feita: Dissipar Magia (teste de Misticismo dissipa magias de CD até o resultado; área de 3m ou criatura; disjunção de 9m sem teste no 5º círculo; `_dissipar_magia`). O jogo ainda não tem itens mágicos permanentes, então a parte de "item mágico" do texto não tem alvo; os encantos de magia são efeitos e caem junto.
+- Universais de 2º círculo (2 de 4 faltam): marca_da_obediencia, runa_de_protecao. Feita: Conjurar Mortos-Vivos (sustentada; criaturas `criatura.*_capanga` com a flag `capanga`, sem turno automático; ordens `mover_mortos` e `atacar_mortos`, ainda sem botão na tela; sombras usam a flag `incorporeo`, que hoje zera todo dano). Feita: Dissipar Magia (teste de Misticismo dissipa magias de CD até o resultado; área de 3m ou criatura; disjunção de 9m sem teste no 5º círculo; `_dissipar_magia`). O jogo ainda não tem itens mágicos permanentes, então a parte de "item mágico" do texto não tem alvo; os encantos de magia são efeitos e caem junto.
 - Universais de 3º círculo (7): imobilizar, lendas_e_historias, manto_de_sombras, pele_de_pedra, selo_de_mana,
   servo_morto_vivo, videncia.
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.

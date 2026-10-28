@@ -177,6 +177,102 @@
    "pdf_page": 200,
    "status": "ADAPTADA",
    "nota": "O livro traz só o tamanho (Pequeno) e as capacidades; os valores de combate são adaptados. Incorpórea: imune a dano."
+  },
+  {
+   "id": "criatura.esqueleto_capanga",
+   "valor": {
+    "nome": "Esqueleto Capanga",
+    "nd": "—",
+    "tipo": "morto-vivo",
+    "tamanho": "medio",
+    "iniciativa": 0,
+    "percepcao": 0,
+    "defesa": 18,
+    "fort": -20,
+    "ref": -20,
+    "von": -20,
+    "pv": 1,
+    "deslocamento_m": 9,
+    "ataques": [],
+    "atributos": {
+     "for": 2,
+     "des": 2,
+     "con": 0,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {}
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano), Conjurar Mortos-Vivos (pág. 235)",
+   "pagina": 235,
+   "pdf_page": 241,
+   "status": "ADAPTADA",
+   "nota": "Capanga de Conjurar Mortos-Vivos: 1 PV, falha em qualquer teste de resistência, age só por ordem do conjurador."
+  },
+  {
+   "id": "criatura.carnical_capanga",
+   "valor": {
+    "nome": "Carniçal Capanga",
+    "nd": "—",
+    "tipo": "morto-vivo",
+    "tamanho": "medio",
+    "iniciativa": 0,
+    "percepcao": 0,
+    "defesa": 27,
+    "fort": -20,
+    "ref": -20,
+    "von": -20,
+    "pv": 1,
+    "deslocamento_m": 9,
+    "ataques": [],
+    "atributos": {
+     "for": 3,
+     "des": 3,
+     "con": 0,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {}
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano), Conjurar Mortos-Vivos (pág. 235)",
+   "pagina": 235,
+   "pdf_page": 241,
+   "status": "ADAPTADA",
+   "nota": "Capanga de Conjurar Mortos-Vivos (aprimoramento): causa 1d8+3 de trevas, perda de 1d8 PV por veneno e paralisia (Fortitude)."
+  },
+  {
+   "id": "criatura.sombra_capanga",
+   "valor": {
+    "nome": "Sombra Capanga",
+    "nd": "—",
+    "tipo": "morto-vivo",
+    "tamanho": "medio",
+    "iniciativa": 0,
+    "percepcao": 0,
+    "defesa": 35,
+    "fort": -20,
+    "ref": -20,
+    "von": -20,
+    "pv": 1,
+    "deslocamento_m": 9,
+    "ataques": [],
+    "atributos": {
+     "for": 0,
+     "des": 4,
+     "con": 0,
+     "int": 0,
+     "sab": 0,
+     "car": 0
+    },
+    "pericias": {}
+   },
+   "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano), Conjurar Mortos-Vivos (pág. 235)",
+   "pagina": 235,
+   "pdf_page": 241,
+   "status": "ADAPTADA",
+   "nota": "Capanga de Conjurar Mortos-Vivos (aprimoramento): incorpórea, causa 2d10 de trevas e perda de 1d4 PM (Fortitude)."
   }
  ]
 }

@@ -519,6 +519,8 @@ func _run_until_player() -> Array:
 				return out
 			if sim.c(id).flags.has("guardiao"):
 				out.append_array(_turno_guardiao(id))
+			elif sim.c(id).flags.has("capanga"):
+				pass   # mortos-vivos conjurados só agem por ordem do conjurador
 			elif sim.c(id).side == "enemy" and not Atitudes.agressiva(atitude_de(id)):
 				out.append(fact("TURN_SKIPPED", {"actor": id, "reason": "atitude", "atitude": atitude_de(id)}))
 			else:
@@ -943,14 +945,14 @@ func _tile_livre_na_sim(centro: Vector2i, usados: Array) -> Vector2i:
 
 ## Invocação (Servo Divino, Guardião Divino...): cria uma criatura do bestiário do mesmo lado do conjurador,
 ## logo depois dele na ordem. Dura `rodadas` rodadas (-1 = até o fim do combate); ao acabar, sai da simulação.
-func invocar(caster: String, rule_id: String, rodadas: int, fonte: String) -> String:
+func invocar(caster: String, rule_id: String, rodadas: int, fonte: String, centro: Vector2i = Vector2i(-9999, -9999)) -> String:
 	var cx: Dictionary = sim.c(caster)
 	var usados: Array = []
 	for id in sim.combatants:
 		usados.append(sim.c(id).tile)
 	var nova := "inv_%s_%d" % [fonte, sim.combatants.size()]
 	var sh := CharacterSheet.from_creature(sim.rules, rule_id, nova)
-	sim.combatants[nova] = {"id": nova, "side": cx.side, "order": "", "tile": _tile_livre_na_sim(cx.tile, usados), "sheet": sh,
+	sim.combatants[nova] = {"id": nova, "side": cx.side, "order": "", "tile": _tile_livre_na_sim(cx.tile if centro.x == -9999 else centro, usados), "sheet": sh,
 		"charge_turn": -99, "damaged_round": -1, "surprised": false, "flags": []}
 	sim.order.insert(sim.order.find(caster) + 1, nova)
 	if rodadas != 0:
@@ -2300,6 +2302,65 @@ func _encerrar_magia_dissipada(cand: Dictionary, out: Array) -> void:
 			sim.remove_marca(str(cand.id), str(cand.alvo))
 
 
+## Mortos-vivos conjurados (Conjurar Mortos-Vivos) ainda de pé que obedecem a `dono`.
+func _capangas_de(dono: String) -> Array:
+	var r: Array = []
+	for cid in sim.combatants:
+		if (sim.c(cid).flags as Array).has("capanga_de_" + dono) and not sim.c(cid).sheet.is_dead():
+			r.append(cid)
+	return r
+
+
+## Imunidades dos capangas: atordoamento, cansaço, doença, encantamento, paralisia, veneno, frio.
+func _imunidades_capanga(sh: CharacterSheet) -> void:
+	for cond in ["atordoado", "exausto", "fatigado", "doente", "enfeiticado", "fascinado", "paralisado", "envenenado"]:
+		sh.add_efeito("capanga", "imune", 1, "cena", cond)
+	for tipo in ["frio", "veneno"]:
+		sh.add_efeito("capanga", "imune", 1, "cena", tipo)
+
+
+## Golpe de um morto-vivo conjurado: fere um inimigo adjacente (o preferido, se estiver ao lado). Esqueleto 1d6+2 de trevas;
+## carniçal 1d8+3, perda de 1d8 PV por veneno e Fortitude ou paralisado 1 rodada (imune por um dia); sombra 2d10 e
+## Fortitude ou perde 1d4 PM (só vivos). A CD é a do conjurador.
+func _golpe_capanga(dono: String, cid: String, preferido: String) -> Array:
+	var out: Array = []
+	var alvo := ""
+	for x in sim.combatants:
+		if sim.is_enemy(cid, x) and not sim.c(x).sheet.is_dead() and CombatSim.cheb(sim.c(cid).tile, sim.c(x).tile) <= 1:
+			if alvo == "" or x == preferido:
+				alvo = x
+	if alvo == "":
+		return out
+	var tipo_cp := str(sim.c(cid).sheet.source_rule)
+	var expr := "1d6+2"
+	if tipo_cp.ends_with("carnical_capanga"):
+		expr = "1d8+3"
+	elif tipo_cp.ends_with("sombra_capanga"):
+		expr = "2d10"
+	var ts: CharacterSheet = sim.c(alvo).sheet
+	var r := Dice.roll(expr, world.rng, "combat", 1)
+	var dano := _dano_por_tipo(ts, "trevas", int(r.total))
+	var tags: Array = ["magia", "trevas"]
+	tags.append_array(sim.apply_damage(alvo, dano))
+	out.append(fact("ATTACK_RESOLVED", {"attacker": cid, "target": alvo, "weapon": str(sim.c(cid).sheet.name), "d20": 0, "mod": 0, "mods": [], "total": 0,
+		"defense": 0, "camo_roll": 0, "hit": true, "crit": false, "damage": dano, "rolls": r.rolls, "pv_after": ts.pv, "special": false, "ranged": false,
+		"spell": true, "tags": tags}, [dono, alvo]))
+	var cd := spell_dc(sim.c(dono).sheet, {"spell": "conjurar_mortos_vivos"})
+	if tipo_cp.ends_with("carnical_capanga") and not ts.is_dead():
+		var perda := int(Dice.roll("1d8", world.rng, "combat").total)
+		ts.pv -= perda
+		ts.pv_perdido_veneno += perda
+		if ts.efeito_bonus("imune_carnical") == 0:
+			if _resiste(alvo, "fortitude", cd, out):
+				ts.add_efeito("carnical", "imune_carnical", 1, "dia", "", world.day_index() + 1)   # passou: imune por um dia
+			else:
+				sim.add_condicao(alvo, "paralisado", 1, "carnical")
+	elif tipo_cp.ends_with("sombra_capanga") and ts.creature_type != "morto-vivo" and ts.creature_type != "construto" and not ts.is_dead():
+		if not _resiste(alvo, "fortitude", cd, out):
+			ts.pm = maxi(0, ts.pm - int(Dice.roll("1d4", world.rng, "combat").total))
+	return out
+
+
 func _resiste(alvo: String, pericia: String, cd: int, out: Array) -> bool:
 	var sv := Checks.skill(sim.c(alvo).sheet, pericia, cd, world.rules, world.rng, "combat")
 	sv = _pos_teste(alvo, sv, cd, out)
@@ -2680,6 +2741,10 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
 					sim.remove_marca(str(m.id), id)
+		"conjurar_mortos_vivos":
+			for cid in sim.combatants.keys():
+				if (sim.c(cid).flags as Array).has("capanga_de_" + id):
+					sim.remove_combatant(cid)   # os mortos-vivos desaparecem com a magia
 		"potencia_divina":
 			for cid in sim.combatants:
 				sim.c(cid).sheet.remove_efeito("magia.potencia_divina")   # tamanho e Força voltam ao normal (ficha)
@@ -3022,6 +3087,16 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if str(z.id) == zid_e:
 					z.tiles = [para_e]
 			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "mover", "tile": [para_e.x, para_e.y]}, [id]))
+		"mover_mortos":
+			for cid in _capangas_de(id):
+				var de_mv: Vector2i = sim.c(cid).tile
+				var caminho_mv := sim.trim_path(cid, sim.find_path(cid, a.tile, true, 60), Area.quadrados(9.0))
+				if not caminho_mv.is_empty():
+					sim.c(cid).tile = caminho_mv[-1]
+					out.append(fact("COMBAT_MOVED", {"actor": cid, "from": [de_mv.x, de_mv.y], "path": caminho_mv.map(func(t): return [t.x, t.y])}, [cid]))
+		"atacar_mortos":
+			for cid in _capangas_de(id):
+				out.append_array(_golpe_capanga(id, cid, str(a.get("target", ""))))
 		"resfriar":
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "esquentar":
@@ -3770,6 +3845,21 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"conjurar_mortos_vivos":
+			# Conjurar Mortos-Vivos (universal 2): sustentada; 6 esqueletos (+1 por aprimoramento), carniçais (3º círculo) ou
+			# sombras (4º). Não agem sozinhos: ordens "mover_mortos" (movimento) e "atacar_mortos" (padrão).
+			var apr_cm: Array = a.get("aprimoramentos", [])
+			var regra_cm := "criatura.sombra_capanga" if apr_cm.has(2) else ("criatura.carnical_capanga" if apr_cm.has(1) else "criatura.esqueleto_capanga")
+			_iniciar_sustentada(id, "conjurar_mortos_vivos", out)
+			var centro_cm: Vector2i = a.get("tile", sim.c(id).tile)
+			for i in range(6 + apr_cm.count(0)):
+				var morto := invocar(id, regra_cm, -1, "mortos_vivos", centro_cm)
+				sim.c(morto).flags.append("capanga")
+				sim.c(morto).flags.append("capanga_de_" + id)
+				if apr_cm.has(2):
+					sim.c(morto).flags.append("incorporeo")
+				_imunidades_capanga(sim.c(morto).sheet)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "conjurar_mortos_vivos", "quantidade": 6 + apr_cm.count(0), "tags": ["magia"]}, [id]))
 		"dissipar_magia":
 			# Dissipar Magia (universal 2): teste de Misticismo; dissipa magias com CD igual ou menor. Aprimoramento (5º círculo):
 			# disjunção numa esfera de 9m, tudo cai sem teste. (O jogo ainda não tem itens mágicos permanentes além dos encantos
