@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"sono": [],   # NPC humanoide aqui adormece pela cena: não vê furtos nem conversa
 	"explosao_de_chamas": [],   # fora de combate, só o truque: acende a tocha que você carrega
 	"projetar_consciencia": [],   # um lugar do mapa ou um NPC (no mesmo plano); sustentada pela cena
 	"controlar_terra": [1],   # fora de combate, só fundir-se à pedra ao lado (um dia)
@@ -74,6 +75,7 @@ var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridã
 var missoes: Dictionary = {}   # Missão Divina: npc -> {destino, ate_dia, recusou, penalidade, cd, marca, cumprida}
 var _dia_missoes := -1
 var _lancando_pela_projecao := false
+var adormecidos: Dictionary = {}   # Sono fora de combate: npc -> tick em que acorda (cena)
 var visitados: Dictionary = {}   # lugares onde o jogador já esteve (Projetar Consciência: lugar conhecido)
 var projecao: Dictionary = {}   # Projetar Consciência ativa: {local, npc, ate, magias}
 var arborea_ate := -1   # Viagem Arbórea ativa até este tick: pode passar de árvore em árvore (TreeHop, 1 PM)
@@ -248,6 +250,10 @@ func _validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"sono":
+			var alvo_so := str(cmd.payload.get("target", ""))
+			if not _no_mesmo_lugar(alvo_so):
+				return PackedStringArray(["o NPC precisa estar aqui"])
 		"explosao_de_chamas":
 			if not cmd.payload.get("truque", false):
 				return PackedStringArray(["fora de combate, só o truque (acender uma tocha)"])
@@ -647,6 +653,15 @@ func _execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"sono":
+			var alvo_so2 := str(cmd.payload.target)
+			var combat_so = world.module("combat")
+			var cd_so: int = combat_so.spell_dc(sh, {"spell": "sono"}) if combat_so != null else 15
+			if Checks.skill(_ficha_npc(alvo_so2), "vontade", cd_so, world.rules, world.rng, "world").get("success", false):
+				out.append(fact("SPELL_MISSED", {"caster": "player", "target": alvo_so2, "spell": "sono", "reason": "resistiu"}, ["player"]))
+			else:
+				adormecidos[alvo_so2] = world.clock.tick + (combat_so.TICKS_CENA if combat_so != null else 6)
+				out.append(fact("NPC_SLEEPING", {"npc": alvo_so2, "spell": "sono"}, [alvo_so2]))
 		"explosao_de_chamas":
 			carregar_luz(Area.quadrados(float(world.rules.value("luz.tocha").raio_m)))
 			out.append(fact("ITEM_LOST", {"item": "tocha"}, ["player"]))
@@ -932,6 +947,11 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Sono: o NPC está dormindo por magia agora?
+func adormecido(npc: String) -> bool:
+	return int(adormecidos.get(npc, -1)) > world.clock.tick
 
 
 ## Projetar Consciência: onde a projeção está ("" se não há): o lugar escolhido ou onde o NPC está agora.
@@ -1912,7 +1932,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "arborea_ate": arborea_ate, "projecao": projecao.duplicate(), "visitados": visitados.duplicate(), "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "arborea_ate": arborea_ate, "projecao": projecao.duplicate(), "visitados": visitados.duplicate(), "adormecidos": adormecidos.duplicate(), "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1930,6 +1950,7 @@ func from_dict(d: Dictionary) -> void:
 	arborea_ate = int(d.get("arborea_ate", -1))
 	projecao = (d.get("projecao", {}) as Dictionary).duplicate()
 	visitados = (d.get("visitados", {}) as Dictionary).duplicate()
+	adormecidos = (d.get("adormecidos", {}) as Dictionary).duplicate()
 	_dia_missoes = int(d.get("dia_missoes", -1))
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()

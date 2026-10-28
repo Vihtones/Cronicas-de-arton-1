@@ -457,7 +457,7 @@ const ORDENS_NOME := {"mover_mortos": "mortos-vivos: andar até o quadrado", "at
 	"labareda": "labareda no alvo", "resfriar": "resfriar o objeto", "raio_tempestade": "raio da tempestade no alvo",
 	"salto_sombra": "saltar até a sombra", "segurar": "segurar-se (Buraco Negro)", "atacar_muralha": "golpear o trecho da muralha",
 	"escalar_muralha": "escalar a muralha", "soltar_muralha": "soltar-se da muralha", "soltar_terremoto": "soltar-se (ou soltar o aliado)",
-	"sair_da_fenda": "sair da fenda", "sair_arvore": "sair pela árvore clicada", "sair_pedra": "sair da pedra", "soltar_gelo": "soltar-se do gelo",
+	"sair_da_fenda": "sair da fenda", "sair_arvore": "sair pela árvore clicada", "sair_pedra": "sair da pedra", "soltar_gelo": "soltar-se do gelo", "soltar_teia": "soltar-se da teia",
 	"parceiro_destruidor": "parceiro destruidor no alvo", "parceiro_medico": "parceiro médico (clique em quem curar)", "ataque_parceiro": "ataque do parceiro combatente"}
 
 
@@ -483,6 +483,7 @@ func ordens_disponiveis() -> Array:
 	if (P.flags as Array).has("na_arvore"): lista.append("sair_arvore")
 	if (P.flags as Array).has("na_pedra"): lista.append("sair_pedra")
 	if s.efeito_bonus("preso_gelo") > 0: lista.append("soltar_gelo")
+	if s.efeito_bonus("preso_teia") > 0: lista.append("soltar_teia")
 	if s.efeito_bonus("parceiro_destruidor") > 0: lista.append("parceiro_destruidor")
 	if s.efeito_bonus("parceiro_medico") > 0: lista.append("parceiro_medico")
 	if s.efeito_bonus("parceiro_ataque_extra") > 0: lista.append("ataque_parceiro")

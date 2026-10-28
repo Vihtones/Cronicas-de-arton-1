@@ -4012,3 +4012,28 @@ func test_arcanas_lote_1_adaga_amedrontar_explosao_leque_raio_vitalidade() -> vo
 	var b3 := _bandido(m3, "bandido_1", -50)
 	check(_lanca(m3, {"type": "cast", "spell": "leque_cromatico", "tile": Vector2i(27, 57)}).ok, "Leque Cromático")
 	check(b3.conditions.has("ofuscado"), "ofuscado pela cena")
+
+
+func test_arcanas_lote_2_sono_teia_hipnotismo_imagem_primor_concentracao() -> void:
+	var lista := ["sono", "teia", "hipnotismo", "imagem_espelhada", "primor_atletico", "concentracao_de_combate"]
+	var m := _cena_arcanista(5, lista)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	check(_lanca(m, {"type": "cast", "spell": "sono", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Sono")
+	check(b1.conditions.has("exausto"), "exausto")
+	check(_lanca(m, {"type": "cast", "spell": "teia", "tile": Vector2i(27, 57)}).ok, "Teia")
+	check(b1.efeito_bonus("preso_teia") > 0, "enredado na teia")
+	check(_lanca(m, {"type": "cast", "spell": "imagem_espelhada"}).ok, "Imagem Espelhada")
+	eq(sim.c("player").sheet.efeito_bonus("imagens"), 3, "três cópias")
+	m[1]._imagem_some("bandido_2", "player", [])
+	eq(sim.c("player").sheet.efeito_bonus("imagens"), 2, "um erro apaga uma cópia")
+	check(_lanca(m, {"type": "cast", "spell": "primor_atletico", "target": "player", "targets": ["player"]}).ok, "Primor Atlético")
+	eq(sim.c("player").sheet.efeito_bonus("deslocamento_m"), 9, "+9m")
+	var m2 := _cena_arcanista(5, lista)
+	_bandido(m2, "bandido_1", -50)
+	check(_lanca(m2, {"type": "cast", "spell": "hipnotismo", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Hipnotismo")
+	check(m2[2].c("bandido_1").sheet.conditions.has("fascinado"), "fascinado")
+	var w = _clerigo_mundo([])[0]
+	var mg = w.module("magia")
+	mg.adormecidos["fulano"] = w.clock.tick + 10
+	check(mg.adormecido("fulano"), "fora de combate, o NPC dorme")

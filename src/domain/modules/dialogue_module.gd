@@ -184,6 +184,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var npcs = world.module("npcs")
 			if npcs == null or npcs.npc(id).is_empty(): return PackedStringArray(["ninguém aqui"])
 			if not npcs.npc(id).alive: return PackedStringArray(["não responde"])
+			var magia_so = world.module("magia")
+			if magia_so != null and magia_so.adormecido(id): return PackedStringArray(["está dormindo"])
 			var t: Vector2i = npcs.npc_tile(id)
 			var p := world.db.world_to_tile(world.player.position)
 			var magia_pc = world.module("magia")

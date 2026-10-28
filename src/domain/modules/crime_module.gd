@@ -60,7 +60,10 @@ func execute(cmd: GameCommand) -> Array:
 			# Furtividade do jogador contra Percepção de cada presente (teste oposto).
 			var mine := Checks.skill(world.player_sheet, "furtividade", 0, world.rules, world.rng, "world")
 			var witnesses: Array = []
+			var magia_c = world.module("magia")
 			for w in present:
+				if magia_c != null and magia_c.adormecido(w):
+					continue   # Sono: quem dorme não vê o furto
 				var theirs: int = world.rng.roll("world", 1, 20)[0] + 1  # PLACEHOLDER: plebeus sem ficha, Percepção +1
 				if theirs >= int(mine.total):
 					witnesses.append(w)

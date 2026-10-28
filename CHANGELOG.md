@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Arcanas de 1º círculo (lote 2): Sono (fora de combate, o NPC dorme e não vê furtos), Teia, Hipnotismo, Imagem Espelhada, Primor Atlético e Concentração de Combate.
+
 - Arcanas de 1º círculo (lote 1): Adaga Mental, Amedrontar, Explosão de Chamas, Leque Cromático, Raio do Enfraquecimento e Vitalidade Fantasma, completas com todos os aprimoramentos e truques.
 
 - Catálogo: as 92 magias arcanas do Livro Básico que faltavam estão cadastradas (texto, execução, alcance, alvo, duração, resistência e aprimoramentos), extraídas do livro por `tools/extrator_magias/`. Ainda não aparecem no jogo: entram uma a uma, completas.

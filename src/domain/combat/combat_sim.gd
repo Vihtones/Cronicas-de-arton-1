@@ -599,6 +599,8 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	var total_mod := 0
 	for m in mods: total_mod += int(m[1])
 	var defense: int = T.sheet.defense(rules, not ranged)
+	if T.sheet.efeito_bonus("imagens") > 0 and sheet.conditions.has("cego"):
+		defense -= 2 * T.sheet.efeito_bonus("imagens")   # Imagem Espelhada: quem não vê as cópias não é confundido
 	if T.flags.has("defensivo"): defense += 5   # Combate Defensivo
 	if T.charge_turn >= 0 and T.charge_turn >= turn_counter - order.size():
 		defense += int(rules.value("acao.investida").penalidade_defesa)

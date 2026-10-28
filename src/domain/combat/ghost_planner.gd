@@ -198,6 +198,24 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "sono" or sp_id == "hipnotismo":
+				var tipos_s: Array = ["humanoide"] if sp_id == "sono" else ["animal", "humanoide"]
+				if sp_id == "hipnotismo" and (apr.has(3) or apr.has(4)): tipos_s.append_array(["espirito", "monstro"])
+				if sp_id == "hipnotismo" and apr.has(4): tipos_s.append_array(["construto", "morto-vivo"])
+				var varios := (sp_id == "sono" and apr.has(2)) or (sp_id == "hipnotismo" and apr.has(1))
+				if not varios and targets.size() != 1: return {"ok": false, "reason": "escolha 1 alvo"}
+				for tg_s in targets:
+					if not sim.combatants.has(tg_s) or tg_s == actor: return {"ok": false, "reason": "alvo inválido"}
+					var qualquer := sp_id == "sono" and apr.has(1)
+					if not qualquer and not tipos_s.has(sim.c(tg_s).sheet.creature_type): return {"ok": false, "reason": "essa criatura não é afetada"}
+			if sp_id == "teia":
+				if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
+			if sp_id == "imagem_espelhada" or (sp_id == "concentracao_de_combate" and not apr.has(2)):
+				targets = [actor]
+			if sp_id == "primor_atletico" and apr.has(2):
+				var tg_pa: String = a.get("target", "")
+				if not sim.combatants.has(tg_pa) or CombatSim.cheb(A.tile, sim.c(tg_pa).tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "escolha uma criatura em alcance curto para saltar até ela"}
 			if sp_id == "amedrontar":
 				if not apr.has(2) and targets.size() != 1: return {"ok": false, "reason": "escolha 1 alvo"}
 				for tg_am in targets:
@@ -716,6 +734,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if not A.sheet.efeito_tipo_existe("preso_muralha", ""): return {"ok": false, "reason": "você não está preso na muralha"}
 			elif not sim.zona_em(t_mu, "muralha") or CombatSim.cheb(A.tile, t_mu) > 1: return {"ok": false, "reason": "escolha um trecho da muralha ao seu lado"}
 			return {"ok": true, "kind": kind_mu}
+		"soltar_teia":
+			if A.sheet.efeito_bonus("preso_teia") <= 0: return {"ok": false, "reason": "você não está preso na teia"}
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "exige ação padrão"}
+			return {"ok": true, "kind": "padrao"}
 		"soltar_gelo":
 			if A.sheet.efeito_bonus("preso_gelo") <= 0: return {"ok": false, "reason": "você não está preso no gelo"}
 			if not sim.can_spend("padrao"): return {"ok": false, "reason": "exige ação padrão"}

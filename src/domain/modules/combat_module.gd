@@ -1202,6 +1202,50 @@ func _cupula_rompe(id: String, out: Array) -> void:
 				return
 
 
+## Teia: Reflexos anula; falhou, enredado (e imóvel) até se soltar.
+func _enredar_na_teia(tg: String, cd: int, imovel: bool, out: Array) -> void:
+	var s: CharacterSheet = sim.c(tg).sheet
+	if s.efeito_bonus("preso_teia") > 0 or _resiste(tg, "reflexos", cd, out):
+		return
+	s.add_efeito("magia.teia", "preso_teia", cd, "cena")
+	for cond in (["enredado", "imovel"] if imovel else ["enredado"]):
+		s.add_efeito("magia.teia", "condicao", 0, "cena", cond)
+		s.add_condition(cond, world.rules)
+	out.append(fact("CONDITION_APPLIED", {"target": tg, "condition": "enredado", "tags": ["magia"]}, [tg]))
+
+
+## Teia no início do turno (2º círculo: refaz o teste) e fogo: dano de fogo em quem está na teia queima os fios dali.
+func _teia_inicio_de_turno(id: String, facts: Array) -> void:
+	for z in sim.zonas:
+		if bool((z.get("dados", {}) as Dictionary).get("teia", false)) and bool(z.dados.refaz) and (z.tiles as Array).has(sim.c(id).tile):
+			_enredar_na_teia(id, int(z.dados.cd), bool(z.dados.imovel), facts)
+
+
+func _teia_queima(tg: String) -> void:
+	for z in sim.zonas:
+		if bool((z.get("dados", {}) as Dictionary).get("teia", false)) and (z.tiles as Array).has(sim.c(tg).tile):
+			z.tiles = (z.tiles as Array).filter(func(t): return t != sim.c(tg).tile)
+			if sim.c(tg).sheet.efeito_bonus("preso_teia") > 0:
+				sim.c(tg).sheet.anular_magia("magia.teia")
+				sim.add_condicao(tg, "em_chamas", 0, "teia")
+
+
+## Imagem Espelhada: o ataque errou, some uma cópia (–2 na Defesa); com o clarão, o atacante fica ofuscado 1 rodada.
+func _imagem_some(atacante: String, alvo: String, out: Array) -> void:
+	var s: CharacterSheet = sim.c(alvo).sheet
+	var n := s.efeito_bonus("imagens")
+	if n <= 0 or sim.c(atacante).sheet.conditions.has("cego"):
+		return
+	var clarao := s.efeito_bonus("imagens_clarao") > 0
+	s.add_efeito("magia.imagem_espelhada", "imagens", n - 1, "cena")
+	s.add_efeito("magia.imagem_espelhada", "defesa", 2 * (n - 1), "cena")
+	if n - 1 <= 0:
+		s.remove_efeito("magia.imagem_espelhada")
+	if clarao:
+		sim.add_condicao(atacante, "ofuscado", 1, "imagem_espelhada")
+	out.append(fact("SPELL_EFFECT", {"spell": "imagem_espelhada", "efeito": "copia_some", "target": alvo, "restam": n - 1}, [alvo]))
+
+
 ## Controlar Água (divina 3): esfera de 30m em alcance longo, pela cena. Congelar: a água vira gelo (atravessável) e quem
 ## nadava fica imóvel (ação padrão e Atletismo ou Acrobacia para escapar). Derreter: o gelo da área volta a ser água.
 ## Enchente: a água sobe para os quadrados vizinhos (só se passa nadando). Evaporar: água e gelo somem; criaturas imunes a
@@ -2650,6 +2694,8 @@ func _dano_de_energia(id: String, tg: String, dados: String, cd: int, pericia: S
 		if passou:
 			dano = dano / 2
 	dano = _dano_por_tipo(T, tipo, dano)
+	if tipo == "fogo":
+		_teia_queima(tg)
 	var tags: Array = ["magia", tipo]
 	if passou: tags.append("resistiu")
 	tags.append_array(sim.apply_damage(tg, dano))
@@ -3334,6 +3380,10 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
 					sim.remove_marca(str(m.id), id)
+		"hipnotismo":
+			for cid in sim.combatants:
+				sim.c(cid).sheet.anular_magia("magia.hipnotismo")
+				sim.c(cid).sheet.remove_condition("fascinado")
 		"cupula_de_repulsao":
 			s.remove_efeito("magia.cupula_de_repulsao")
 		"manto_de_sombras":
@@ -3496,6 +3546,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	_buraco_negro_inicio_de_turno(id, facts)
 	_muralha_inicio_de_turno(id, facts)
 	_terremoto_inicio_de_turno(id, facts)
+	_teia_inicio_de_turno(id, facts)
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
@@ -3794,7 +3845,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# ao outro lado.
 			var z_e := _zona_muralha_em(a.tile)
 			var alturas := 3 + (1 if (z_e.tiles as Array).size() > Area.quadrados(15.0) else 0)
-			if Checks.skill(sim.c(id).sheet, "atletismo", 15, world.rules, world.rng, "combat").get("success", false):
+			if sim.c(id).sheet.efeito_bonus("escalar_livre") > 0 or Checks.skill(sim.c(id).sheet, "atletismo", 15, world.rules, world.rng, "combat").get("success", false):   # Primor Atlético: escala sem teste
 				for _i in (alturas if str(z_e.fonte) == "muralha_de_ossos" else 0):
 					out.append_array(_dano_de_energia(id, id, "4d8", 0, "", "corte", "Muralha de Ossos"))
 				var de_e: Vector2i = sim.c(id).tile
@@ -3806,6 +3857,14 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": "escalar_muralha"}, [id]))
 		"atacar_muralha":
 			out.append_array(_atacar_muralha(id, a.tile))
+		"soltar_teia":
+			var st_t: CharacterSheet = sim.c(id).sheet
+			var cd_st := st_t.efeito_bonus("preso_teia")
+			if Checks.skill(st_t, "acrobacia", cd_st, world.rules, world.rng, "combat").get("success", false) or Checks.skill(st_t, "atletismo", cd_st, world.rules, world.rng, "combat").get("success", false):
+				st_t.anular_magia("magia.teia")
+				out.append(fact("SPELL_ENDED", {"spell": "teia", "target": id, "reason": "soltou"}, [id]))
+			else:
+				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": "teia"}, [id]))
 		"soltar_gelo":
 			var sg: CharacterSheet = sim.c(id).sheet
 			var ok_g: bool = Checks.skill(sg, "atletismo", sg.efeito_bonus("preso_gelo"), world.rules, world.rng, "combat").get("success", false) \
@@ -4611,6 +4670,112 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"sono":
+			# Sono (arcana 1), em combate: falhou, exausto 1 rodada (1d4+1) e depois fatigado pela cena; passou, fatigado 1d4 rodadas.
+			var apr_so: Array = a.get("aprimoramentos", [])
+			var cd_so := spell_dc(sh, a)
+			for tg in a.get("targets", [a.get("target", "")]):
+				if _resiste(str(tg), "vontade", cd_so, out):
+					sim.add_condicao(str(tg), "fatigado", int(Dice.roll("1d4", world.rng, "combat").total), "sono")
+				elif sim.add_condicao(str(tg), "exausto", int(Dice.roll("1d4+1", world.rng, "combat").total) if apr_so.has(0) else 1, "sono"):
+					for mk in sim.marcas:
+						if mk.alvo == str(tg) and mk.tipo == "condicao" and str(mk.dados.condicao) == "exausto":
+							mk.dados["depois"] = "fatigado"
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "sono", "tags": ["magia"]}, [id, tg]))
+		"teia":
+			# Teia (arcana 1): cubo de 6m (+1 cubo de 1,5m); Reflexos anula: enredado (e imóvel); terreno difícil; ação padrão e
+			# Acrobacia ou Atletismo soltam; fogo queima a teia e deixa em chamas. No 2º círculo, refaz o teste no início dos turnos.
+			var apr_te: Array = a.get("aprimoramentos", [])
+			var lado := Area.quadrados(6.0) + apr_te.count(2)
+			var canto: Vector2i = a.get("tile", sim.c(id).tile)
+			var tiles_te: Array = []
+			for dx in lado:
+				for dy in lado:
+					tiles_te.append(canto + Vector2i(dx - lado / 2, dy - lado / 2))
+			var cd_te := spell_dc(sh, a)
+			sim.add_zona("teia_" + id, tiles_te, "terreno_dificil", -1, "teia", {"conjurador": id, "cd": cd_te, "imovel": apr_te.has(0), "refaz": apr_te.has(1), "teia": true})
+			for tg in _criaturas_vivas_em(tiles_te):
+				_enredar_na_teia(str(tg), cd_te, apr_te.has(0), out)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "teia", "tags": ["magia", "area"]}, [id]))
+		"hipnotismo":
+			# Hipnotismo (arcana 1): fascinado 1d4 rodadas (sustentada com aprimoramento); Vontade anula, +5 em combate; quem passa
+			# fica imune por um dia. Truque: 1 rodada, pasmo (uma vez por cena).
+			var apr_hp: Array = a.get("aprimoramentos", [])
+			var cd_hp := spell_dc(sh, a) - 5   # +5 no teste de quem está em combate
+			if apr_hp.has(2):
+				_iniciar_sustentada(id, "hipnotismo", out)
+			for tg in a.get("targets", [a.get("target", "")]):
+				var ts_hp: CharacterSheet = sim.c(str(tg)).sheet
+				if ts_hp.efeito_bonus("imune_hipnotismo") > 0:
+					continue
+				if _resiste(str(tg), "vontade", cd_hp, out):
+					ts_hp.add_efeito("hipnotismo", "imune_hipnotismo", 1, "dia", "", world.day_index() + 1)
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": "hipnotismo", "reason": "resistiu", "percebeu": not apr_hp.has(0)}, [id, tg]))
+					continue
+				if a.get("truque", false):
+					if ts_hp.efeito_bonus("hipnotismo_pasmou") == 0:
+						sim.add_condicao(str(tg), "pasmo", 1, "hipnotismo")
+						ts_hp.add_efeito("hipnotismo", "hipnotismo_pasmou", 1, "cena")
+				else:
+					sim.add_condicao(str(tg), "fascinado", -1 if apr_hp.has(2) else int(Dice.roll("1d4", world.rng, "combat").total), "hipnotismo")
+					if apr_hp.has(2):
+						ts_hp.add_efeito("magia.hipnotismo", "condicao", 0, "cena", "fascinado", -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "hipnotismo", "tags": ["magia"]}, [id, tg]))
+		"imagem_espelhada":
+			# Imagem Espelhada (arcana 1): três cópias (+1), +2 na Defesa por cópia; cada ataque que erra apaga uma (`_imagem_some`);
+			# com o aprimoramento, a cópia apagada ofusca quem a destruiu por uma rodada.
+			var apr_ie: Array = a.get("aprimoramentos", [])
+			var n_ie := 3 + apr_ie.count(0)
+			sh.add_efeito("magia.imagem_espelhada", "imagens", n_ie, "cena")
+			sh.add_efeito("magia.imagem_espelhada", "defesa", 2 * n_ie, "cena")
+			if apr_ie.has(1):
+				sh.add_efeito("magia.imagem_espelhada", "imagens_clarao", 1, "cena")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "imagem_espelhada", "copias": n_ie, "tags": ["magia"]}, [id]))
+		"primor_atletico":
+			# Primor Atlético (arcana 1): toque; +9m de deslocamento e +10 em Atletismo (+20 para saltar; escalar sem teste); ou
+			# salto até uma criatura em alcance curto, com os efeitos de investida e um dado extra no próximo ataque corpo a corpo;
+			# no 2º círculo, dois dados nos testes de perícias de For, Des e Con.
+			var apr_pa: Array = a.get("aprimoramentos", [])
+			if apr_pa.has(2):
+				var alvo_pa: String = a.target
+				var de_pa: Vector2i = sim.c(id).tile
+				var perto := _tile_livre_na_sim(sim.c(alvo_pa).tile, sim.combatants.keys().map(func(x): return sim.c(x).tile))
+				sim.c(id).tile = perto
+				sim.c(id).charge_turn = sim.turn_counter
+				sh.add_efeito("magia.primor_atletico", "ataque", int(world.rules.value("acao.investida").bonus_ataque), "turno")
+				sh.add_efeito("magia.primor_atletico", "dado_extra_corpo", 1, "turno")
+				out.append(fact("COMBAT_MOVED", {"actor": id, "from": [de_pa.x, de_pa.y], "path": [[perto.x, perto.y]], "salto": true}, [id]))
+			else:
+				var tg_pa: String = a.get("target", id)
+				var ts_pa: CharacterSheet = sim.c(tg_pa).sheet
+				ts_pa.add_efeito("magia.primor_atletico", "deslocamento_m", 9, "cena", "", -1, id)
+				ts_pa.add_efeito("magia.primor_atletico", "pericia_atletismo", 10, "cena", "", -1, id)
+				if apr_pa.has(0):
+					ts_pa.add_efeito("magia.primor_atletico", "pericia_saltar", 20, "cena", "", -1, id)
+				if apr_pa.has(1):
+					ts_pa.add_efeito("magia.primor_atletico", "escalar_livre", 1, "cena", "", -1, id)
+				if apr_pa.has(3):
+					for at in ["for", "des", "con"]:
+						ts_pa.add_efeito("magia.primor_atletico", "vantagem_atributo", 1, "cena", at, -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_pa, "buff": "primor_atletico", "tags": ["magia"]}, [id, tg_pa]))
+		"concentracao_de_combate":
+			# Concentração de Combate (arcana 1): 1 rodada (cena, padrão), dois dados no ataque; 3º: quem o ataca rola o pior; 4º:
+			# criaturas escolhidas em alcance curto; 5º: um dia, imune a surpreendido e desprevenido, +10 na Defesa e em Reflexos.
+			var apr_cc: Array = a.get("aprimoramentos", [])
+			var fim_cc := "dia" if apr_cc.has(3) else ("cena" if (apr_cc.has(0) or apr_cc.has(2)) else "rodada_orientacao")
+			var ate_cc := world.day_index() + 1 if apr_cc.has(3) else -1
+			var alvos_cc: Array = a.get("targets", [id]) if apr_cc.has(2) else [id]
+			for tg in alvos_cc:
+				var ts_cc: CharacterSheet = sim.c(str(tg)).sheet
+				ts_cc.add_efeito("magia.concentracao_de_combate", "concentracao_combate", 1, fim_cc, "", ate_cc, id)
+				if apr_cc.has(1):
+					ts_cc.add_efeito("magia.concentracao_de_combate", "concentracao_pior", 1, fim_cc, "", ate_cc, id)
+				if apr_cc.has(3):
+					for cond_cc in ["surpreendido", "desprevenido"]:
+						ts_cc.add_efeito("magia.concentracao_de_combate", "imune", 1, "dia", cond_cc, ate_cc, id)
+					ts_cc.add_efeito("magia.concentracao_de_combate", "defesa", 10, "dia", "", ate_cc, id)
+					ts_cc.add_efeito("magia.concentracao_de_combate", "pericia_reflexos", 10, "dia", "", ate_cc, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "concentracao_de_combate", "tags": ["magia"]}, [id, tg]))
 		"adaga_mental":
 			# Adaga Mental (arcana 1): 2d6 (+1d6) psíquico e atordoado 1 rodada (uma vez por cena); Vontade: metade e sem condição.
 			# Silenciosa (sem gesto nem palavra: vale de armadura); fincada por um dia: o conjurador sabe onde o alvo está.
@@ -5549,6 +5714,10 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 	v.defense = int(v.defense) + _reacao_escudo(attacker, target, pre)   # reação de magia antes da rolagem
 	v.defense = int(v.defense) + _reacao_armadura_arcana(attacker, target, pre)
 	var d20: int = world.rng.roll("combat", 1, 20)[0]
+	if A.sheet.efeito_bonus("concentracao_combate") > 0:
+		d20 = maxi(d20, int(world.rng.roll("combat", 1, 20)[0]))   # Concentração de Combate: dois dados, o melhor
+	if T.sheet.efeito_bonus("concentracao_pior") > 0:
+		d20 = mini(d20, int(world.rng.roll("combat", 1, 20)[0]))   # quem ataca o concentrado (3º círculo) fica com o pior
 	var camo_roll := 0
 	var camo_miss := false
 	if int(v.miss_chance) > 0:
@@ -5581,7 +5750,11 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		extra += ClassFeatures.instinto_bonus(A.sheet)   # Instinto Selvagem: +dano em qualquer ataque
 		if T.damaged_round == sim.round_no and Array(A.sheet.habilidades).any(func(h): return str(h).begins_with("oportunista")):
 			extra += 2
-		var r := Dice.roll(atk.dano, world.rng, "combat", int(atk.mult) if crit else 1, extra)
+		var dano_expr := str(atk.dano)
+		if not bool(v.get("ranged", false)) and A.sheet.efeito_bonus("dado_extra_corpo") > 0:
+			dano_expr = _mais_dados(dano_expr, 1)   # Primor Atlético (salto): um dado extra neste ataque
+			A.sheet.remove_efeito_stat("dado_extra_corpo")
+		var r := Dice.roll(dano_expr, world.rng, "combat", int(atk.mult) if crit else 1, extra)
 		dmg = maxi(1, int(r.total))
 		for elem in _dano_elemental_arma(A.sheet):
 			var rd := Dice.roll("%dd6" % int(elem.dados), world.rng, "combat", int(atk.mult) if crit else 1)
@@ -5651,6 +5824,7 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		tags.append_array(sim.apply_damage(target, dmg))
 	else:
 		tags.append("esquiva" if not camo_miss else "falha")
+		_imagem_some(attacker, target, out_runa)
 		# Golpe de Raspão (LB p.65): 1/rodada, 2 PM, metade do dano ao errar (automático se houver PM)
 		var gr_key := "raspao_%d" % sim.round_no
 		if A.sheet.has_power("golpe_raspao") and A.sheet.pm >= 2 and not A.flags.has(gr_key) and not camo_miss and _raspao_wanted(attacker):
