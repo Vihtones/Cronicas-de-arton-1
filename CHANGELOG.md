@@ -2,6 +2,7 @@
 
 ## 0.7.1 (em andamento)
 
+- Mirar e bater: na exploração, clicar numa criatura a até 8 quadrados começa a luta. Lutas com até 3 inimigos usam o modo ação (turno com relógio de 4s, mira com chance de acerto, clique golpeia ou anda na hora, inimigos agem rápido); as regras continuam as do combate tático. Opção na pausa (4s, 6s ou tático).
 - Roda de magias (Tab, em exploração e em combate): fatias coloridas por escola com custo, círculo e texto da magia; em combate escolhe a magia do turno, fora de combate abre as formas de lançá-la ali. O cinto da exploração ganhou Inventário e Magias.
 - Lojas vivas: comprar e vender lado a lado com a ficha do item e a comparação com o equipado; vender por metade do preço (comando Sell), bolsa do vendedor que se recupera por dia, revenda do que você vendeu, pechincha diária por Diplomacia (Haggle: −10%/−20% ou +10% se irritar) e saudação conforme a relação.
 - Inventário (tecla I): equipado, mochila em grade, ficha do item com números de regra e comparação com o equipado; equipar, desequipar (novo comando Unequip) e usar.

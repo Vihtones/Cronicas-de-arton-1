@@ -30,6 +30,8 @@ var settings := {
 	"reduce_flashes": false,
 	"seconds_per_tick": 2.0,      # PLACEHOLDER §20.7: 2s reais = 10 min de jogo
 	"disabled_modules": [],
+	"combate_acao": true,         # lutas pequenas em tempo real (mirar e clicar, turno com relógio)
+	"acao_segundos": 4.0,        # tempo do turno do jogador no modo ação
 }
 const SETTINGS_PATH := "user://settings.json"
 

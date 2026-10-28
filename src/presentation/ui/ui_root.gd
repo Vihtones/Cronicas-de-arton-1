@@ -904,6 +904,9 @@ func update_combat_bar() -> void:
 		var nm: String = "Você" if id == "player" else x.sheet.name
 		order.append(("▶" if id == s.current_id() else "") + "%s %d/%d" % [nm, x.sheet.pv, x.sheet.pv_max])
 	var mine := s.current_id() == "player"
+	if combat_view.acao:
+		combat_info.text = "Rodada %d · %s\n%s" % [s.round_no, " | ".join(order), ("AÇÃO — mire e clique para golpear, clique no chão para andar, Tab magias, Espaço passa (%.1fs)" % maxf(0.0, combat_view.acao_relogio)) if mine else "Inimigos agindo..."]
+		return
 	combat_info.text = "Rodada %d · %s\n%s" % [s.round_no, " | ".join(order),
 		("Seu turno — clique para planejar (modo: %s%s). Botão direito desfaz. Enter confirma." % [combat_view.mode, (", ESPECIAL" if combat_view.special else "") +
 			(", raspão: " + ("sim" if combat_view.raspao else "não") if Game.world.player_sheet.has_power("golpe_raspao") else "")]) if mine else "Turno dos inimigos..."]
@@ -937,6 +940,14 @@ func _refresh_pause() -> void:
 	var spd: float = float(Game.settings.combat_speed)
 	v.add_child(_button("Velocidade do combate: " + ("instantâneo" if spd <= 0 else "%dx" % int(spd)), func():
 		Game.settings.combat_speed = {1.0: 2.0, 2.0: 0.0, 0.0: 1.0}.get(float(Game.settings.combat_speed), 1.0); Game.save_settings(); _refresh_pause()))
+	v.add_child(_button("Lutas pequenas em tempo real: " + ("sim (%ds por turno)" % int(Game.settings.get("acao_segundos", 4.0)) if bool(Game.settings.get("combate_acao", true)) else "não (tático)"), func():
+		if not bool(Game.settings.get("combate_acao", true)):
+			Game.settings.combate_acao = true; Game.settings.acao_segundos = 4.0
+		elif float(Game.settings.get("acao_segundos", 4.0)) < 6.0:
+			Game.settings.acao_segundos = 6.0
+		else:
+			Game.settings.combate_acao = false
+		Game.save_settings(); _refresh_pause()))
 	v.add_child(_button("Reduzir movimento de câmera: " + ("sim" if Game.settings.reduce_motion else "não"), func():
 		Game.settings.reduce_motion = not Game.settings.reduce_motion; Game.save_settings(); _refresh_pause()))
 	v.add_child(_button("Reduzir flashes: " + ("sim" if Game.settings.reduce_flashes else "não"), func():

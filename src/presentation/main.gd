@@ -206,6 +206,10 @@ func build_actions() -> Array:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Game.world != null and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and Game.mode == Game.Mode.EXPLORE and not ui.any_panel_open():
+		if _atacar_mirando(Game.db.world_to_tile(get_global_mouse_position())):
+			get_viewport().set_input_as_handled()
+		return
 	if Game.world == null or not (event is InputEventKey) or not event.pressed or event.echo:
 		return
 	var k: int = event.keycode
@@ -263,6 +267,20 @@ func _explore_key(k: int) -> void:
 			else:
 				npc_layer.sync_all()
 				life.prefill()
+
+
+## Mirar e bater na exploração: clicar numa criatura visível a até 8 quadrados começa a luta (de surpresa se ela
+## não te notou). Lutas pequenas seguem no modo ação do CombatView.
+func _atacar_mirando(t: Vector2i) -> bool:
+	var c: CombatModule = Game.world.modules.combat
+	var pt := Game.player_tile()
+	for id in c.visible_creatures():
+		if CombatSim.cheb(t, c.creature_tile(id)) <= 1 and CombatSim.cheb(pt, c.creature_tile(id)) <= 8:
+			var r := Game.send("StartCombat", {"enemies": [id]})
+			if not r.accepted:
+				ui.log_msg("✘ " + "; ".join(r.errors))
+			return true
+	return false
 
 
 var _bakes_left := 0

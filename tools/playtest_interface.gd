@@ -39,6 +39,10 @@ func _confere(nome: String, ok: bool) -> void:
 		falhas += 1
 
 
+func panel_off() -> void:
+	main.ui.close_panels()
+
+
 func _tecla(k: int) -> void:
 	var t := InputEventKey.new()
 	t.keycode = k
@@ -78,5 +82,33 @@ func _run() -> void:
 	main.ui._on_spell_picked("aviso")
 	_confere("fora de combate, escolher abre como lançar", main.ui.panel_cast.visible)
 	await _shot("i4_lancar")
+	panel_off()
+	# modo ação: mirar e bater numa criatura
+	var c = G.world.modules.combat
+	var alvo := ""
+	for id in c.creature_state:
+		if c.is_active_creature(id) and c._group_with([id]).size() <= 3:
+			alvo = id
+			break
+	_confere("há uma criatura para lutar", alvo != "")
+	G.world.player.position = G.db.tile_to_world(c.creature_tile(alvo) + Vector2i(2, 0))
+	main.player.sync_from_world()
+	await _frames(3)
+	_confere("clique na criatura começa a luta", main._atacar_mirando(c.creature_tile(alvo)) and c.active)
+	for i in 400:
+		if main.combat_view.my_turn():
+			break
+		await process_frame
+	_confere("modo ação ligado", main.combat_view.acao)
+	await _shot("i5_mira")
+	var antes := int(c.sim.c(alvo).sheet.pv) if c.sim.combatants.has(alvo) else -1
+	main.combat_view.acao_clique(c.sim.c(alvo).tile)
+	for i in 900:
+		if main.combat_view.my_turn() and not main.combat_view.playing:
+			break
+		await process_frame
+	_confere("o turno passou e voltou ao jogador (ou a luta acabou)", main.combat_view.my_turn() or not c.active)
+	print("pv do alvo: ", antes, " -> ", (c.sim.c(alvo).sheet.pv if c.active and c.sim.combatants.has(alvo) else "fim"))
+	await _shot("i6_depois")
 	print("falhas: ", falhas)
 	quit(falhas)

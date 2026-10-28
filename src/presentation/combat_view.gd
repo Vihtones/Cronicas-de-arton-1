@@ -39,6 +39,13 @@ var _font: Font
 
 
 var ghost: GhostActor
+## Modo ação (lutas com até ACAO_MAX inimigos): o turno do jogador tem relógio; clicar num inimigo mira e bate na
+## hora (anda até ele se preciso), clicar no chão anda. As regras continuam as do combate tático: o domínio
+## valida e rola tudo; só a interface fica em tempo real. Lutas maiores continuam táticas.
+const ACAO_MAX := 3
+var acao := false
+var acao_relogio := 0.0
+var _acao_fim_pendente := false
 
 
 func _ready() -> void:
@@ -587,8 +594,57 @@ func toggle_pungente() -> void:
 	_update_preview()
 
 
+func _tick_acao(dt: float) -> void:
+	if not acao or not active():
+		return
+	if _acao_fim_pendente and not playing:
+		_acao_fim_pendente = false
+		if my_turn():
+			end_turn()
+		return
+	if my_turn() and plan.is_empty():
+		acao_relogio -= dt
+		if acao_relogio <= 0.0:
+			message.emit("Tempo esgotado.")
+			end_turn()
+
+
+## Modo ação: o clique vira ação imediata. Golpe ou magia encerram o turno quando a animação termina.
+func acao_clique(t: Vector2i) -> void:
+	hover = t
+	if mode == "magia" and SpellRules.multi_alvo(spell, GhostPlanner.spell_rule(Game.world.rules, spell), spell_apr):
+		_toggle_alvo(t)
+		if not spell_alvos.is_empty():
+			confirm()
+			_acao_fim_pendente = true
+		return
+	var cand := candidate_actions(t)
+	if cand.is_empty():
+		return
+	var g: Dictionary = Game.world.modules.combat.preview(cand)
+	if not g.valid:
+		message.emit("Inválido: " + str(g.steps[-1].reason))
+		return
+	plan = cand
+	var golpe := cand.any(func(a): return str(a.type) != "move")
+	confirm()
+	if golpe:
+		mode = "mover"
+		_acao_fim_pendente = true
+	elif not sim().can_spend("padrao") and not sim().can_spend("movimento"):
+		_acao_fim_pendente = true
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not active():
+		return
+	if acao and my_turn() and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		acao_clique(Game.db.world_to_tile(get_global_mouse_position()))
+		get_viewport().set_input_as_handled()
+		return
+	if acao and my_turn() and event is InputEventKey and event.pressed and event.keycode == KEY_SPACE:
+		end_turn()
+		get_viewport().set_input_as_handled()
 		return
 	if playing and (event.is_action_pressed("ui_cancel") or (event is InputEventMouseButton and event.pressed)):
 		_skip = true
@@ -661,6 +717,9 @@ func _draw() -> void:
 	if not active():
 		return
 	var s := sim()
+	if acao and my_turn():
+		_desenha_mira(s)
+		return
 	var center: Vector2i = s.c("player").tile
 	var rng := 9
 	for y in range(center.y - rng, center.y + rng + 1):
@@ -734,9 +793,35 @@ func _draw() -> void:
 
 
 func _process(_d: float) -> void:
+	_tick_acao(_d)
 	_refresh_ghost()
 	if active():
 		queue_redraw()
+
+
+func _desenha_mira(s: CombatSim) -> void:
+	var de := Game.db.tile_to_world(s.c("player").tile)
+	var para := get_global_mouse_position()
+	var alvo := s.occupant(Game.db.world_to_tile(para), "player")
+	var inimigo := alvo != "" and s.is_enemy("player", alvo)
+	var cor := Color(1.0, 0.35, 0.3, 0.9) if inimigo else Color(1, 1, 1, 0.35)
+	draw_line(de, para, cor, 1.5 if inimigo else 1.0)
+	if inimigo:
+		var ct := Game.db.tile_to_world(s.c(alvo).tile)
+		draw_arc(ct, 14.0, 0, TAU, 20, cor, 2.0)
+		var pv: Dictionary = preview
+		var ch := -1.0
+		for st in pv.get("steps", []):
+			if st.get("ok", false) and st.has("hit_chance"):
+				ch = float(st.hit_chance)
+		if ch >= 0.0:
+			draw_string(_font, ct + Vector2(-14, -20), "%d%%" % int(ch * 100), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, cor)
+	else:
+		draw_arc(para, 6.0, 0, TAU, 12, cor, 1.0)
+	# relógio do turno
+	var frac := clampf(acao_relogio / float(Game.settings.get("acao_segundos", 4.0)), 0.0, 1.0)
+	draw_rect(Rect2(de + Vector2(-16, 20), Vector2(32, 4)), Color(0, 0, 0, 0.6))
+	draw_rect(Rect2(de + Vector2(-16, 20), Vector2(32 * frac, 4)), Color(0.95, 0.8, 0.3) if frac > 0.3 else Color(1, 0.35, 0.3))
 
 
 # --- Reprodução cinematográfica ----------------------------------------------------------
@@ -750,7 +835,7 @@ func _on_event(e: GameEvent) -> void:
 
 func _speed() -> float:
 	var s: float = float(Game.settings.combat_speed)
-	return 0.0 if s <= 0.0 else 1.0 / s
+	return 0.0 if s <= 0.0 else (1.0 / s) * (0.45 if acao else 1.0)
 
 
 func _wait(sec: float) -> void:
@@ -778,6 +863,10 @@ func _play_one(e: GameEvent) -> void:
 	var p := e.payload
 	match e.event_type:
 		"COMBAT_STARTED":
+			var inimigos := sim().combatants.keys().filter(func(x): return sim().is_enemy("player", x)).size()
+			acao = bool(Game.settings.get("combate_acao", true)) and inimigos <= ACAO_MAX
+			if acao:
+				message.emit("Modo ação: mire com o mouse e clique para golpear; clique no chão para andar. Espaço passa a vez.")
 			npc_layer.sync_creatures()
 			player_view.global_position = Game.db.tile_to_world(sim().c("player").tile)
 			camera.punch(1.1, 0.4)
@@ -785,6 +874,7 @@ func _play_one(e: GameEvent) -> void:
 		"TURN_STARTED":
 			if cine: cine.new_turn()
 			if p.actor == "player":
+				acao_relogio = float(Game.settings.get("acao_segundos", 4.0))
 				raspao = Game.world.modules.combat.power_policy.get("golpe_raspao", "auto") == "auto"
 			var v := _actor_view(p.actor)
 			if v and p.actor != "player":
