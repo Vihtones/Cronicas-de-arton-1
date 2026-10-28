@@ -1068,6 +1068,41 @@ func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
 	return false
 
 
+## Conceder Milagre no turno do companheiro: magia de cura ou sem resistência vai para o aliado mais ferido ao alcance;
+## as outras, para o inimigo mais próximo ao alcance. Lançada, a magia some e a penalidade de PM do conjurador acaba.
+func _milagre_do_companheiro(id: String) -> Array:
+	var s: CharacterSheet = sim.c(id).sheet
+	var sp_id := ""
+	var conj := ""
+	for e in s.efeitos:
+		if e.stat == "milagre":
+			sp_id = str(e.tipo)
+			conj = str(e.get("conj", ""))
+	if sp_id == "" or not sim.can_spend("padrao"):
+		return []
+	var sp: Dictionary = GhostPlanner.spell_rule(world.rules, sp_id)
+	var alcance := 1 if str(sp.get("alcance", "")) == "toque" else int(world.rules.value("alcance.quadrados", {}).get(SpellRules.alcance_efetivo(sp_id, str(sp.get("alcance", "curto")), []), 6))
+	var aliado: bool = sp.has("cura") or str(sp.get("resistencia", "nenhuma")) == "nenhuma"
+	var alvo := id if str(sp.get("alcance", "")) == "pessoal" else ""
+	var melhor := 1 << 30
+	if alvo == "":
+		for cid in sim.combatants:
+			var x: Dictionary = sim.c(cid)
+			if x.sheet.is_dead() or CombatSim.cheb(x.tile, sim.c(id).tile) > alcance or sim.is_enemy(id, cid) == aliado:
+				continue
+			var chave: int = x.sheet.pv - x.sheet.pv_max if aliado else CombatSim.cheb(x.tile, sim.c(id).tile)
+			if chave < melhor:
+				melhor = chave
+				alvo = cid
+	if alvo == "" or (aliado and alvo != id and sim.c(alvo).sheet.pv >= sim.c(alvo).sheet.pv_max and sp.has("cura")):
+		return []
+	sim.spend("padrao")
+	s.remove_efeito("magia.conceder_milagre")
+	if sim.combatants.has(conj):
+		sim.c(conj).sheet.remove_efeito("milagre." + id)
+	return _cast(id, {"type": "cast", "spell": sp_id, "target": alvo, "targets": [alvo], "aprimoramentos": []}, {"cost": 0})
+
+
 ## Cúpula de Repulsão ----------------------------------------------------------------------------------------------
 func _no_grupo(id: String, grupo: String) -> bool:
 	var s: CharacterSheet = sim.c(id).sheet
@@ -4413,6 +4448,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"conceder_milagre":
+			# Conceder Milagre (divina 4): o companheiro tocado pode lançar a magia uma vez, sem pagar PM (`_milagre_do_companheiro`,
+			# no turno dele); até lá o conjurador fica com –3 PM (–6 no 3º círculo).
+			var tg_cm: String = a.target
+			sim.c(tg_cm).sheet.add_efeito("magia.conceder_milagre", "milagre", 1, "permanente", str(a.magia), -1, id)
+			sh.add_efeito("milagre." + tg_cm, "pm_max", -6 if (a.get("aprimoramentos", []) as Array).has(0) else -3, "permanente")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_cm, "buff": "conceder_milagre", "magia": str(a.magia), "tags": ["magia"]}, [id, tg_cm]))
 		"cupula_de_repulsao":
 			# Cúpula de Repulsão (divina 4): sustentada. Criaturas do grupo (tipo ou raça) que tentam chegar a menos de 3m
 			# (4,5m com o aprimoramento) fazem Vontade (`_cupula_barra`); falharam, não chegam nem atacam corpo a corpo nesta
@@ -5380,6 +5422,7 @@ func _coup(attacker: String, target: String) -> Array:
 func _ai_turn(id: String) -> Array:
 	var out: Array = []
 	var me := sim.c(id)
+	out.append_array(_milagre_do_companheiro(id))
 	var ordem := str(me.get("order", ""))
 	# recuar (companheiro): ferido, afasta-se do inimigo mais próximo em vez de lutar
 	if ordem == "recuar" and me.sheet.pv < me.sheet.pv_max / 2:

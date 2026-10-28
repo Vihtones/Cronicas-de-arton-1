@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Conceder Milagre (divina, 4º círculo): um companheiro do grupo recebe uma magia sua de até 2º (3º) círculo e a lança uma vez, sem PM, no turno dele (curas e ajudas no aliado mais ferido, ataques no inimigo mais próximo); você fica com –3 PM (–6) até lá.
+
 - Cúpula de Repulsão (divina, 4º círculo): sustentada; criaturas do tipo ou raça escolhida que tentam se aproximar a menos de 3m (4,5m) fazem Vontade e, se falham, param e não atacam corpo a corpo na rodada; no 5º círculo também desvia ataques à distância; avançar sobre elas rompe a cúpula.
 
 - Terremoto (divina, 4º círculo): esfera de 30m; quem está no solo fica atordoado; na cripta ou em construção o teto desaba (12d6 e agarrado), junto a barrancos o chão desmorona, na água forma-se lama que prende, e ao ar livre abrem-se fendas que se fecham no turno seguinte do conjurador, matando quem ficou nelas. Agarrados sofrem 1d6 por rodada até se soltarem.

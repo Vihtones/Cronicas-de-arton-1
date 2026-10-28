@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"conceder_milagre": [],   # num companheiro do grupo (fora de combate a magia fica com ele para a próxima luta)
 	"runa_de_protecao": [],   # no chão onde você está (1 hora, pó de diamante T$ 200) ou no próprio corpo (aprimoramentos)
 	"comunhao_com_a_natureza": [],   # dados de auxílio pelo dia, ou (aprimoramento) informações da região
 	"despertar_consciencia": [],   # animal ou planta ao lado, escultura (aprimoramento) ou um parceiro seu
@@ -205,6 +206,13 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"conceder_milagre":
+			var party_cm = world.module("party")
+			if party_cm == null or not party_cm.members.has(str(cmd.payload.get("target", ""))):
+				return PackedStringArray(["toque um companheiro do grupo"])
+			var err_cm := SpellRules.erro_milagre(world.rules, sh, str(cmd.payload.get("magia", "")), apr.has(0))
+			if err_cm != "":
+				return PackedStringArray([err_cm])
 		"runa_de_protecao":
 			if int(world.player.gold) < 200:
 				return PackedStringArray(["falta o pó de diamante (T$ 200)"])
@@ -500,6 +508,13 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"conceder_milagre":
+			var tg_cm := str(cmd.payload.target)
+			var ficha_cm := CharacterSheet.from_dict(world.module("party").members[tg_cm].sheet)
+			ficha_cm.add_efeito("magia.conceder_milagre", "milagre", 1, "permanente", str(cmd.payload.magia), -1, "player")
+			sh.add_efeito("milagre." + tg_cm, "pm_max", -6 if (cmd.payload.get("aprimoramentos", []) as Array).has(0) else -3, "permanente")
+			out.append(fact("COMPANION_STATE", {"npc": tg_cm, "sheet": ficha_cm.to_dict()}, [tg_cm]))
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": tg_cm, "buff": "conceder_milagre", "magia": str(cmd.payload.magia), "tags": ["magia"]}, ["player", tg_cm]))
 		"runa_de_protecao":
 			out.append_array(runa_de_protecao(cmd.payload, sh))
 		"comunhao_com_a_natureza":

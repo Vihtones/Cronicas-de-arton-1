@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos", "terremoto", "cupula_de_repulsao"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos", "terremoto", "cupula_de_repulsao", "conceder_milagre"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3839,3 +3839,19 @@ func test_cupula_de_repulsao_barra_ataque_corpo_a_corpo_de_quem_falha() -> void:
 	var out: Array = []
 	check(m[1]._cupula_barra("bandido_1", "player", false, out), "o ataque corpo a corpo é barrado")
 	check(not m[1]._cupula_barra("bandido_1", "player", true, out), "à distância passa (sem o aprimoramento)")
+
+
+func test_conceder_milagre_companheiro_lanca_a_magia_sem_pm() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	var comp := CharacterBuilder.build(m[3], "humano", "guerreiro", CharacterBuilder.presets("guerreiro")[0], ["for", "des", "con"], "guerreiro")
+	comp.pv_max = 50
+	comp.pv = 10
+	sim.combatants["comp"] = {"id": "comp", "side": "player", "order": "", "tile": Vector2i(25, 57), "sheet": comp, "charge_turn": -99, "damaged_round": -1, "surprised": false, "flags": []}
+	var pm_max0: int = sim.c("player").sheet.pm_max
+	check(_lanca(m, {"type": "cast", "spell": "conceder_milagre", "target": "comp", "targets": ["comp"], "magia": "curar_ferimentos"}).ok, "Conceder Milagre")
+	eq(sim.c("player").sheet.pm_max, pm_max0 - 3, "–3 PM até o companheiro usar")
+	sim.budget = {"std": 1, "move": 1}
+	m[1]._milagre_do_companheiro("comp")
+	check(comp.pv > 10, "o companheiro se curou com a magia")
+	eq(sim.c("player").sheet.pm_max, pm_max0, "a penalidade acabou")

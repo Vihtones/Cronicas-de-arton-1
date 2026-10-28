@@ -194,6 +194,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "conceder_milagre":
+				var tg_cm: String = a.get("target", "")
+				if not sim.combatants.has(tg_cm) or tg_cm == actor or sim.is_enemy(actor, tg_cm) or str(tg_cm).begins_with("inv_"): return {"ok": false, "reason": "toque um companheiro"}
+				var err_cm := SpellRules.erro_milagre(sim.rules, A.sheet, str(a.get("magia", "")), apr.has(0))
+				if err_cm != "": return {"ok": false, "reason": err_cm}
 			if sp_id == "cupula_de_repulsao":
 				if str(a.get("grupo", "")) == "": return {"ok": false, "reason": "escolha o tipo de criatura ou a raça (grupo)"}
 				targets = [actor]

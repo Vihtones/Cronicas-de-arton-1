@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"conceder_milagre": {"aprimoramentos": [0]},   # um companheiro lança uma magia sua de até 2º (3º) círculo, uma vez, sem PM; –3 (–6) PM até lá
 	"cupula_de_repulsao": {"aprimoramentos": [0, 1]},   # sustentada: um tipo ou raça não se aproxima (Vontade); 4,5m; desvia ataques à distância (5º)
 	"terremoto": {"aprimoramentos": []},   # atordoa quem está no solo; efeito pelo terreno (teto, desabamento, fendas, desmoronamento, lamaçal)
 	"muralha_de_ossos": {"aprimoramentos": [0, 1]},   # muro de 15m (+15m) que fere e prende; trechos destrutíveis; escalar fere; esqueletos animados agarram
@@ -147,6 +148,15 @@ static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
 const RUNA_SEM := ["comando", "orientacao", "arma_magica", "fisico_divino", "mente_divina", "controlar_madeira", "controlar_fogo",
 	"rogar_maldicao", "criar_elementos", "aliado_animal", "augurio", "condicao", "circulo_da_justica", "luz", "escuridao", "nevoa",
 	"controlar_plantas", "enxame_de_pestes", "miasma_mefitico", "tempestade_divina", "resistencia_a_energia"]
+## Conceder Milagre: a magia concedida é sua, completa, de até 2º (3º) círculo e não pede escolhas na hora.
+static func erro_milagre(rules: RuleRegistry, sh: CharacterSheet, sp: String, terceiro: bool) -> String:
+	if not sh.spells.has(sp) or not COMPLETAS.has(sp) or RUNA_SEM.has(sp) or sp == "conceder_milagre":
+		return "escolha uma magia que você conhece e que pode ser concedida"
+	if int(rules.value("magia." + sp, {}).get("circulo", 9)) > (3 if terceiro else 2):
+		return "a magia concedida vai até o %dº círculo" % (3 if terceiro else 2)
+	return ""
+
+
 const TIPOS_DESPERTAR := ["ajudante", "combatente", "fortao", "guardiao", "medico", "perseguidor", "vigilante"]
 
 
