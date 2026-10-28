@@ -3,6 +3,7 @@
 ## 0.7.1 (em andamento)
 
 - Arcanas de 1º círculo (lote 2): Sono (fora de combate, o NPC dorme e não vê furtos), Teia, Hipnotismo, Imagem Espelhada, Primor Atlético e Concentração de Combate.
+- Arcanas de 1º círculo (lote 3): Área Escorregadia (zona com Acrobacia, arma escorregadia), Enfeitiçar (prestativo, sugestão, espíritos/monstros, todos no alcance) e Tranca Arcana (tranca +10/+15, abrir trancas). Disfarce Ilusório e Transmutar Objetos têm partes prontas (+10/+20 em Enganação; curar construto; restaurar objeto), mas ficam fora de COMPLETAS até haver disfarce de objetos/terceiros e criação de objetos.
 
 - Arcanas de 1º círculo (lote 1): Adaga Mental, Amedrontar, Explosão de Chamas, Leque Cromático, Raio do Enfraquecimento e Vitalidade Fantasma, completas com todos os aprimoramentos e truques.
 

@@ -130,7 +130,7 @@ func execute(cmd: GameCommand) -> Array:
 			s.locked = false
 			return [fact("OBJECT_UNLOCKED", {"object": id, "with": d.key, "location": loc}, ["player"])]
 		"pick_lock":
-			var r := Checks.skill(world.player_sheet, "ladinagem", int(d.get("lock_cd", 20)), world.rules, world.rng)
+			var r := Checks.skill(world.player_sheet, "ladinagem", int(d.get("lock_cd", 20)) + int(s.get("tranca_arcana", 0)), world.rules, world.rng)
 			var ex = world.module("exploration")
 			if ex != null: ex.record_attempt("obj:" + id, "ladinagem", r.success)
 			if r.success:
@@ -197,6 +197,42 @@ func danificar(id: String, dano: int, ignora_rd: bool, fonte: String) -> Array:
 
 ## Controlar Madeira. Fortalecer: +5 na RD e dobra os PV (uma vez) até o fim do dia. Retorcer: a porta emperra (Força
 ## CD 25 para abrir). Repelir: porta ou baú se abre sozinho e destranca. Modelar: abre passagem numa parede de madeira.
+## Tranca Arcana: tranca o objeto (+bônus na CD de Ladinagem e de Força para abrir); o conjurador abre livremente.
+func trancar_arcana(id: String, bonus: int) -> Array:
+	_ensure()
+	var s: Dictionary = state.get(id, {})
+	if s.is_empty():
+		return []
+	s.open = false
+	s.locked = true
+	s.tranca_arcana = bonus
+	return [fact("OBJECT_LOCKED", {"object": id, "by": "tranca_arcana", "bonus": bonus}, ["player"])]
+
+
+## Tranca Arcana (aprimoramento) e truque: abre (destranca e dissipa a tranca) ou só abre/fecha o que não está trancado.
+func abrir_magico(id: String, destrancar: bool) -> Array:
+	_ensure()
+	var s: Dictionary = state.get(id, {})
+	if s.is_empty() or (bool(s.locked) and not destrancar):
+		return []
+	s.locked = false
+	s.erase("tranca_arcana")
+	s.open = not bool(s.open) if not destrancar else true
+	return [fact("OBJECT_OPENED" if bool(s.open) else "OBJECT_CLOSED", {"object": id, "by": "magia"}, ["player"])]
+
+
+## Transmutar Objetos (restaurar): o objeto volta a ficar inteiro.
+func restaurar(id: String) -> Array:
+	_ensure()
+	var s: Dictionary = state.get(id, {})
+	var d := world.db.object_def(id)
+	if s.is_empty() or not d.has("break"):
+		return []
+	s.broken = false
+	s.pv = int(d["break"].get("pv", s.get("pv", 1)))
+	return [fact("OBJECT_RESTORED", {"object": id}, ["player"])]
+
+
 func fortalecer(id: String, ate_dia: int) -> Array:
 	_ensure()
 	var s: Dictionary = state.get(id, {})

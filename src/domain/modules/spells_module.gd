@@ -38,6 +38,9 @@ const FORA_DE_COMBATE := {
 	"projetar_consciencia": [],   # um lugar do mapa ou um NPC (no mesmo plano); sustentada pela cena
 	"controlar_terra": [1],   # fora de combate, só fundir-se à pedra ao lado (um dia)
 	"viagem_arborea": [],   # de uma árvore ao lado para outra no mapa; com o aprimoramento, o grupo, até uma planta a 100km
+	"tranca_arcana": [],   # porta ou baú adjacente (+10, +5 com o aprimoramento 1); aprimoramento 0 abre trancas
+	"disfarce_ilusorio": [],   # +10 (+20) em Enganação para disfarce pela cena
+	"transmutar_objetos": [],   # truque: conserta (restaura com o aprimoramento 3) um objeto adjacente
 	"globo_da_verdade": [],   # o que você (ou um NPC tocado) viu sobre um assunto; aprimoramentos: mês, ano, cadáver, 10 globos
 	"missao_divina": [],   # num NPC aqui: ir a um lugar (uma semana, ou um ano); ou a marca (aprimoramento)
 	"servo_divino": [],   # tarefa "entregar": o espírito leva um item a um lugar, para ser recolhido lá no prazo
@@ -283,6 +286,15 @@ func _validate(cmd: GameCommand) -> PackedStringArray:
 			var err_va := _valida_arvores(cmd.payload)
 			if not err_va.is_empty():
 				return err_va
+		"tranca_arcana", "transmutar_objetos":
+			var obj_ta := str(cmd.payload.get("object_id", ""))
+			var objs = world.module("objects")
+			if objs == null or world.db.object_def(obj_ta).is_empty() or not objs.is_adjacent(obj_ta):
+				return PackedStringArray(["toque um objeto adjacente"])
+			if sp_id == "tranca_arcana" and not ["door", "chest"].has(str(world.db.object_def(obj_ta).type)):
+				return PackedStringArray(["só portas e baús"])
+			if sp_id == "transmutar_objetos" and not apr.has(3) and not apr.has(4):
+				return PackedStringArray(["fora de combate: restaurar um objeto (aprimoramento)"])
 		"globo_da_verdade":
 			var alvo_gv := str(cmd.payload.get("target", "player"))
 			if str(cmd.payload.get("pergunta", "")) == "":
@@ -679,6 +691,20 @@ func _execute(cmd: GameCommand) -> Array:
 			if not (cmd.payload.get("aprimoramentos", []) as Array).has(0):
 				arborea_ate = world.clock.tick + (combat_va.TICKS_CENA if combat_va != null else 6)
 			out.append_array(_viajar_pela_arvore(cmd.payload))
+		"tranca_arcana":
+			var apr_ta: Array = cmd.payload.get("aprimoramentos", [])
+			var objs_ta = world.module("objects")
+			if apr_ta.has(0):
+				out.append_array(objs_ta.abrir_magico(str(cmd.payload.object_id), true))
+			else:
+				out.append_array(objs_ta.trancar_arcana(str(cmd.payload.object_id), 15 if apr_ta.has(1) else 10))
+		"transmutar_objetos":
+			out.append_array(world.module("objects").restaurar(str(cmd.payload.object_id)))
+		"disfarce_ilusorio":
+			var apr_di: Array = cmd.payload.get("aprimoramentos", [])
+			var combat_di = world.module("combat")
+			sh.add_efeito("magia.disfarce_ilusorio", "pericia_enganacao", 20 if apr_di.has(2) else 10, "cena", "", world.clock.tick + (combat_di.TICKS_CENA if combat_di != null else 6))
+			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "disfarce_ilusorio", "tags": ["magia", "ilusao"]}, ["player"]))
 		"globo_da_verdade":
 			out.append_array(globo_da_verdade(cmd.payload, sh))
 		"missao_divina":

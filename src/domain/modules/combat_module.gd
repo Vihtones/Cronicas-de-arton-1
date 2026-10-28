@@ -1202,6 +1202,19 @@ func _cupula_rompe(id: String, out: Array) -> void:
 				return
 
 
+## Área Escorregadia: quem anda por ela faz Acrobacia; falhou, cai e para ali.
+func _escorregar(id: String, path: Array, out: Array) -> void:
+	for t in path:
+		for z in sim.zonas:
+			if str(z.tipo) == "escorregadia" and (z.tiles as Array).has(t):
+				if Checks.skill(sim.c(id).sheet, "acrobacia", int(z.dados.cd_acrobacia), world.rules, world.rng, "combat").get("success", false):
+					return
+				sim.c(id).tile = t
+				sim.c(id).sheet.add_condition("caido", world.rules)
+				out.append(fact("CONDITION_APPLIED", {"target": id, "condition": "caido", "tags": ["magia", "escorregou"]}, [id]))
+				return
+
+
 ## Teia: Reflexos anula; falhou, enredado (e imóvel) até se soltar.
 func _enredar_na_teia(tg: String, cd: int, imovel: bool, out: Array) -> void:
 	var s: CharacterSheet = sim.c(tg).sheet
@@ -3662,6 +3675,7 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y])}, [id]))
 			out.append_array(_dano_vegetacao_afiada(id, path))
 			out.append_array(_runa_no_combate(id, from, v.end))
+			_escorregar(id, path, out)
 			_cupula_rompe(id, out)
 			out.append_array(_aura_divina_entrada(id, from, path))
 			for r_id in reactors:
@@ -4670,6 +4684,51 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"area_escorregadia":
+			# Área Escorregadia (arcana 1): quadrado de 3m (+1,5m por aprimoramento): Reflexos ou cai; depois, andar por ela pede
+			# Acrobacia (CD 10, 15 ou 20) para não cair. Num alvo, a arma dele fica escorregadia: Reflexos ou a larga, e de novo a
+			# cada ataque com ela.
+			var apr_ae: Array = a.get("aprimoramentos", [])
+			var cd_ae := spell_dc(sh, a)
+			var cd_acro := 20 if apr_ae.has(2) else (15 if apr_ae.has(1) else 10)
+			if sim.combatants.has(a.get("target", "")) and str(a.target) != id:
+				var tg_ae: String = a.target
+				sim.c(tg_ae).sheet.add_efeito("magia.area_escorregadia", "arma_escorregadia", cd_ae, "cena", "", -1, id)
+				if not _resiste(tg_ae, "reflexos", cd_ae, out):
+					_largar_arma(tg_ae)
+					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg_ae, "condition": "largou_a_arma", "tags": ["magia"]}, [id, tg_ae]))
+			else:
+				var canto_ae: Vector2i = a.get("tile", sim.c(id).tile)
+				var tiles_ae: Array = [canto_ae, canto_ae + Vector2i(1, 0), canto_ae + Vector2i(0, 1), canto_ae + Vector2i(1, 1)]
+				for i in apr_ae.count(0):
+					tiles_ae.append(canto_ae + Vector2i(2 + i, 0))
+				sim.add_zona("escorregadia_" + id, tiles_ae, "escorregadia", -1, "area_escorregadia", {"conjurador": id, "cd_acrobacia": cd_acro})
+				for tg in _criaturas_vivas_em(tiles_ae):
+					if not _resiste(str(tg), "reflexos", cd_ae, out):
+						sim.c(str(tg)).sheet.add_condition("caido", world.rules)
+						out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": "caido", "tags": ["magia"]}, [id, tg]))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "area_escorregadia", "tags": ["magia"]}, [id]))
+		"enfeiticar":
+			# Enfeitiçar (arcana 1): Vontade (+5 em combate) anula; falhou, enfeitiçado e prestativo até uma ação hostil sua ou dos
+			# aliados. Sugestão (aprimoramento): em vez disso, cumpre uma das ordens do Comando.
+			var apr_en: Array = a.get("aprimoramentos", [])
+			var cd_en := spell_dc(sh, a) - 5
+			for tg in a.get("targets", [a.get("target", "")]):
+				if _resiste(str(tg), "vontade", cd_en, out):
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": tg, "spell": "enfeiticar", "reason": "resistiu"}, [id, tg]))
+					continue
+				if apr_en.has(0):
+					sim.add_marca("comando", str(tg), "enfeiticar", "comando", -1, {"ordem": str(a.ordem), "conjurador": id})
+				else:
+					sim.c(str(tg)).sheet.add_efeito("magia.enfeiticar", "condicao", 0, "cena", "enfeiticado", -1, id)
+					sim.c(str(tg)).sheet.add_condition("enfeiticado", world.rules)
+					_pacificar(id, str(tg), "prestativo", "enfeiticar")
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "enfeiticar", "tags": ["magia", "encantamento"]}, [id, tg]))
+		"transmutar_objetos":
+			# Transmutar Objetos (arcana 1), em combate: cura 2d8 PV de um construto tocado (aprimoramento).
+			var ts_to: CharacterSheet = sim.c(str(a.get("target", ""))).sheet
+			var cura_to := ts_to.curar(int(Dice.roll("2d8", world.rng, "combat").total))
+			out.append(fact("HEALED", {"actor": id, "target": a.get("target", ""), "amount": cura_to, "pv_after": ts_to.pv, "source": "transmutar_objetos"}, [id]))
 		"sono":
 			# Sono (arcana 1), em combate: falhou, exausto 1 rodada (1d4+1) e depois fatigado pela cena; passou, fatigado 1d4 rodadas.
 			var apr_so: Array = a.get("aprimoramentos", [])
@@ -5703,6 +5762,12 @@ func _dano_elemental_arma(sh: CharacterSheet) -> Array:
 
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
 	var out_runa := _runa_corporal(target, attacker, "ataque")
+	var cd_esc: int = sim.c(attacker).sheet.efeito_bonus("arma_escorregadia")
+	if cd_esc > 0 and not bool(v.get("ranged", false)) and str(sim.c(attacker).sheet.equipment.get("weapon", "")) != "" and not _resiste(attacker, "reflexos", cd_esc, out_runa):
+		_largar_arma(attacker)   # Área Escorregadia na arma: escapou da mão
+		return out_runa + [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": "", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": 0,
+			"camo_roll": 0, "hit": false, "crit": false, "damage": 0, "rolls": [], "pv_after": sim.c(target).sheet.pv, "special": false, "ranged": false,
+			"spell": false, "tags": ["arma_escorregadia"]}, [attacker, target])]
 	if _cupula_barra(attacker, target, bool(v.get("ranged", false)), out_runa):
 		return out_runa + [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": "", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": 0,
 			"camo_roll": 0, "hit": false, "crit": false, "damage": 0, "rolls": [], "pv_after": sim.c(target).sheet.pv, "special": false, "ranged": bool(v.get("ranged", false)),

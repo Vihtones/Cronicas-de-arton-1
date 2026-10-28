@@ -4037,3 +4037,23 @@ func test_arcanas_lote_2_sono_teia_hipnotismo_imagem_primor_concentracao() -> vo
 	var mg = w.module("magia")
 	mg.adormecidos["fulano"] = w.clock.tick + 10
 	check(mg.adormecido("fulano"), "fora de combate, o NPC dorme")
+
+
+func test_arcanas_lote_3_escorregadia_enfeiticar_tranca() -> void:
+	var lista := ["area_escorregadia", "enfeiticar", "tranca_arcana"]
+	var m := _cena_arcanista(5, lista)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	check(_lanca(m, {"type": "cast", "spell": "area_escorregadia", "tile": Vector2i(27, 57), "aprimoramentos": [2]}).ok, "Área Escorregadia")
+	check(sim.zonas.any(func(z): return str(z.tipo) == "escorregadia" and int(z.dados.cd_acrobacia) == 20), "zona com Acrobacia CD 20")
+	check(b1.conditions.has("caido"), "quem estava na área caiu")
+	var m2 := _cena_arcanista(5, lista)
+	var b2 := _bandido(m2, "bandido_1", -50)
+	check(_lanca(m2, {"type": "cast", "spell": "enfeiticar", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Enfeitiçar")
+	check(b2.conditions.has("enfeiticado"), "enfeitiçado")
+	var w = _clerigo_mundo([])[0]
+	var ob = w.module("objects")
+	ob.trancar_arcana("porta_taverna", 15)
+	check(bool(ob.state["porta_taverna"].locked) and int(ob.state["porta_taverna"].tranca_arcana) == 15, "tranca arcana +15")
+	ob.abrir_magico("porta_taverna", true)
+	check(bool(ob.state["porta_taverna"].open) and not bool(ob.state["porta_taverna"].locked), "aprimoramento abre a tranca")

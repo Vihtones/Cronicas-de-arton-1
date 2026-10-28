@@ -198,6 +198,21 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "area_escorregadia":
+				if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
+				if not sim.combatants.has(a.get("target", "")):
+					targets = [actor]
+			if sp_id == "enfeiticar":
+				var tipos_en: Array = ["espirito", "monstro"] if apr.has(1) else ["humanoide"]
+				if apr.has(2):
+					targets = sim.combatants.keys().filter(func(x): return sim.is_enemy(actor, x) and tipos_en.has(sim.c(x).sheet.creature_type) and CombatSim.cheb(A.tile, sim.c(x).tile) <= int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)))
+				if targets.is_empty(): return {"ok": false, "reason": "nenhum alvo válido"}
+				for tg_en in targets:
+					if not sim.combatants.has(tg_en) or not tipos_en.has(sim.c(tg_en).sheet.creature_type): return {"ok": false, "reason": "Enfeitiçar não afeta esse alvo"}
+				if apr.has(0) and not SpellRules.ORDENS_COMANDO.has(str(a.get("ordem", ""))): return {"ok": false, "reason": "sugestão: " + ", ".join(PackedStringArray(SpellRules.ORDENS_COMANDO))}
+			if sp_id == "transmutar_objetos" and not apr.has(0): return {"ok": false, "reason": "em combate, só curar um construto (aprimoramento)"}
+			if sp_id == "transmutar_objetos" and apr.has(0) and (targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.c(targets[0]).sheet.creature_type != "construto"): return {"ok": false, "reason": "toque um construto"}
+			if sp_id == "tranca_arcana" or sp_id == "disfarce_ilusorio": return {"ok": false, "reason": "essa magia é lançada fora de combate"}
 			if sp_id == "sono" or sp_id == "hipnotismo":
 				var tipos_s: Array = ["humanoide"] if sp_id == "sono" else ["animal", "humanoide"]
 				if sp_id == "hipnotismo" and (apr.has(3) or apr.has(4)): tipos_s.append_array(["espirito", "monstro"])
