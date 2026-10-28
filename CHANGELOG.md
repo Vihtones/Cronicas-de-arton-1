@@ -2,6 +2,8 @@
 
 ## 0.7.2 (em andamento)
 
+- HUD: barra de atalhos e cinto de combate movidos para o canto inferior direito, em duas linhas, sem sobrepor o painel de status (canto inferior esquerdo).
+
 - HUD redesenhado (inspirado em Baldur's Gate 3 e Stoneshard): retrato em medalhão de bronze, barras mais grossas com brilho e valor, painel de status maior, relógio com moldura, atalhos com bisel e selo de tecla. Registro de texto acima do painel.
 - Tela: a janela agora preenche a tela cheia (escala fracionária com aspecto expandido), em vez de escala inteira que deixava bordas.
 - A IA conhece a relação com o jogador (amizade, confiança, medo, mágoa), quantas vezes já conversaram e o humor do morador agora (medo ou bom humor). Esses fatos entram na conversa e na validação de números.

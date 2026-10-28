@@ -134,6 +134,12 @@ func _make_theme() -> Theme:
 	return t
 
 
+func _ancorar_canto_inferior_direito(c: Control) -> void:
+	c.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	c.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	c.offset_right = -4
+	c.offset_bottom = -4
+
 func _panel(parent: Control, anchor_preset: int) -> PanelContainer:
 	var p := PanelContainer.new()
 	parent.add_child(p)
@@ -325,10 +331,13 @@ func _build_hud(root: Control) -> void:
 	toast.modulate.a = 0.0
 	root.add_child(toast)
 	# cinto de atalhos da exploração (centro, embaixo)
-	belt = _panel(root, Control.PRESET_TOP_LEFT)
-	belt.position = Vector2(232, 322)
-	var brow := HBoxContainer.new()
-	brow.add_theme_constant_override("separation", 2)
+	# canto inferior direito: não encosta no painel de status (canto inferior esquerdo)
+	belt = _panel(root, Control.PRESET_BOTTOM_RIGHT)
+	_ancorar_canto_inferior_direito(belt)
+	var brow := HFlowContainer.new()   # quebra em 2 linhas para caber ao lado do painel de status
+	brow.custom_minimum_size = Vector2(324, 0)
+	brow.add_theme_constant_override("h_separation", 2)
+	brow.add_theme_constant_override("v_separation", 2)
 	belt.add_child(brow)
 	for spec in [["interagir", "E", "Interagir [E]", func(): get_parent().call("_explore_key", KEY_E)],
 			["diario", "J", "Diário [J]", func(): toggle_journal()],
@@ -884,11 +893,10 @@ func _build_combat_bar(root: Control) -> void:
 	combat_bar.offset_right = -120
 	combat_info = _label("", 8)
 	combat_bar.add_child(combat_info)
-	combat_belt = _panel(root, Control.PRESET_TOP_LEFT)
-	combat_belt.position = Vector2(204, 290)
-	combat_belt.custom_minimum_size = Vector2(0, 0)
+	combat_belt = _panel(root, Control.PRESET_BOTTOM_RIGHT)
+	_ancorar_canto_inferior_direito(combat_belt)
 	var row := HFlowContainer.new()   # quebra linha em vez de cortar espaços para fora da tela
-	row.custom_minimum_size = Vector2(424, 0)
+	row.custom_minimum_size = Vector2(324, 0)
 	row.add_theme_constant_override("h_separation", 2)
 	row.add_theme_constant_override("v_separation", 2)
 	combat_belt.add_child(row)
