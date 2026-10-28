@@ -57,8 +57,8 @@ func _run() -> void:
 	var G = root.get_node("Game")
 	await _frames(10)
 	# 1. criação do personagem com o botão de destino
-	main.ui._creation["class"] = "arcanista"; main.ui._creation.path = "mago"
-	main.ui._creation.class_picks = ["conhecimento", "intuicao"]; main.ui._creation.free_picks = ["percepcao"]
+	main.ui.panel_creation.c["class"] = "arcanista"; main.ui.panel_creation.c.path = "mago"
+	main.ui.panel_creation.c.class_picks = ["conhecimento", "intuicao"]; main.ui.panel_creation.c.free_picks = ["percepcao"]
 	main.ui.open_creation()
 	await _frames(5)
 	await _shot("p1_criacao")

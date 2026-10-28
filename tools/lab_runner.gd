@@ -37,7 +37,7 @@ func _run() -> void:
 	await _shot("10_laboratorio")
 	main.ui.panel_lab.visible = false
 	main.ui.open_creation()
-	main.ui._creation.race = "anao"; main.ui._creation["class"] = "arcanista"; main.ui._refresh_creation()
+	main.ui.panel_creation.c.race = "anao"; main.ui.panel_creation.c["class"] = "arcanista"; main.ui.panel_creation.refresh()
 	await _shot("11_criacao")
 	main.ui.panel_creation.visible = false
 	# magia

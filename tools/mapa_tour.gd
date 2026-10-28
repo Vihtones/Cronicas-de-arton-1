@@ -21,7 +21,7 @@ func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	var G = root.get_node("Game")
 	await _frames(10)
-	main.ui._creation["class"] = "guerreiro"
+	main.ui.panel_creation.c["class"] = "guerreiro"
 	G.new_game(false, 7)
 	for i in 600:
 		var carregando: bool = main.ui._loading != null and main.ui._loading.visible

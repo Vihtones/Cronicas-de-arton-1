@@ -50,7 +50,7 @@ func test_c4_caminhos_do_arcanista() -> void:
 	check(f.pm_max != b.pm_max or f.attrs.car == f.attrs["int"], "PM somam o atributo do caminho")
 	var m := _arc("mago")
 	eq(m.arcane_path, "mago")
-	eq(m.spells.size(), 3, "mago teria 4; só 3 implementadas (pendente registrado)")
+	eq(m.spells.size(), 4, "mago começa com 4 magias (LB p.37)")
 	eq(CharacterSheet.from_dict(m.to_dict()).arcane_path, "mago", "caminho no save")
 
 

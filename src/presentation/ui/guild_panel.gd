@@ -9,6 +9,7 @@ var _v: VBoxContainer
 
 
 func _init() -> void:
+	UiEstilo.janela(self)
 	custom_minimum_size = Vector2(560, 300)
 	var sc := ScrollContainer.new()
 	sc.custom_minimum_size = Vector2(560, 300)

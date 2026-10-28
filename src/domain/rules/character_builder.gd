@@ -36,6 +36,29 @@ const DEFAULT_CHOICES := {
 ## Magias arcanas de 1º círculo implementadas (LB cap. 4). O Mago começa com 4 (LB p.37), mas só há 3 prontas: PENDENTE.
 const ARCANE_SPELLS := ["seta_infalivel", "armadura_arcana", "toque_chocante"]
 const ARCANE_PATHS := ["bruxo", "feiticeiro", "mago"]
+const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
+
+
+## Magias de 1º círculo que a classe pode escolher na criação: arcanas (arcanista) ou divinas (clérigo), mais
+## as universais, e só as que estão completas no jogo (SpellRules.COMPLETAS).
+static func magias_iniciais_possiveis(rules: RuleRegistry, p_class: String) -> Array:
+	var tipo := "arcana" if p_class == "arcanista" else ("divina" if p_class == "clerigo" else "")
+	if tipo == "":
+		return []
+	var out: Array = []
+	for sp in SpellRules.COMPLETAS:
+		var m: Dictionary = rules.value("magia." + str(sp), {})
+		if int(m.get("circulo", 0)) == 1 and str(m.get("tipo", "")) in [tipo, "universal"]:
+			out.append(str(sp))
+	out.sort()
+	return out
+
+
+static func magias_iniciais_qtd(rules: RuleRegistry, p_class: String, p_path: String) -> int:
+	if p_class == "arcanista":
+		var path: String = p_path if ARCANE_PATHS.has(p_path) else "bruxo"
+		return int(rules.value("classe.arcanista").magias_iniciais) + int(rules.value("classe.arcanista.caminho")[path].get("magias_iniciais_extra", 0))
+	return 3 if p_class == "clerigo" else 0
 
 
 ## Lista de perícias da classe (LB p.37, 65, 73).
@@ -159,15 +182,17 @@ static func build(rules: RuleRegistry, p_race: String, p_class: String, attrs_ba
 		s.caster_attr = str(rules.value("classe.arcanista.caminho")[path].atributo)
 		s.pm_max += maxi(0, int(s.attrs[s.caster_attr]))
 		var want := int(c.magias_iniciais) + int(rules.value("classe.arcanista.caminho")[path].get("magias_iniciais_extra", 0))
-		var chosen: Array = p_spells if not p_spells.is_empty() else ARCANE_SPELLS
-		for sp in chosen:
-			if ARCANE_SPELLS.has(sp) and not s.spells.has(sp) and s.spells.size() < want:
+		var podem := magias_iniciais_possiveis(rules, "arcanista")
+		for sp in (p_spells if not p_spells.is_empty() else []) + ARCANE_SPELLS + podem:
+			if podem.has(sp) and not s.spells.has(sp) and s.spells.size() < want:
 				s.spells.append(sp)
 	if p_class == "clerigo":
 		# Clérigo: conjura com Sabedoria. Só Curar Ferimentos está implementada (ver ROADMAP).
 		s.caster_attr = "sab"
-		for sp in ["curar_ferimentos", "perdicao", "infligir_ferimentos"]:   # 3 magias iniciais, todas completas (SpellRules.COMPLETAS)
-			s.spells.append(sp)
+		var podem_c := magias_iniciais_possiveis(rules, "clerigo")
+		for sp in p_spells + ["curar_ferimentos", "perdicao", "infligir_ferimentos"]:   # 3 magias iniciais (escolhidas ou as padrão)
+			if podem_c.has(sp) and not s.spells.has(sp) and s.spells.size() < 3:
+				s.spells.append(sp)
 	s.pm = s.pm_max
 	for f in c.pericias_fixas:
 		s.trained.append(str(f).get_slice("|", 0))

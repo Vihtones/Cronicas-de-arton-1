@@ -17,6 +17,7 @@ var _rodape: Label
 
 
 func _init() -> void:
+	UiEstilo.janela(self)
 	custom_minimum_size = Vector2(620, 330)
 	var v := VBoxContainer.new()
 	add_child(v)

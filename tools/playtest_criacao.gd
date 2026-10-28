@@ -24,8 +24,10 @@ func _frames(n: int) -> void:
 func _run() -> void:
 	await _frames(15)
 	for cls in ["guerreiro", "ladino", "arcanista"]:
-		main.ui._creation["class"] = cls
+		main.ui.panel_creation.c["class"] = cls
 		main.ui.open_creation()
+		main.ui.panel_creation.etapa = {"guerreiro": 0, "ladino": 2, "arcanista": 3}[cls]
+		main.ui.panel_creation.refresh()
 		await _frames(5)
 		await RenderingServer.frame_post_draw
 		root.get_viewport().get_texture().get_image().save_png(out_dir.path_join("k_criacao_%s.png" % cls))

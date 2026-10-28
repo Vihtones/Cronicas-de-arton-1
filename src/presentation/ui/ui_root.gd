@@ -1074,7 +1074,6 @@ var panel_lab: PanelContainer
 var panel_creation: PanelContainer
 var panel_hub: PanelContainer
 var debug_label: Label
-var _creation := {"race": "humano", "class": "guerreiro", "preset": 0, "feminine": false, "class_picks": [], "free_picks": [], "path": "bruxo"}
 var _heir_mode := false
 var panel_prologo: PanelContainer
 var _prologo: Dictionary = {}   # respostas do questionário (id da pergunta -> opção)
@@ -1119,26 +1118,16 @@ func _start_proto(id: String) -> void:
 
 # --- Criação de personagem ----------------------------------------------------------------
 func _build_creation(root: Control) -> void:
-	panel_creation = _panel(root, Control.PRESET_CENTER)
-	panel_creation.position = Vector2(80, 16)
-	panel_creation.custom_minimum_size = Vector2(460, 0)
-	panel_creation.visible = false
+	var cp := CreationPanel.new()
+	panel_creation = cp
+	root.add_child(cp)
+	cp.position = Vector2(20, 12)
+	cp.visible = false
+	cp.concluido.connect(_criacao_concluida)
+	cp.cancelado.connect(func(): panel_title.visible = _titulo_antes)
 
 
-func _reset_picks() -> void:
-	_creation.class_picks = []
-	_creation.free_picks = []
-
-
-func _toggle_pick(key: String, k: String, limit: int) -> void:
-	var arr: Array = _creation[key]
-	if arr.has(k): arr.erase(k)
-	elif arr.size() < limit: arr.append(k)
-
-
-func open_creation() -> void:
-	panel_creation.visible = true
-	_refresh_creation()
+var _titulo_antes := false
 
 
 func _row_label(t: String) -> Label:
@@ -1148,149 +1137,30 @@ func _row_label(t: String) -> Label:
 	return l
 
 
-func _refresh_creation() -> void:
-	for c in panel_creation.get_children():
-		c.queue_free()
-	var split := HBoxContainer.new()
-	split.add_theme_constant_override("separation", 8)
-	panel_creation.add_child(split)
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(372, 312)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	split.add_child(sc)
-	# prévia à direita: retrato, figura com a aparência provisória da raça e resumo
-	var pv := VBoxContainer.new()
-	pv.custom_minimum_size = Vector2(104, 0)
-	split.add_child(pv)
-	var ptr := Portrait.new()
-	ptr.custom_minimum_size = Vector2(96, 96)
-	ptr.set_actor("player", _creation.race)
-	ptr.set_expression("determinado")
-	pv.add_child(ptr)
-	var fig := TextureRect.new()
-	var at := AtlasTexture.new()
-	var folha: Texture2D = load("res://assets/chars/player.png")
-	at.atlas = folha
-	at.region = Rect2(0, 0, folha.get_width() / 3, folha.get_height() / 4)   # primeiro quadro (parado, de frente)
-	fig.texture = at
-	fig.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	fig.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	var look := RaceLook.of(_creation.race)
-	fig.custom_minimum_size = Vector2(96, 96 * float(look.scale))
-	fig.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	fig.self_modulate = look.tint
-	pv.add_child(fig)
-	var pv_info := _label("", 8)
-	pv_info.custom_minimum_size = Vector2(100, 0)
-	pv.add_child(pv_info)
-	var v := VBoxContainer.new()
-	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sc.add_child(v)
-	v.add_child(_h("Criação de personagem (LB cap. 1)"))
-	v.add_child(_label("Raça (LB p.18-31):", 9))
-	var rr := HFlowContainer.new()
-	for r in CharacterBuilder.RACES:
-		var rb := _button(("● " if _creation.race == r else "") + CharacterBuilder.RACE_NAMES[r], func(): _creation.race = r; _reset_picks(); _refresh_creation())
-		rb.add_theme_font_size_override("font_size", 8)
-		rr.add_child(rb)
-	v.add_child(rr)
-	var rinfo: Dictionary = {} if _creation.race == "humano" else Game.rules.value("raca." + _creation.race, {})
-	var pend: Array = rinfo.get("pendente", [])
-	if not pend.is_empty():
-		v.add_child(_label("Ainda sem sistema nesta raça: " + ", ".join(pend) + " (ver ROADMAP).", 7))
-	var cr := HBoxContainer.new()
-	cr.add_child(_row_label("Classe:"))
-	for c in CharacterBuilder.CLASSES:
-		cr.add_child(_button(("● " if _creation["class"] == c else "") + CharacterBuilder.CLASS_NAMES.get(c, c.capitalize()), func(): _creation["class"] = c; _creation.preset = 0; _reset_picks(); _refresh_creation()))
-	v.add_child(cr)
-	var pr := HBoxContainer.new()
-	pr.add_child(_row_label("Atributos:"))
-	var presets: Array = CharacterBuilder.presets(_creation["class"])
-	for i in presets.size():
-		var pre: Dictionary = presets[i]
-		pr.add_child(_button(("● " if _creation.preset == i else "") + "F%d D%d C%d I%d S%d Ca%d" % [pre["for"], pre.des, pre.con, pre["int"], pre.sab, pre.car],
-			func(): _creation.preset = i; _reset_picks(); _refresh_creation()))
-	v.add_child(pr)
-	v.add_child(_button("Gênero: " + ("feminino" if _creation.feminine else "masculino"), func(): _creation.feminine = not _creation.feminine; _refresh_creation()))
-	var attrs: Dictionary = presets[_creation.preset]
-	var picks: Array = ["for", "des", "con"] if _creation["class"] == "guerreiro" else (["des", "int", "car"] if _creation["class"] == "ladino" else ["int", "des", "sab"])
-	var base := CharacterBuilder.build(Game.rules, _creation.race, _creation["class"], attrs, picks)
-	# C17 — escolha de perícias (LB p.114): as da classe saem da lista; Int e Versátil liberam quaisquer
-	var slots := CharacterBuilder.skill_slots(Game.rules, _creation["class"], _creation.race, base.attrs)
-	var fixed: Array = []
-	for f in Game.rules.value("classe." + _creation["class"]).pericias_fixas: fixed.append(str(f).get_slice("|", 0))
-	v.add_child(_label("Perícias da classe (%d/%d) — fixas: %s" % [_creation.class_picks.size(), slots.classe, ", ".join(fixed)], 8))
-	var cflow := HFlowContainer.new()
-	for k in CharacterBuilder.class_list(Game.rules, _creation["class"]):
-		if fixed.has(k): continue
-		var on: bool = _creation.class_picks.has(k)
-		var b := _button(("● " if on else "") + k, func(): _toggle_pick("class_picks", k, slots.classe); _refresh_creation())
-		b.add_theme_font_size_override("font_size", 7)
-		cflow.add_child(b)
-	v.add_child(cflow)
-	if slots.livres > 0:
-		v.add_child(_label("Perícias livres por Inteligência/Versátil (%d/%d)" % [_creation.free_picks.size(), slots.livres], 8))
-		var fflow := HFlowContainer.new()
-		for k in Game.rules.value("pericia.tabela").keys():
-			if fixed.has(k) or _creation.class_picks.has(k): continue
-			var on2: bool = _creation.free_picks.has(k)
-			var b2 := _button(("● " if on2 else "") + k, func(): _toggle_pick("free_picks", k, slots.livres); _refresh_creation())
-			b2.add_theme_font_size_override("font_size", 7)
-			fflow.add_child(b2)
-		v.add_child(fflow)
-	if _creation["class"] == "arcanista":
-		var ar := HBoxContainer.new()
-		ar.add_child(_row_label("Caminho:"))
-		var desc := {"bruxo": "Int, foco", "feiticeiro": "Car, linhagem", "mago": "Int, grimório, +1 magia"}
-		for pth in CharacterBuilder.ARCANE_PATHS:
-			ar.add_child(_button(("● " if _creation.path == pth else "") + "%s (%s)" % [pth.capitalize(), desc[pth]], func(): _creation.path = pth; _refresh_creation()))
-		v.add_child(ar)
-	var b_dict := {"race": _creation.race, "class": _creation["class"], "attrs": attrs, "human_picks": picks,
-		"class_picks": _creation.class_picks.duplicate(), "free_picks": _creation.free_picks.duplicate(), "path": _creation.path,
-		"name": ("Aventureira" if _creation.feminine else "Aventureiro")}
-	var errs := CharacterBuilder.validate_skills(Game.rules, _creation["class"], _creation.race, base.attrs, _creation.class_picks, _creation.free_picks) \
-		if not _creation.class_picks.is_empty() else PackedStringArray()
-	var s := CharacterBuilder.build_from(Game.rules, b_dict)
-	pv_info.text = "%s\n%s\nPV %d · PM %d\nDefesa %d\n%.0fm · %s" % [CharacterBuilder.RACE_NAMES[_creation.race], _creation["class"].capitalize(),
-		s.pv_max, s.pm_max, s.defense(Game.rules), s.speed_m, s.size]
-	v.add_child(_label("Resultado: PV %d · PM %d · Defesa %d · Deslocamento %.0fm · Perícias: %s%s" % [s.pv_max, s.pm_max, s.defense(Game.rules), s.speed_m,
-		", ".join(Array(s.trained)), ("\nMagias: " + ", ".join(Array(s.spells)) + ((" · caminho " + s.arcane_path) if s.arcane_path != "" else "")) if not s.spells.is_empty() else ""], 8))
-	if _creation.class_picks.is_empty():
-		v.add_child(_label("Sem escolha, usa as perícias sugeridas.", 7))
-	elif not errs.is_empty():
-		v.add_child(_label("✘ " + "; ".join(errs), 8))
-	# poderes da classe (LB cap. 1) com o efeito de cada um; os gerais vêm ao subir de nível (LB p.124)
-	v.add_child(_h("Poderes da classe — %s" % _creation["class"].capitalize()))
-	for p in ProgressionModule.POWERS.get(_creation["class"], []):
-		var efeito := ProgressionModule.efeito_texto(Game.rules.value("poder." + p, {}))
-		v.add_child(_label("• %s%s" % [PowerTreePanel.NAMES.get(p, p), (" — " + efeito) if efeito != "" else ""], 8))
-	v.add_child(_label("Poderes gerais (ex.: Ataque Poderoso, Esquiva) são escolhidos ao subir de nível.", 7))
-	if _creation["class"] == "arcanista" and _creation.path == "mago":
-		v.add_child(_label("O Mago começa com 4 magias (LB p.37); só 3 estão implementadas — a 4ª fica pendente.", 7))
-	v.add_child(_label("Aparência das raças é provisória (tinta e escala). Outras classes: ver ROADMAP.", 7))
-	v.add_child(_button("Começar", func():
-		if not errs.is_empty():
-			log_msg("✘ " + "; ".join(errs)); return
-		panel_creation.visible = false
-		if _heir_mode:
-			_heir_mode = false
-			var hb := b_dict.duplicate(); hb.name = "Herdeiro"
-			var r := Game.send("ContinueAsHeir", {"build": hb})
-			if r.accepted:
-				Game.set_mode(Game.Mode.EXPLORE)
-				Game.world_reloaded.emit()
-			else: log_msg("✘ " + "; ".join(r.errors))
-			return
-		Game.new_game_with_build(b_dict, _creation.feminine)
-		open_prologo()))
-	if not _heir_mode:
-		v.add_child(_button("Deixar o Destino Decidir", func():
-			if not errs.is_empty():
-				log_msg("✘ " + "; ".join(errs)); return
-			panel_creation.visible = false
-			Game.new_game_with_build(b_dict, _creation.feminine)
-			Game.start_prologue_from_seed(randi())))
-	v.add_child(_button("Cancelar", func(): panel_creation.visible = false))
+func open_creation() -> void:
+	_titulo_antes = panel_title.visible
+	panel_title.visible = false
+	(panel_creation as CreationPanel).abrir(_heir_mode)
+
+
+func _criacao_concluida(b_dict: Dictionary, feminino: bool, destino: bool) -> void:
+	if _heir_mode:
+		_heir_mode = false
+		var hb := b_dict.duplicate()
+		if str(hb.name) in ["Aventureiro", "Aventureira"]:
+			hb.name = "Herdeiro"
+		var r := Game.send("ContinueAsHeir", {"build": hb})
+		if r.accepted:
+			Game.set_mode(Game.Mode.EXPLORE)
+			Game.world_reloaded.emit()
+		else:
+			log_msg("✘ " + "; ".join(r.errors))
+		return
+	Game.new_game_with_build(b_dict, feminino)
+	if destino:
+		Game.start_prologue_from_seed(randi())
+	else:
+		open_prologo()
 
 
 # --- Prólogo vivo (Arton Viva, Fase 3) --------------------------------------------------------
