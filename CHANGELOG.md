@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Cúpula de Repulsão (divina, 4º círculo): sustentada; criaturas do tipo ou raça escolhida que tentam se aproximar a menos de 3m (4,5m) fazem Vontade e, se falham, param e não atacam corpo a corpo na rodada; no 5º círculo também desvia ataques à distância; avançar sobre elas rompe a cúpula.
+
 - Terremoto (divina, 4º círculo): esfera de 30m; quem está no solo fica atordoado; na cripta ou em construção o teto desaba (12d6 e agarrado), junto a barrancos o chão desmorona, na água forma-se lama que prende, e ao ar livre abrem-se fendas que se fecham no turno seguinte do conjurador, matando quem ficou nelas. Agarrados sofrem 1d6 por rodada até se soltarem.
 
 - Muralha de Ossos (universal, 4º círculo): muro de 15m (+15m) que bloqueia a passagem; quem está nele ou ao lado sofre 4d8 de corte e pode ficar preso; trechos de 3m com Defesa 8, 40 PV e RD 10 podem ser destruídos; escalar fere 4d8 a cada 3m; com o aprimoramento, esqueletos animados agarram quem começa o turno ao lado.

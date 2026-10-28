@@ -194,6 +194,9 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "cupula_de_repulsao":
+				if str(a.get("grupo", "")) == "": return {"ok": false, "reason": "escolha o tipo de criatura ou a raça (grupo)"}
+				targets = [actor]
 			if sp_id == "terremoto":
 				if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
 				targets = [actor]

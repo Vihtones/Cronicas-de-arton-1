@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos", "terremoto"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos", "terremoto", "cupula_de_repulsao"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3828,3 +3828,14 @@ func test_terremoto_atordoa_e_desaba_na_cripta() -> void:
 	check(b1.conditions.has("atordoado"), "atordoado")
 	eq(m[0].db.zone_at(Vector2i(27, 57)), "cripta", "a cena é na cripta")
 	check(b1.pv < pv0 and b1.efeito_bonus("preso_terremoto") > 0, "na cripta, o teto cai: dano e agarrado")
+
+
+func test_cupula_de_repulsao_barra_ataque_corpo_a_corpo_de_quem_falha() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	_bandido(m, "bandido_1", -50)   # falha na Vontade
+	var grupo: String = sim.c("bandido_1").sheet.creature_type
+	check(_lanca(m, {"type": "cast", "spell": "cupula_de_repulsao", "grupo": grupo}).ok, "Cúpula de Repulsão")
+	var out: Array = []
+	check(m[1]._cupula_barra("bandido_1", "player", false, out), "o ataque corpo a corpo é barrado")
+	check(not m[1]._cupula_barra("bandido_1", "player", true, out), "à distância passa (sem o aprimoramento)")

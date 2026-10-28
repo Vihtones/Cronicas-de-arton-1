@@ -1068,6 +1068,72 @@ func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
 	return false
 
 
+## Cúpula de Repulsão ----------------------------------------------------------------------------------------------
+func _no_grupo(id: String, grupo: String) -> bool:
+	var s: CharacterSheet = sim.c(id).sheet
+	return s.creature_type == grupo or s.race_id == grupo
+
+
+## Portadores de cúpula que afetam `id`: [{portador, raio, cd, distancia}].
+func _cupulas_contra(id: String) -> Array:
+	var r: Array = []
+	for pid in sim.combatants:
+		var ps: CharacterSheet = sim.c(pid).sheet
+		for e in ps.efeitos:
+			if e.stat == "cupula" and pid != id and _no_grupo(id, str(e.tipo)):
+				r.append({"portador": pid, "raio": int(e.bonus), "cd": ps.efeito_bonus("cupula_cd"), "distancia": ps.efeito_bonus("cupula_distancia") > 0})
+	return r
+
+
+## Vontade da criatura do grupo contra a cúpula, uma vez por rodada (passou, a cúpula não a barra nesta rodada).
+func _cupula_teste(id: String, c: Dictionary, out: Array) -> bool:
+	var flags: Array = sim.c(id).flags
+	var chave := "cupula_%s_%d" % [str(c.portador), sim.round_no]
+	if flags.has(chave + "_ok"):
+		return true
+	if flags.has(chave + "_falhou"):
+		return false
+	var passou := _resiste(id, "vontade", int(c.cd), out)
+	flags.append(chave + ("_ok" if passou else "_falhou"))
+	return passou
+
+
+## Índice do primeiro passo que entraria na cúpula de alguém (a criatura falhou na Vontade): o caminho para antes dele.
+## -1 se nada barra.
+func _cupula_corta(id: String, path: Array, out: Array) -> int:
+	for c in _cupulas_contra(id):
+		var centro: Vector2i = sim.c(str(c.portador)).tile
+		for i in path.size():
+			if CombatSim.cheb(path[i], centro) <= int(c.raio):
+				if not _cupula_teste(id, c, out):
+					out.append(fact("SPELL_EFFECT", {"spell": "cupula_de_repulsao", "efeito": "barrou", "target": id}, [id]))
+					return i
+				break
+	return -1
+
+
+## Ataque contra o portador: corpo a corpo (ou à distância, no 5º círculo) de criatura do grupo exige passar na Vontade.
+func _cupula_barra(atacante: String, alvo: String, distancia: bool, out: Array) -> bool:
+	for c in _cupulas_contra(atacante):
+		if str(c.portador) != alvo or (distancia and not bool(c.distancia)):
+			continue
+		if not _cupula_teste(atacante, c, out):
+			return true
+	return false
+
+
+## O portador que se aproxima de uma criatura do grupo rompe a cúpula.
+func _cupula_rompe(id: String, out: Array) -> void:
+	var s: CharacterSheet = sim.c(id).sheet
+	for e in s.efeitos:
+		if e.stat != "cupula":
+			continue
+		for cid in sim.combatants:
+			if cid != id and _no_grupo(cid, str(e.tipo)) and not sim.c(cid).sheet.is_dead() and CombatSim.cheb(sim.c(cid).tile, sim.c(id).tile) <= int(e.bonus):
+				_encerrar_sustentada(id, out)
+				return
+
+
 ## Terremoto ------------------------------------------------------------------------------------------------------
 func _terremoto_no_terreno(conj: String, cid: String, cd: int) -> Array:
 	var out: Array = []
@@ -3090,6 +3156,8 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
 					sim.remove_marca(str(m.id), id)
+		"cupula_de_repulsao":
+			s.remove_efeito("magia.cupula_de_repulsao")
 		"manto_de_sombras":
 			for cid in sim.combatants:
 				sim.c(cid).sheet.remove_efeito("magia.manto_de_sombras")
@@ -3357,10 +3425,15 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			var path := GhostPlanner._tiles(a.path)
 			var from: Vector2i = sim.c(id).tile
 			var reactors := _reflex_watchers(id, from)
+			var corte_cu := _cupula_corta(id, path, out)
+			if corte_cu >= 0:
+				path = path.slice(0, corte_cu)
+				v["end"] = path[-1] if not path.is_empty() else from
 			sim.c(id).tile = v.end
 			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [from.x, from.y], "path": path.map(func(t): return [t.x, t.y])}, [id]))
 			out.append_array(_dano_vegetacao_afiada(id, path))
 			out.append_array(_runa_no_combate(id, from, v.end))
+			_cupula_rompe(id, out)
 			out.append_array(_aura_divina_entrada(id, from, path))
 			for r_id in reactors:
 				if CombatSim.cheb(sim.c(r_id).tile, v.end) > 1:
@@ -4340,6 +4413,17 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"cupula_de_repulsao":
+			# Cúpula de Repulsão (divina 4): sustentada. Criaturas do grupo (tipo ou raça) que tentam chegar a menos de 3m
+			# (4,5m com o aprimoramento) fazem Vontade (`_cupula_barra`); falharam, não chegam nem atacam corpo a corpo nesta
+			# rodada. No 5º círculo, também desvia ataques à distância. Se o conjurador avança sobre elas, a cúpula se rompe.
+			var apr_cu: Array = a.get("aprimoramentos", [])
+			_iniciar_sustentada(id, "cupula_de_repulsao", out)
+			sh.add_efeito("magia.cupula_de_repulsao", "cupula", 1 + (1 if apr_cu.has(0) else 0), "cena", str(a.grupo), -1, id)
+			sh.add_efeito("magia.cupula_de_repulsao", "cupula_cd", spell_dc(sh, a), "cena", "", -1, id)
+			if apr_cu.has(1):
+				sh.add_efeito("magia.cupula_de_repulsao", "cupula_distancia", 1, "cena", "", -1, id)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "cupula_de_repulsao", "grupo": str(a.grupo), "tags": ["magia"]}, [id]))
 		"terremoto":
 			# Terremoto (divina 4): esfera de 30m por uma rodada. Quem está no solo fica atordoado (uma vez por cena). Pelo
 			# terreno de cada um: cripta ou dentro de construção (desaba) — 12d6 de impacto e agarrado, Reflexos metade e evita;
@@ -5088,6 +5172,10 @@ func _dano_elemental_arma(sh: CharacterSheet) -> Array:
 
 func _resolve_attack(attacker: String, target: String, v: Dictionary, special: bool) -> Array:
 	var out_runa := _runa_corporal(target, attacker, "ataque")
+	if _cupula_barra(attacker, target, bool(v.get("ranged", false)), out_runa):
+		return out_runa + [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": "", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": 0,
+			"camo_roll": 0, "hit": false, "crit": false, "damage": 0, "rolls": [], "pv_after": sim.c(target).sheet.pv, "special": false, "ranged": bool(v.get("ranged", false)),
+			"spell": false, "tags": ["cupula"]}, [attacker, target])]
 	var A := sim.c(attacker)
 	var T := sim.c(target)
 	var atk: Dictionary = v.atk
