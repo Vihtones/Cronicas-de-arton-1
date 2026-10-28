@@ -159,7 +159,7 @@ static func resposta_direta(world: WorldState, npc: String, e: Dictionary, salt:
 
 ## Conhecimento verificado para perguntas abertas (IA). Só fatos que o jogo já tem e que o jogador PODE saber:
 ## o lugar, as lojas, a guilda, os moradores presentes e os mistérios já descobertos. Limite de tamanho fixo.
-const CONHECIMENTO_MAX := 900
+const CONHECIMENTO_MAX := 1500
 
 
 static func conhecimento(world: WorldState, npc: String) -> String:
@@ -207,6 +207,22 @@ static func conhecimento(world: WorldState, npc: String) -> String:
 				fatos.append(txt)
 		if not fatos.is_empty():
 			partes.append("Você já descobriu: %s." % " ".join(PackedStringArray(fatos)))
+	var te = world.module("town_events")
+	if te != null and not te.active_ids().is_empty():
+		partes.append("Acontecendo na vila: %s." % ", ".join(PackedStringArray(te.active_ids())))
+	var fam := str(world.npc_def(npc).get("family", ""))
+	var faction := str(world.npc_def(npc).get("faction", ""))
+	if faction != "":
+		for f in world.db.npcs.get("factions", []):
+			if str(f.id) == faction:
+				partes.append("O morador é do grupo %s; o grupo quer: %s." % [str(f.get("name", faction)), ", ".join(PackedStringArray(f.get("goals", [])))])
+	if fam != "":
+		var parentes: Array = []
+		for id in world.all_npc_ids():
+			if str(world.npc_def(id).get("family", "")) == fam and id != npc and parentes.size() < 4:
+				parentes.append(str(world.npc_def(id).get("name", id)))
+		if not parentes.is_empty():
+			partes.append("Família: %s." % ", ".join(PackedStringArray(parentes)))
 	if npcs != null and loc != "":
 		var presentes: Array = []
 		for id in npcs.npcs_at(loc):
@@ -219,7 +235,7 @@ static func conhecimento(world: WorldState, npc: String) -> String:
 
 
 ## Convicções pessoais do morador (opiniões, não fatos): a fé e o ofício. Limite fixo.
-const CONVICOES_MAX := 320
+const CONVICOES_MAX := 450
 
 
 static func convicoes(world: WorldState, npc: String) -> String:

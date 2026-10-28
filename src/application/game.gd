@@ -106,7 +106,7 @@ func start_prologue_from_seed(p_seed: int) -> GameCommand.Result:
 	return start_prologue(Prologue.from_seed(p_seed))
 
 
-const IA_LOCAL := {"enabled": true, "endpoint": "http://127.0.0.1:8080/v1/chat/completions", "model": "local", "timeout_s": 12}
+const IA_LOCAL := {"enabled": true, "endpoint": "http://127.0.0.1:8080/v1/chat/completions", "model": "local", "timeout_s": 30}
 
 
 const IA_HEALTH := "http://127.0.0.1:8080/health"
@@ -143,7 +143,7 @@ func _ia_sem_resposta(done: Callable, tentativa: int) -> void:
 		if embutida.is_empty():
 			done.call(false)
 			return
-		_ia_pid = OS.create_process(embutida.servidor, ["-m", embutida.modelo, "--host", "127.0.0.1", "--port", "8080", "-c", "2048", "-ngl", "99"])
+		_ia_pid = OS.create_process(embutida.servidor, ["-m", embutida.modelo, "--host", "127.0.0.1", "--port", "8080", "-c", "4096", "-np", "1", "-ngl", "99"])
 		if _ia_pid <= 0:
 			_ia_pid = -1
 			done.call(false)

@@ -300,3 +300,19 @@ func test_convicoes_dos_moradores_entram_na_conversa_aberta() -> void:
 	p.transport_override = func(_m): return "Acredito em " + nome + ", forasteiro. Quem erra deve responder por isso."
 	p.converse_async(fe_id, f, func(t): got[0] = t)
 	eq(got[0], "Acredito em " + nome + ", forasteiro. Quem erra deve responder por isso.", "opinião com a divindade do morador é aceita")
+
+
+func test_prompt_da_conversa_aberta_cabe_no_contexto_do_modelo_local() -> void:
+	# servidor com -c 4096 e -np 1: o prompt inteiro (sistema + histórico + pergunta) precisa caber com folga
+	var w := WorldHelpers.world(5)
+	var f := FreeTalk.ficha(w, "hilda", "o que você acha da guerra, da fé e da estrada?", "", "desconhecido")
+	var chat: Array = []
+	for i in 12:
+		chat.append({"q": "pergunta longa número %d sobre a vila e a estrada" % i, "r": "resposta longa número %d sobre o que aconteceu hoje" % i})
+	f["chat"] = chat
+	var p := LlmDialogueProvider.new({"enabled": true, "max_calls": 5})
+	var total := 0
+	for m in p.build_chat(f):
+		total += str(m.content).length()
+	check(total < 6000, "prompt com %d caracteres (limite 6000 ≈ 2000 tokens)" % total)
+	check((p.build_chat(f).size() - 2) <= 12, "histórico limitado aos últimos 6 turnos")

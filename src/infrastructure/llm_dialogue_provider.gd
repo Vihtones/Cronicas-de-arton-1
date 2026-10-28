@@ -124,13 +124,14 @@ func build_chat(ficha: Dictionary) -> Array:
 		ficha.get("period", ""), ficha.get("weather", "")]
 	var aberta := bool(ficha.get("aberta", false))
 	if aberta:
-		sistema += "Converse como uma pessoa de verdade: pode concordar, discordar, contar de si, reagir ao que o forasteiro disse e perguntar de volta. Suas convicções pessoais (opiniões suas, não fatos): " + str(ficha.get("convicoes", "")) + ". Para fatos do mundo, use SOMENTE os 'Fatos do mundo' abaixo; se a pergunta sobre o mundo não estiver neles, diga que não sabe do seu jeito, sem inventar. Fatos do mundo: " + str(ficha.get("conhecimento", "")) + ". "
+		sistema += "Converse como uma pessoa de verdade, com palavras simples e naturais: pode concordar, discordar, contar de si, reagir ao que o forasteiro disse e perguntar de volta. Não repita frases anteriores. Exemplo de tom (não copie as palavras): 'Ah, isso é coisa de estrada, forasteiro. Eu, no seu lugar, perguntaria antes ao guarda.' Suas convicções pessoais (opiniões suas, não fatos): " + str(ficha.get("convicoes", "")) + ". Para fatos do mundo, use SOMENTE os 'Fatos do mundo' abaixo; se a pergunta sobre o mundo não estiver neles, diga que não sabe do seu jeito, sem inventar. Fatos do mundo: " + str(ficha.get("conhecimento", "")) + ". "
 	else:
 		sistema += "Use SOMENTE os fatos da 'resposta de referência' e das lembranças; não invente nomes, lugares, preços, itens ou promessas. Se a referência diz que não sabe, diga que não sabe do seu jeito. "
 	if lemb != "":
 		sistema += "Lembranças recentes: " + lemb + ". "
 	var msgs: Array = [{"role": "system", "content": sistema}]
-	for h in ficha.get("chat", []):
+	var historico: Array = ficha.get("chat", [])
+	for h in historico.slice(max(0, historico.size() - 6)):   # últimos 6 turnos: cabe no contexto de 4096 tokens
 		msgs.append({"role": "user", "content": str(h.q)})
 		msgs.append({"role": "assistant", "content": str(h.r)})
 	if aberta:
@@ -198,7 +199,10 @@ func converse_async(npc_id: String, ficha: Dictionary, done: Callable) -> void:
 	var headers := ["Content-Type: application/json"]
 	if str(config.get("api_key", "")) != "":
 		headers.append_array(["x-api-key: " + str(config.api_key), "Authorization: Bearer " + str(config.api_key), "anthropic-version: 2023-06-01"])
-	var corpo := {"model": config.get("model", "local"), "max_tokens": 120, "temperature": 0.7, "messages": msgs}
+	# Sampling para o modelo local (Qwen 1.5B): temperatura um pouco mais alta dá fala mais natural;
+	# top_p e penalidade de repetição evitam que o morador repita a mesma frase; a parada em linha em branco mantém a fala curta.
+	var corpo := {"model": config.get("model", "local"), "max_tokens": 120, "temperature": 0.85, "top_p": 0.9,
+		"repeat_penalty": 1.12, "stop": ["\n\n"], "messages": msgs}
 	if str(msgs[0].role) == "system" and not eh_local() and str(config.get("endpoint", "")).contains("anthropic"):
 		corpo = {"model": config.get("model", ""), "max_tokens": 120, "system": msgs[0].content, "messages": msgs.slice(1)}
 	if http.request(str(config.get("endpoint", "")), headers, HTTPClient.METHOD_POST, JSON.stringify(corpo)) != OK:
