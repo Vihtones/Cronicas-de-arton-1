@@ -194,6 +194,22 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "intervencao_divina":
+				var err_id := SpellRules.erro_intervencao(sim.rules, A.sheet, a)
+				if err_id != "": return {"ok": false, "reason": err_id}
+				var op_id := str(a.opcao)
+				var longo_id := int(sim.rules.value("alcance.quadrados", {}).get("longo", 60))
+				if ["item", "proteger"].has(op_id): return {"ok": false, "reason": "essa opção é fora de combate"}
+				if op_id == "curar":
+					if targets.is_empty() or targets.size() > 10: return {"ok": false, "reason": "até 10 criaturas"}
+					for tg_id in targets:
+						if not sim.combatants.has(tg_id) or CombatSim.cheb(A.tile, sim.c(tg_id).tile) > longo_id: return {"ok": false, "reason": "alvo fora do alcance longo"}
+				if op_id == "ressuscitar":
+					var tg_rs: String = a.get("target", "")
+					if not sim.combatants.has(tg_rs) or not sim.c(tg_rs).sheet.is_dead() or sim.round_no - int(sim.c(tg_rs).get("morte_rodada", -99)) > 1: return {"ok": false, "reason": "só quem morreu há até uma rodada"}
+					if CombatSim.cheb(A.tile, sim.c(tg_rs).tile) > longo_id: return {"ok": false, "reason": "fora do alcance longo"}
+				if op_id != "curar" and op_id != "ressuscitar":
+					targets = [actor]
 			if sp_id == "reanimacao_impura":
 				var tg_ri: String = a.get("target", "")
 				if not sim.combatants.has(tg_ri) or not sim.c(tg_ri).sheet.is_dead() or not sim.c(tg_ri).has("morte_rodada"): return {"ok": false, "reason": "toque uma criatura morta nesta cena"}

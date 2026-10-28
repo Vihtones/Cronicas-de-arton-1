@@ -1068,6 +1068,37 @@ func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
 	return false
 
 
+## Intervenção Divina: todos os PV e todas as condições (mortos-vivos também se curam).
+func _cura_total(id: String, tg: String) -> Array:
+	var ts: CharacterSheet = sim.c(tg).sheet
+	var antes := ts.pv
+	ts.pv = maxi(ts.pv, ts.pv_max)
+	for e in ts.efeitos.duplicate(true):
+		if e.stat == "condicao":
+			ts.anular_magia(str(e.id))
+	for cond in Array(ts.conditions):
+		ts.remove_condition(str(cond))
+	return [fact("HEALED", {"actor": id, "target": tg, "amount": ts.pv - antes, "pv_after": ts.pv, "source": "intervencao_divina"}, [id, tg])]
+
+
+## Intervenção Divina: os efeitos de uma magia somem de toda a cena (fichas, zonas, marcas e a sustentação).
+func _dissipar_magia_inteira(id: String, sp: String) -> Array:
+	var out: Array = []
+	for cid in sim.sustentadas.keys():
+		if str(sim.sustentadas[cid]) == sp:
+			_encerrar_sustentada(cid, out)
+	for cid in sim.combatants:
+		sim.c(cid).sheet.anular_magia("magia." + sp)
+	for z in sim.zonas.duplicate(true):
+		if str(z.fonte) == sp:
+			sim.remove_zona(str(z.id))
+	for m in sim.marcas.duplicate(true):
+		if str(m.fonte) == sp:
+			sim.remove_marca(str(m.id), str(m.alvo))
+	out.append(fact("SPELL_ENDED", {"caster": id, "spell": sp, "reason": "intervencao_divina"}, [id]))
+	return out
+
+
 ## Conceder Milagre no turno do companheiro: magia de cura ou sem resistência vai para o aliado mais ferido ao alcance;
 ## as outras, para o inimigo mais próximo ao alcance. Lançada, a magia some e a penalidade de PM do conjurador acaba.
 func _milagre_do_companheiro(id: String) -> Array:
@@ -4448,6 +4479,28 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"intervencao_divina":
+			# Intervenção Divina (divina 5). Curar: todos os PV e condições de até 10 criaturas (cura mortos-vivos também).
+			# Dissipar: os efeitos de uma magia de até 4º círculo, em toda a cena. Com o sacrifício de 2 PM (–2 PM máximos para
+			# sempre): duplicar uma magia de até 4º círculo (sem custo) ou ressuscitar quem morreu há até uma rodada (1 PV).
+			var op_id := str(a.opcao)
+			if SpellRules.INTERVENCAO_SACRIFICIO.has(op_id):
+				sh.add_efeito("sacrificio.intervencao_%d" % world.clock.tick, "pm_max", -2, "permanente")
+			match op_id:
+				"curar":
+					for tg in a.get("targets", []):
+						out.append_array(_cura_total(id, str(tg)))
+				"dissipar":
+					out.append_array(_dissipar_magia_inteira(id, str(a.magia)))
+				"duplicar":
+					var sub: Dictionary = (a.acao as Dictionary).duplicate(true)
+					sub["type"] = "cast"
+					out.append_array(_cast(id, sub, {"cost": 0}))
+				"ressuscitar":
+					var ts_rs: CharacterSheet = sim.c(a.target).sheet
+					ts_rs.pv = 1
+					out.append(fact("HEALED", {"actor": id, "target": a.target, "amount": 0, "pv_after": 1, "source": "intervencao_divina", "ressuscitou": true}, [id, a.target]))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "intervencao_divina", "opcao": op_id, "tags": ["magia"]}, [id]))
 		"reanimacao_impura":
 			# Reanimação Impura (divina 5): a criatura volta (com os PV cheios, valor adotado: o livro não diz) como morto-vivo do lado
 			# do conjurador, mantendo habilidades e magias, e age pela IA aliada. No fim da cena volta a morrer (`_end_combat`); se for
@@ -4486,6 +4539,10 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# uma fenda e quem falha em Reflexos cai nela. No próximo turno do conjurador as fendas se fecham (quem está nelas morre)
 			# e as fissuras da água também. Agarrados sofrem 1d6 por rodada até se soltarem (ação completa e Atletismo).
 			var centro_tr: Vector2i = a.get("tile", sim.c(id).tile)
+			var magia_tr = world.module("magia")
+			if magia_tr != null and magia_tr.desastre_impedido(centro_tr):
+				out.append(fact("SPELL_MISSED", {"caster": id, "spell": "terremoto", "reason": "povoado protegido pelos deuses"}, [id]))
+				return out
 			var area_tr: Array = Area.esfera(centro_tr, Area.quadrados(30.0))
 			var cd_tr := spell_dc(sh, a)
 			sim.add_zona("terremoto_" + id, area_tr, "terremoto", -1, "terremoto", {"conjurador": id, "cd": cd_tr})

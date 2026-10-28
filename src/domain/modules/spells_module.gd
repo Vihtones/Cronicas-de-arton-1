@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"intervencao_divina": [],   # curar o grupo, criar item, duplicar magia, proteger o povoado
 	"conceder_milagre": [],   # num companheiro do grupo (fora de combate a magia fica com ele para a próxima luta)
 	"runa_de_protecao": [],   # no chão onde você está (1 hora, pó de diamante T$ 200) ou no próprio corpo (aprimoramentos)
 	"comunhao_com_a_natureza": [],   # dados de auxílio pelo dia, ou (aprimoramento) informações da região
@@ -63,6 +64,8 @@ var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [..
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
 var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de combate: {ate: tick}
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
+var cidade_protegida: Dictionary = {}   # Intervenção Divina: {zona} protegida do próximo desastre
+var _duplicando := false   # Intervenção Divina (duplicar): a magia duplicada não pede ser conhecida nem PM
 var runas: Array = []   # Runa de Proteção no chão: {id, centro:[x,y], raio, tipo, dados, gatilho, palavra, cd, conj, dentro, achada}
 var videncia: Dictionary = {}   # Vidência ativa: {alvo, ate: tick}; enquanto dura, `videncia_ver` mostra o alvo e os arredores
 var luz_carregada: Dictionary = {}   # luz que o jogador carrega fora de combate: {raio: quadrados, ate: tick}
@@ -108,12 +111,12 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return PackedStringArray(["sem personagem"])
 	var sp_id := str(cmd.payload.get("spell", ""))
 	var apr: Array = cmd.payload.get("aprimoramentos", [])
-	if not sh.spells.has(sp_id):
+	if not sh.spells.has(sp_id) and not _duplicando:
 		return PackedStringArray(["magia não conhecida"])
 	if world.rules.value("magia." + sp_id, {}).has("cura"):
 		if not apr.is_empty():
 			return PackedStringArray(["fora de combate, a cura é lançada sem aprimoramentos"])
-		if sh.pm < GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, sp_id), cmd.payload, sh):
+		if not _duplicando and sh.pm < GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, sp_id), cmd.payload, sh):
 			return PackedStringArray(["PM insuficiente"])
 		return PackedStringArray()
 	if not FORA_DE_COMBATE.has(sp_id):
@@ -131,7 +134,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return PackedStringArray(["magia acima do círculo que você conjura"])
 	if not SpellRules.aprimoramentos_validos(sp_id, apr, sh, world.rules):
 		return PackedStringArray(["aprimoramento não disponível para essa magia"])
-	if sh.pm < GhostPlanner.spell_cost(world.rules, sp, cmd.payload, sh):
+	if not _duplicando and sh.pm < GhostPlanner.spell_cost(world.rules, sp, cmd.payload, sh):
 		return PackedStringArray(["PM insuficiente"])
 	match sp_id:
 		"bencao":
@@ -206,6 +209,25 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"intervencao_divina":
+			var err_iv := SpellRules.erro_intervencao(world.rules, sh, cmd.payload)
+			if err_iv != "":
+				return PackedStringArray([err_iv])
+			match str(cmd.payload.opcao):
+				"dissipar", "ressuscitar":
+					return PackedStringArray(["essa opção é em combate"])
+				"item":
+					var it := str(cmd.payload.get("item", ""))
+					var def_it: Dictionary = world.db.items.get(it, {})
+					if def_it.is_empty() or int(def_it.get("price", 0)) <= 0 or int(def_it.price) > 30000:
+						return PackedStringArray(["escolha um item mundano à venda de até T$ 30.000"])
+				"duplicar":
+					var sub_v := GameCommand.create("intervencao", "player", "CastSpell", (cmd.payload.acao as Dictionary).duplicate(true))
+					_duplicando = true
+					var errs_v := validate(sub_v)
+					_duplicando = false
+					if not errs_v.is_empty():
+						return errs_v
 		"conceder_milagre":
 			var party_cm = world.module("party")
 			if party_cm == null or not party_cm.members.has(str(cmd.payload.get("target", ""))):
@@ -372,7 +394,7 @@ func execute(cmd: GameCommand) -> Array:
 		return _pensamentos(alvo, false)
 	var sp_id := str(cmd.payload.get("spell", ""))
 	var sp := GhostPlanner.spell_rule(world.rules, sp_id)
-	var custo := GhostPlanner.spell_cost(world.rules, sp, cmd.payload, sh)
+	var custo := 0 if _duplicando else GhostPlanner.spell_cost(world.rules, sp, cmd.payload, sh)
 	sh.pm -= custo
 	var out: Array = [fact("SPELL_CAST", {"caster": "player", "spell": sp_id, "cost": custo, "fora_de_combate": true,
 		"aprimoramentos": cmd.payload.get("aprimoramentos", [])}, ["player"])]
@@ -508,6 +530,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"intervencao_divina":
+			out.append_array(intervencao_divina(cmd.payload, sh))
 		"conceder_milagre":
 			var tg_cm := str(cmd.payload.target)
 			var ficha_cm := CharacterSheet.from_dict(world.module("party").members[tg_cm].sheet)
@@ -528,6 +552,9 @@ func execute(cmd: GameCommand) -> Array:
 		"lendas_e_historias":
 			out.append_array(lendas_e_historias(cmd.payload))
 		"controlar_o_clima":
+			if str(cmd.payload.clima) == "tempestade" and desastre_impedido(_tile_jogador()):
+				out.append(fact("SPELL_MISSED", {"caster": "player", "spell": "controlar_o_clima", "reason": "povoado protegido pelos deuses"}, ["player"]))
+				return out
 			var clima_cc: WeatherModule = world.module("weather")
 			var horas_cc := int(Dice.roll("4d12", world.rng, "world").total)
 			var antes_cc: String = clima_cc.forcar(str(cmd.payload.clima), horas_cc)
@@ -760,6 +787,48 @@ func _ha_tesouro(loc: String) -> bool:
 			for f in act.get("reveals", []):
 				if ex == null or not ex.knows(str(f)):
 					return true
+	return false
+
+
+## Intervenção Divina fora de combate. Curar: o jogador e os companheiros, todos os PV e condições. Com o sacrifício de
+## 2 PM (–2 PM máximos para sempre): criar um item mundano de até T$ 30.000, duplicar uma magia de até 4º círculo (sem PM)
+## ou proteger o povoado da zona atual de um desastre (o próximo Terremoto ou tempestade de Controlar o Clima ali não vinga).
+func intervencao_divina(p: Dictionary, sh: CharacterSheet) -> Array:
+	var out: Array = []
+	var op := str(p.opcao)
+	if SpellRules.INTERVENCAO_SACRIFICIO.has(op):
+		sh.add_efeito("sacrificio.intervencao_%d" % world.clock.tick, "pm_max", -2, "permanente")
+	match op:
+		"curar":
+			sh.pv = maxi(sh.pv, sh.pv_max)
+			for cond in Array(sh.conditions):
+				sh.remove_condition(str(cond))
+			var party = world.module("party")
+			if party != null:
+				for mid in party.members:
+					var f := CharacterSheet.from_dict(party.members[mid].sheet)
+					f.pv = maxi(f.pv, f.pv_max)
+					for cond2 in Array(f.conditions):
+						f.remove_condition(str(cond2))
+					out.append(fact("COMPANION_STATE", {"npc": mid, "sheet": f.to_dict()}, [mid]))
+		"item":
+			out.append(fact("ITEM_GAINED", {"item": str(p.item), "from": "intervencao_divina"}, ["player"]))
+		"duplicar":
+			var sub := GameCommand.create("intervencao", "player", "CastSpell", (p.acao as Dictionary).duplicate(true))
+			_duplicando = true
+			out.append_array(execute(sub))
+			_duplicando = false
+		"proteger":
+			cidade_protegida = {"zona": world.db.zone_at(_tile_jogador())}
+	out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "intervencao_divina", "opcao": op, "tags": ["magia"]}, ["player"]))
+	return out
+
+
+## Proteção de Intervenção Divina: o desastre (Terremoto, tempestade) que cairia nesta zona não vinga; gasta a proteção.
+func desastre_impedido(t: Vector2i) -> bool:
+	if not cidade_protegida.is_empty() and str(cidade_protegida.zona) == world.db.zone_at(t):
+		cidade_protegida = {}
+		return true
 	return false
 
 
@@ -1520,7 +1589,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1533,6 +1602,7 @@ func from_dict(d: Dictionary) -> void:
 	luz_carregada = (d.get("luz_carregada", {}) as Dictionary).duplicate()
 	videncia = (d.get("videncia", {}) as Dictionary).duplicate()
 	runas = (d.get("runas", []) as Array).duplicate(true)
+	cidade_protegida = (d.get("cidade_protegida", {}) as Dictionary).duplicate()
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()
