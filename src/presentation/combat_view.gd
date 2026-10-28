@@ -52,6 +52,7 @@ func _ready() -> void:
 	z_index = 5
 	_font = ThemeDB.fallback_font
 	Game.event_published.connect(_on_event)
+	Game.world_reloaded.connect(_on_reload)
 	ghost = GhostActor.new()
 	ghost.name = "Fantasma"
 	add_child(ghost)
@@ -101,6 +102,18 @@ func _refresh_ghost() -> void:
 		return
 	var v := player_view.view
 	ghost.set_script_data(Game.db.tile_to_world(sim().c("player").tile), segs, v.sprite.texture, v.sprite.self_modulate, v.base_scale)
+
+
+## Mundo novo ou carregado: a reprodução em curso pertence ao mundo velho e é descartada.
+func _on_reload() -> void:
+	_queue.clear()
+	_skip = true
+	acao = false
+	_acao_fim_pendente = false
+	plan.clear()
+	preview = {}
+	if cine:
+		cine.skip()
 
 
 func active() -> bool:
@@ -847,9 +860,13 @@ func _wait(sec: float) -> void:
 
 func _play() -> void:
 	playing = true
+	var mundo := Game.world
 	while not _queue.is_empty():
 		var e: GameEvent = _queue.pop_front()
 		await _play_one(e)
+		if Game.world != mundo:   # o mundo mudou no meio da reprodução
+			_queue.clear()
+			break
 	playing = false
 	_skip = false
 	camera.focus_override = null

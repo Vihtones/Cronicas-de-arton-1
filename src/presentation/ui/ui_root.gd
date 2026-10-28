@@ -170,6 +170,8 @@ func _button(text: String, cb: Callable) -> Button:
 
 # --- HUD ------------------------------------------------------------------------------
 var hud_status: PanelContainer
+var hud_cond: Label
+var hud_quests: Label
 var hud_portrait: Portrait
 var hud_name: Label
 var bar_pv: ProgressBar
@@ -185,7 +187,7 @@ var toast: Label
 var belt: PanelContainer
 var _belt_slots: Dictionary = {}
 var _belt_key := ""
-var panel_tree: PowerTreePanel
+var panel_tree: PowerPanel
 var panel_inv: InventoryPanel
 var panel_guild: GuildPanel
 var spell_wheel: SpellWheel
@@ -252,6 +254,20 @@ func _build_hud(root: Control) -> void:
 	hud_right = _label("", 7)
 	hud_right.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(hud_right)
+	hud_cond = _label("", 7)
+	hud_cond.autowrap_mode = TextServer.AUTOWRAP_OFF
+	hud_cond.add_theme_color_override("font_color", Color(0.75, 0.85, 1.0))
+	col.add_child(hud_cond)
+	# rastreador de contratos (abaixo do relógio)
+	hud_quests = _label("", 7)
+	hud_quests.position = Vector2(500, 150)
+	hud_quests.size = Vector2(136, 60)
+	hud_quests.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	hud_quests.add_theme_color_override("font_color", Color(0.95, 0.9, 0.75))
+	hud_quests.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	hud_quests.add_theme_constant_override("outline_size", 3)
+	hud_quests.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(hud_quests)
 	# placa de hora e lugar (canto superior direito)
 	hud_clock = _panel(root, Control.PRESET_TOP_LEFT)
 	hud_clock.position = Vector2(500, 4)
@@ -369,6 +385,17 @@ func update_hud() -> void:
 	var prog: ProgressionModule = w.modules.progression
 	bar_xp.max_value = maxi(1, prog.xp_to_next()); bar_xp.value = s.xp
 	hud_right.text = "%s %s · T$ %d%s" % [CharacterBuilder.RACE_NAMES.get(s.race_id, ""), s.class_id.capitalize(), w.player.gold, " · furtivo" if sneak else ""]
+	var conds: Array = []
+	for cd in s.conditions:
+		conds.append(str(cd))
+	hud_cond.text = ("⚠ " + ", ".join(conds)) if not conds.is_empty() else ""
+	var qm: QuestModule = w.modules.quests
+	var ql: Array = []
+	for qid in qm.ativas:
+		var qa: Dictionary = qm.ativas[qid]
+		ql.append(("✔ " if bool(qa.progresso.feito) else "◆ ") + str(qa.titulo) + "\n" + qm.progresso_texto(qa).substr(0, 34))
+	hud_quests.text = "\n".join(ql.slice(0, 3))
+	hud_quests.visible = not w.modules.combat.active
 	if hud_portrait.actor_id != "player" or hud_portrait.race != s.race_id:
 		hud_portrait.set_actor("player", s.race_id)
 	var ratio := float(s.pv) / maxf(1.0, s.pv_max)
@@ -1392,7 +1419,7 @@ func toggle_inv() -> void:
 
 
 func _build_tree(root: Control) -> void:
-	panel_tree = PowerTreePanel.new()
+	panel_tree = PowerPanel.new()
 	root.add_child(panel_tree)
 	panel_tree.position = Vector2(20, 14)
 	panel_tree.visibility_changed.connect(_on_panel_shown.bind(panel_tree))

@@ -123,6 +123,9 @@ func _run() -> void:
 	main.ui.toggle_guild()
 	await _shot("i7_guilda")
 	main.ui.close_panels()
+	G.world.clock.tick = 6 * 12
+	await _frames(5)
+	await _shot("i7b_hud")
 	var q = G.world.modules.quests
 	var cid: String = q.ativas.values()[0].criaturas[0]
 	G.world.player.position = G.db.tile_to_world(G.world.modules.combat.creature_tile(cid) + Vector2i(3, 0))

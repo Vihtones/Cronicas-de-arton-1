@@ -74,6 +74,9 @@ func _run() -> void:
 	await _frames(5)
 	main.ui.panel_tree.refresh()
 	await _frames(3)
+	main.ui.panel_tree.filtro = "todos"
+	main.ui.panel_tree.refresh()
+	await _frames(3)
 	await _shot("s2_arvore")
 	print("FIM falhas=%d" % falhas)
 	quit(falhas)

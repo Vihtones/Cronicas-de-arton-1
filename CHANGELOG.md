@@ -2,6 +2,7 @@
 
 ## 0.7.1 (em andamento)
 
+- Seleção de poderes (K) em cartões: filtros (disponíveis, da classe, gerais, que você tem, todos), busca, efeito, custo, pré-requisitos e o que falta; árvore desenhada em "Ver árvore". HUD: condições ativas e rastreador de contratos. Reprodução do combate descartada ao trocar de mundo.
 - Criação de personagem refeita em 5 etapas (Raça, Classe, Atributos, Perícias e magias, Resumo): descrição e números de cada raça e classe, compra de 10 pontos com + e − (LB p.17), escolha dos +1 do humano/lefou/osteon/sereia, escolha das magias iniciais entre todas as de 1º círculo completas (arcanista e clérigo; o mago agora começa com 4), nome livre e prévia constante. Janelas grandes com fundo opaco.
 - Guilda dos Aventureiros e missões (QuestModule, data/world/quests.json): inscrição na sede (taverna), quadro com 5 contratos renovado a cada 3 dias — caçar (as criaturas surgem no mundo), entregar e explorar —, ranks Cobre → Platina por pontos, ND máximo por rank (contratos acima marcados como arriscados), pagamento em ouro, XP e pontos. Painel L (diário de missões / quadro), alvos no minimapa, avisos na tela.
 - Bestiário: 44 criaturas do capítulo 7 do Livro Básico extraídas do texto (tools/extrator_ameacas/), com os números do livro (status ADAPTADA; habilidades especiais listadas na nota até ganharem efeito).
