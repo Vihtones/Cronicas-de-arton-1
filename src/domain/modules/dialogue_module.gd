@@ -186,7 +186,9 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			if not npcs.npc(id).alive: return PackedStringArray(["não responde"])
 			var t: Vector2i = npcs.npc_tile(id)
 			var p := world.db.world_to_tile(world.player.position)
-			if CombatSim.cheb(t, p) > 2: return PackedStringArray(["longe demais para conversar"])
+			var magia_pc = world.module("magia")
+			var projetado: bool = magia_pc != null and magia_pc.projecao_ve(id)   # Projetar Consciência: fala mental com quem a projeção vê
+			if CombatSim.cheb(t, p) > 2 and not projetado: return PackedStringArray(["longe demais para conversar"])
 		"ChooseOption":
 			if session.is_empty(): return PackedStringArray(["sem conversa"])
 			var vis := visible_options(session.npc, session.node)

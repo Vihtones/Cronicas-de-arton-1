@@ -3964,3 +3964,13 @@ func test_controlar_agua_congelar_torna_a_agua_atravessavel() -> void:
 	check(not sim.passable(agua, "player"), "a água não se atravessa a pé")
 	check(_lanca(m, {"type": "cast", "spell": "controlar_agua", "efeito": "congelar", "tile": agua}).ok, "Controlar Água")
 	check(sim.passable(agua, "player"), "congelada, sim")
+
+
+func test_projetar_consciencia_ve_o_npc_e_conversa_de_longe() -> void:
+	var w = _clerigo_mundo(["projetar_consciencia"])[0]
+	w.player_sheet.level = 17
+	var npc_id: String = w.db.all_npc_ids()[0]
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "projetar_consciencia", "npc": npc_id}).accepted, "Projetar Consciência")
+	var mg = w.module("magia")
+	check(mg.projecao_ve(npc_id), "a projeção vê o NPC")
+	check(WorldHelpers.cmd(w, "StartDialogue", {"npc_id": npc_id}).accepted, "fala mentalmente com ele, mesmo longe")

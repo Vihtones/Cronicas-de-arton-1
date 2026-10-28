@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"projetar_consciencia": [],   # um lugar do mapa ou um NPC (no mesmo plano); sustentada pela cena
 	"controlar_terra": [1],   # fora de combate, só fundir-se à pedra ao lado (um dia)
 	"viagem_arborea": [],   # de uma árvore ao lado para outra no mapa; com o aprimoramento, o grupo, até uma planta a 100km
 	"globo_da_verdade": [],   # o que você (ou um NPC tocado) viu sobre um assunto; aprimoramentos: mês, ano, cadáver, 10 globos
@@ -71,6 +72,9 @@ var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de com
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
 var missoes: Dictionary = {}   # Missão Divina: npc -> {destino, ate_dia, recusou, penalidade, cd, marca, cumprida}
 var _dia_missoes := -1
+var _lancando_pela_projecao := false
+var visitados: Dictionary = {}   # lugares onde o jogador já esteve (Projetar Consciência: lugar conhecido)
+var projecao: Dictionary = {}   # Projetar Consciência ativa: {local, npc, ate, magias}
 var arborea_ate := -1   # Viagem Arbórea ativa até este tick: pode passar de árvore em árvore (TreeHop, 1 PM)
 var cidade_protegida: Dictionary = {}   # Intervenção Divina: {zona} protegida do próximo desastre
 var _duplicando := false   # Intervenção Divina (duplicar): a magia duplicada não pede ser conhecida nem PM
@@ -83,15 +87,33 @@ var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim
 
 
 func module_id() -> String: return "magia"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune", "TreeHop", "LeaveStone"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune", "TreeHop", "LeaveStone", "EndProjection"])
 
 
+## Projetar Consciência (aprimoramento): "pela_projecao" lança a magia a partir da projeção — sem componente material
+## e sem ser sustentada; os NPCs que a projeção vê contam como presentes.
 func validate(cmd: GameCommand) -> PackedStringArray:
+	if not bool(cmd.payload.get("pela_projecao", false)):
+		return _validate(cmd)
+	if projecao.is_empty() or not bool(projecao.magias) or projecao_local() == "":
+		return PackedStringArray(["sem projeção capaz de lançar magias"])
+	var regra: Dictionary = world.rules.value("magia." + str(cmd.payload.get("spell", "")), {})
+	if "Componente material" in str(regra.get("texto", "")) or str(regra.get("duracao", "")) == "sustentada":
+		return PackedStringArray(["pela projeção, só magias sem componente material e não sustentadas"])
+	_lancando_pela_projecao = true
+	var erros := _validate(cmd)
+	_lancando_pela_projecao = false
+	return erros
+
+
+func _validate(cmd: GameCommand) -> PackedStringArray:
 	var combat = world.module("combat")
 	if combat != null and combat.active:
 		return PackedStringArray(["em combate: use as ações de combate"])
 	if cmd.type == "CollectMessenger":
 		return PackedStringArray() if mensageiros.any(func(m): return str(m.destino) == str(cmd.payload.get("destino", ""))) else PackedStringArray(["nenhum mensageiro lá"])
+	if cmd.type == "EndProjection":
+		return PackedStringArray() if not projecao.is_empty() else PackedStringArray(["sem projeção"])
 	if cmd.type == "LeaveStone":
 		return PackedStringArray() if world.player_sheet != null and world.player_sheet.efeito_bonus("mesclado") > 0 else PackedStringArray(["você não está fundido à pedra"])
 	if cmd.type == "TreeHop":
@@ -225,6 +247,17 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"projetar_consciencia":
+			var npc_pc := str(cmd.payload.get("npc", ""))
+			var local_pc := str(cmd.payload.get("local", ""))
+			if npc_pc != "":
+				var npcs_pc = world.module("npcs")
+				if npcs_pc == null or npcs_pc.npc(npc_pc).is_empty() or not bool(npcs_pc.npc(npc_pc).get("alive", true)):
+					return PackedStringArray(["escolha um NPC vivo"])
+			elif not _local_existe(local_pc):
+				return PackedStringArray(["escolha um lugar conhecido ou um NPC"])
+			elif not _visitado(local_pc):
+				return PackedStringArray(["o lugar precisa ser conhecido por você"])
 		"controlar_terra":
 			var t_ct := _tile_jogador()
 			var pedra := false
@@ -433,9 +466,19 @@ func _controlar_madeira(payload: Dictionary, sh: CharacterSheet) -> Array:
 
 
 func execute(cmd: GameCommand) -> Array:
+	_lancando_pela_projecao = bool(cmd.payload.get("pela_projecao", false))
+	var out := _execute(cmd)
+	_lancando_pela_projecao = false
+	return out
+
+
+func _execute(cmd: GameCommand) -> Array:
 	var sh: CharacterSheet = world.player_sheet
 	if cmd.type == "CollectMessenger":
 		return _coletar_mensageiro(str(cmd.payload.get("destino", "")))
+	if cmd.type == "EndProjection":
+		projecao = {}
+		return [fact("SPELL_ENDED", {"spell": "projetar_consciencia", "target": "player", "reason": "encerrada"}, ["player"])]
 	if cmd.type == "LeaveStone":
 		world.player_sheet.remove_efeito("magia.controlar_terra")
 		return [fact("SPELL_ENDED", {"spell": "controlar_terra", "target": "player", "reason": "saiu"}, ["player"])]
@@ -597,6 +640,11 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"projetar_consciencia":
+			var combat_pc = world.module("combat")
+			projecao = {"local": str(cmd.payload.get("local", "")), "npc": str(cmd.payload.get("npc", "")), "magias": (cmd.payload.get("aprimoramentos", []) as Array).has(0),
+				"ate": world.clock.tick + (combat_pc.TICKS_CENA if combat_pc != null else 6)}
+			out.append(fact("PROJECTION", {"caster": "player", "visao": projecao_ver()}, ["player"]))
 		"controlar_terra":
 			sh.add_efeito("magia.controlar_terra", "mesclado", 1, "dia", "", world.day_index() + 1)
 			out.append(fact("BUFF_APPLIED", {"actor": "player", "target": "player", "buff": "controlar_terra", "efeito": "fundir", "tags": ["magia"]}, ["player"]))
@@ -873,6 +921,42 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Projetar Consciência: onde a projeção está ("" se não há): o lugar escolhido ou onde o NPC está agora.
+func projecao_local() -> String:
+	if projecao.is_empty() or world.clock.tick >= int(projecao.ate):
+		return ""
+	if str(projecao.npc) != "":
+		var npcs = world.module("npcs")
+		return str(npcs.npc(str(projecao.npc)).get("location", "")) if npcs != null else ""
+	return str(projecao.local)
+
+
+## A projeção vê este NPC (está no mesmo lugar dela)?
+func projecao_ve(npc: String) -> bool:
+	var lugar := projecao_local()
+	var npcs = world.module("npcs")
+	return lugar != "" and npcs != null and str(npcs.npc(npc).get("location", "")) == lugar
+
+
+## O que a projeção vê agora: quem está no lugar e os objetos dele.
+func projecao_ver() -> Dictionary:
+	var lugar := projecao_local()
+	if lugar == "":
+		return {}
+	var npcs = world.module("npcs")
+	var presentes: Array = []
+	for n in world.db.all_npc_ids():
+		if npcs != null and str(npcs.npc(n).get("location", "")) == lugar and bool(npcs.npc(n).get("alive", true)):
+			presentes.append(n)
+	var objs: Array = world.db.all_objects().filter(func(o): return world.db.location_at(Vector2i(int(o.tile[0]), int(o.tile[1]))) == lugar).map(func(o): return o.id)
+	return {"lugar": lugar, "presentes": presentes, "objetos": objs}
+
+
+## Lugar conhecido: já esteve nele (a exploração guarda os lugares visitados) ou é o lugar atual.
+func _visitado(loc: String) -> bool:
+	return loc == world.db.location_at(_tile_jogador()) or visitados.has(loc)
 
 
 ## Viagem Arbórea fora de combate: árvore ao seu lado e destino "arvore" (qualquer árvore do mapa, que está toda a menos
@@ -1217,6 +1301,9 @@ func ao_mover() -> Array:
 	var sh: CharacterSheet = world.player_sheet
 	if sh == null:
 		return []
+	var aqui := world.db.location_at(_tile_jogador())
+	if aqui != "":
+		visitados[aqui] = true
 	sh.remove_efeito_stat("area_natural")
 	if sh.efeito_bonus("auxilio_dados") > 0 and world.db.is_natural(_tile_jogador()):
 		sh.add_efeito("comunhao.area", "area_natural", 1, "dia", "", world.day_index() + 1)
@@ -1700,6 +1787,8 @@ func _no_mesmo_lugar(npc: String) -> bool:
 	var npcs = world.module("npcs")
 	if npcs == null or npcs.npc(npc).is_empty() or not bool(npcs.npc(npc).alive):
 		return false
+	if _lancando_pela_projecao and projecao_ve(npc):
+		return true   # Projetar Consciência (aprimoramento): a magia parte da projeção
 	return str(npcs.npc(npc).location) == world.db.location_at(_tile_jogador())
 
 
@@ -1812,7 +1901,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "arborea_ate": arborea_ate, "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "arborea_ate": arborea_ate, "projecao": projecao.duplicate(), "visitados": visitados.duplicate(), "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1828,6 +1917,8 @@ func from_dict(d: Dictionary) -> void:
 	cidade_protegida = (d.get("cidade_protegida", {}) as Dictionary).duplicate()
 	missoes = (d.get("missoes", {}) as Dictionary).duplicate(true)
 	arborea_ate = int(d.get("arborea_ate", -1))
+	projecao = (d.get("projecao", {}) as Dictionary).duplicate()
+	visitados = (d.get("visitados", {}) as Dictionary).duplicate()
 	_dia_missoes = int(d.get("dia_missoes", -1))
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()

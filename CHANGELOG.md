@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Projetar Consciência (universal, 5º círculo): a consciência vai a um lugar já visitado ou para junto de um NPC; vê quem e o que há lá e conversa mentalmente com quem vê; com o aprimoramento, lança magias sem componente material e não sustentadas nos NPCs de lá.
+
 - Interface: botão e tecla J de "Ordens" no combate, que mostra só as ações disponíveis no momento (mortos-vivos, Fúria do Panteão, enxame, chama, labareda, resfriar, raio da tempestade, salto de sombra, segurar-se, muralha, terremoto, sair da árvore ou da pedra, gelo, parceiros destruidor, médico e combatente); um clique no mapa executa.
 
 - Controlar Água (divina, 3º círculo): congelar (gelo atravessável; quem nadava fica preso), derreter, enchente (a água sobe para a margem), evaporar (10d8 de fogo, +2d8, em quem é imune a frio; metade nos outros vivos) e partir (caminho seco).

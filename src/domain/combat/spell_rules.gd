@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"projetar_consciencia": {"aprimoramentos": [0]},   # consciência num lugar ou junto de um NPC: vê, ouve e fala mentalmente; lança magias de lá
 	"controlar_agua": {"aprimoramentos": [0]},   # congelar, derreter, enchente, evaporar (10d8 de fogo, +2d8), partir
 	"controlar_terra": {"aprimoramentos": [0, 1]},   # amolecer, modelar (parede ou passagem), solidificar; +2 cubos; fundir-se à pedra por um dia
 	"viagem_arborea": {"aprimoramentos": [0]},   # entra numa árvore ao lado e sai de qualquer outra a até 1km; com o grupo, até outra planta a 100km
