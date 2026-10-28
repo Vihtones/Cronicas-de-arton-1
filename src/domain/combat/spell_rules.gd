@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"globo_da_verdade": {"aprimoramentos": [0, 1, 2, 3]},   # cena vista por você ou por quem tocar (semana; mês; ano); cadáver; 10 globos em alcance longo
 	"missao_divina": {"aprimoramentos": [0, 1]},   # fora de combate: NPC deve ir a um lugar; recusou, Vontade por dia ou –2 cumulativo; marca; um ano
 	"servo_divino": {"aprimoramentos": [0, 1]},   # espírito cumpre uma tarefa: lutar (cena) ou entregar um item; um dia; uma semana
 	"intervencao_divina": {"aprimoramentos": []},   # cura total de 10; dissipa magia até 4º; com sacrifício de 2 PM: item, duplicar magia, proteger povoado, ressuscitar

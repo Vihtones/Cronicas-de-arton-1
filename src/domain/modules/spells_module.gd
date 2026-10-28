@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"globo_da_verdade": [],   # o que você (ou um NPC tocado) viu sobre um assunto; aprimoramentos: mês, ano, cadáver, 10 globos
 	"missao_divina": [],   # num NPC aqui: ir a um lugar (uma semana, ou um ano); ou a marca (aprimoramento)
 	"servo_divino": [],   # tarefa "entregar": o espírito leva um item a um lugar, para ser recolhido lá no prazo
 	"intervencao_divina": [],   # curar o grupo, criar item, duplicar magia, proteger o povoado
@@ -213,6 +214,19 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"globo_da_verdade":
+			var alvo_gv := str(cmd.payload.get("target", "player"))
+			if str(cmd.payload.get("pergunta", "")) == "":
+				return PackedStringArray(["faça a pergunta (o assunto da cena)"])
+			if alvo_gv != "player":
+				var npcs_gv = world.module("npcs")
+				if npcs_gv == null or npcs_gv.npc(alvo_gv).is_empty():
+					return PackedStringArray(["toque você mesmo ou um NPC"])
+				var morto_gv: bool = not bool(npcs_gv.npc(alvo_gv).get("alive", true))
+				if morto_gv and not apr.has(2):
+					return PackedStringArray(["um cadáver só com o aprimoramento"])
+				if not morto_gv and not _no_mesmo_lugar(alvo_gv):
+					return PackedStringArray(["o NPC precisa estar aqui para ser tocado"])
 		"missao_divina":
 			var alvo_md := str(cmd.payload.get("target", ""))
 			if not _no_mesmo_lugar(alvo_md):
@@ -554,6 +568,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"globo_da_verdade":
+			out.append_array(globo_da_verdade(cmd.payload, sh))
 		"missao_divina":
 			out.append_array(missao_divina(cmd.payload, sh))
 		"servo_divino":
@@ -820,6 +836,51 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Globo da Verdade de Gwen (divina 2): mostra o que você (a crônica) ou o NPC tocado (as memórias de quem viu) viu sobre
+## a pergunta, até uma semana atrás (um mês, um ano). O NPC vivo faz Vontade para anular. Cadáver: a última cena vista.
+## Com 10 globos em alcance longo, quem está no lugar também vê a cena (ganha a lembrança).
+func globo_da_verdade(p: Dictionary, sh: CharacterSheet) -> Array:
+	var apr: Array = p.get("aprimoramentos", [])
+	var alvo := str(p.get("target", "player"))
+	var pergunta := str(p.pergunta).to_lower()
+	var por_dia := 24 * 60 / world.clock.tick_minutes
+	var janela := por_dia * (365 if apr.has(1) else (30 if apr.has(0) else 7))
+	var desde := world.clock.tick - janela
+	var cenas: Array = []
+	var npcs = world.module("npcs")
+	var morto: bool = alvo != "player" and npcs != null and not bool(npcs.npc(alvo).get("alive", true))
+	if alvo == "player":
+		var cr = world.module("chronicle")
+		for en in (cr.entries if cr != null else []):
+			if int(en.tick) >= desde and str(en.text).to_lower().contains(pergunta):
+				cenas.append({"tick": int(en.tick), "texto": str(en.text)})
+	else:
+		var combat = world.module("combat")
+		var cd: int = combat.spell_dc(sh, {"spell": "globo_da_verdade"}) if combat != null else 15
+		if not morto and Checks.skill(_ficha_npc(alvo), "vontade", cd, world.rules, world.rng, "world").get("success", false):
+			return [fact("SPELL_MISSED", {"caster": "player", "target": alvo, "spell": "globo_da_verdade", "reason": "resistiu"}, ["player"])]
+		var mem = world.module("memory")
+		var lista: Array = mem.list(alvo) if mem != null else []
+		for m in lista:
+			if str(m.get("source", "")) == "boato":
+				continue
+			var bate := pergunta in str(m.get("text", "")).to_lower() or pergunta == str(m.get("about", "")) or pergunta == str(m.get("subject", "")) or pergunta == str(m.get("location", ""))
+			if (morto or int(m.get("tick", 0)) >= desde) and bate:
+				cenas.append({"tick": int(m.get("tick", 0)), "texto": str(m.get("text", "")), "lugar": str(m.get("location", ""))})
+		if morto and not cenas.is_empty():
+			cenas.sort_custom(func(x, y): return int(x.tick) > int(y.tick))
+			cenas = [cenas[0]]   # a última cena vista
+	var out: Array = [fact("TRUTH_GLOBE", {"caster": "player", "target": alvo, "pergunta": pergunta, "cenas": cenas, "globos": 10 if apr.has(3) else 1}, ["player"])]
+	if apr.has(3) and npcs != null and not cenas.is_empty():
+		var mem2 = world.module("memory")
+		var lugar := world.db.location_at(_tile_jogador())
+		for n in world.db.all_npc_ids():
+			if n != alvo and str(npcs.npc(n).get("location", "")) == lugar and mem2 != null:
+				mem2.add_memory(n, {"key": "globo:%s:%d" % [pergunta, int(cenas[0].tick)], "about": alvo, "subject": "", "valence": 0, "location": lugar,
+					"tick": world.clock.tick, "emotion": "surpresa", "reliability": 1.0, "source": "visto", "durable": false, "text": "Vi no globo: " + str(cenas[0].texto)})
+	return out
 
 
 ## Missão Divina (divina 3): o NPC faz Vontade (anula). Falhou: deve ir ao destino em até uma semana (um ano com o

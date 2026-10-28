@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Globo da Verdade de Gwen (divina, 2º círculo): mostra o que você ou um NPC tocado viu sobre um assunto na última semana (mês, ano); num cadáver, a última cena; com 10 globos, quem está no lugar também vê.
+
 - Missão Divina (divina, 3º círculo): o NPC que falha na Vontade deve ir ao lugar escolhido em uma semana (um ano); quem aceita vai até lá; quem recusa sofre –2 cumulativo em testes e rolagens a cada dia em que falha na Vontade. A marca (aprimoramento) pune cada crime do marcado.
 
 - Servo Divino (divina, 3º círculo): pago o espírito (T$ 100, 500 ou 1.000), ele luta ao seu lado na cena ou, fora de combate, leva um item a um lugar para ser recolhido lá (no mesmo dia, em um dia ou em uma semana).

@@ -3911,3 +3911,14 @@ func test_missao_divina_quem_recusa_sofre_penalidade_por_dia() -> void:
 	mg.on_tick(0)
 	eq(mg.penalidade_missao(alvo), 2, "–2 depois de um dia sem cumprir")
 	eq(w.module("party").ficha_de(alvo).efeito_bonus("testes"), -2, "a ficha do NPC sente a penalidade")
+
+
+func test_globo_da_verdade_mostra_o_que_o_npc_viu() -> void:
+	var w = _clerigo_mundo(["globo_da_verdade"])[0]
+	var mg = w.module("magia")
+	var alvo: String = w.db.all_npc_ids()[0]
+	w.module("memory").add_memory(alvo, {"key": "teste_globo", "about": "lobos", "subject": "", "valence": 0, "location": "praca", "tick": w.clock.tick,
+		"emotion": "medo", "reliability": 1.0, "source": "visto", "durable": false, "text": "Vi lobos na estrada."})
+	w.player_sheet.level = 99   # CD altíssima: o NPC não resiste
+	var f: Array = mg.globo_da_verdade({"target": alvo, "pergunta": "lobos"}, w.player_sheet)
+	eq((f[0].payload.cenas as Array).size(), 1, "uma cena sobre lobos")
