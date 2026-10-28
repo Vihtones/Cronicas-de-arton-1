@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Parceiros: os sete tipos que faltavam estão no jogo (adepto, assassino, atirador, destruidor, magivocador, médico e vigilante), nos três níveis de poder do Livro Básico.
+
 - Vidência (universal, 3º círculo): fora de combate, vê e ouve um NPC a qualquer distância e quem está com ele, pela cena; o alvo resiste com Vontade (+10 se nunca viu o jogador, –5 se o conhece bem).
 
 - Lendas e Histórias (universal, 3º círculo): ao tocar uma criatura, objeto ou lugar, revela tudo (estatísticas, magias, resistências, imunidades, magias ativas; ofício, facção e paradeiro de NPCs; quem e o que há num lugar). Com o aprimoramento, à distância, em um dia e com T$ 1.000 de componente.

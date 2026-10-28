@@ -3719,3 +3719,22 @@ func test_videncia_mostra_o_npc_quando_ele_falha() -> void:
 	w.player_sheet.level = 99   # CD altíssima: o NPC falha
 	mg.lancar_videncia(npc_id, w.player_sheet)
 	eq(str(mg.videncia_ver().get("alvo", "")), npc_id, "a visão mostra o alvo")
+
+
+func test_parceiros_novos_atirador_adepto_medico_e_vigilante() -> void:
+	var r := RuleRegistry.load_default()
+	var Parc := preload("res://src/domain/rules/parceiros.gd")
+	for t in ["adepto", "assassino", "atirador", "destruidor", "magivocador", "medico", "vigilante"]:
+		eq(Parc.validar(r, {"tipo": t, "nivel": "veterano"}), "", "%s disponível" % t)
+	var m := _cena_grupo(9)
+	var sim: CombatSim = m[2]
+	var P: CharacterSheet = sim.c("player").sheet
+	Parc.aplicar(P, [{"id": "a", "tipo": "adepto", "nivel": "veterano"}, {"id": "b", "tipo": "medico", "nivel": "veterano"}], r)
+	var sp := GhostPlanner.spell_rule(r, "bencao")
+	eq(GhostPlanner.spell_cost(r, sp, {"spell": "bencao"}, P), maxi(0, GhostPlanner.spell_cost(r, sp, {"spell": "bencao"}) - 1), "adepto tira 1 PM")
+	P.pv = P.pv_max - 30
+	var pv0 := P.pv
+	var v := GhostPlanner.validate_action(sim, "player", {"type": "parceiro_medico", "target": "player"})
+	check(v.ok, "médico cura")
+	m[1]._execute_action("player", {"type": "parceiro_medico", "target": "player"}, v)
+	check(P.pv > pv0, "curou")

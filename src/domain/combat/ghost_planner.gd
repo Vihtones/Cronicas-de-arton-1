@@ -2,6 +2,7 @@ class_name GhostPlanner
 extends RefCounted
 const SpellRules := preload("res://src/domain/combat/spell_rules.gd")
 const Area := preload("res://src/domain/combat/area.gd")
+const Parceiros := preload("res://src/domain/rules/parceiros.gd")
 ## Projeção fantasma (§9): recebe o estado (somente leitura), clona e simula o plano
 ## sem dados. Mostra custos, alcance, chance de acerto e onde o plano fica inválido.
 ## Regra crítica: nunca altera o CombatSim original.
@@ -125,7 +126,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if A.sheet.has_efeito("magia.potencia_divina"): return {"ok": false, "reason": "sob Potência Divina você não pode lançar magias"}
 			if a.get("pungente", false) and not A.sheet.has_power("magia_pungente"):
 				return {"ok": false, "reason": "você não tem Magia Pungente"}
-			var cost := spell_cost(sim.rules, sp, a)
+			var cost := spell_cost(sim.rules, sp, a, A.sheet)
 			if A.sheet.pm < cost: return {"ok": false, "reason": "PM insuficiente (%d)" % cost}
 			var targets: Array = a.get("targets", [a.get("target", actor)])
 			var apr: Array = a.get("aprimoramentos", [])
@@ -606,6 +607,28 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if CombatSim.cheb(ze[0].tiles[0], para_e) > Area.quadrados(12.0): return {"ok": false, "reason": "o enxame anda até 12m"}
 			if sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes" and z != ze[0] and (z.tiles as Array).has(para_e)): return {"ok": false, "reason": "já há um enxame lá"}
 			return {"ok": true, "kind": "movimento"}
+		"parceiro_destruidor":
+			# Parceiro destruidor (LB p.261): ação livre, 1/2/4 PM; dano de energia em alcance curto (mestre: área de 6m em médio).
+			var nv_d := Parceiros.nivel_acao(A.sheet, "parceiro_destruidor")
+			if nv_d == "": return {"ok": false, "reason": "sem parceiro destruidor"}
+			if (A.flags as Array).has("parceiro_destruidor_%d" % sim.round_no): return {"ok": false, "reason": "uma vez por rodada"}
+			if A.sheet.pm < A.sheet.efeito_bonus("parceiro_destruidor"): return {"ok": false, "reason": "PM insuficiente"}
+			if not SpellRules.TIPOS_ENERGIA.has(str(a.get("tipo_energia", "fogo"))): return {"ok": false, "reason": "tipo de energia inválido"}
+			var alcance_d := int(sim.rules.value("alcance.quadrados", {}).get("medio" if nv_d == "mestre" else "curto", 6))
+			var centro_d: Vector2i = a.get("tile", sim.c(a.get("target", actor)).tile if sim.combatants.has(a.get("target", "")) else A.tile)
+			if nv_d != "mestre" and (not sim.combatants.has(a.get("target", "")) or not sim.is_enemy(actor, a.target)): return {"ok": false, "reason": "escolha um inimigo"}
+			if CombatSim.cheb(A.tile, centro_d) > alcance_d: return {"ok": false, "reason": "fora do alcance"}
+			return {"ok": true, "kind": "livre"}
+		"parceiro_medico":
+			# Parceiro médico (LB p.261): uma vez por rodada, 1/3/5 PM para curar criatura adjacente (veterano: ou remover condição).
+			var nv_m := Parceiros.nivel_acao(A.sheet, "parceiro_medico")
+			if nv_m == "": return {"ok": false, "reason": "sem parceiro médico"}
+			if (A.flags as Array).has("parceiro_medico_%d" % sim.round_no): return {"ok": false, "reason": "uma vez por rodada"}
+			if A.sheet.pm < A.sheet.efeito_bonus("parceiro_medico"): return {"ok": false, "reason": "PM insuficiente"}
+			var alvo_md: String = a.get("target", actor)
+			if not sim.combatants.has(alvo_md) or sim.c(alvo_md).sheet.is_dead() or CombatSim.cheb(A.tile, sim.c(alvo_md).tile) > 1: return {"ok": false, "reason": "a criatura precisa estar adjacente"}
+			if str(a.get("condicao", "")) != "" and nv_m == "iniciante": return {"ok": false, "reason": "remover condição é do médico veterano"}
+			return {"ok": true, "kind": "livre"}
 		"segurar":
 			# Buraco Negro: ação de movimento para se segurar num objeto fixo (+2 nos testes de resistência até o próximo turno).
 			if not sim.zonas.any(func(z): return str(z.tipo) == "buraco_negro"): return {"ok": false, "reason": "nada puxando você"}
@@ -751,7 +774,8 @@ static func spell_rule(rules: RuleRegistry, sp_id: String) -> Dictionary:
 	return rules.value("magia." + sp_id, {})
 
 
-static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary) -> int:
+## `sheet` (opcional): o parceiro adepto tira 1 PM das magias de até 1º (ou 2º) círculo.
+static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary, sheet: CharacterSheet = null) -> int:
 	if a.get("truque", false):
 		return 0   # Truque: custo zero
 	var base := 0 if int(sp.get("circulo", 1)) == 0 else int(rules.value("magia.custo_por_circulo")[str(int(sp.circulo))])
@@ -760,6 +784,8 @@ static func spell_cost(rules: RuleRegistry, sp: Dictionary, a: Dictionary) -> in
 	base += SpellRules.custo_aprimoramentos(rules, str(a.get("spell", "")), a.get("aprimoramentos", []))
 	if str(a.get("spell", "")) == "lagrimas_de_wynna" and a.get("aprimoramentos", []).has(1):
 		base += 1   # Lágrimas de Wynna (ritual): sacrifício de 1 PM além do custo do aprimoramento
+	if sheet != null and not a.get("truque", false) and sheet.efeito_bonus("parceiro_adepto") > 0 and int(sp.get("circulo", 1)) <= sheet.efeito_bonus("parceiro_adepto"):
+		base = maxi(0, base - 1)   # parceiro adepto
 	return base
 
 

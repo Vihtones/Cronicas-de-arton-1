@@ -506,6 +506,8 @@ func puxar(id: String, destino: Vector2i, quadrados: int) -> Array:
 
 
 func flanking(attacker: String, target: String) -> bool:
+	if c(target).sheet.has_power("olhos_nas_costas"):
+		return false   # parceiro vigilante mestre: não pode ser flanqueado
 	var a: Vector2i = c(attacker).tile
 	var t: Vector2i = c(target).tile
 	var opposite := t + (t - a)
@@ -545,6 +547,8 @@ func attack_profile(attacker: String, target: String, atk_index: int, special: b
 	if cm != 0: mods.append(["condição", cm])
 	if not ranged and sheet.has_effective_condition(rules, "caido"): mods.append(["atacante caído", -5])
 	if not ranged and flanking(attacker, target): mods.append(["flanqueando", int(rules.value("situacao.flanquear").bonus_ataque)])
+	elif not ranged and sheet.efeito_bonus("parceiro_flanco") > 0 and not (A.flags as Array).has("parceiro_flanco_%d" % round_no):
+		mods.append(["parceiro assassino", int(rules.value("situacao.flanquear").bonus_ataque)])   # como se flanqueasse, 1 inimigo por rodada
 	if charge: mods.append(["investida", int(rules.value("acao.investida").bonus_ataque)])
 	if ranged and (zona_em(A.tile, "tempestade") or zona_em(T.tile, "tempestade")): mods.append(["vendaval", -5])   # Tempestade Divina
 	if ranged and (zona_em(A.tile, "furia") or zona_em(T.tile, "furia")): return {"ok": false, "reason": "os ventos da Fúria do Panteão impedem ataques à distância"}

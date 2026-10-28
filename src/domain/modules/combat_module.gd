@@ -417,6 +417,8 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 	var pre: Array = []
 	if player_surprised and enemy_ids.any(func(e): return int(creature_state.get(e, {}).get("detectado_ate", -1)) > world.clock.tick):
 		player_surprised = false   # Detectar Ameaças (aprimoramento): não é surpreendido por quem detectou
+	if world.player_sheet.has_power("esquiva_sobrenatural"):
+		player_surprised = false   # parceiro vigilante veterano: nunca é surpreendido
 	var dlg = world.module("dialogue")
 	if dlg != null and not dlg.session.is_empty():
 		pre.append(fact("DIALOGUE_ENDED", {"npc": dlg.session.npc, "reason": "combate"}))
@@ -452,7 +454,7 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 		if not pen_t.is_empty() and int(pen_t.ate) > world.clock.tick:
 			sim.c(id).sheet.add_efeito("magia.tranquilidade", "ataque", int(pen_t.ataque), "cena")   # Tranquilidade resistida
 	# Iniciativa (LB p.231): jogador rola; inimigos fazem um teste único com o menor valor.
-	var p_mod := world.player_sheet.skill_value("iniciativa", world.rules) + world.player_sheet.efeito_bonus("proxima_iniciativa")
+	var p_mod := world.player_sheet.skill_value("iniciativa", world.rules) + world.player_sheet.efeito_bonus("proxima_iniciativa") + world.player_sheet.efeito_bonus("pericia_iniciativa")
 	world.player_sheet.remove_efeito_stat("proxima_iniciativa")   # Aviso (alerta): +5 no próximo teste de Iniciativa
 	var e_mod := 999
 	for id in enemy_ids:
@@ -2187,7 +2189,7 @@ func _dano_de_fogo(id: String, tg: String, dados: String, cd: int, pericia: Stri
 func _dano_de_energia(id: String, tg: String, dados: String, cd: int, pericia: String, tipo: String, nome: String) -> Array:
 	var out: Array = []
 	var T: CharacterSheet = sim.c(tg).sheet
-	var dano := _dados_energia(dados, tipo, sim.c(tg).tile)
+	var dano := _dados_energia(_mais_dados(dados, sim.c(id).sheet.efeito_bonus("parceiro_magia_dados") if sim.combatants.has(id) else 0), tipo, sim.c(tg).tile)   # parceiro magivocador
 	var passou := false
 	if pericia != "":
 		passou = _resiste(tg, pericia, cd, out)
@@ -2901,6 +2903,14 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 
 ## Consagrar e Profanar (SpellsModule): na área consagrada, dados de luz (cura e dano) saem no máximo; na
 ## profanada, os de trevas. Fora delas, rolagem normal. `mult` multiplica os dados (crítico).
+## "XdY+Z" com n dados a mais: "(X+n)dY+Z".
+static func _mais_dados(expr: String, n: int) -> String:
+	var i := expr.find("d")
+	if n <= 0 or i <= 0 or not expr.substr(0, i).is_valid_int():
+		return expr
+	return str(int(expr.substr(0, i)) + n) + expr.substr(i)
+
+
 func _dados_energia(expr: String, tipo: String, tile: Vector2i, mult: int = 1) -> int:
 	var magia_m = world.module("magia")
 	if magia_m != null and magia_m.maximiza(tipo, tile):
@@ -3278,6 +3288,31 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if str(z.id) == zid_e:
 					z.tiles = [para_e]
 			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "mover", "tile": [para_e.x, para_e.y]}, [id]))
+		"parceiro_destruidor":
+			var sh_d: CharacterSheet = sim.c(id).sheet
+			var nv_d := Parceiros.nivel_acao(sh_d, "parceiro_destruidor")
+			sh_d.pm -= sh_d.efeito_bonus("parceiro_destruidor")
+			(sim.c(id).flags as Array).append("parceiro_destruidor_%d" % sim.round_no)
+			var dano_d := str(world.rules.value("parceiro.tipos", {}).destruidor.dano[nv_d])
+			var tipo_d := str(a.get("tipo_energia", "fogo"))
+			var alvos_d: Array = [a.get("target", "")]
+			if nv_d == "mestre":
+				var centro_d: Vector2i = a.get("tile", sim.c(a.get("target", id)).tile if sim.combatants.has(a.get("target", "")) else sim.c(id).tile)
+				alvos_d = _criaturas_vivas_em(Area.esfera(centro_d, Area.quadrados(6.0))).filter(func(x): return sim.is_enemy(id, x))
+			for tg in alvos_d:
+				out.append_array(_dano_de_energia(id, str(tg), dano_d, 0, "", tipo_d, "Parceiro destruidor"))
+		"parceiro_medico":
+			var sh_md: CharacterSheet = sim.c(id).sheet
+			var nv_md := Parceiros.nivel_acao(sh_md, "parceiro_medico")
+			sh_md.pm -= sh_md.efeito_bonus("parceiro_medico")
+			(sim.c(id).flags as Array).append("parceiro_medico_%d" % sim.round_no)
+			var ts_md: CharacterSheet = sim.c(a.get("target", id)).sheet
+			if str(a.get("condicao", "")) != "":
+				ts_md.remove_condition(str(a.condicao))
+				out.append(fact("CONDITION_REMOVED", {"actor": id, "target": a.get("target", id), "condition": str(a.condicao)}, [id]))
+			else:
+				var cura_md := ts_md.curar(int(Dice.roll(str(world.rules.value("parceiro.tipos", {}).medico.cura[nv_md]), world.rng, "combat").total))
+				out.append(fact("HEALED", {"actor": id, "target": a.get("target", id), "amount": cura_md, "pv_after": ts_md.pv, "source": "parceiro_medico"}, [id]))
 		"segurar":
 			sim.c(id).sheet.add_efeito("segurando", "resistencia", 2, "turno")
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "segurando", "tags": []}, [id]))
@@ -4808,6 +4843,11 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			(A.flags as Array).append("parceiro_dano_%d" % sim.round_no)   # Fortão: uma vez por rodada
 			dmg += int(Dice.roll(dado_parceiro, world.rng, "combat").total)
 			tags.append("parceiro")
+		var dado_dist := Parceiros.dano_distancia(A.sheet)
+		if dado_dist != "" and bool(v.get("ranged", false)) and not (A.flags as Array).has("parceiro_dist_%d" % sim.round_no):
+			(A.flags as Array).append("parceiro_dist_%d" % sim.round_no)   # Atirador: uma vez por rodada
+			dmg += int(Dice.roll(dado_dist, world.rng, "combat").total)
+			tags.append("parceiro")
 		var golpe_n := int(v.get("golpe_dados", 0))
 		if golpe_n > 0:
 			dmg += int(Dice.roll("%dd8" % golpe_n, world.rng, "combat", int(atk.mult) if crit else 1).total)   # Golpe Divino
@@ -4817,9 +4857,13 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 		rolls = r.rolls
 		# Ataque Furtivo (LB p.73): 1/rodada, alvo desprevenido ou flanqueado; dados extras não multiplicam.
 		var sa_key := "furtivo_%d" % sim.round_no
-		if A.sheet.class_id == "ladino" and not A.flags.has(sa_key) and int(T.sheet.efeito_bonus("imune", "furtivo")) <= 0 and \
-				(T.sheet.has_effective_condition(world.rules, "desprevenido") or (not v.ranged and sim.flanking(attacker, target))):
-			var n_dice: int = 1 + (int(A.sheet.level) - 1) / 2
+		var flanco_parceiro: bool = v.mods.any(func(m): return m[0] == "parceiro assassino")
+		if flanco_parceiro:
+			A.flags.append("parceiro_flanco_%d" % sim.round_no)
+		var tem_furtivo: bool = A.sheet.class_id == "ladino" or A.sheet.efeito_bonus("parceiro_furtivo") > 0
+		if tem_furtivo and not A.flags.has(sa_key) and int(T.sheet.efeito_bonus("imune", "furtivo")) <= 0 and \
+				(T.sheet.has_effective_condition(world.rules, "desprevenido") or (not v.ranged and (sim.flanking(attacker, target) or flanco_parceiro))):
+			var n_dice: int = (1 + (int(A.sheet.level) - 1) / 2 if A.sheet.class_id == "ladino" else 0) + A.sheet.efeito_bonus("parceiro_furtivo")
 			var sa := Dice.roll("%dd6" % n_dice, world.rng, "combat")
 			dmg += int(sa.total)
 			rolls.append_array(sa.rolls)

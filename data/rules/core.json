@@ -1314,8 +1314,13 @@
    "id": "parceiro.tipos",
    "valor": {
     "adepto": {
-     "implementado": false,
-     "texto": "Iniciante: –1 PM nas magias de 1º círculo. Veterano: também nas de 2º. Mestre: a redução se acumula com outras."
+     "implementado": true,
+     "texto": "Iniciante: –1 PM nas magias de 1º círculo. Veterano: também nas de 2º. Mestre: a redução se acumula com outras.",
+     "circulo_max": {
+      "iniciante": 1,
+      "veterano": 2,
+      "mestre": 2
+     }
     },
     "ajudante": {
      "implementado": true,
@@ -1340,12 +1345,27 @@
      "texto": "+2 em duas perícias; veterano: +2 em três; mestre: +4 em três. Não Luta nem Pontaria."
     },
     "assassino": {
-     "implementado": false,
-     "texto": "Iniciante: Ataque Furtivo +1d6. Veterano: bônus por flanquear contra um inimigo por rodada. Mestre: +2d6."
+     "implementado": true,
+     "texto": "Iniciante: Ataque Furtivo +1d6. Veterano: bônus por flanquear contra um inimigo por rodada. Mestre: +2d6.",
+     "furtivo": {
+      "iniciante": 1,
+      "veterano": 1,
+      "mestre": 2
+     },
+     "flanco": {
+      "iniciante": false,
+      "veterano": true,
+      "mestre": true
+     }
     },
     "atirador": {
-     "implementado": false,
-     "texto": "Uma vez por rodada, +1d6 numa rolagem de dano à distância; veterano 1d10; mestre 2d8."
+     "implementado": true,
+     "texto": "Uma vez por rodada, +1d6 numa rolagem de dano à distância; veterano 1d10; mestre 2d8.",
+     "dano_distancia": {
+      "iniciante": "1d6",
+      "veterano": "1d10",
+      "mestre": "2d8"
+     }
     },
     "combatente": {
      "implementado": true,
@@ -1358,8 +1378,18 @@
      "texto": "+2 em ataques; veterano +3; mestre +4 e, uma vez por rodada, 5 PM para um ataque extra."
     },
     "destruidor": {
-     "implementado": false,
-     "texto": "Ação livre, 1 PM: 2d6 de energia em alcance curto; veterano: 2 PM para 4d6; mestre: 4 PM para 6d6 numa área de 6m em alcance médio."
+     "implementado": true,
+     "texto": "Ação livre, 1 PM: 2d6 de energia em alcance curto; veterano: 2 PM para 4d6; mestre: 4 PM para 6d6 numa área de 6m em alcance médio.",
+     "pm": {
+      "iniciante": 1,
+      "veterano": 2,
+      "mestre": 4
+     },
+     "dano": {
+      "iniciante": "2d6",
+      "veterano": "4d6",
+      "mestre": "6d6"
+     }
     },
     "fortao": {
      "implementado": true,
@@ -1381,12 +1411,32 @@
      "texto": "+2 na Defesa; veterano +3; mestre +4 e +2 em testes de resistência."
     },
     "magivocador": {
-     "implementado": false,
-     "texto": "+1 dado no dano das magias; veterano: +1 na CD; mestre: dobra os bônus."
+     "implementado": true,
+     "texto": "+1 dado no dano das magias; veterano: +1 na CD; mestre: dobra os bônus.",
+     "dados": {
+      "iniciante": 1,
+      "veterano": 1,
+      "mestre": 2
+     },
+     "cd": {
+      "iniciante": 0,
+      "veterano": 1,
+      "mestre": 2
+     }
     },
     "medico": {
-     "implementado": false,
-     "texto": "Uma vez por rodada, 1 PM para curar 1d8+1 de criatura adjacente; veterano: 3 PM para 3d8+3 ou remover condição; mestre: 5 PM para 6d8+6."
+     "implementado": true,
+     "texto": "Uma vez por rodada, 1 PM para curar 1d8+1 de criatura adjacente; veterano: 3 PM para 3d8+3 ou remover condição; mestre: 5 PM para 6d8+6.",
+     "pm": {
+      "iniciante": 1,
+      "veterano": 3,
+      "mestre": 5
+     },
+     "cura": {
+      "iniciante": "1d8+1",
+      "veterano": "3d8+3",
+      "mestre": "6d8+6"
+     }
     },
     "montaria": {
      "implementado": true,
@@ -1410,8 +1460,21 @@
      "texto": "+2 em Percepção e Sobrevivência; veterano: Sentidos Aguçados; mestre: Percepção às Cegas."
     },
     "vigilante": {
-     "implementado": false,
-     "texto": "+2 em Percepção e Iniciativa; veterano: Esquiva Sobrenatural; mestre: Olhos nas Costas."
+     "implementado": true,
+     "texto": "+2 em Percepção e Iniciativa; veterano: Esquiva Sobrenatural; mestre: Olhos nas Costas.",
+     "pericias": {
+      "percepcao": 2,
+      "iniciativa": 2
+     },
+     "poderes": {
+      "veterano": [
+       "esquiva_sobrenatural"
+      ],
+      "mestre": [
+       "esquiva_sobrenatural",
+       "olhos_nas_costas"
+      ]
+     }
     }
    },
    "fonte": "T20 Livro Básico (Jambô, edição Jogo do Ano)",

@@ -127,3 +127,16 @@ servos com ação própria (generalizando o turno do Guardião); por último as 
 - Marca: Ligação Sombria, Rogar Maldição, Condição.
 - Invocação: Servo Divino, Guardião Divino.
 - PV temporários: Heroísmo (40 PV).
+
+## Parceiros (LB p.261)
+
+Todos os tipos de parceiro estão no jogo (`src/domain/rules/parceiros.gd`, dados em `parceiro.tipos` de core.json): ajudante,
+combatente, fortão, guardião, montaria, perseguidor e, agora, adepto (–1 PM nas magias de 1º/2º círculo, `spell_cost` com a
+ficha), assassino (Ataque Furtivo +1d6/+2d6 mesmo sem ser ladino; veterano: um inimigo por rodada conta como flanqueado),
+atirador (+1d6/1d10/2d8 numa rolagem de dano à distância por rodada), destruidor (ação livre "parceiro_destruidor", 1/2/4 PM,
+2d6/4d6/6d6 de energia; mestre em área de 6m), magivocador (+1/+2 dados no dano das magias que passam por `_dano_de_energia`;
++1/+2 na CD), médico (ação livre "parceiro_medico", 1/3/5 PM, cura 1d8+1/3d8+3/6d8+6 ou remove condição) e vigilante (+2 em
+Percepção e Iniciativa; Esquiva Sobrenatural: não é surpreendido; Olhos nas Costas: não pode ser flanqueado).
+Limites: as ações do destruidor e do médico ainda não têm botão na tela; o magivocador não soma em magias que rolam dano por
+conta própria (como Toque da Morte).
+

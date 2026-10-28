@@ -96,7 +96,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 	if world.rules.value("magia." + sp_id, {}).has("cura"):
 		if not apr.is_empty():
 			return PackedStringArray(["fora de combate, a cura é lançada sem aprimoramentos"])
-		if sh.pm < GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, sp_id), cmd.payload):
+		if sh.pm < GhostPlanner.spell_cost(world.rules, GhostPlanner.spell_rule(world.rules, sp_id), cmd.payload, sh):
 			return PackedStringArray(["PM insuficiente"])
 		return PackedStringArray()
 	if not FORA_DE_COMBATE.has(sp_id):
@@ -114,7 +114,7 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return PackedStringArray(["magia acima do círculo que você conjura"])
 	if not SpellRules.aprimoramentos_validos(sp_id, apr, sh, world.rules):
 		return PackedStringArray(["aprimoramento não disponível para essa magia"])
-	if sh.pm < GhostPlanner.spell_cost(world.rules, sp, cmd.payload):
+	if sh.pm < GhostPlanner.spell_cost(world.rules, sp, cmd.payload, sh):
 		return PackedStringArray(["PM insuficiente"])
 	match sp_id:
 		"bencao":
@@ -306,7 +306,7 @@ func execute(cmd: GameCommand) -> Array:
 		return _pensamentos(alvo, false)
 	var sp_id := str(cmd.payload.get("spell", ""))
 	var sp := GhostPlanner.spell_rule(world.rules, sp_id)
-	var custo := GhostPlanner.spell_cost(world.rules, sp, cmd.payload)
+	var custo := GhostPlanner.spell_cost(world.rules, sp, cmd.payload, sh)
 	sh.pm -= custo
 	var out: Array = [fact("SPELL_CAST", {"caster": "player", "spell": sp_id, "cost": custo, "fora_de_combate": true,
 		"aprimoramentos": cmd.payload.get("aprimoramentos", [])}, ["player"])]
