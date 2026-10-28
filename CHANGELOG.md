@@ -7,7 +7,7 @@
 - Corrida com Shift (1,8×) na exploração; emboscada fora de combate (C furtivo, a até 3 quadrados, sem ser visto) começa a luta já com surpresa.
 - Combate no modo ação mais lento (0,7×) e silhuetas distintas para lobo, esqueleto, aranha, cobra, orc e ogro.
 - Economia por região (vila, valkaria, samburdia, fronteira): a refeição na taverna debita a despensa da região onde é servida.
-- Pacote Windows com pasta "IA local" (guia). Se llama-server.exe e modelo.gguf estiverem nela, o jogo sobe a IA sozinho ao ligar "IA local" e a encerra ao sair. Build sem esses arquivos sai sem IA e avisa; o caminho de inicialização ainda não foi verificado de ponta a ponta.
+- Pacote Windows com pasta "IA local" (guia). Se llama-server.exe e modelo.gguf estiverem nela, o jogo sobe a IA sozinho ao ligar "IA local" e a encerra ao sair. O build aceita IA_SERVIDOR (servidor com DLLs) e IA_MODELO (modelo.gguf); sem o modelo, o pacote leva só o servidor e avisa. O caminho de inicialização ainda não foi verificado no Windows.
 - Testes: viagem aceita os dois desfechos (chegada ou emboscada tática na partida); farinha testa o mecanismo do evento semanal em vez do saldo final. 701 aprovados.
 - Diálogo livre: o jogador digita e o morador responde pelo estado do mundo (lugares, pessoas, rumores, loja, guilda, tempo); insultos e ameaças ficam na memória. IA local opcional (llama.cpp, RX 580 ok) só reescreve a voz, com validador e fallback; botão no menu de pausa e guia em tools/ia_local.
 - Seleção de poderes (K) em cartões: filtros (disponíveis, da classe, gerais, que você tem, todos), busca, efeito, custo, pré-requisitos e o que falta; árvore desenhada em "Ver árvore". HUD: condições ativas e rastreador de contratos. Reprodução do combate descartada ao trocar de mundo.

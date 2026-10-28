@@ -26,15 +26,18 @@ cp tools/LEIA-ME-WINDOWS.txt "$PKG/LEIA-ME.txt"
 mkdir -p "$PKG/IA local"
 cp tools/ia_local/LEIA-ME.md "$PKG/IA local/LEIA-ME.md"
 cp tools/ia_local/iniciar.bat "$PKG/IA local/iniciar.bat"
-# IA embutida (opcional): IA_SERVIDOR = llama-server.exe (build Vulkan do llama.cpp), IA_MODELO = modelo .gguf.
-# Com os dois, o jogo sobe a IA sozinho ao ligar "IA local". Sem eles, o pacote sai sem IA e avisa.
-if [ -n "${IA_SERVIDOR:-}" ] && [ -n "${IA_MODELO:-}" ]; then
+# IA embutida (opcional): IA_SERVIDOR = llama-server.exe (build Vulkan do llama.cpp, com as DLLs ao lado),
+# IA_MODELO = modelo .gguf. Sem o modelo, o servidor vai junto e o modelo entra como arquivo modelo.gguf na pasta.
+if [ -n "${IA_SERVIDOR:-}" ]; then
   cp "$IA_SERVIDOR" "$PKG/IA local/llama-server.exe"
-  cp "$IA_MODELO" "$PKG/IA local/modelo.gguf"
   cp "$(dirname "$IA_SERVIDOR")"/*.dll "$PKG/IA local/" 2>/dev/null || true
-  echo "IA embutida: $(basename "$IA_MODELO")"
+  echo "IA embutida: servidor incluído"
+fi
+if [ -n "${IA_MODELO:-}" ]; then
+  cp "$IA_MODELO" "$PKG/IA local/modelo.gguf"
+  echo "IA embutida: modelo incluído"
 else
-  echo "AVISO: pacote SEM IA embutida (defina IA_SERVIDOR e IA_MODELO para incluir)"
+  echo "AVISO: modelo.gguf NÃO incluído (copie-o para a pasta IA local do pacote)"
 fi
 ( cd "$PKG" && sha256sum CronicasDeArton.exe > SHA256.txt )
 ( cd "$TMP" && zip -qr "$OUT/CronicasDeArton-v$VER-Windows.zip" CronicasDeArton )
