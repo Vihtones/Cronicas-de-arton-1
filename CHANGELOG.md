@@ -2,6 +2,7 @@
 
 ## 0.7.2 (em andamento)
 
+- Conversa como gente: cada morador tem convicções pessoais (fé e ofício, em data/dialogue/convicoes.json) e pode opinar, concordar, discordar e perguntar de volta. Opiniões não viram fatos do mundo. O validador deixou de rejeitar palavras que começam frase.
 - Conversa com a IA: perguntas fora dos 16 assuntos prontos são respondidas pela IA a partir de um resumo verificado do mundo (lugar, lojas, guilda, moradores presentes, mistérios já descobertos; nunca os não descobertos). Números e nomes que não estão nos fatos são rejeitados e cai na resposta do jogo.
 - Despensa por casa (Arton Viva, Fase 1): no tempo livre, quem tem ouro compra pão para a casa onde há vendedor de pão (o ouro vai ao tesouro); com comida guardada, o morador come em casa sem pagar taverna. A despensa começa vazia, vai até 3 refeições e é salva com o jogo.
 - Fome e cansaço são arredondados a 4 casas ao gravar, para o save reproduzir a simulação com exatidão.

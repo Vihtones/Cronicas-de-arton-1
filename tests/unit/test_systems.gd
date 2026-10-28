@@ -276,3 +276,27 @@ func test_conversa_aberta_responde_pelo_conhecimento_do_mundo() -> void:
 	p.transport_override = func(_m): return "Custa 999 moedas, forasteiro."
 	p.converse_async("hilda", f, func(t): got[0] = t)
 	eq(got[0], f.base, "número que não está nos fatos é rejeitado")
+
+
+func test_convicoes_dos_moradores_entram_na_conversa_aberta() -> void:
+	var w := WorldHelpers.world(5)
+	var fe_id := ""
+	var sem_fe := ""
+	for id in w.all_npc_ids():
+		var dev := str(w.npc_def(id).get("devotion", ""))
+		if dev != "" and fe_id == "":
+			fe_id = id
+		if dev == "" and sem_fe == "":
+			sem_fe = id
+	check(fe_id != "" and sem_fe != "", "há moradores com e sem devoção")
+	var c_fe := FreeTalk.convicoes(w, fe_id)
+	check(c_fe.length() > 0 and c_fe.length() <= FreeTalk.CONVICOES_MAX, "convicções com devoção (%d)" % c_fe.length())
+	check(FreeTalk.convicoes(w, sem_fe).length() > 0, "convicções sem devoção vêm do ofício")
+	var f := FreeTalk.ficha(w, fe_id, "o que você acha da justiça?", "", "desconhecido")
+	var p := LlmDialogueProvider.new({"enabled": true, "max_calls": 5})
+	check(str(p.build_chat(f)[0].content).contains("Converse como uma pessoa"), "prompt pede conversa de pessoa")
+	var got := [""]
+	var nome := str(w.npc_def(fe_id).get("devotion", ""))
+	p.transport_override = func(_m): return "Acredito em " + nome + ", forasteiro. Quem erra deve responder por isso."
+	p.converse_async(fe_id, f, func(t): got[0] = t)
+	eq(got[0], "Acredito em " + nome + ", forasteiro. Quem erra deve responder por isso.", "opinião com a divindade do morador é aceita")

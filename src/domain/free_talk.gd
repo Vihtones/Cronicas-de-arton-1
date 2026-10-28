@@ -218,6 +218,26 @@ static func conhecimento(world: WorldState, npc: String) -> String:
 	return txt.substr(0, CONHECIMENTO_MAX)
 
 
+## Convicções pessoais do morador (opiniões, não fatos): a fé e o ofício. Limite fixo.
+const CONVICOES_MAX := 320
+
+
+static func convicoes(world: WorldState, npc: String) -> String:
+	var c: Dictionary = world.db.convicoes
+	var d := world.npc_def(npc)
+	var partes: Array = []
+	var fe := str(d.get("devotion", ""))
+	if fe != "" and c.get("devocao", {}).has(fe):
+		partes.append(str(c.devocao[fe][0]))
+	var prof := str(d.get("profession", ""))
+	var linhas: Array = c.get("por_profissao", {}).get(prof, [])
+	if not linhas.is_empty():
+		partes.append(str(linhas[0]))
+	if linhas.size() > 1:
+		partes.append(str(linhas[1]))
+	return " ".join(PackedStringArray(partes)).substr(0, CONVICOES_MAX)
+
+
 ## Ficha de fatos para o modelo de linguagem: só o que o morador PODE saber, sem segredos do mistério.
 ## Pergunta aberta (intenção desconhecida): a IA responde pelo conhecimento do mundo, não pela resposta pronta.
 static func ficha(world: WorldState, npc: String, frase: String, base: String, intent: String = "") -> Dictionary:
@@ -234,6 +254,7 @@ static func ficha(world: WorldState, npc: String, frase: String, base: String, i
 		"register": DialogueVoice.register(world, npc), "tier": DialogueVoice.tier(world, npc), "period": DialogueVoice.period(world),
 		"weather": w.region.condition if w != null else "limpo", "lembrancas": lembrancas, "frase": frase, "base": base,
 		"aberta": intent == "desconhecido", "conhecimento": conhecimento(world, npc) if intent == "desconhecido" else "",
+		"convicoes": convicoes(world, npc) if intent == "desconhecido" else "",
 		"allowed_names": _nomes_permitidos(world)}
 
 

@@ -1,0 +1,205 @@
+{
+ "schema_version": 1,
+ "status": "ORIGINAL_DO_JOGO",
+ "por_profissao": {
+  "criança": [
+   "Gosto de brincar perto do rio e de ouvir histórias de caçada.",
+   "Acho chato ter que ficar quieto quando os adultos falam."
+  ],
+  "ferreiro": [
+   "Um bom ferro se faz com paciência, não com pressa.",
+   "Desconfio de quem compra arma sem saber usar."
+  ],
+  "lavrador": [
+   "Quem não respeita a terra não come no inverno.",
+   "Chuva boa é a que chega na hora certa."
+  ],
+  "lavradora": [
+   "A colheita ensina a esperar, e eu aprendi a respeitar isso.",
+   "Prefiro uma roça pequena e cuidada a uma grande e abandonada."
+  ],
+  "guarda": [
+   "A estrada é de todos, por isso ela precisa de ordem.",
+   "Não gosto de ver gente armada sem motivo na vila."
+  ],
+  "guarda aposentado": [
+   "Já vi muita briga boba virar tragédia, então hoje prefiro conversar.",
+   "Respeito quem serve, mesmo quando errado."
+  ],
+  "capitã da guarda": [
+   "Disciplina salva vidas, e eu cobro isso de todos.",
+   "Quem promete proteção precisa cumprir."
+  ],
+  "capitão da guarda": [
+   "Ordem não se pede, se mantém.",
+   "Não tolero covardia nem traição."
+  ],
+  "alcaide": [
+   "Governar é ouvir o povo antes de decidir.",
+   "Prefiro um acordo justo a uma briga longa."
+  ],
+  "caçador": [
+   "O bicho que você caça também tem família; respeito isso, mas não me choro por ele.",
+   "Floresta sem cuidado vira armadilha."
+  ],
+  "estalajadeira": [
+   "Quem chega cansado merece cama limpa e comida quente.",
+   "Hóspede educado é bem-vindo, mesmo que venha de longe."
+  ],
+  "estalajadeiro": [
+   "Uma boa estalagem é a alma da estrada.",
+   "Não aceito bagunça dentro da minha casa."
+  ],
+  "taverneiro": [
+   "Taverna boa é lugar onde se ouve tudo, e eu guardo o que ouço.",
+   "Bebida se paga, briga não."
+  ],
+  "taverneira": [
+   "Gosto de ver gente rindo na mesa; isso alegra a vila.",
+   "Quem fala alto demais precisa aprender a baixar a voz."
+  ],
+  "mercadora": [
+   "Negócio bom é o que deixa os dois lados contentes.",
+   "Desconfio de preço bom demais."
+  ],
+  "mercadora viajante": [
+   "Já vi terra demais para achar que a minha é a única.",
+   "Estrada ensina a não confiar em aparência."
+  ],
+  "mercador": [
+   "Ouro vai e volta; o que fica é a palavra dada.",
+   "Prefiro um acordo claro a uma promessa vaga."
+  ],
+  "armeira": [
+   "Uma lâmina boa precisa de quem a saiba respeitar.",
+   "Não vendo arma para quem não sabe o que faz."
+  ],
+  "aprendiz": [
+   "Ainda tenho muito a aprender e isso não me incomoda.",
+   "Gosto de perguntar, mesmo quando todos já sabem a resposta."
+  ],
+  "cozinheiro": [
+   "Comida feita com pressa sempre tem gosto de pressa.",
+   "Quem come bem trabalha melhor."
+  ],
+  "cozinheira": [
+   "Comida é a forma mais simples de cuidar de alguém.",
+   "Gosto de cozinhar com o que a terra dá na estação."
+  ],
+  "vigia": [
+   "Sono no posto é pecado, e eu não durmo.",
+   "Vejo mais do que deveria, mas guardo para mim."
+  ],
+  "curandeira": [
+   "Erva boa cura, mas nunca substitui cuidado de gente.",
+   "Respeito quem sofre em silêncio."
+  ],
+  "clériga de Lena": [
+   "A vida é o bem mais precioso, e cuido dela sem pedir nada em troca.",
+   "Quem sofre não precisa de sermão, precisa de ajuda."
+  ],
+  "sacerdotisa de Khalmyr": [
+   "Justiça não é vingança; é o equilíbrio que todos merecem.",
+   "Quem mente para o juiz mente para o próprio povo."
+  ],
+  "acólito": [
+   "A fé dá força para aguentar os dias ruins.",
+   "Prefiro rezar em silêncio do que discutir religião."
+  ],
+  "moleiro": [
+   "Farinha boa começa com trigo bem cuidado.",
+   "O moinho precisa de paciência e de água no tempo certo."
+  ],
+  "ajudante de moleiro": [
+   "Trabalho duro não me assusta; me assusta ficar sem fazer nada.",
+   "Gosto de ver a farinha saindo limpa."
+  ],
+  "fiandeira": [
+   "Fio fino exige mão calma.",
+   "Gosto de ouvir a conversa das mulheres enquanto trabalho."
+  ],
+  "pastora": [
+   "O rebanho é minha família; cuido dele com carinho.",
+   "Bicho solto na estrada é perigo para todos."
+  ],
+  "bêbado": [
+   "Todo mundo tem um jeito de esquecer; o meu é a caneca.",
+   "Ninguém precisa me julgar, eu já me julgo bastante."
+  ],
+  "barqueiro": [
+   "O rio não perdoa descuido, e eu respeito o rio.",
+   "Cobrar a travessia é justo; atravessar de graça é que é perigoso."
+  ],
+  "pescador": [
+   "Peixe vem para quem sabe esperar.",
+   "O rio dá, mas o rio cobra."
+  ],
+  "ancião": [
+   "Vi muita coisa mudar nesta vila, e nem tudo mudou para melhor.",
+   "Gosto de ver os jovens perguntando; é sinal de que a vila segue viva."
+  ],
+  "anciã": [
+   "A memória é o que sustenta uma vila; por isso gosto de contar o passado.",
+   "Não confio em pressa, ela costuma trazer arrependimento."
+  ],
+  "erudito": [
+   "Saber demais também é um peso; prefiro perguntar a afirmar.",
+   "Livros velhos guardam verdades que o povo esqueceu."
+  ],
+  "mensageiro": [
+   "Carta boa é a que chega sem ser lida pelo caminho.",
+   "Estrada é longa e eu gosto de conhecer gente nela."
+  ],
+  "atendente da guilda": [
+   "Aventureiro sem registro é perigo para ele mesmo.",
+   "Contrato bom é o que todo mundo entende antes de aceitar."
+  ],
+  "capitão de caravana": [
+   "A caravana é uma família que se move; quem fica para trás é responsabilidade de todos.",
+   "Estrada sem comando vira saque."
+  ],
+  "carroceira": [
+   "Carroça bem cuidada chega inteira ao destino.",
+   "Gosto de conhecer gente nova em cada viagem."
+  ],
+  "guia": [
+   "Quem se perde na terra de Arton paga caro; eu ensino o caminho certo.",
+   "Respeito a natureza mais do que a pressa."
+  ],
+  "minerador": [
+   "A pedra guarda o que a gente precisa, mas cobra suor.",
+   "Mina sem escora é túmulo."
+  ],
+  "mineradora": [
+   "Pedra boa se acha com paciência e cuidado.",
+   "Quem trabalha na mina aprende a confiar no companheiro."
+  ],
+  "capataz": [
+   "Trabalho bem feito é trabalho sem pressa e sem desperdício.",
+   "Não aceito quem enrola na lida."
+  ],
+  "barqueira": [
+   "O rio ensina a ter respeito.",
+   "Quem atravessa comigo volta com a história para contar."
+  ],
+  "pesquisador": [
+   "Pergunta certa vale mais do que resposta rápida.",
+   "Acredito no que se vê e se confirma."
+  ]
+ },
+ "devocao": {
+  "Khalmyr": [
+   "Acredito na justiça de Khalmyr: quem erra deve responder por isso.",
+   "Tento julgar sem pressa e sem favor."
+  ],
+  "Lena": [
+   "Acredito em Lena: a vida merece cuidado, mesmo de quem não conhecemos.",
+   "Ajudar quem sofre é a coisa mais simples que eu posso fazer."
+  ],
+  "Allihanna": [
+   "Acredito em Allihanna: a terra e os bichos são sagrados e merecem respeito.",
+   "Quem maltrata a natureza um dia paga por isso."
+  ]
+ },
+ "nota": "Opiniões pessoais dos moradores: podem ser ditas em primeira pessoa; nunca são fatos do mundo."
+}
