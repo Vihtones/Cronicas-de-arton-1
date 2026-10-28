@@ -198,6 +198,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "controlar_agua":
+				if not SpellRules.EFEITOS_AGUA.has(str(a.get("efeito", ""))): return {"ok": false, "reason": "efeito: congelar, derreter, enchente, evaporar ou partir"}
+				if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
+				targets = [actor]
 			if sp_id == "controlar_terra":
 				if apr.has(1):
 					if not SpellRules.arvore_ao_lado(sim.db, A.tile) and not _pedra_ao_lado(sim, A.tile): return {"ok": false, "reason": "é preciso pedra ou terra ao seu lado para se fundir"}
@@ -703,6 +707,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if not A.sheet.efeito_tipo_existe("preso_muralha", ""): return {"ok": false, "reason": "você não está preso na muralha"}
 			elif not sim.zona_em(t_mu, "muralha") or CombatSim.cheb(A.tile, t_mu) > 1: return {"ok": false, "reason": "escolha um trecho da muralha ao seu lado"}
 			return {"ok": true, "kind": kind_mu}
+		"soltar_gelo":
+			if A.sheet.efeito_bonus("preso_gelo") <= 0: return {"ok": false, "reason": "você não está preso no gelo"}
+			if not sim.can_spend("padrao"): return {"ok": false, "reason": "exige ação padrão"}
+			return {"ok": true, "kind": "padrao"}
 		"sair_pedra":
 			if not (A.flags as Array).has("na_pedra"): return {"ok": false, "reason": "você não está fundido à pedra"}
 			return {"ok": true, "kind": "livre"}

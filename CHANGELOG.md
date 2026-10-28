@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Controlar Água (divina, 3º círculo): congelar (gelo atravessável; quem nadava fica preso), derreter, enchente (a água sobe para a margem), evaporar (10d8 de fogo, +2d8, em quem é imune a frio; metade nos outros vivos) e partir (caminho seco).
+
 - Controlar Terra (divina, 3º círculo): amolecer (o teto desaba na cripta ou em construções; no chão, terreno difícil), levantar parede de pedra (RD 8, 50 PV a cada 3m) ou abrir passagem numa parede, solidificar lama e areia prendendo quem está nelas, ou fundir-se à pedra por um dia (aprimoramento).
 
 - Viagem Arbórea (divina, 3º círculo): entra numa árvore ao lado e sai de qualquer outra do mapa; em combate, dentro da árvore ninguém o alcança e uma ação de movimento o tira dela; fora de combate, pela cena, pode passar de árvore em árvore por 1 PM; com o aprimoramento, o grupo vai junto.

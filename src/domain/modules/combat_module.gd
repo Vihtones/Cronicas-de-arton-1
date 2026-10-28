@@ -1202,6 +1202,63 @@ func _cupula_rompe(id: String, out: Array) -> void:
 				return
 
 
+## Controlar Água (divina 3): esfera de 30m em alcance longo, pela cena. Congelar: a água vira gelo (atravessável) e quem
+## nadava fica imóvel (ação padrão e Atletismo ou Acrobacia para escapar). Derreter: o gelo da área volta a ser água.
+## Enchente: a água sobe para os quadrados vizinhos (só se passa nadando). Evaporar: água e gelo somem; criaturas imunes a
+## frio (como elementais da água) sofrem 10d8 de fogo (+2d8), as outras vivas, metade (Fortitude reduz à metade). Partir: o
+## nível baixa e abre um caminho seco. (O mapa não separa água rasa de funda nem tem barcos: a água é sempre tratada como
+## rasa, e as opções que só valem para embarcações ficam de fora.)
+func _controlar_agua(id: String, a: Dictionary, sh: CharacterSheet) -> Array:
+	var out: Array = []
+	var cd := spell_dc(sh, a)
+	var area: Array = Area.esfera(a.get("tile", sim.c(id).tile), Area.quadrados(30.0))
+	var agua: Array = area.filter(func(t): return world.db.is_water(t))
+	var chave := "%s_%d" % [id, sim.round_no]
+	match str(a.efeito):
+		"congelar":
+			sim.add_zona("gelo_" + chave, agua, "gelo", -1, "controlar_agua", {"conjurador": id})
+			for cid in sim.combatants.keys():
+				if agua.has(sim.c(cid).tile) and not sim.c(cid).sheet.is_dead():
+					sim.c(cid).sheet.add_efeito("magia.controlar_agua", "preso_gelo", cd, "cena")
+					sim.c(cid).sheet.add_condition("imovel", world.rules)
+					out.append(fact("CONDITION_APPLIED", {"target": cid, "condition": "imovel", "tags": ["magia", "frio"]}, [cid]))
+		"derreter":
+			for z in sim.zonas.duplicate(true):
+				if str(z.tipo) == "gelo" and _alguma_em(z.tiles, area):
+					sim.remove_zona(str(z.id))
+		"enchente":
+			var cheia: Array = []
+			for t in agua:
+				for dx in [-1, 0, 1]:
+					for dy in [-1, 0, 1]:
+						var n: Vector2i = t + Vector2i(dx, dy)
+						if area.has(n) and not world.db.is_water(n) and sim.walk_fn.call(n) and not cheia.has(n):
+							cheia.append(n)
+			sim.add_zona("agua_" + chave, cheia, "agua", -1, "controlar_agua", {"conjurador": id})
+		"evaporar", "partir":
+			for z in sim.zonas.duplicate(true):
+				if str(z.tipo) in ["gelo", "agua"] and _alguma_em(z.tiles, area):
+					sim.remove_zona(str(z.id))
+			sim.add_zona("seco_" + chave, agua, "seco", -1, "controlar_agua", {"conjurador": id})
+			if str(a.efeito) == "evaporar":
+				var dados := "%dd8" % (10 + 2 * (a.get("aprimoramentos", []) as Array).count(0))
+				for cid in sim.combatants.keys():
+					var s_c: CharacterSheet = sim.c(cid).sheet
+					if not area.has(sim.c(cid).tile) or s_c.is_dead() or cid == id:
+						continue
+					if s_c.efeito_bonus("imune", "frio") > 0 or int(s_c.dr.get("frio", 0)) >= 99:
+						out.append_array(_dano_de_energia(id, cid, dados, cd, "", "fogo", "Evaporar"))
+					elif not ["morto-vivo", "construto"].has(s_c.creature_type):
+						var r_ev := _dados_energia(dados, "fogo", sim.c(cid).tile) / 2
+						if _resiste(cid, "fortitude", cd, out):
+							r_ev = r_ev / 2
+						r_ev = _dano_por_tipo(s_c, "fogo", r_ev)
+						sim.apply_damage(cid, r_ev)
+						out.append(fact("HAZARD", {"actor": cid, "hazard": "evaporar", "damage": r_ev, "pv_after": s_c.pv, "tags": ["magia", "fogo"]}, [cid]))
+	out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "controlar_agua", "efeito": str(a.efeito), "tags": ["magia", "area"]}, [id]))
+	return out
+
+
 ## Controlar Terra (universal 3): 9 cubos de 1,5m (+2) numa linha a partir do quadrado. Amolecer: na cripta ou dentro de
 ## construção derruba o teto (10d6 de impacto, Reflexos metade); no chão, terreno difícil. Modelar: "parede" (cobertura total,
 ## RD 8 e 50 PV a cada 3m) ou "passagem" (abre a parede nos cubos). Solidificar: lama e areia (solo macio) endurecem e quem
@@ -3749,6 +3806,14 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": "escalar_muralha"}, [id]))
 		"atacar_muralha":
 			out.append_array(_atacar_muralha(id, a.tile))
+		"soltar_gelo":
+			var sg: CharacterSheet = sim.c(id).sheet
+			var ok_g: bool = Checks.skill(sg, "atletismo", sg.efeito_bonus("preso_gelo"), world.rules, world.rng, "combat").get("success", false) \
+					or Checks.skill(sg, "acrobacia", sg.efeito_bonus("preso_gelo"), world.rules, world.rng, "combat").get("success", false)
+			if ok_g:
+				sg.remove_efeito_stat("preso_gelo")
+				sg.remove_condition("imovel")
+			out.append(fact("SPELL_ENDED" if ok_g else "SKILL_FAILED", {"spell": "controlar_agua", "actor": id, "target": id, "reason": "gelo"}, [id]))
 		"sair_pedra":
 			(sim.c(id).flags as Array).erase("na_pedra")
 			sim.c(id).sheet.remove_efeito("magia.controlar_terra")
@@ -4544,6 +4609,8 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"controlar_agua":
+			out.append_array(_controlar_agua(id, a, sh))
 		"controlar_terra":
 			out.append_array(_controlar_terra(id, a, sh))
 		"viagem_arborea":
