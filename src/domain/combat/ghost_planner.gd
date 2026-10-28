@@ -198,6 +198,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "amedrontar":
+				if not apr.has(2) and targets.size() != 1: return {"ok": false, "reason": "escolha 1 alvo"}
+				for tg_am in targets:
+					if not sim.combatants.has(tg_am) or not sim.is_enemy(actor, tg_am): return {"ok": false, "reason": "alvo inválido"}
+					if not apr.has(1) and not ["animal", "humanoide"].has(sim.c(tg_am).sheet.creature_type): return {"ok": false, "reason": "Amedrontar afeta animais e humanoides"}
+					if CombatSim.cheb(A.tile, sim.c(tg_am).tile) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
+			if sp_id == "raio_do_enfraquecimento" and not apr.has(1) and targets.size() != 1: return {"ok": false, "reason": "escolha 1 alvo"}
+			if sp_id == "explosao_de_chamas" or sp_id == "leque_cromatico":
+				targets = [actor]
 			if sp_id == "controlar_agua":
 				if not SpellRules.EFEITOS_AGUA.has(str(a.get("efeito", ""))): return {"ok": false, "reason": "efeito: congelar, derreter, enchente, evaporar ou partir"}
 				if CombatSim.cheb(A.tile, a.get("tile", A.tile)) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}

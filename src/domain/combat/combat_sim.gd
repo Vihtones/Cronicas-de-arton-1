@@ -846,6 +846,9 @@ func _passar_rodada() -> void:
 			expiradas.append(m.id)
 			if m.tipo == "condicao" and combatants.has(m.alvo):
 				c(m.alvo).sheet.remove_condition(str(m.dados.condicao))   # condição de rodadas (ex.: cego da Cólera de Azgher)
+				if str((m.dados as Dictionary).get("depois", "")) != "":   # Amedrontar: apavorado, depois abalado pela cena
+					c(m.alvo).sheet.add_efeito("magia." + str(m.fonte), "condicao", 0, "cena", str(m.dados.depois))
+					c(m.alvo).sheet.add_condition(str(m.dados.depois), rules)
 			if m.tipo == "efeito" and combatants.has(m.alvo):
 				c(m.alvo).sheet.anular_magia(str(m.dados.efeito))   # efeito de magia de rodadas (Rogar Maldição resistida)
 			if m.tipo == "invocacao" and combatants.has(m.alvo):

@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"explosao_de_chamas": [],   # fora de combate, só o truque: acende a tocha que você carrega
 	"projetar_consciencia": [],   # um lugar do mapa ou um NPC (no mesmo plano); sustentada pela cena
 	"controlar_terra": [1],   # fora de combate, só fundir-se à pedra ao lado (um dia)
 	"viagem_arborea": [],   # de uma árvore ao lado para outra no mapa; com o aprimoramento, o grupo, até uma planta a 100km
@@ -247,6 +248,12 @@ func _validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"explosao_de_chamas":
+			if not cmd.payload.get("truque", false):
+				return PackedStringArray(["fora de combate, só o truque (acender uma tocha)"])
+			var st_ex = world.module("state")
+			if st_ex == null or not st_ex.has_item("tocha"):
+				return PackedStringArray(["você não tem tocha para acender"])
 		"projetar_consciencia":
 			var npc_pc := str(cmd.payload.get("npc", ""))
 			var local_pc := str(cmd.payload.get("local", ""))
@@ -640,6 +647,10 @@ func _execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"explosao_de_chamas":
+			carregar_luz(Area.quadrados(float(world.rules.value("luz.tocha").raio_m)))
+			out.append(fact("ITEM_LOST", {"item": "tocha"}, ["player"]))
+			out.append(fact("LIGHT_LIT", {"item": "tocha", "spell": "explosao_de_chamas"}, ["player"]))
 		"projetar_consciencia":
 			var combat_pc = world.module("combat")
 			projecao = {"local": str(cmd.payload.get("local", "")), "npc": str(cmd.payload.get("npc", "")), "magias": (cmd.payload.get("aprimoramentos", []) as Array).has(0),

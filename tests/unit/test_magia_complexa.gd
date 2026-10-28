@@ -3974,3 +3974,41 @@ func test_projetar_consciencia_ve_o_npc_e_conversa_de_longe() -> void:
 	var mg = w.module("magia")
 	check(mg.projecao_ve(npc_id), "a projeção vê o NPC")
 	check(WorldHelpers.cmd(w, "StartDialogue", {"npc_id": npc_id}).accepted, "fala mentalmente com ele, mesmo longe")
+
+
+# --- Arcanas --------------------------------------------------------------------------------
+func _cena_arcanista(nivel: int, magias: Array) -> Array:
+	var m := _cena_grupo(nivel)
+	var r: RuleRegistry = m[3]
+	var sh := CharacterBuilder.build(r, "humano", "arcanista", CharacterBuilder.presets("arcanista")[0], ["for", "des", "con"], "arcanista")
+	sh.level = nivel
+	sh.spells = PackedStringArray(magias)
+	sh.equipment["armor"] = ""
+	sh.pm = 99
+	sh.pv_max = 999
+	sh.pv = 999
+	m[2].c("player").sheet = sh
+	return m
+
+
+func test_arcanas_lote_1_adaga_amedrontar_explosao_leque_raio_vitalidade() -> void:
+	var lista := ["adaga_mental", "amedrontar", "explosao_de_chamas", "leque_cromatico", "raio_do_enfraquecimento", "vitalidade_fantasma"]
+	var m := _cena_arcanista(5, lista)
+	var sim: CombatSim = m[2]
+	var b1 := _bandido(m, "bandido_1", -50)
+	var pv0 := b1.pv
+	check(_lanca(m, {"type": "cast", "spell": "adaga_mental", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Adaga Mental")
+	check(b1.pv < pv0 and b1.conditions.has("atordoado"), "dano psíquico e atordoado")
+	check(_lanca(m, {"type": "cast", "spell": "explosao_de_chamas", "tile": Vector2i(27, 57)}).ok, "Explosão de Chamas")
+	check(_lanca(m, {"type": "cast", "spell": "raio_do_enfraquecimento", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Raio do Enfraquecimento")
+	check(b1.conditions.has("fatigado"), "fatigado")
+	check(_lanca(m, {"type": "cast", "spell": "vitalidade_fantasma"}).ok, "Vitalidade Fantasma")
+	check(sim.c("player").sheet.pv_temp >= 2, "PV temporários")
+	var m2 := _cena_arcanista(5, lista)
+	var b2 := _bandido(m2, "bandido_1", -50)
+	check(_lanca(m2, {"type": "cast", "spell": "amedrontar", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Amedrontar")
+	check(b2.conditions.has("apavorado"), "apavorado")
+	var m3 := _cena_arcanista(5, lista)
+	var b3 := _bandido(m3, "bandido_1", -50)
+	check(_lanca(m3, {"type": "cast", "spell": "leque_cromatico", "tile": Vector2i(27, 57)}).ok, "Leque Cromático")
+	check(b3.conditions.has("ofuscado"), "ofuscado pela cena")

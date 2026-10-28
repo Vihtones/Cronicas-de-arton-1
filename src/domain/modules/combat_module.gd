@@ -3980,7 +3980,7 @@ func _casting_check(id: String, sh: CharacterSheet, sp: Dictionary, cost: int) -
 		var r := Checks.skill(sh, "vontade", int(c.concentration_cd), world.rules, world.rng, "combat")
 		if not r.get("success", true):
 			return {"caster": id, "check": "vontade", "cd": c.concentration_cd, "reason": c.reason, "d20": r.d20, "total": r.total}
-	if not (c.armor as Dictionary).is_empty():
+	if not (c.armor as Dictionary).is_empty() and not bool(_cur_action.get("silenciosa", false)):
 		var r2 := Checks.skill(sh, "misticismo", int(c.armor.cd), world.rules, world.rng, "combat", int(c.armor.mod))
 		if not r2.get("allowed", true) or not r2.get("success", false):
 			return {"caster": id, "check": "misticismo", "cd": c.armor.cd, "reason": "armadura", "d20": int(r2.get("d20", 0)), "total": int(r2.get("total", 0))}
@@ -3994,7 +3994,9 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 	sh.pm -= int(v.cost)
 	var out: Array = []
 	# C5 — Concentração (LB p.170) e armadura (LB p.171): a falha perde a magia, mas os PM já foram gastos.
+	_cur_action = {"silenciosa": str(a.spell) == "adaga_mental" and (a.get("aprimoramentos", []) as Array).has(0)}   # sem gesto: vale de armadura
 	var fail := _casting_check(id, sh, sp, int(v.cost))
+	_cur_action = {}
 	if not fail.is_empty():
 		out.append(fact("SPELL_FAILED", fail, [id]))
 		out.append(fact("SPELL_CAST", {"caster": id, "spell": a.spell, "pm_cost": v.cost, "pm_after": sh.pm, "failed": true}, [id]))
@@ -4609,6 +4611,113 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"adaga_mental":
+			# Adaga Mental (arcana 1): 2d6 (+1d6) psíquico e atordoado 1 rodada (uma vez por cena); Vontade: metade e sem condição.
+			# Silenciosa (sem gesto nem palavra: vale de armadura); fincada por um dia: o conjurador sabe onde o alvo está.
+			var apr_ad: Array = a.get("aprimoramentos", [])
+			var tg_ad: String = a.get("target", "")
+			var cd_ad := spell_dc(sh, a)
+			var passou_ad := _resiste(tg_ad, "vontade", cd_ad, out)
+			var ts_ad: CharacterSheet = sim.c(tg_ad).sheet
+			var dano_ad := _dano_por_tipo(ts_ad, "psiquico", _dados_energia("%dd6" % (2 + apr_ad.count(2)), "psiquico", sim.c(tg_ad).tile))
+			if passou_ad:
+				dano_ad = dano_ad / 2
+			elif ts_ad.efeito_bonus("adaga_atordoou") == 0:
+				sim.add_condicao(tg_ad, "atordoado", 1, "adaga_mental")
+				ts_ad.add_efeito("adaga_mental", "adaga_atordoou", 1, "cena")
+			sim.apply_damage(tg_ad, dano_ad)
+			out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg_ad, "weapon": "Adaga Mental", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": cd_ad,
+				"camo_roll": 0, "hit": true, "crit": false, "damage": dano_ad, "rolls": [], "pv_after": ts_ad.pv, "special": false, "ranged": true, "spell": true,
+				"save": "vontade", "saved": passou_ad, "oculta": apr_ad.has(0) and not passou_ad, "tags": ["magia", "psiquico"]}, [id, tg_ad]))
+			if apr_ad.has(1):
+				sh.add_efeito("magia.adaga_mental", "adaga_fincada", 1, "dia", tg_ad, world.day_index() + 1)
+		"amedrontar":
+			# Amedrontar (arcana 1): Vontade; falhou, apavorado 1 rodada (1d4+1) e depois abalado pela cena; passou, abalado 1d4.
+			var apr_me: Array = a.get("aprimoramentos", [])
+			var cd_me := spell_dc(sh, a)
+			for tg in a.get("targets", [a.get("target", "")]):
+				if _resiste(str(tg), "vontade", cd_me, out):
+					sim.add_condicao(str(tg), "abalado", int(Dice.roll("1d4", world.rng, "combat").total), "amedrontar")
+				else:
+					var rod_me := int(Dice.roll("1d4+1", world.rng, "combat").total) if apr_me.has(0) else 1
+					if sim.add_condicao(str(tg), "apavorado", rod_me, "amedrontar"):
+						for mk in sim.marcas:
+							if mk.alvo == str(tg) and mk.tipo == "condicao" and str(mk.dados.condicao) == "apavorado":
+								mk.dados["depois"] = "abalado"
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "amedrontar", "tags": ["magia", "medo"]}, [id, tg]))
+		"explosao_de_chamas":
+			# Explosão de Chamas (arcana 1): cone de 6m, 2d6 (+1d6) de fogo, Reflexos metade; ou Reflexos parcial: falhou, em chamas.
+			var apr_ex: Array = a.get("aprimoramentos", [])
+			var t_ex: Vector2i = a.get("tile", sim.c(id).tile + Vector2i(1, 0))
+			var dir_ex := Vector2i(signi(t_ex.x - sim.c(id).tile.x), signi(t_ex.y - sim.c(id).tile.y))
+			if dir_ex == Vector2i.ZERO:
+				dir_ex = Vector2i(1, 0)
+			var cd_ex := spell_dc(sh, a)
+			for tg in _criaturas_vivas_em(Area.cone(sim.c(id).tile, dir_ex, Area.quadrados(6.0))):
+				if tg == id:
+					continue
+				var antes_ex := out.size()
+				out.append_array(_dano_de_energia(id, tg, "%dd6" % (2 + apr_ex.count(0)), cd_ex, "reflexos", "fogo", "Explosão de Chamas"))
+				if apr_ex.has(1) and out.size() > antes_ex and not bool(out[-1].payload.get("saved", true)):
+					sim.add_condicao(tg, "em_chamas", 0, "explosao_de_chamas")
+		"leque_cromatico":
+			# Leque Cromático (arcana 1): cone de 4,5m; animais e humanoides (espíritos e monstros; construtos e mortos-vivos) que
+			# veem falham na Vontade: atordoados 1 rodada (uma vez por cena) e ofuscados pela cena (vulneráveis, com aprimoramento).
+			var apr_lq: Array = a.get("aprimoramentos", [])
+			var tipos_lq: Array = ["animal", "humanoide"]
+			if apr_lq.has(1) or apr_lq.has(2): tipos_lq.append_array(["espirito", "monstro"])
+			if apr_lq.has(2): tipos_lq.append_array(["construto", "morto-vivo"])
+			var t_lq: Vector2i = a.get("tile", sim.c(id).tile + Vector2i(1, 0))
+			var dir_lq := Vector2i(signi(t_lq.x - sim.c(id).tile.x), signi(t_lq.y - sim.c(id).tile.y))
+			if dir_lq == Vector2i.ZERO:
+				dir_lq = Vector2i(1, 0)
+			var cd_lq := spell_dc(sh, a)
+			for tg in _criaturas_vivas_em(Area.cone(sim.c(id).tile, dir_lq, Area.quadrados(4.5))):
+				var ts_lq: CharacterSheet = sim.c(tg).sheet
+				if tg == id or not tipos_lq.has(ts_lq.creature_type) or ts_lq.conditions.has("cego") or _resiste(tg, "vontade", cd_lq, out):
+					continue
+				if ts_lq.efeito_bonus("leque_atordoou") == 0:
+					sim.add_condicao(tg, "atordoado", 1, "leque_cromatico")
+					ts_lq.add_efeito("leque_cromatico", "leque_atordoou", 1, "cena")
+				for cond_lq in (["ofuscado", "vulneravel"] if apr_lq.has(0) else ["ofuscado"]):
+					ts_lq.add_efeito("magia.leque_cromatico", "condicao", 0, "cena", cond_lq, -1, id)
+					ts_lq.add_condition(cond_lq, world.rules)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg, "buff": "leque_cromatico", "tags": ["magia"]}, [id, tg]))
+		"raio_do_enfraquecimento":
+			# Raio do Enfraquecimento (arcana 1): Fortitude; falhou, fatigado (exausto); passou, vulnerável (fatigado). Truque: toque,
+			# Fortitude anula, fatigado.
+			var apr_re: Array = a.get("aprimoramentos", [])
+			var cd_re := spell_dc(sh, a)
+			for tg in a.get("targets", [a.get("target", "")]):
+				var ts_re: CharacterSheet = sim.c(str(tg)).sheet
+				var passou_re := _resiste(str(tg), "fortitude", cd_re, out)
+				var cond_re := ""
+				if a.get("truque", false):
+					cond_re = "" if passou_re else "fatigado"
+				elif apr_re.has(0) or apr_re.has(1):
+					cond_re = "fatigado" if passou_re else "exausto"
+				else:
+					cond_re = "vulneravel" if passou_re else "fatigado"
+				if cond_re != "" and ts_re.efeito_bonus("imune", cond_re) == 0:
+					ts_re.add_efeito("magia.raio_do_enfraquecimento", "condicao", 0, "cena", cond_re, -1, id)
+					ts_re.add_condition(cond_re, world.rules)
+					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": cond_re, "tags": ["magia"]}, [id, tg]))
+		"vitalidade_fantasma":
+			# Vitalidade Fantasma (arcana 1): 2d10 (+1d10) PV temporários pela cena. Esfera de 6m (2º círculo): 1d10 (+1d10) de
+			# trevas nas criaturas vivas da área, Fortitude metade; PV temporários iguais ao dano total.
+			var apr_vf: Array = a.get("aprimoramentos", [])
+			if apr_vf.has(1):
+				var total_vf := 0
+				for tg in _criaturas_vivas_em(Area.esfera(sim.c(id).tile, Area.quadrados(6.0))):
+					if tg == id or ["morto-vivo", "construto"].has(sim.c(tg).sheet.creature_type):
+						continue
+					var pv_antes: int = sim.c(tg).sheet.pv
+					out.append_array(_dano_de_energia(id, tg, "%dd10" % (1 + apr_vf.count(0)), spell_dc(sh, a), "fortitude", "trevas", "Vitalidade Fantasma"))
+					total_vf += maxi(0, pv_antes - sim.c(tg).sheet.pv)
+				sh.pv_temp = maxi(sh.pv_temp, total_vf)
+			else:
+				sh.pv_temp = maxi(sh.pv_temp, int(Dice.roll("%dd10" % (2 + apr_vf.count(0)), world.rng, "combat").total))
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "vitalidade_fantasma", "pv_temp": sh.pv_temp, "tags": ["magia"]}, [id]))
 		"controlar_agua":
 			out.append_array(_controlar_agua(id, a, sh))
 		"controlar_terra":
