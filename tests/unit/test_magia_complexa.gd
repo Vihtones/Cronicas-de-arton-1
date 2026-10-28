@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance", "furia_do_panteao", "visao_da_verdade", "marca_da_obediencia", "libertacao", "selo_de_mana", "manto_de_sombras", "buraco_negro", "lendas_e_historias", "videncia", "muralha_de_ossos"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3797,3 +3797,23 @@ func test_runa_de_protecao_explode_quando_o_jogador_entra_e_runa_no_corpo() -> v
 	eq(mg.runas.size(), 0, "a runa se descarregou")
 	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "runa_de_protecao", "aprimoramentos": [1], "magia": "bencao", "gatilho": "ataque"}).accepted, "runa no corpo")
 	check(w.player_sheet.efeito_tipo_existe("runa_corporal", "bencao"), "Bênção gravada na runa")
+
+
+func test_muralha_de_ossos_bloqueia_fere_e_trecho_cai() -> void:
+	var m := _cena_grupo(13)
+	var sim: CombatSim = m[2]
+	var b2 := _bandido(m, "bandido_2", -50)
+	var pv0 := b2.pv
+	check(_lanca(m, {"type": "cast", "spell": "muralha_de_ossos", "tile": Vector2i(31, 54), "direcao": [0, 1]}).ok, "Muralha de Ossos")
+	check(not sim.passable(Vector2i(31, 56), "player"), "a muralha bloqueia a passagem")
+	check(b2.pv < pv0, "quem está ao lado sofre corte")
+	check(b2.efeito_tipo_existe("preso_muralha", ""), "e fica preso")
+	var z: Dictionary = m[1]._zona_muralha_em(Vector2i(31, 56))
+	z.dados.pv["1"] = 1
+	sim.c("player").tile = Vector2i(30, 56)
+	sim.c("player").sheet.attacks.clear()
+	sim.c("player").sheet.attacks.append({"nome": "maça", "bonus_fixo": 0, "dano": "1d8+5", "for_no_dano": false, "margem": 20, "mult": 2, "alcance_q": 1, "tipo": "impacto"})
+	for i in 5:   # só erra com 1 natural
+		if int(z.dados.pv["1"]) > 0:
+			m[1]._atacar_muralha("player", Vector2i(31, 56))
+	check(sim.passable(Vector2i(31, 56), "player"), "trecho com 0 PV cai e libera a passagem")

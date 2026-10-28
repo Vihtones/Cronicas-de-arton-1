@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"muralha_de_ossos": {"aprimoramentos": [0, 1]},   # muro de 15m (+15m) que fere e prende; trechos destrutíveis; escalar fere; esqueletos animados agarram
 	"runa_de_protecao": {"aprimoramentos": [0, 1, 2]},   # runa no chão que explode (+2d6); runa no corpo com magia de 1º (ou 2º) círculo como reação
 	"comunhao_com_a_natureza": {"aprimoramentos": [0, 1, 2, 3]},   # dados de auxílio em áreas naturais; informações da região; +2 dados; d6; d8
 	"despertar_consciencia": {"aprimoramentos": [0, 1]},   # animal, planta ou parceiro vira parceiro veterano por um dia; escultura; permanente (–3 PM)
@@ -113,7 +114,7 @@ const REACAO_APR := {"armadura_arcana": [0], "protecao_divina": [1], "premonicao
 ## Aprimoramentos que trocam o alvo por "criaturas escolhidas" (vários alvos).
 const ELEMENTOS := ["agua", "ar", "fogo", "terra"]
 ## Magias que podem mirar um quadrado vazio (o clique dá o ponto de origem).
-const ALVO_QUADRADO := ["buraco_negro", "furia_do_panteao", "conjurar_mortos_vivos", "dissipar_magia", "controlar_madeira", "tempestade_divina", "enxame_de_pestes", "miasma_mefitico", "circulo_da_justica", "criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
+const ALVO_QUADRADO := ["muralha_de_ossos", "buraco_negro", "furia_do_panteao", "conjurar_mortos_vivos", "dissipar_magia", "controlar_madeira", "tempestade_divina", "enxame_de_pestes", "miasma_mefitico", "circulo_da_justica", "criar_elementos", "nevoa", "controlar_plantas", "luz", "escuridao"]
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
 const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},

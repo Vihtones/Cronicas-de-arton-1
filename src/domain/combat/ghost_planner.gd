@@ -194,6 +194,12 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "muralha_de_ossos":
+				var tile_mo: Vector2i = a.get("tile", A.tile)
+				if CombatSim.cheb(A.tile, tile_mo) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 20)): return {"ok": false, "reason": "fora do alcance"}
+				var dir_mo: Array = a.get("direcao", [1, 0])
+				if dir_mo.size() != 2 or (int(dir_mo[0]) == 0 and int(dir_mo[1]) == 0) or absi(int(dir_mo[0])) > 1 or absi(int(dir_mo[1])) > 1: return {"ok": false, "reason": "direção: [dx, dy] entre -1 e 1"}
+				targets = [actor]
 			if sp_id == "buraco_negro":
 				var tile_bn: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tile_bn) > int(sim.rules.value("alcance.quadrados", {}).get("longo", 60)): return {"ok": false, "reason": "fora do alcance"}
@@ -629,6 +635,15 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if not sim.combatants.has(alvo_md) or sim.c(alvo_md).sheet.is_dead() or CombatSim.cheb(A.tile, sim.c(alvo_md).tile) > 1: return {"ok": false, "reason": "a criatura precisa estar adjacente"}
 			if str(a.get("condicao", "")) != "" and nv_m == "iniciante": return {"ok": false, "reason": "remover condição é do médico veterano"}
 			return {"ok": true, "kind": "livre"}
+		"atacar_muralha", "soltar_muralha", "escalar_muralha":
+			# Muralha de Ossos: atacar um trecho adjacente (padrão), soltar-se (padrão, Atletismo), escalar (completa, Atletismo).
+			var kind_mu := "completa" if str(a.type) == "escalar_muralha" else "padrao"
+			if not sim.can_spend(kind_mu): return {"ok": false, "reason": "sem a ação necessária"}
+			var t_mu: Vector2i = a.get("tile", A.tile)
+			if str(a.type) == "soltar_muralha":
+				if not A.sheet.efeito_tipo_existe("preso_muralha", ""): return {"ok": false, "reason": "você não está preso na muralha"}
+			elif not sim.zona_em(t_mu, "muralha") or CombatSim.cheb(A.tile, t_mu) > 1: return {"ok": false, "reason": "escolha um trecho da muralha ao seu lado"}
+			return {"ok": true, "kind": kind_mu}
 		"segurar":
 			# Buraco Negro: ação de movimento para se segurar num objeto fixo (+2 nos testes de resistência até o próximo turno).
 			if not sim.zonas.any(func(z): return str(z.tipo) == "buraco_negro"): return {"ok": false, "reason": "nada puxando você"}

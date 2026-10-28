@@ -1068,6 +1068,97 @@ func _alguma_em(tiles_a: Array, tiles_b: Array) -> bool:
 	return false
 
 
+## Muralha de Ossos ---------------------------------------------------------------------------------------------
+func _zona_muralha_em(t: Vector2i) -> Dictionary:
+	for z in sim.zonas:
+		if str(z.tipo) == "muralha" and (z.tiles as Array).has(t):
+			return z
+	return {}
+
+
+## Reflexos ou fica preso (agarrado) na muralha.
+func _prender_na_muralha(cid: String, cd: int, out: Array) -> void:
+	if _resiste(cid, "reflexos", cd, out):
+		return
+	var s: CharacterSheet = sim.c(cid).sheet
+	s.add_efeito("magia.muralha_de_ossos", "preso_muralha", cd, "cena")
+	s.add_efeito("magia.muralha_de_ossos", "condicao", 0, "cena", "agarrado")
+	s.add_condition("agarrado", world.rules)
+	out.append(fact("CONDITION_APPLIED", {"target": cid, "condition": "agarrado", "tags": ["magia"]}, [cid]))
+
+
+## Ação padrão e Atletismo contra a CD: passou, sai para um lado; falhou, 4d8 de corte.
+func _soltar_da_muralha(cid: String) -> Array:
+	var out: Array = []
+	var s: CharacterSheet = sim.c(cid).sheet
+	var cd := s.efeito_bonus("preso_muralha")
+	if Checks.skill(s, "atletismo", cd, world.rules, world.rng, "combat").get("success", false):
+		s.anular_magia("magia.muralha_de_ossos")
+		if sim.zona_em(sim.c(cid).tile, "muralha"):
+			sim.c(cid).tile = _tile_livre_na_sim(sim.c(cid).tile, sim.combatants.keys().map(func(x): return sim.c(x).tile) + _tiles_de_muralha())
+		out.append(fact("SPELL_ENDED", {"spell": "muralha_de_ossos", "target": cid, "reason": "soltou"}, [cid]))
+	else:
+		var conj := ""
+		for z in sim.zonas:
+			if str(z.tipo) == "muralha":
+				conj = str(z.dados.conjurador)
+		out.append_array(_dano_de_energia(conj if sim.combatants.has(conj) else cid, cid, "4d8", 0, "", "corte", "Muralha de Ossos"))
+	return out
+
+
+func _tiles_de_muralha() -> Array:
+	var r: Array = []
+	for z in sim.zonas:
+		if str(z.tipo) == "muralha":
+			r.append_array(z.tiles)
+	return r
+
+
+## Golpe num trecho (Defesa 8: só erra com 1 natural): dano da arma, RD 10 contra corte, frio e perfuração. Com 0 PV, o
+## trecho de 3m cai e quem estava preso nele fica livre.
+func _atacar_muralha(id: String, t: Vector2i) -> Array:
+	var out: Array = []
+	var z := _zona_muralha_em(t)
+	var s: CharacterSheet = sim.c(id).sheet
+	if z.is_empty() or s.attacks.is_empty():
+		return out
+	var atk: Dictionary = CombatSim.ataque_efetivo(world.rules, s, s.attacks[0])
+	if int(world.rng.roll("combat", 1, 20)[0]) == 1:
+		out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": "muralha", "weapon": atk.nome, "hit": false, "damage": 0, "tags": ["muralha"]}, [id]))
+		return out
+	var dano := int(Dice.roll(str(atk.dano), world.rng, "combat", 1, int(s.attrs["for"]) if atk.get("for_no_dano", false) else 0).total)
+	if ["corte", "frio", "perfuracao"].has(str(atk.get("tipo", ""))):
+		dano = maxi(0, dano - 10)
+	var seg := str(z.dados.segmento["%d,%d" % [t.x, t.y]])
+	z.dados.pv[seg] = int(z.dados.pv[seg]) - dano
+	out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": "muralha", "weapon": atk.nome, "hit": true, "damage": dano, "pv_after": int(z.dados.pv[seg]), "tags": ["muralha"]}, [id]))
+	if int(z.dados.pv[seg]) <= 0:
+		var caem: Array = (z.tiles as Array).filter(func(x): return str(z.dados.segmento["%d,%d" % [x.x, x.y]]) == seg)
+		z.tiles = (z.tiles as Array).filter(func(x): return not caem.has(x))
+		for cid in sim.combatants:
+			if caem.has(sim.c(cid).tile):
+				sim.c(cid).sheet.anular_magia("magia.muralha_de_ossos")
+		out.append(fact("SPELL_EFFECT", {"spell": "muralha_de_ossos", "efeito": "trecho_destruido", "tiles": caem.map(func(x): return [x.x, x.y])}, [id]))
+	return out
+
+
+## Muralha animada: quem começa o turno ao lado faz Reflexos ou fica preso. Quem está preso e não é o jogador tenta se
+## soltar com a ação padrão.
+func _muralha_inicio_de_turno(id: String, facts: Array) -> void:
+	var s: CharacterSheet = sim.c(id).sheet
+	if s.efeito_tipo_existe("preso_muralha", "") and id != "player":
+		sim.budget.std = 0
+		facts.append_array(_soltar_da_muralha(id))
+		return
+	for z in sim.zonas:
+		if str(z.tipo) != "muralha" or not bool(z.dados.animada) or str(z.dados.conjurador) == id:
+			continue
+		for t in z.tiles:
+			if CombatSim.cheb(t, sim.c(id).tile) <= 1 and not s.efeito_tipo_existe("preso_muralha", ""):
+				_prender_na_muralha(id, int(z.dados.cd), facts)
+				return
+
+
 ## Buraco Negro, no início do turno do conjurador: todos a até alcance longo (o conjurador também, sem o aprimoramento)
 ## fazem Fortitude; falhou, caído e puxado 30m. Depois de três turnos, o buraco se fecha.
 func _buraco_negro_do_conjurador(id: String, facts: Array) -> void:
@@ -3091,6 +3182,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	_nuvens_do_conjurador(id, facts)
 	_buraco_negro_do_conjurador(id, facts)
 	_buraco_negro_inicio_de_turno(id, facts)
+	_muralha_inicio_de_turno(id, facts)
 	if s.has_efeito("magia.premonicao"):
 		s.add_efeito("magia.premonicao", "premonicao_uso", 1, "rodada")   # uma vez por rodada, a cada turno do conjurador
 	_zonas_e_marcas_inicio_de_turno(id, facts)
@@ -3367,6 +3459,25 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			else:
 				var cura_md := ts_md.curar(int(Dice.roll(str(world.rules.value("parceiro.tipos", {}).medico.cura[nv_md]), world.rng, "combat").total))
 				out.append(fact("HEALED", {"actor": id, "target": a.get("target", id), "amount": cura_md, "pv_after": ts_md.pv, "source": "parceiro_medico"}, [id]))
+		"soltar_muralha":
+			out.append_array(_soltar_da_muralha(id))
+		"escalar_muralha":
+			# Escalar: Atletismo (CD 15) e 4d8 de corte a cada 3m de altura (9m, +3m com o aprimoramento de tamanho); passou, chega
+			# ao outro lado.
+			var z_e := _zona_muralha_em(a.tile)
+			var alturas := 3 + (1 if (z_e.tiles as Array).size() > Area.quadrados(15.0) else 0)
+			if Checks.skill(sim.c(id).sheet, "atletismo", 15, world.rules, world.rng, "combat").get("success", false):
+				for _i in alturas:
+					out.append_array(_dano_de_energia(id, id, "4d8", 0, "", "corte", "Muralha de Ossos"))
+				var de_e: Vector2i = sim.c(id).tile
+				var outro: Vector2i = a.tile + (a.tile - de_e)
+				if sim.walk_fn.call(outro) and sim.occupant(outro, id) == "" and not sim.zona_em(outro, "muralha"):
+					sim.c(id).tile = outro
+					out.append(fact("COMBAT_MOVED", {"actor": id, "from": [de_e.x, de_e.y], "path": [[a.tile.x, a.tile.y], [outro.x, outro.y]]}, [id]))
+			else:
+				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": "escalar_muralha"}, [id]))
+		"atacar_muralha":
+			out.append_array(_atacar_muralha(id, a.tile))
 		"segurar":
 			sim.c(id).sheet.add_efeito("segurando", "resistencia", 2, "turno")
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "segurando", "tags": []}, [id]))
@@ -4152,6 +4263,37 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"muralha_de_ossos":
+			# Muralha de Ossos (universal 4): muro de 15m (+15m) a partir do quadrado, na direção escolhida. Trechos de 3m com
+			# Defesa 8, 40 PV e RD 10 contra corte, frio e perfuração. Quem está nele ou ao lado sofre 4d8 de corte e faz Reflexos
+			# para não ficar preso (agarrado). Com o aprimoramento, esqueletos animados agarram quem começa o turno ao lado.
+			var apr_mo: Array = a.get("aprimoramentos", [])
+			var dir_mo := Vector2i(int((a.get("direcao", [1, 0]) as Array)[0]), int((a.get("direcao", [1, 0]) as Array)[1]))
+			var tiles_mo: Array = []
+			var seg_de: Dictionary = {}
+			var pos_mo: Vector2i = a.get("tile", sim.c(id).tile)
+			for i in range(Area.quadrados(15.0 + 15.0 * apr_mo.count(0))):
+				if not sim.walk_fn.call(pos_mo):
+					break
+				tiles_mo.append(pos_mo)
+				seg_de["%d,%d" % [pos_mo.x, pos_mo.y]] = i / 2
+				pos_mo += dir_mo
+			var pvs: Dictionary = {}
+			for k in seg_de:
+				pvs[str(seg_de[k])] = 40
+			var cd_mo := spell_dc(sh, a)
+			sim.add_zona("muralha_" + id, tiles_mo, "muralha", -1, "muralha_de_ossos", {"conjurador": id, "cd": cd_mo, "segmento": seg_de, "pv": pvs, "animada": apr_mo.has(1)})
+			for cid in sim.combatants.keys():
+				if cid == id or sim.c(cid).sheet.is_dead():
+					continue
+				var perto := false
+				for t_mo in tiles_mo:
+					perto = perto or CombatSim.cheb(t_mo, sim.c(cid).tile) <= 1
+				if not perto:
+					continue
+				out.append_array(_dano_de_energia(id, cid, "4d8", 0, "", "corte", "Muralha de Ossos"))
+				_prender_na_muralha(cid, cd_mo, out)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "muralha_de_ossos", "tiles": tiles_mo.map(func(t): return [t.x, t.y]), "tags": ["magia", "area"]}, [id]))
 		"buraco_negro":
 			# Buraco Negro (universal 5): puxa por três turnos do conjurador (`_buraco_negro_do_conjurador`); quem termina o
 			# turno no espaço é sugado (`_buraco_negro_fim_de_turno`). Com o aprimoramento, o conjurador não é afetado.
