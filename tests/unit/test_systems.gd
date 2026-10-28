@@ -255,3 +255,24 @@ func test_ia_fala_livre_valida_e_cai_para_a_base() -> void:
 	p.transport_override = func(_m): return "Fale com Zorbax no Castelo."
 	p.converse_async("hilda", ficha, func(t): got[0] = t)
 	eq(got[0], ficha.base, "rejeita nome inventado e usa a base")
+
+
+func test_conversa_aberta_responde_pelo_conhecimento_do_mundo() -> void:
+	var w := WorldHelpers.world(5)
+	var txt := FreeTalk.conhecimento(w, "hilda")
+	check(txt.length() > 0 and txt.length() <= FreeTalk.CONHECIMENTO_MAX, "conhecimento não vazio e dentro do limite (%d)" % txt.length())
+	check(txt.contains("Lugares"), "lista lugares do mundo")
+	var f := FreeTalk.ficha(w, "hilda", "quanto custa uma espada longa na loja", "Não sei dizer.", "desconhecido")
+	check(bool(f.aberta), "pergunta desconhecida vira aberta")
+	check(str(f.conhecimento) != "", "ficha leva o conhecimento")
+	var p := LlmDialogueProvider.new({"enabled": true, "max_calls": 5})
+	var msgs := p.build_chat(f)
+	check(str(msgs[0].content).contains("Fatos do mundo"), "prompt de conversa aberta leva os fatos")
+	eq(str(msgs[msgs.size() - 1].content), f.frase, "a última mensagem é a pergunta do forasteiro")
+	var got := [""]
+	p.transport_override = func(_m): return "Não sei dizer, forasteiro, isso é do armeiro."
+	p.converse_async("hilda", f, func(t): got[0] = t)
+	eq(got[0], "Não sei dizer, forasteiro, isso é do armeiro.", "resposta fiel aos fatos é aceita")
+	p.transport_override = func(_m): return "Custa 999 moedas, forasteiro."
+	p.converse_async("hilda", f, func(t): got[0] = t)
+	eq(got[0], f.base, "número que não está nos fatos é rejeitado")

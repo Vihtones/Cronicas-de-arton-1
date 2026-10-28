@@ -176,7 +176,7 @@ func view() -> Dictionary:
 			label += "  [%s CD %d]" % [str(o.test.skill).capitalize(), int(o.test.cd)]
 		opts.append({"index": i, "text": label})
 	return {"npc": npc, "name": world.npc_def(npc).get("name", npc), "node": session.node, "text": node.get("text", ""), "options": opts,
-		"chat": session.get("chat", []), "intent": str(session.get("intent", "")), "ficha": FreeTalk.ficha(world, npc, str(session.get("chat", [{}]).back().get("q", "")) if not (session.get("chat", []) as Array).is_empty() else "", str(node.get("text", "")))}
+		"chat": session.get("chat", []), "intent": str(session.get("intent", "")), "ficha": FreeTalk.ficha(world, npc, str(session.get("chat", [{}]).back().get("q", "")) if not (session.get("chat", []) as Array).is_empty() else "", str(node.get("text", "")), str(session.get("intent", "")))}
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:

@@ -157,8 +157,70 @@ static func resposta_direta(world: WorldState, npc: String, e: Dictionary, salt:
 	return ""
 
 
+## Conhecimento verificado para perguntas abertas (IA). Só fatos que o jogo já tem e que o jogador PODE saber:
+## o lugar, as lojas, a guilda, os moradores presentes e os mistérios já descobertos. Limite de tamanho fixo.
+const CONHECIMENTO_MAX := 900
+
+
+static func conhecimento(world: WorldState, npc: String) -> String:
+	var partes: Array = []
+	var w = world.module("weather")
+	partes.append("Agora: %s, tempo %s." % [DialogueVoice.period(world), w.region.condition if w != null else "limpo"])
+	var npcs = world.module("npcs")
+	var loc := str(npcs.npc(npc).get("location", "")) if npcs != null else ""
+	if loc != "":
+		partes.append("O morador está em: %s." % str(world.db.location(loc).get("name", loc)))
+	var nomes_locais: Array = []
+	for l in world.db.all_locations():
+		if nomes_locais.size() >= 14:
+			break
+		nomes_locais.append(str(l.get("name", l.id)))
+	partes.append("Lugares da vila e arredores: %s." % ", ".join(PackedStringArray(nomes_locais)))
+	var lojas: Dictionary = world.db.economy.get("shops", {})
+	var frases_lojas: Array = []
+	for vend in lojas:
+		if frases_lojas.size() >= 6:
+			break
+		var nomes_itens: Array = []
+		for it in lojas[vend]:
+			nomes_itens.append(str(world.db.items.get(str(it), {}).get("name", it)))
+		var nv := str(world.npc_def(str(vend)).get("name", vend))
+		frases_lojas.append("%s vende %s" % [nv, ", ".join(PackedStringArray(nomes_itens.slice(0, 4)))])
+	partes.append("Lojas: %s." % "; ".join(PackedStringArray(frases_lojas)))
+	var q = world.module("quests")
+	if q != null:
+		if q.membro:
+			partes.append("Guilda: você é membro, rank %s, %d pontos." % [str(q.rank().get("nome", "")), int(q.pontos)])
+		var titulos: Array = []
+		for c in q.quadro:
+			titulos.append(str(c.get("titulo", "")))
+		if not titulos.is_empty():
+			partes.append("Quadro da guilda: %s." % ", ".join(PackedStringArray(titulos.slice(0, 3))))
+	var ex = world.module("exploration")
+	if ex != null:
+		var fatos: Array = []
+		for f in ex.known_facts.keys():
+			if fatos.size() >= 4:
+				break
+			var txt := world.db.fact_text(str(f))
+			if txt != "":
+				fatos.append(txt)
+		if not fatos.is_empty():
+			partes.append("Você já descobriu: %s." % " ".join(PackedStringArray(fatos)))
+	if npcs != null and loc != "":
+		var presentes: Array = []
+		for id in npcs.npcs_at(loc):
+			if presentes.size() >= 6:
+				break
+			presentes.append("%s (%s)" % [str(world.npc_def(id).get("name", id)), str(world.npc_def(id).get("profession", ""))])
+		partes.append("Aqui agora: %s." % ", ".join(PackedStringArray(presentes)))
+	var txt := " ".join(PackedStringArray(partes))
+	return txt.substr(0, CONHECIMENTO_MAX)
+
+
 ## Ficha de fatos para o modelo de linguagem: só o que o morador PODE saber, sem segredos do mistério.
-static func ficha(world: WorldState, npc: String, frase: String, base: String) -> Dictionary:
+## Pergunta aberta (intenção desconhecida): a IA responde pelo conhecimento do mundo, não pela resposta pronta.
+static func ficha(world: WorldState, npc: String, frase: String, base: String, intent: String = "") -> Dictionary:
 	var d := world.npc_def(npc)
 	var mem = world.module("memory")
 	var lembrancas: Array = []
@@ -171,6 +233,7 @@ static func ficha(world: WorldState, npc: String, frase: String, base: String) -
 	return {"name": d.get("name", npc), "profession": d.get("profession", ""), "traits": d.get("traits", []),
 		"register": DialogueVoice.register(world, npc), "tier": DialogueVoice.tier(world, npc), "period": DialogueVoice.period(world),
 		"weather": w.region.condition if w != null else "limpo", "lembrancas": lembrancas, "frase": frase, "base": base,
+		"aberta": intent == "desconhecido", "conhecimento": conhecimento(world, npc) if intent == "desconhecido" else "",
 		"allowed_names": _nomes_permitidos(world)}
 
 

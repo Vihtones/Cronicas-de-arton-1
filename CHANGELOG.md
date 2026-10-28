@@ -2,12 +2,13 @@
 
 ## 0.7.2 (em andamento)
 
+- Conversa com a IA: perguntas fora dos 16 assuntos prontos são respondidas pela IA a partir de um resumo verificado do mundo (lugar, lojas, guilda, moradores presentes, mistérios já descobertos; nunca os não descobertos). Números e nomes que não estão nos fatos são rejeitados e cai na resposta do jogo.
 - Despensa por casa (Arton Viva, Fase 1): no tempo livre, quem tem ouro compra pão para a casa onde há vendedor de pão (o ouro vai ao tesouro); com comida guardada, o morador come em casa sem pagar taverna. A despensa começa vazia, vai até 3 refeições e é salva com o jogo.
 - Fome e cansaço são arredondados a 4 casas ao gravar, para o save reproduzir a simulação com exatidão.
 
 ## 0.7.1
 
-- Desempenho: simulação de 7 dias ~0,35 s (antes ~1,2 s). Busca de visitas entre moradores passa a percorrer só as relações conhecidas (mesmo desempate), e o agrupamento por local das relações vira uma passada única.
+- Desempenho: simulação de 7 dias ~0,8 s (antes ~1,2 s; o teste de tempo tem meta de 1 s e está perto do limite). Busca de visitas entre moradores passa a percorrer só as relações conhecidas (mesmo desempate), e o agrupamento por local das relações vira uma passada única.
 - Mundo cresce só por acréscimo (nenhuma coordenada deslocada): Fronteira do Leste (x 160..287), Horizonte a leste (x 288..335) e Vale do Sul ao sul (linhas 64..95); mapa 336×96. Moradores, lojas, economia, famílias, facções e criaturas novos (67 NPCs).
 - Corrida com Shift (1,8×) na exploração; emboscada fora de combate (C furtivo, a até 3 quadrados, sem ser visto) começa a luta já com surpresa.
 - Combate no modo ação mais lento (0,7×) e silhuetas distintas para lobo, esqueleto, aranha, cobra, orc e ogro.

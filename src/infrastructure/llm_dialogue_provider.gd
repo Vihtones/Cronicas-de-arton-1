@@ -122,14 +122,21 @@ func build_chat(ficha: Dictionary) -> Array:
 		ficha.get("name", ""), ficha.get("profession", ""), ficha.get("register", "simples"), ficha.get("tier", "neutro"), traços if traços != "" else "nenhum"]
 	sistema += "Agora é %s e o tempo está %s. Responda em português, em primeira pessoa, com no máximo 2 frases curtas, sem narrar ações nem usar asteriscos. " % [
 		ficha.get("period", ""), ficha.get("weather", "")]
-	sistema += "Use SOMENTE os fatos da 'resposta de referência' e das lembranças; não invente nomes, lugares, preços, itens ou promessas. Se a referência diz que não sabe, diga que não sabe do seu jeito. "
+	var aberta := bool(ficha.get("aberta", false))
+	if aberta:
+		sistema += "Responda à pergunta do forasteiro usando SOMENTE os 'Fatos do mundo' abaixo; se a resposta não estiver neles, diga que não sabe do seu jeito, sem inventar. Fatos do mundo: " + str(ficha.get("conhecimento", "")) + ". "
+	else:
+		sistema += "Use SOMENTE os fatos da 'resposta de referência' e das lembranças; não invente nomes, lugares, preços, itens ou promessas. Se a referência diz que não sabe, diga que não sabe do seu jeito. "
 	if lemb != "":
 		sistema += "Lembranças recentes: " + lemb + ". "
 	var msgs: Array = [{"role": "system", "content": sistema}]
 	for h in ficha.get("chat", []):
 		msgs.append({"role": "user", "content": str(h.q)})
 		msgs.append({"role": "assistant", "content": str(h.r)})
-	msgs.append({"role": "user", "content": "%s\n\n[Resposta de referência, mantenha o conteúdo e reescreva na sua voz: %s]" % [ficha.get("frase", ""), ficha.get("base", "")]})
+	if aberta:
+		msgs.append({"role": "user", "content": str(ficha.get("frase", ""))})
+	else:
+		msgs.append({"role": "user", "content": "%s\n\n[Resposta de referência, mantenha o conteúdo e reescreva na sua voz: %s]" % [ficha.get("frase", ""), ficha.get("base", "")]})
 	return msgs
 
 
@@ -137,11 +144,17 @@ func accept_livre(base: String, out: String, ficha: Dictionary) -> bool:
 	var t := out.strip_edges()
 	if t == "" or t.length() > 320 or t.contains("*") or t.contains("["):
 		return false
+	# números só valem se estiverem nos fatos (preços, dias, quantidades), na pergunta ou na referência
+	var fatos := str(ficha.get("conhecimento", "")) + " " + str(ficha.get("frase", "")) + " " + base
+	var num := RegEx.create_from_string("\\b\\d+\\b")
+	for m in num.search_all(t):
+		if not fatos.contains(m.get_string()):
+			return false
 	var permitidos: Array = ficha.get("allowed_names", [])
 	var re := RegEx.create_from_string("\\b[A-ZÁÉÍÓÚÂÊÔÃÕ][a-záéíóúâêôãõç]{3,}\\b")
 	for m in re.search_all(t):
 		var w := m.get_string()
-		if m.get_start() > 0 and not base.contains(w) and not str(ficha.get("frase", "")).contains(w) and not permitidos.has(w):
+		if m.get_start() > 0 and not fatos.contains(w) and not permitidos.has(w):
 			return false
 	return true
 
