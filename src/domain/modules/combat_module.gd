@@ -20,6 +20,7 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
+const CONDICOES_SEGUNDA_CHANCE := ["abalado", "apavorado", "alquebrado", "atordoado", "cego", "confuso", "debilitado", "enjoado", "envenenado", "esmorecido", "exausto", "fascinado", "fatigado", "fraco", "frustrado", "lento", "ofuscado", "paralisado", "pasmo", "surdo"]
 const POWER_POLICIES := {"premonicao_reacao": ["auto", "nunca"], "escudo_da_fe": ["auto", "nunca"], "protecao_divina": ["auto", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"],
@@ -3850,6 +3851,79 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"toque_da_morte":
+			# Toque da Morte (universal 5): 10d8+10 de trevas. Abaixo da metade dos PV, Fortitude: falhou, PV a –10; passou, dano normal.
+			# Aprimoramentos: raio (curto); raios em todos os inimigos em alcance curto.
+			var apr_tm: Array = a.get("aprimoramentos", [])
+			var alvos_tm: Array = a.get("targets", [a.get("target", id)])
+			if apr_tm.has(1):
+				alvos_tm = sim.combatants.keys().filter(func(x): return sim.is_enemy(id, x) and not sim.c(x).sheet.is_dead() and CombatSim.cheb(sim.c(id).tile, sim.c(x).tile) <= ALCANCE_CURTO_QUADRADOS)
+			for tg in alvos_tm:
+				var ts_tm: CharacterSheet = sim.c(tg).sheet
+				var cd_tm := spell_dc(sh, a)
+				var fraco_tm: bool = ts_tm.pv * 2 < ts_tm.pv_max
+				var morreu_tm := false
+				if fraco_tm and not _resiste(tg, "fortitude", cd_tm, out):
+					ts_tm.pv = mini(ts_tm.pv, -10)
+					morreu_tm = true
+				var r_tm := Dice.roll("10d8+10", world.rng, "combat", 1, battle_bonus(sh))
+				var dano_tm := 0 if morreu_tm else _dano_por_tipo(ts_tm, "trevas", int(r_tm.total))
+				var tags_tm: Array = ["magia", "trevas"]
+				tags_tm.append_array(sim.apply_damage(tg, dano_tm))
+				out.append(fact("ATTACK_RESOLVED", {"attacker": id, "target": tg, "weapon": "Toque da Morte", "d20": 0, "mod": 0, "mods": [], "total": 0, "defense": cd_tm,
+					"camo_roll": 0, "hit": true, "crit": false, "damage": dano_tm, "rolls": r_tm.rolls, "pv_after": ts_tm.pv, "special": false, "ranged": apr_tm.has(0) or apr_tm.has(1),
+					"spell": true, "tags": tags_tm}, [id, tg]))
+		"palavra_primordial":
+			# Palavra Primordial (universal 5): atordoar (1d4+1 rodadas, uma vez por cena; se resistir, desprevenido 1d4), cegar (resistiu:
+			# ofuscado 1d4) ou matar (Vontade e, com mais da metade dos PV, também Fortitude; resistiu: 10d8 PV e sangrando).
+			var tg_pp: String = a.target
+			var ts_pp: CharacterSheet = sim.c(tg_pp).sheet
+			var cd_pp := spell_dc(sh, a)
+			var passou_pp := _resiste(tg_pp, "vontade", cd_pp, out)
+			match str(a.efeito):
+				"atordoar":
+					if passou_pp or ts_pp.efeito_bonus("palavra_atordoou") > 0:
+						sim.add_condicao(tg_pp, "desprevenido", int(Dice.roll("1d4", world.rng, "combat").total), "palavra_primordial")
+					else:
+						sim.add_condicao(tg_pp, "atordoado", int(Dice.roll("1d4+1", world.rng, "combat").total), "palavra_primordial")
+						ts_pp.add_efeito("magia.palavra_primordial", "palavra_atordoou", 1, "cena", "", -1, id)
+				"cegar":
+					if passou_pp:
+						sim.add_condicao(tg_pp, "ofuscado", int(Dice.roll("1d4", world.rng, "combat").total), "palavra_primordial")
+					else:
+						ts_pp.add_efeito("magia.palavra_primordial", "condicao", 0, "cena", "cego", -1, id)
+						ts_pp.add_condition("cego", world.rules)
+				"matar":
+					var sobrevive := passou_pp
+					if not sobrevive and ts_pp.pv * 2 > ts_pp.pv_max:
+						sobrevive = _resiste(tg_pp, "fortitude", cd_pp, out)   # mais da metade dos PV: segundo teste
+					if sobrevive:
+						sim.apply_damage(tg_pp, int(Dice.roll("10d8", world.rng, "combat").total))
+						sim.add_condicao(tg_pp, "sangrando", 0, "palavra_primordial")
+					else:
+						ts_pp.pv = mini(ts_pp.pv, ts_pp.death_threshold())
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": tg_pp, "buff": "palavra_primordial", "efeito": str(a.efeito), "tags": ["magia"]}, [id, tg_pp]))
+		"segunda_chance":
+			# Segunda Chance (divina 5): cura 200 PV (+20) e várias condições; até 5 alvos; ou quem morreu há até uma rodada.
+			# Mortos-vivos sofrem a luz como dano (Vontade reduz à metade).
+			var apr_sc: Array = a.get("aprimoramentos", [])
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts_sc: CharacterSheet = sim.c(tg).sheet
+				var total_sc := 200 + 20 * apr_sc.count(0)
+				if ts_sc.creature_type == "morto-vivo":
+					var cd_sc := spell_dc(sh, a)
+					var dano_sc := _dano_por_tipo(ts_sc, "luz", total_sc)
+					if _resiste(tg, "vontade", cd_sc, out):
+						dano_sc = maxi(1, dano_sc / 2)
+					sim.apply_damage(tg, dano_sc)
+					continue
+				var cura_sc := ts_sc.curar(total_sc)
+				for e_sc in ts_sc.efeitos.duplicate(true):
+					if e_sc.stat == "condicao" and CONDICOES_SEGUNDA_CHANCE.has(str(e_sc.tipo)):
+						ts_sc.anular_magia(str(e_sc.id))
+				for cond_sc in CONDICOES_SEGUNDA_CHANCE:
+					ts_sc.remove_condition(cond_sc)
+				out.append(fact("HEALED", {"actor": id, "target": tg, "amount": cura_sc, "pv_after": ts_sc.pv, "source": "segunda_chance"}, [id, tg]))
 		"imobilizar":
 			# Imobilizar (universal 3): Vontade; falhou, paralisado; passou, lento. A cada rodada o alvo gasta a ação completa
 			# num novo teste (`_begin_turn_base`) e, se passar, se liberta.

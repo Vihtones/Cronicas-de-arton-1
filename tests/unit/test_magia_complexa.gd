@@ -231,7 +231,7 @@ func _cena_grupo(nivel: int) -> Array:
 	var r := RuleRegistry.load_default()
 	var sh := CharacterBuilder.build(r, "humano", "clerigo", CharacterBuilder.presets("clerigo")[0], ["for", "des", "con"], "clerigo")
 	sh.level = nivel
-	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra"])
+	sh.spells = PackedStringArray(["coluna_de_chamas", "sopro_da_salvacao", "circulo_da_restauracao", "poeira_da_podridao", "invulnerabilidade", "premonicao", "colera_de_azgher", "ligacao_sombria", "aura_divina", "banimento", "guardiao_divino", "lagrimas_de_wynna", "orientacao", "arma_magica", "nevoa", "bencao", "perdicao", "consagrar", "profanar", "curar_ferimentos", "infligir_ferimentos", "despedacar", "arma_espiritual", "manto_do_cruzado", "armamento_da_natureza", "caminhos_da_natureza", "controlar_plantas", "santuario", "comando", "acalmar_animal", "tranquilidade", "suporte_ambiental", "detectar_ameacas", "abencoar_alimentos", "criar_elementos", "luz", "escuridao", "aviso", "compreensao", "visao_mistica", "fisico_divino", "mente_divina", "oracao", "purificacao", "raio_solar", "silencio", "soco_de_arsenal", "voz_divina", "condicao", "circulo_da_justica", "controlar_fogo", "miasma_mefitico", "enxame_de_pestes", "rogar_maldicao", "tempestade_divina", "aliado_animal", "controlar_madeira", "heroismo", "protecao_contra_magia", "potencia_divina", "dispersar_as_trevas", "anular_a_luz", "dissipar_magia", "conjurar_mortos_vivos", "imobilizar", "pele_de_pedra", "toque_da_morte", "palavra_primordial", "segunda_chance"])
 	sh.equipment["armor"] = ""
 	var w := WorldHelpers.world(5)
 	w.player_sheet = sh
@@ -3590,3 +3590,21 @@ func test_imobilizar_paralisa_e_pele_de_pedra_da_rd() -> void:
 	check(b1.conditions.has("paralisado"), "alvo paralisado")
 	check(_lanca(m, {"type": "cast", "spell": "pele_de_pedra"}).ok, "Pele de Pedra")
 	eq(sim.c("player").sheet.efeito_rd("fogo"), 5, "RD 5")
+
+
+func test_toque_da_morte_palavra_primordial_e_segunda_chance() -> void:
+	var m := _cena_grupo(17)
+	var sim: CombatSim = m[2]
+	var b1: CharacterSheet = sim.c("bandido_1").sheet
+	b1.pv_max = 100
+	b1.pv = 40   # abaixo da metade
+	_bandido(m, "bandido_1", -50)   # falha na Fortitude
+	b1.level = 1
+	check(_lanca(m, {"type": "cast", "spell": "toque_da_morte", "target": "bandido_1", "targets": ["bandido_1"]}).ok, "Toque da Morte")
+	check(b1.is_down(), "PV levados a –10 ou menos")
+	var sc := _cena_grupo(17)
+	var alvo: CharacterSheet = sc[2].c("player").sheet
+	alvo.pv_max = 500
+	alvo.pv = 100
+	check(_lanca(sc, {"type": "cast", "spell": "segunda_chance", "target": "player", "targets": ["player"]}).ok, "Segunda Chance")
+	eq(alvo.pv, 300, "cura 200")

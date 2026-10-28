@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Toque da Morte, Palavra Primordial (universais, 5º círculo) e Segunda Chance (divina, 5º) completas. Toque da Morte: 10d8+10 de trevas, Fortitude ou PV a –10 abaixo da metade, com raio e raios em todos os inimigos no alcance curto. Palavra Primordial: atordoar, cegar ou matar, em alvo de nível menor. Segunda Chance: cura 200 PV (+20), tira 20 condições, até 5 alvos, ou revive quem morreu há até uma rodada.
+
 - Imobilizar e Pele de Pedra (universais, 3º círculo) completas. Imobilizar: Vontade (falhou, paralisado; passou, lento), espíritos, mais alvos, qualquer criatura no 4º círculo, e o alvo tenta se libertar a cada turno. Pele de Pedra: RD 5, toque, um dia, aço (RD 10) e estátua (petrificado) por 1d4 rodadas ou permanente.
 
 - Conjurar Mortos-Vivos (universal, 2º círculo) completa: sustentada; seis esqueletos capangas (+1 por aprimoramento), carniçais (3º círculo, veneno e paralisia) ou sombras (4º, perdem PM de vivos). Só agem por ordem do conjurador: mover (movimento) e atacar adjacentes (padrão); somem quando a magia termina. As ordens existem no jogo, mas ainda não têm botão na tela.

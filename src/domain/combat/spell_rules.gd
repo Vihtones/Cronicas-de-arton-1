@@ -14,6 +14,9 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"toque_da_morte": {"aprimoramentos": [0, 1]},   # 10d8+10 de trevas; abaixo da metade dos PV, Fortitude ou PV a –10; raio; todos os inimigos em curto
+	"palavra_primordial": {"aprimoramentos": []},   # atordoar, cegar ou matar (Vontade parcial); alvo de nível menor que o seu
+	"segunda_chance": {"aprimoramentos": [0, 1, 2]},   # cura 200 e condições; +20; até 5 alvos; quem morreu há até uma rodada
 	"imobilizar": {"aprimoramentos": [0, 1, 2]},   # paralisado (Vontade: lento); espírito; +1 alvo; qualquer criatura (4º círculo)
 	"pele_de_pedra": {"aprimoramentos": [0, 1, 2, 3, 4]},   # RD 5; toque; um dia; aço RD 10; estátua 1d4 rodadas; estátua permanente
 	"conjurar_mortos_vivos": {"aprimoramentos": [0, 1, 2]},   # 6 esqueletos (+1 cada); carniçais (3º círculo); sombras (4º)
@@ -100,7 +103,7 @@ const ALVO_QUADRADO := ["conjurar_mortos_vivos", "dissipar_magia", "controlar_ma
 const MULTI_APR := {"infligir_ferimentos": [3], "resistencia_a_energia": [2], "curar_ferimentos": [3], "comando": [1], "acalmar_animal": [2], "tranquilidade": [1, 2], "suporte_ambiental": [0], "aviso": [3], "compreensao": [1], "fisico_divino": [0], "mente_divina": [0]}
 ## Aprimoramentos que mudam o alcance: {magia: {índice: novo alcance}}.
 const ALCANCE_APR := {"controlar_madeira": {0: "pessoal"}, "circulo_da_justica": {0: "pessoal"}, "soco_de_arsenal": {0: "pessoal"}, "fisico_divino": {0: "curto"}, "mente_divina": {0: "curto"}, "oracao": {2: "medio"}, "toque_chocante": {2: "pessoal"}, "compreensao": {0: "curto", 1: "curto", 3: "pessoal"}, "luz": {4: "longo", 6: "toque"}, "escuridao": {4: "pessoal"}, "suporte_ambiental": {0: "curto"}, "acalmar_animal": {0: "medio"}, "tranquilidade": {2: "medio"}, "invulnerabilidade": {0: "curto"}, "infligir_ferimentos": {3: "curto"}, "resistencia_a_energia": {2: "curto"}, "escudo_da_fe": {0: "toque", 3: "toque"},
-	"protecao_divina": {1: "curto"}, "potencia_divina": {2: "toque"}, "pele_de_pedra": {0: "toque", 3: "toque", 4: "toque"}, "dispersar_as_trevas": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
+	"protecao_divina": {1: "curto"}, "potencia_divina": {2: "toque"}, "pele_de_pedra": {0: "toque", 3: "toque", 4: "toque"}, "toque_da_morte": {0: "curto", 1: "curto"}, "segunda_chance": {1: "curto"}, "dispersar_as_trevas": {1: "curto"}, "curar_ferimentos": {2: "curto", 3: "curto"}}
 ## Aprimoramentos que se excluem entre si (mudam o mesmo efeito).
 const EXCLUSIVOS := {"resistencia_a_energia": [[3, 4]], "protecao_contra_magia": [[1, 2]], "conjurar_mortos_vivos": [[1, 2]], "pele_de_pedra": [[1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]}
 ## Escolas de magia (LB, Proteção contra Magia): minúsculas, sem acento na comparação (ver `escola_valida`).

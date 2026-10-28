@@ -189,6 +189,20 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "toque_da_morte" and apr.has(1):
+				targets = [actor]
+			if sp_id == "palavra_primordial":
+				if not ["atordoar", "cegar", "matar"].has(str(a.get("efeito", ""))): return {"ok": false, "reason": "escolha o efeito: atordoar, cegar ou matar"}
+				var tg_pp: String = a.get("target", "")
+				if not sim.combatants.has(tg_pp) or sim.c(tg_pp).sheet.is_dead() or sim.c(tg_pp).sheet.level >= A.sheet.level: return {"ok": false, "reason": "o alvo precisa ter menos níveis que você"}
+				targets = [tg_pp]
+			if sp_id == "segunda_chance":
+				if targets.size() > (5 if apr.has(1) else 1) or targets.is_empty(): return {"ok": false, "reason": "alvos demais"}
+				for tg_sc in targets:
+					if not sim.combatants.has(tg_sc): return {"ok": false, "reason": "alvo inválido"}
+					if sim.c(tg_sc).sheet.is_dead():
+						var morte: int = int(sim.c(tg_sc).get("morte_rodada", -99))
+						if not apr.has(2) or sim.round_no - morte > 1: return {"ok": false, "reason": "só quem morreu há até uma rodada (com o aprimoramento)"}
 			if sp_id == "imobilizar":
 				if targets.size() != 1 + apr.count(1): return {"ok": false, "reason": "escolha %d alvo(s)" % (1 + apr.count(1))}
 				var tipos_im: Array = ["humanoide", "animal"]

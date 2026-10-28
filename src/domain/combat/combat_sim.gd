@@ -602,7 +602,10 @@ static func archer_bonus(sheet: CharacterSheet, ranged: bool) -> int:
 ## Dano com ligações: se `target` está ligado por Ligação Sombria, o alvo da ligação faz Fortitude e sofre o mesmo dano
 ## quando falha. A ligação acaba se o alvo cair a 0 PV (exceto com o aprimoramento de 5 PM).
 func apply_damage(target: String, amount: int) -> Array:
+	var ja_morto: bool = c(target).sheet.is_dead()
 	var tags := _dano_bruto(target, amount)
+	if not ja_morto and c(target).sheet.is_dead():
+		c(target)["morte_rodada"] = round_no   # Segunda Chance revive quem morreu há até uma rodada
 	# Concentração na execução (LB p.170): ser ferido exige Vontade com CD igual ao dano; falha perde a magia.
 	if amount > 0 and rng != null and conjurando.has(target) and int(conjurando[target].rodadas) > 0:
 		var sv_c := Checks.skill(c(target).sheet, "vontade", amount, rules, rng, "combat")
