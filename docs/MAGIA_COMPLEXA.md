@@ -107,8 +107,7 @@ Magias do catálogo (`data/rules/personagem.json`) que ainda não estão em `Spe
 - Divinas de 5º círculo (4): furia_do_panteao, intervencao_divina, reanimacao_impura, segunda_chance.
 - Universais de 1º círculo: todas feitas.
 - Universais de 2º círculo (2 de 4 faltam): marca_da_obediencia, runa_de_protecao. Feita: Conjurar Mortos-Vivos (sustentada; criaturas `criatura.*_capanga` com a flag `capanga`, sem turno automático; ordens `mover_mortos` e `atacar_mortos`, ainda sem botão na tela; sombras usam a flag `incorporeo`, que hoje zera todo dano). Feita: Dissipar Magia (teste de Misticismo dissipa magias de CD até o resultado; área de 3m ou criatura; disjunção de 9m sem teste no 5º círculo; `_dissipar_magia`). O jogo ainda não tem itens mágicos permanentes, então a parte de "item mágico" do texto não tem alvo; os encantos de magia são efeitos e caem junto.
-- Universais de 3º círculo (7): imobilizar, lendas_e_historias, manto_de_sombras, pele_de_pedra, selo_de_mana,
-  servo_morto_vivo, videncia.
+- Universais de 3º círculo (5 de 7 faltam): lendas_e_historias, manto_de_sombras (sombras e luz), selo_de_mana (21 pontos onde PM é gasto), servo_morto_vivo, videncia. Feitas: Imobilizar (paralisado/lento; novo teste de Vontade no início do turno do alvo, que gasta a ação) e Pele de Pedra (RD 5/10; estátua = condição petrificado, 1d4 rodadas ou permanente).
 - Universais de 4º círculo (4): libertacao, muralha_de_ossos, viagem_planar, visao_da_verdade.
 - Universais de 5º círculo (5): buraco_negro, palavra_primordial, projetar_consciencia, roubar_a_alma, toque_da_morte.
 - Arcanas de 1º círculo do catálogo: feitas (Armadura Arcana, Toque Chocante, Seta Infalível).

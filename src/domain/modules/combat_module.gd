@@ -2864,6 +2864,11 @@ func _begin_turn_base(id: String) -> Dictionary:
 	s.limpar_efeitos("turno")   # efeitos "até o próximo turno" acabam quando a criatura age de novo
 	s.limpar_efeitos("rodada")
 	_sustentar(id, facts)
+	var libertou := false
+	if s.efeito_bonus("imobilizar_cd") > 0 and _resiste(id, "vontade", s.efeito_bonus("imobilizar_cd"), facts):
+		s.anular_magia("magia.imobilizar")   # Imobilizar: gasta a ação completa num novo teste e, passando, se liberta
+		facts.append(fact("SPELL_ENDED", {"spell": "imobilizar", "target": id, "reason": "resistiu"}, [id]))
+		libertou = true
 	var ordem_cmd := _obedecer_comando(id, facts)
 	if ["fuja", "venha"].has(str(ordem_cmd.get("ordem", ""))) and sim.combatants.has(str(ordem_cmd.conj)):
 		x["comando_turno"] = ordem_cmd
@@ -2879,7 +2884,7 @@ func _begin_turn_base(id: String) -> Dictionary:
 	_perigos_inicio_de_turno(id, facts)
 	_luz_solar(id, facts)
 	_resolver_conjuracao(id, facts)
-	if x.flags.has("fora") or s.is_dead():
+	if x.flags.has("fora") or s.is_dead() or libertou:
 		return {"skip": true, "facts": facts}
 	CondicoesCombate.inicio_de_turno(sim, id, world.rng, facts)   # em chamas e sangramento
 	if s.is_dead():
@@ -3845,6 +3850,38 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"imobilizar":
+			# Imobilizar (universal 3): Vontade; falhou, paralisado; passou, lento. A cada rodada o alvo gasta a ação completa
+			# num novo teste (`_begin_turn_base`) e, se passar, se liberta.
+			var cd_im := spell_dc(sh, a)
+			for tg in a.get("targets", [a.get("target", id)]):
+				var ts_im: CharacterSheet = sim.c(tg).sheet
+				var cond_im := "lento" if _resiste(tg, "vontade", cd_im, out) else "paralisado"
+				if ts_im.efeito_bonus("imune", cond_im) > 0:
+					continue
+				ts_im.add_efeito("magia.imobilizar", "condicao", 0, "cena", cond_im, -1, id)
+				ts_im.add_condition(cond_im, world.rules)
+				ts_im.add_efeito("magia.imobilizar", "imobilizar_cd", cd_im, "cena", "", -1, id)
+				out.append(fact("CONDITION_APPLIED", {"actor": id, "target": tg, "condition": cond_im, "tags": ["magia"]}, [id, tg]))
+		"pele_de_pedra":
+			# Pele de Pedra (universal 3): RD 5 (10 de aço); toque; um dia. Estátua (4º círculo): Fortitude anula; 1d4 rodadas, ou
+			# permanente (5º). A estátua é o estado "petrificado" (RD 8).
+			var apr_pp: Array = a.get("aprimoramentos", [])
+			var alvo_pp: String = a.get("target", id) if (apr_pp.has(0) or apr_pp.has(3) or apr_pp.has(4)) else id
+			var ts_pp: CharacterSheet = sim.c(alvo_pp).sheet
+			if apr_pp.has(3) or apr_pp.has(4):
+				if _resiste(alvo_pp, "fortitude", spell_dc(sh, a), out):
+					out.append(fact("SPELL_MISSED", {"caster": id, "target": alvo_pp, "spell": "pele_de_pedra", "reason": "resistiu"}, [id, alvo_pp]))
+				elif apr_pp.has(4):
+					ts_pp.add_efeito("magia.pele_de_pedra", "condicao", 0, "permanente", "petrificado", -1, id)
+					ts_pp.add_condition("petrificado", world.rules)
+					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": alvo_pp, "condition": "petrificado", "tags": ["magia"]}, [id, alvo_pp]))
+				else:
+					sim.add_condicao(alvo_pp, "petrificado", int(Dice.roll("1d4", world.rng, "combat").total), "pele_de_pedra")
+					out.append(fact("CONDITION_APPLIED", {"actor": id, "target": alvo_pp, "condition": "petrificado", "tags": ["magia"]}, [id, alvo_pp]))
+			else:
+				ts_pp.add_efeito("magia.pele_de_pedra", "rd", 10 if apr_pp.has(2) else 5, "dia" if apr_pp.has(1) else "cena", "*", world.day_index() + 1 if apr_pp.has(1) else -1, id)
+				out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_pp, "buff": "pele_de_pedra", "tags": ["magia"]}, [id, alvo_pp]))
 		"conjurar_mortos_vivos":
 			# Conjurar Mortos-Vivos (universal 2): sustentada; 6 esqueletos (+1 por aprimoramento), carniçais (3º círculo) ou
 			# sombras (4º). Não agem sozinhos: ordens "mover_mortos" (movimento) e "atacar_mortos" (padrão).

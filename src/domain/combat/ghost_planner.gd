@@ -189,6 +189,18 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "imobilizar":
+				if targets.size() != 1 + apr.count(1): return {"ok": false, "reason": "escolha %d alvo(s)" % (1 + apr.count(1))}
+				var tipos_im: Array = ["humanoide", "animal"]
+				if apr.has(0): tipos_im = ["espirito"]
+				for tg_im in targets:
+					if not sim.combatants.has(tg_im) or sim.c(tg_im).sheet.is_dead(): return {"ok": false, "reason": "alvo inválido"}
+					if not apr.has(2) and not tipos_im.has(str(sim.c(tg_im).sheet.creature_type)): return {"ok": false, "reason": "Imobilizar não afeta esse tipo de criatura"}
+			if sp_id == "pele_de_pedra":
+				if apr.has(0) or apr.has(3) or apr.has(4):
+					if targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.c(targets[0]).sheet.is_dead(): return {"ok": false, "reason": "escolha 1 criatura"}
+				else:
+					targets = [actor]
 			if sp_id == "conjurar_mortos_vivos":
 				var tile_cm: Vector2i = a.get("tile", A.tile)
 				if CombatSim.cheb(A.tile, tile_cm) > int(sim.rules.value("alcance.quadrados", {}).get("curto", 6)): return {"ok": false, "reason": "fora do alcance"}
