@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"despertar_consciencia": [],   # animal ou planta ao lado, escultura (aprimoramento) ou um parceiro seu
 	"servo_morto_vivo": [],   # cadáver de humanoide, animal ou monstro vira parceiro morto-vivo permanente
 	"videncia": [],   # um NPC a qualquer distância; a familiaridade muda a Vontade dele
 	"lendas_e_historias": [],   # NPC, objeto ou lugar tocado; com o aprimoramento, qualquer um conhecido (um dia, T$ 1.000)
@@ -190,6 +191,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"despertar_consciencia":
+			var err_dc := _valida_despertar(cmd.payload)
+			if err_dc != "":
+				return PackedStringArray([err_dc])
 		"servo_morto_vivo":
 			var alvo_sm := str(cmd.payload.get("target", ""))
 			var err_sm := _valida_cadaver(alvo_sm, "toque")
@@ -458,6 +463,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"despertar_consciencia":
+			out.append_array(despertar_consciencia(cmd.payload))
 		"servo_morto_vivo":
 			out.append_array(servo_morto_vivo(cmd.payload))
 		"videncia":
@@ -698,6 +705,85 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Despertar Consciência: alvo_tipo "animal" (criatura viva ao lado), "planta" (vegetação ao lado), "escultura" (objeto com
+## "escultura", só com o aprimoramento) ou "parceiro" (um parceiro seu: sobe um passo de poder, uma vez; se já é mestre,
+## ganha o bônus iniciante de outro tipo).
+func _valida_despertar(p: Dictionary) -> String:
+	var apr: Array = p.get("aprimoramentos", [])
+	var tipo_alvo := str(p.get("alvo_tipo", ""))
+	var alvo := str(p.get("alvo", ""))
+	var pj := _tile_jogador()
+	if not SpellRules.TIPOS_DESPERTAR.has(str(p.get("tipo", ""))):
+		return "tipo de parceiro: " + ", ".join(PackedStringArray(SpellRules.TIPOS_DESPERTAR))
+	if apr.has(0) and tipo_alvo != "escultura":
+		return "com o aprimoramento, o alvo é uma escultura"
+	match tipo_alvo:
+		"animal":
+			var combat = world.module("combat")
+			if combat == null or not combat.creature_state.has(alvo) or not bool(combat.creature_state[alvo].get("alive", false)):
+				return "escolha um animal vivo"
+			if str((combat.creature_state[alvo].get("sheet", {}) as Dictionary).get("creature_type", "")) != "animal":
+				return "o alvo precisa ser um animal"
+			var t: Vector2i = combat.creature_tile(alvo)
+			if maxi(absi(pj.x - t.x), absi(pj.y - t.y)) > 1:
+				return "toque o animal"
+		"planta":
+			var ok := false
+			for dx in [-1, 0, 1]:
+				for dy in [-1, 0, 1]:
+					ok = ok or world.db.is_vegetation(pj + Vector2i(dx, dy))
+			if not ok:
+				return "não há planta ao seu lado"
+		"escultura":
+			if not apr.has(0):
+				return "esculturas só com o aprimoramento"
+			var od := world.db.object_def(alvo)
+			if od.is_empty() or not bool(od.get("escultura", false)):
+				return "escolha uma escultura"
+			if maxi(absi(pj.x - int(od.tile[0])), absi(pj.y - int(od.tile[1]))) > 1:
+				return "toque a escultura"
+		"parceiro":
+			var party = world.module("party")
+			var par: Dictionary = party.parceiro(alvo) if party != null else {}
+			if par.is_empty():
+				return "parceiro desconhecido"
+			if bool(par.get("despertado", false)):
+				return "esse parceiro já foi despertado"
+		_:
+			return "alvo_tipo: animal, planta, escultura ou parceiro"
+	return ""
+
+
+func despertar_consciencia(p: Dictionary) -> Array:
+	var apr: Array = p.get("aprimoramentos", [])
+	var party = world.module("party")
+	var tipo := str(p.tipo)
+	var ate := -1 if apr.has(1) else world.day_index() + 1
+	var novo := {}
+	if str(p.alvo_tipo) == "parceiro":
+		novo = (party.parceiro(str(p.alvo)) as Dictionary).duplicate(true)
+		var niveis := ["iniciante", "veterano", "mestre"]
+		var i := niveis.find(str(novo.nivel))
+		if i < 2:
+			novo["nivel"] = niveis[i + 1]
+		else:
+			novo["extra"] = {"tipo": tipo, "pericias": (p.get("pericias", []) as Array).duplicate()}
+		novo["despertado"] = true
+	else:
+		var especie: String = {"animal": str(p.alvo), "planta": "planta", "escultura": "escultura (construto)"}[str(p.alvo_tipo)]
+		novo = {"id": "despertar_%s" % str(p.alvo), "tipo": tipo, "nivel": "veterano", "nome": "%s desperto" % especie, "especie": especie,
+			"fonte": "despertar_consciencia", "ate_dia": ate, "despertado": true, "inteligencia": -1}
+		if tipo == "ajudante":
+			novo["pericias"] = (p.get("pericias", []) as Array).duplicate()
+	var err: String = party.adicionar_parceiro(novo) if party != null else "sem módulo de parceiros"
+	if err != "":
+		return [fact("SPELL_MISSED", {"caster": "player", "spell": "despertar_consciencia", "reason": err}, ["player"])]
+	var out: Array = [fact("PARTNER_GAINED", {"partner": novo.id, "tipo": novo.tipo, "nivel": novo.nivel, "nome": str(novo.get("nome", ""))}, ["player"])]
+	if apr.has(1):
+		world.player_sheet.add_efeito("despertar." + str(novo.id), "pm_max", -3, "permanente")   # penalidade de –3 PM
+	return out
 
 
 ## Servo Morto-Vivo: o cadáver vira esqueleto ou zumbi (zumbi se o corpo está preservado), carniçal, sombra ou múmia,

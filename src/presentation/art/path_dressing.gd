@@ -389,6 +389,20 @@ func _draw_extras(ci: CanvasItem) -> void:
 		for x in db.size.x:
 			if db.tile_char(Vector2i(x, y)) == "o":
 				_cobbles(ci, Vector2(x, y) * TILE + Vector2(16, 16))
+	# 5) esculturas (objetos com "escultura": estátua de pedra num pedestal)
+	for o in db.all_objects():
+		if bool(o.get("escultura", false)):
+			_estatua(ci, Vector2(int(o.tile[0]), int(o.tile[1])) * TILE + Vector2(16, 16))
+
+
+func _estatua(ci: CanvasItem, c: Vector2) -> void:
+	var pedra := Color(0.62, 0.62, 0.66)
+	var sombra := Color(0.38, 0.38, 0.42)
+	ci.draw_rect(Rect2(c + Vector2(-11, 6), Vector2(22, 8)), sombra)
+	ci.draw_rect(Rect2(c + Vector2(-9, 4), Vector2(18, 6)), pedra)
+	ci.draw_colored_polygon(PackedVector2Array([c + Vector2(-6, 4), c + Vector2(6, 4), c + Vector2(4, -8), c + Vector2(-4, -8)]), pedra)
+	ci.draw_circle(c + Vector2(0, -11), 4.0, pedra)
+	ci.draw_line(c + Vector2(-4, -6), c + Vector2(-8, -12), sombra, 2.0)
 
 
 var _cobbled := {}

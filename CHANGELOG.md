@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Despertar Consciência (divina, 3º círculo): um animal ou planta ao lado vira parceiro veterano por um dia (ajudante, combatente, fortão, guardião, médico, perseguidor ou vigilante); num parceiro seu, ele sobe um passo de poder (mestre ganha o bônus iniciante de outro tipo); escultura com o aprimoramento; permanente com –3 PM. Mapa: Estátua de Lena no templo.
+
 - Servo Morto-Vivo (universal, 3º círculo): um cadáver de humanoide, animal ou monstro vira parceiro morto-vivo permanente (esqueleto ou zumbi iniciante; carniçal ou sombra veteranos; múmia mestre), com o componente em T$; uma vez por rodada, o servo é sacrificado para evitar um dano. Lendas e Histórias de toque volta a funcionar fora de combate.
 
 - Parceiros: os sete tipos que faltavam estão no jogo (adepto, assassino, atirador, destruidor, magivocador, médico e vigilante), nos três níveis de poder do Livro Básico.

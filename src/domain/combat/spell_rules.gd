@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"despertar_consciencia": {"aprimoramentos": [0, 1]},   # animal, planta ou parceiro vira parceiro veterano por um dia; escultura; permanente (–3 PM)
 	"servo_morto_vivo": {"aprimoramentos": [0, 1, 2]},   # cadáver vira parceiro morto-vivo (esqueleto/zumbi, carniçal, sombra, múmia)
 	"videncia": {"aprimoramentos": []},   # fora de combate: vê e ouve um NPC a qualquer distância (Vontade anula, com modificador por familiaridade)
 	"lendas_e_historias": {"aprimoramentos": [0]},   # tudo sobre criatura, objeto ou lugar tocado; à distância por um dia (T$ 1.000)
@@ -137,6 +138,9 @@ static func info_ficha(sh: CharacterSheet, rules: RuleRegistry) -> Dictionary:
 
 
 ## Servo Morto-Vivo: por aprimoramento (-1 = sem), a criatura, o poder de parceiro, os tipos possíveis e o componente (T$).
+const TIPOS_DESPERTAR := ["ajudante", "combatente", "fortao", "guardiao", "medico", "perseguidor", "vigilante"]
+
+
 const SERVOS := {
 	-1: {"criatura": "", "nivel": "iniciante", "tipos": ["ajudante", "atirador", "combatente", "fortao", "guardiao", "montaria"], "custo": 100},
 	0: {"criatura": "carniçal", "nivel": "veterano", "tipos": ["ajudante", "atirador", "combatente", "fortao", "guardiao"], "custo": 500},

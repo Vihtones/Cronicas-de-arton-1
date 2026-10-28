@@ -214,11 +214,16 @@ func add_efeito(id_efeito: String, stat: String, bonus: int, fim: String, tipo: 
 func _ao_entrar(e: Dictionary) -> void:
 	if e.stat == "atributo":
 		attrs[str(e.tipo)] = int(attrs.get(str(e.tipo), 0)) + int(e.bonus)
+	elif e.stat == "pm_max":
+		pm_max += int(e.bonus)   # penalidade de PM (Despertar Consciência permanente)
+		pm = mini(pm, pm_max)
 
 
 func _ao_sair(e: Dictionary) -> void:
 	if e.stat == "atributo":
 		attrs[str(e.tipo)] = int(attrs.get(str(e.tipo), 0)) - int(e.bonus)
+	elif e.stat == "pm_max":
+		pm_max -= int(e.bonus)
 	elif e.stat == "tamanho":
 		size = str(e.tipo)   # Potência Divina: o tamanho volta ao que era (tipo guarda o tamanho original)
 

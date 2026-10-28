@@ -1174,6 +1174,16 @@
     27
    ],
    "name": "Poço de Pedra Branca"
+  },
+  {
+   "id": "estatua_lena",
+   "type": "prop",
+   "tile": [
+    30,
+    11
+   ],
+   "name": "Estátua de Lena",
+   "escultura": true
   }
  ],
  "targets": [

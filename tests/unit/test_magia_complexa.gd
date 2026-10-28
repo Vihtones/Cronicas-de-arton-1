@@ -3754,3 +3754,15 @@ func test_servo_morto_vivo_vira_parceiro_e_e_sacrificado_para_evitar_dano() -> v
 	check(not w.module("party").parceiro("servo_corpo_teste").is_empty(), "virou parceiro")
 	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "servo_morto_vivo", "target": "corpo_teste", "tipo": "guardiao"}).accepted, "o corpo não serve de novo")
 	check(w.player_sheet.efeito_bonus("servo_sacrificio") > 0, "pode ser sacrificado")
+
+
+func test_despertar_consciencia_escultura_permanente_com_penalidade_de_pm() -> void:
+	var w = _clerigo_mundo(["despertar_consciencia"])[0]
+	var od: Dictionary = w.db.object_def("estatua_lena")
+	w.player.position = w.db.tile_to_world(Vector2i(int(od.tile[0]) + 1, int(od.tile[1])))
+	var pm_max0: int = w.player_sheet.pm_max
+	var r := WorldHelpers.cmd(w, "CastSpell", {"spell": "despertar_consciencia", "alvo_tipo": "escultura", "alvo": "estatua_lena", "tipo": "guardiao", "aprimoramentos": [0, 1]})
+	check(r.accepted, "Despertar Consciência na estátua")
+	eq(str(w.module("party").parceiro("despertar_estatua_lena").get("nivel", "")), "veterano", "parceiro veterano")
+	eq(w.player_sheet.pm_max, pm_max0 - 3, "–3 PM pela versão permanente")
+	check(not WorldHelpers.cmd(w, "CastSpell", {"spell": "despertar_consciencia", "alvo_tipo": "parceiro", "alvo": "despertar_estatua_lena", "tipo": "guardiao"}).accepted, "o mesmo parceiro não é despertado duas vezes")

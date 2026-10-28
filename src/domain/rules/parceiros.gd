@@ -43,54 +43,60 @@ static func aplicar(sh: CharacterSheet, lista: Array, rules: RuleRegistry) -> vo
 		if n >= limite(sh.level):
 			break
 		n += 1
-		var t := tipo(rules, str(p.tipo))
-		var nv := str(p.nivel)
-		var eid := "parceiro." + str(p.id)
-		if str(p.get("fonte", "")) == "servo_morto_vivo":
-			sh.add_efeito(eid, "servo_sacrificio", 1, "parceiro")   # pode ser sacrificado para evitar um dano
-		match str(p.tipo):
-			"ajudante":
-				var bonus: int = int((t.pericias[nv] as Array)[1])
-				for x in p.get("pericias", []):
-					sh.add_efeito(eid, "pericia_" + str(x), bonus, "parceiro")
-			"combatente":
-				sh.add_efeito(eid, "ataque", int(t.ataque[nv]), "parceiro")
-				if nv == "mestre":
-					sh.add_efeito(eid, "parceiro_ataque_extra", 1, "parceiro")
-			"fortao":
-				sh.add_efeito(eid, "parceiro_dano_corpo", 1, "parceiro", str(t.dano_corpo[nv]))
-			"guardiao":
-				sh.add_efeito(eid, "defesa", int(t.defesa[nv]), "parceiro")
-				if nv == "mestre":
-					sh.add_efeito(eid, "resistencia", int(t.resistencia_mestre), "parceiro")
-			"perseguidor":
-				for x in t.pericias:
-					sh.add_efeito(eid, "pericia_" + str(x), int(t.pericias[x]), "parceiro")
-				for pw in t.poderes.get(nv, []):
-					sh.add_efeito(eid, "poder_temp", 1, "parceiro", str(pw))
-			"montaria":
-				sh.add_efeito(eid, "montaria", 1, "parceiro", str(p.get("especie", "")) + "|" + nv)
-			"adepto":
-				sh.add_efeito(eid, "parceiro_adepto", int(t.circulo_max[nv]), "parceiro")
-			"assassino":
-				sh.add_efeito(eid, "parceiro_furtivo", int(t.furtivo[nv]), "parceiro")
-				if bool(t.flanco[nv]):
-					sh.add_efeito(eid, "parceiro_flanco", 1, "parceiro")
-			"atirador":
-				sh.add_efeito(eid, "parceiro_dano_distancia", 1, "parceiro", str(t.dano_distancia[nv]))
-			"destruidor":
-				sh.add_efeito(eid, "parceiro_destruidor", int(t.pm[nv]), "parceiro", nv)
-			"magivocador":
-				sh.add_efeito(eid, "parceiro_magia_dados", int(t.dados[nv]), "parceiro")
-				if int(t.cd[nv]) > 0:
-					sh.add_efeito(eid, "cd_magias", int(t.cd[nv]), "parceiro")
-			"medico":
-				sh.add_efeito(eid, "parceiro_medico", int(t.pm[nv]), "parceiro", nv)
-			"vigilante":
-				for x in t.pericias:
-					sh.add_efeito(eid, "pericia_" + str(x), int(t.pericias[x]), "parceiro")
-				for pw in t.poderes.get(nv, []):
-					sh.add_efeito(eid, "poder_temp", 1, "parceiro", str(pw))
+		_aplicar_um(sh, p, rules)
+		if p.has("extra"):   # Despertar Consciência num parceiro mestre: bônus de outro tipo, iniciante
+			_aplicar_um(sh, {"id": str(p.id) + "_extra", "tipo": str(p.extra.tipo), "nivel": "iniciante", "pericias": p.extra.get("pericias", [])}, rules)
+
+
+static func _aplicar_um(sh: CharacterSheet, p: Dictionary, rules: RuleRegistry) -> void:
+	var t := tipo(rules, str(p.tipo))
+	var nv := str(p.nivel)
+	var eid := "parceiro." + str(p.id)
+	if str(p.get("fonte", "")) == "servo_morto_vivo":
+		sh.add_efeito(eid, "servo_sacrificio", 1, "parceiro")   # pode ser sacrificado para evitar um dano
+	match str(p.tipo):
+		"ajudante":
+			var bonus: int = int((t.pericias[nv] as Array)[1])
+			for x in p.get("pericias", []):
+				sh.add_efeito(eid, "pericia_" + str(x), bonus, "parceiro")
+		"combatente":
+			sh.add_efeito(eid, "ataque", int(t.ataque[nv]), "parceiro")
+			if nv == "mestre":
+				sh.add_efeito(eid, "parceiro_ataque_extra", 1, "parceiro")
+		"fortao":
+			sh.add_efeito(eid, "parceiro_dano_corpo", 1, "parceiro", str(t.dano_corpo[nv]))
+		"guardiao":
+			sh.add_efeito(eid, "defesa", int(t.defesa[nv]), "parceiro")
+			if nv == "mestre":
+				sh.add_efeito(eid, "resistencia", int(t.resistencia_mestre), "parceiro")
+		"perseguidor":
+			for x in t.pericias:
+				sh.add_efeito(eid, "pericia_" + str(x), int(t.pericias[x]), "parceiro")
+			for pw in t.poderes.get(nv, []):
+				sh.add_efeito(eid, "poder_temp", 1, "parceiro", str(pw))
+		"montaria":
+			sh.add_efeito(eid, "montaria", 1, "parceiro", str(p.get("especie", "")) + "|" + nv)
+		"adepto":
+			sh.add_efeito(eid, "parceiro_adepto", int(t.circulo_max[nv]), "parceiro")
+		"assassino":
+			sh.add_efeito(eid, "parceiro_furtivo", int(t.furtivo[nv]), "parceiro")
+			if bool(t.flanco[nv]):
+				sh.add_efeito(eid, "parceiro_flanco", 1, "parceiro")
+		"atirador":
+			sh.add_efeito(eid, "parceiro_dano_distancia", 1, "parceiro", str(t.dano_distancia[nv]))
+		"destruidor":
+			sh.add_efeito(eid, "parceiro_destruidor", int(t.pm[nv]), "parceiro", nv)
+		"magivocador":
+			sh.add_efeito(eid, "parceiro_magia_dados", int(t.dados[nv]), "parceiro")
+			if int(t.cd[nv]) > 0:
+				sh.add_efeito(eid, "cd_magias", int(t.cd[nv]), "parceiro")
+		"medico":
+			sh.add_efeito(eid, "parceiro_medico", int(t.pm[nv]), "parceiro", nv)
+		"vigilante":
+			for x in t.pericias:
+				sh.add_efeito(eid, "pericia_" + str(x), int(t.pericias[x]), "parceiro")
+			for pw in t.poderes.get(nv, []):
+				sh.add_efeito(eid, "poder_temp", 1, "parceiro", str(pw))
 
 
 ## Dado extra de dano à distância uma vez por rodada (Atirador): "" se não há.
