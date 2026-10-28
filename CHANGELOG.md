@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Viagem Arbórea (divina, 3º círculo): entra numa árvore ao lado e sai de qualquer outra do mapa; em combate, dentro da árvore ninguém o alcança e uma ação de movimento o tira dela; fora de combate, pela cena, pode passar de árvore em árvore por 1 PM; com o aprimoramento, o grupo vai junto.
+
 - Globo da Verdade de Gwen (divina, 2º círculo): mostra o que você ou um NPC tocado viu sobre um assunto na última semana (mês, ano); num cadáver, a última cena; com 10 globos, quem está no lugar também vê.
 
 - Missão Divina (divina, 3º círculo): o NPC que falha na Vontade deve ir ao lugar escolhido em uma semana (um ano); quem aceita vai até lá; quem recusa sofre –2 cumulativo em testes e rolagens a cada dia em que falha na Vontade. A marca (aprimoramento) pune cada crime do marcado.

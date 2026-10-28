@@ -3922,3 +3922,19 @@ func test_globo_da_verdade_mostra_o_que_o_npc_viu() -> void:
 	w.player_sheet.level = 99   # CD altíssima: o NPC não resiste
 	var f: Array = mg.globo_da_verdade({"target": alvo, "pergunta": "lobos"}, w.player_sheet)
 	eq((f[0].payload.cenas as Array).size(), 1, "uma cena sobre lobos")
+
+
+func test_viagem_arborea_leva_de_uma_arvore_a_outra() -> void:
+	var w = _clerigo_mundo(["viagem_arborea"])[0]
+	var arvores: Array = []
+	for y in w.db.size.y:
+		for x in w.db.size.x:
+			if w.db.tile_char(Vector2i(x, y)) == "T" and SpellRules.saida_da_arvore(w.db, Vector2i(x, y), func(_t): return false) != Vector2i(-1, -1):
+				arvores.append(Vector2i(x, y))
+	check(arvores.size() >= 2, "há árvores no mapa")
+	var junto := SpellRules.saida_da_arvore(w.db, arvores[0], func(_t): return false)
+	w.player.position = w.db.tile_to_world(junto)
+	var destino: Vector2i = arvores[-1]
+	check(WorldHelpers.cmd(w, "CastSpell", {"spell": "viagem_arborea", "arvore": [destino.x, destino.y]}).accepted, "Viagem Arbórea")
+	var p: Vector2i = w.db.world_to_tile(w.player.position)
+	check(maxi(absi(p.x - destino.x), absi(p.y - destino.y)) <= 1, "saiu junto da árvore de destino")

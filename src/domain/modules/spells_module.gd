@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"viagem_arborea": [],   # de uma árvore ao lado para outra no mapa; com o aprimoramento, o grupo, até uma planta a 100km
 	"globo_da_verdade": [],   # o que você (ou um NPC tocado) viu sobre um assunto; aprimoramentos: mês, ano, cadáver, 10 globos
 	"missao_divina": [],   # num NPC aqui: ir a um lugar (uma semana, ou um ano); ou a marca (aprimoramento)
 	"servo_divino": [],   # tarefa "entregar": o espírito leva um item a um lugar, para ser recolhido lá no prazo
@@ -69,6 +70,7 @@ var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de com
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
 var missoes: Dictionary = {}   # Missão Divina: npc -> {destino, ate_dia, recusou, penalidade, cd, marca, cumprida}
 var _dia_missoes := -1
+var arborea_ate := -1   # Viagem Arbórea ativa até este tick: pode passar de árvore em árvore (TreeHop, 1 PM)
 var cidade_protegida: Dictionary = {}   # Intervenção Divina: {zona} protegida do próximo desastre
 var _duplicando := false   # Intervenção Divina (duplicar): a magia duplicada não pede ser conhecida nem PM
 var runas: Array = []   # Runa de Proteção no chão: {id, centro:[x,y], raio, tipo, dados, gatilho, palavra, cd, conj, dentro, achada}
@@ -80,7 +82,7 @@ var areas: Array = []            # {tipo, centro:[x,y], raio, ate: minuto do fim
 
 
 func module_id() -> String: return "magia"
-func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune"])
+func handled_commands() -> PackedStringArray: return PackedStringArray(["CastSpell", "DetectMagic", "ReadThoughts", "CollectMessenger", "SearchRunes", "DisarmRune", "TreeHop"])
 
 
 func validate(cmd: GameCommand) -> PackedStringArray:
@@ -89,6 +91,12 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 		return PackedStringArray(["em combate: use as ações de combate"])
 	if cmd.type == "CollectMessenger":
 		return PackedStringArray() if mensageiros.any(func(m): return str(m.destino) == str(cmd.payload.get("destino", ""))) else PackedStringArray(["nenhum mensageiro lá"])
+	if cmd.type == "TreeHop":
+		if world.clock.tick >= arborea_ate:
+			return PackedStringArray(["a Viagem Arbórea não está ativa"])
+		if world.player_sheet.pm < 1:
+			return PackedStringArray(["PM insuficiente (1)"])
+		return _valida_arvores(cmd.payload)
 	if cmd.type == "SearchRunes":
 		return PackedStringArray()
 	if cmd.type == "DisarmRune":
@@ -214,6 +222,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"viagem_arborea":
+			var err_va := _valida_arvores(cmd.payload)
+			if not err_va.is_empty():
+				return err_va
 		"globo_da_verdade":
 			var alvo_gv := str(cmd.payload.get("target", "player"))
 			if str(cmd.payload.get("pergunta", "")) == "":
@@ -413,6 +425,9 @@ func execute(cmd: GameCommand) -> Array:
 	var sh: CharacterSheet = world.player_sheet
 	if cmd.type == "CollectMessenger":
 		return _coletar_mensageiro(str(cmd.payload.get("destino", "")))
+	if cmd.type == "TreeHop":
+		world.player_sheet.pm -= 1
+		return _viajar_pela_arvore(cmd.payload)
 	if cmd.type == "SearchRunes":
 		return _procurar_runas()
 	if cmd.type == "DisarmRune":
@@ -568,6 +583,11 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"viagem_arborea":
+			var combat_va = world.module("combat")
+			if not (cmd.payload.get("aprimoramentos", []) as Array).has(0):
+				arborea_ate = world.clock.tick + (combat_va.TICKS_CENA if combat_va != null else 6)
+			out.append_array(_viajar_pela_arvore(cmd.payload))
 		"globo_da_verdade":
 			out.append_array(globo_da_verdade(cmd.payload, sh))
 		"missao_divina":
@@ -836,6 +856,31 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Viagem Arbórea fora de combate: árvore ao seu lado e destino "arvore" (qualquer árvore do mapa, que está toda a menos
+## de 1km; com o aprimoramento, o grupo vai junto, e 100km cobrem o mapa inteiro).
+func _valida_arvores(p: Dictionary) -> PackedStringArray:
+	if not SpellRules.arvore_ao_lado(world.db, _tile_jogador()):
+		return PackedStringArray(["é preciso uma árvore ao seu lado"])
+	var arv: Vector2i = _vec(p.get("arvore", [-1, -1]))
+	if world.db.tile_char(arv) != "T":
+		return PackedStringArray(["escolha a árvore de destino"])
+	if SpellRules.saida_da_arvore(world.db, arv, func(_x): return false) == Vector2i(-1, -1):
+		return PackedStringArray(["não há espaço livre junto dessa árvore"])
+	return PackedStringArray()
+
+
+func _vec(v: Variant) -> Vector2i:
+	if v is Vector2i:
+		return v
+	return Vector2i(int(v[0]), int(v[1]))
+
+
+func _viajar_pela_arvore(p: Dictionary) -> Array:
+	var saida := SpellRules.saida_da_arvore(world.db, _vec(p.arvore), func(_x): return false)
+	world.player.position = world.db.tile_to_world(saida)
+	return [fact("PLAYER_TELEPORTED", {"to": [saida.x, saida.y], "spell": "viagem_arborea"}, ["player"])] + ao_mover()
 
 
 ## Globo da Verdade de Gwen (divina 2): mostra o que você (a crônica) ou o NPC tocado (as memórias de quem viu) viu sobre
@@ -1750,7 +1795,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "arborea_ate": arborea_ate, "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1765,6 +1810,7 @@ func from_dict(d: Dictionary) -> void:
 	runas = (d.get("runas", []) as Array).duplicate(true)
 	cidade_protegida = (d.get("cidade_protegida", {}) as Dictionary).duplicate()
 	missoes = (d.get("missoes", {}) as Dictionary).duplicate(true)
+	arborea_ate = int(d.get("arborea_ate", -1))
 	_dia_missoes = int(d.get("dia_missoes", -1))
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()

@@ -1916,6 +1916,8 @@ func _santuario_quebra(id: String, a: Dictionary, out: Array) -> void:
 
 ## A IA não mira quem não percebe nem quem já não consegue atacar (Santuário).
 func _pode_mirar(id: String, alvo: String) -> bool:
+	if (sim.c(alvo).flags as Array).has("na_arvore"):
+		return false   # Viagem Arbórea: dentro da árvore, ninguém o alcança
 	var m := _santuario_de(alvo)
 	if m.is_empty():
 		return true
@@ -3696,6 +3698,12 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				out.append(fact("SKILL_FAILED", {"actor": id, "skill": "atletismo", "reason": "escalar_muralha"}, [id]))
 		"atacar_muralha":
 			out.append_array(_atacar_muralha(id, a.tile))
+		"sair_arvore":
+			var de_ar: Vector2i = sim.c(id).tile
+			var saida := SpellRules.saida_da_arvore(world.db, a.arvore, func(x): return sim.occupant(x, id) != "")
+			(sim.c(id).flags as Array).erase("na_arvore")
+			sim.c(id).tile = saida
+			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [de_ar.x, de_ar.y], "path": [[saida.x, saida.y]], "teleporte": true}, [id]))
 		"segurar":
 			sim.c(id).sheet.add_efeito("segurando", "resistencia", 2, "turno")
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "segurando", "tags": []}, [id]))
@@ -4481,6 +4489,11 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 			# magias ativas); por isso não é preciso sustentá-la por mais rodadas.
 			var tg_lh: String = a.get("target", "")
 			out.append(fact("LORE_REVEALED", {"caster": id, "alvo_tipo": "criatura", "alvo": tg_lh, "info": SpellRules.info_ficha(sim.c(tg_lh).sheet, world.rules)}, [id, tg_lh]))
+		"viagem_arborea":
+			# Viagem Arbórea (divina 3): entra na árvore ao lado; lá dentro percebe tudo, mas não age nem é alcançado. Uma ação de
+			# movimento ("sair_arvore") o tira desta ou de outra árvore a até 1km.
+			(sim.c(id).flags as Array).append("na_arvore")
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "viagem_arborea", "tags": ["magia"]}, [id]))
 		"servo_divino":
 			# Servo Divino (divina 3): pago o espírito, ele luta ao seu lado até o fim da cena (tarefa "lutar"; o tipo de criatura,
 			# que o livro deixa ao mestre, é o espírito servo do bestiário do jogo).

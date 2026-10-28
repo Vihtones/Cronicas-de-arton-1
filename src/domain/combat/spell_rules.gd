@@ -14,6 +14,7 @@ const COMPLETAS := {
 	"protecao_contra_magia": {"aprimoramentos": [0, 1, 2]},   # +5 em resistências (+10); imune a 1 ou 2 escolas de magia
 	"potencia_divina": {"aprimoramentos": [0, 1, 2]},   # sustentada; Força +4 (+1); RD 10 (+5); toque em aliado (devoto da mesma divindade)
 	"dispersar_as_trevas": {"aprimoramentos": [0, 1, 2, 3]},   # dissipa até 3º (4º, 5º); aliados +4 e RD 10; inimigos cegos 1x por cena
+	"viagem_arborea": {"aprimoramentos": [0]},   # entra numa árvore ao lado e sai de qualquer outra a até 1km; com o grupo, até outra planta a 100km
 	"globo_da_verdade": {"aprimoramentos": [0, 1, 2, 3]},   # cena vista por você ou por quem tocar (semana; mês; ano); cadáver; 10 globos em alcance longo
 	"missao_divina": {"aprimoramentos": [0, 1]},   # fora de combate: NPC deve ir a um lugar; recusou, Vontade por dia ou –2 cumulativo; marca; um ano
 	"servo_divino": {"aprimoramentos": [0, 1]},   # espírito cumpre uma tarefa: lutar (cena) ou entregar um item; um dia; uma semana
@@ -169,6 +170,25 @@ static func servo_divino_custo(apr: Array) -> int:
 
 static func servo_divino_dias(apr: Array) -> int:
 	return 7 if apr.has(1) else (1 if apr.has(0) else 0)
+
+
+## Árvore ao lado (8 vizinhos) de um quadrado.
+static func arvore_ao_lado(db: ContentDB, t: Vector2i) -> bool:
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			if (dx != 0 or dy != 0) and db.tile_char(t + Vector2i(dx, dy)) == "T":
+				return true
+	return false
+
+
+## Quadrado livre ao lado de uma árvore (para sair dela); (-1, -1) se nenhum.
+static func saida_da_arvore(db: ContentDB, arvore: Vector2i, ocupado: Callable) -> Vector2i:
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var t := arvore + Vector2i(dx, dy)
+			if (dx != 0 or dy != 0) and db.static_walkable(t) and not ocupado.call(t):
+				return t
+	return Vector2i(-1, -1)
 
 
 const OPCOES_INTERVENCAO := ["curar", "dissipar", "item", "duplicar", "proteger", "ressuscitar"]

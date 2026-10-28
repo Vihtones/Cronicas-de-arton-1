@@ -29,6 +29,8 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 	var t: String = a.get("type", "")
 	if A.sheet.efeito_bonus("arvore") > 0:
 		return {"ok": false, "reason": "na forma de árvore não pode falar nem fazer ações físicas"}
+	if (A.flags as Array).has("na_arvore") and t != "sair_arvore":
+		return {"ok": false, "reason": "dentro da árvore você só percebe os arredores; saia dela (ação de movimento)"}
 	match t:
 		"move":
 			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento disponível"}
@@ -194,6 +196,10 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			if sp_id == "lendas_e_historias":
 				if apr.has(0): return {"ok": false, "reason": "a versão à distância leva um dia: só fora de combate"}
 				if targets.size() != 1 or not sim.combatants.has(targets[0]): return {"ok": false, "reason": "toque 1 criatura"}
+			if sp_id == "viagem_arborea":
+				if apr.has(0): return {"ok": false, "reason": "a viagem de 100km é fora de combate"}
+				if not SpellRules.arvore_ao_lado(sim.db, A.tile): return {"ok": false, "reason": "é preciso uma árvore ao seu lado"}
+				targets = [actor]
 			if sp_id == "missao_divina": return {"ok": false, "reason": "Missão Divina é lançada fora de combate, num NPC"}
 			if sp_id == "servo_divino":
 				if str(a.get("tarefa", "lutar")) != "lutar": return {"ok": false, "reason": "em combate, a tarefa do espírito é lutar"}
@@ -688,6 +694,14 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 				if not A.sheet.efeito_tipo_existe("preso_muralha", ""): return {"ok": false, "reason": "você não está preso na muralha"}
 			elif not sim.zona_em(t_mu, "muralha") or CombatSim.cheb(A.tile, t_mu) > 1: return {"ok": false, "reason": "escolha um trecho da muralha ao seu lado"}
 			return {"ok": true, "kind": kind_mu}
+		"sair_arvore":
+			# Viagem Arbórea: ação de movimento para sair desta árvore ou de qualquer outra a até 1km (todo o mapa).
+			if not (A.flags as Array).has("na_arvore"): return {"ok": false, "reason": "você não está numa árvore"}
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			var arv: Vector2i = a.get("arvore", Vector2i(-1, -1))
+			if sim.db.tile_char(arv) != "T": return {"ok": false, "reason": "escolha a árvore de onde sair"}
+			if SpellRules.saida_da_arvore(sim.db, arv, func(x): return sim.occupant(x, actor) != "") == Vector2i(-1, -1): return {"ok": false, "reason": "não há espaço livre junto dessa árvore"}
+			return {"ok": true, "kind": "movimento"}
 		"segurar":
 			# Buraco Negro: ação de movimento para se segurar num objeto fixo (+2 nos testes de resistência até o próximo turno).
 			if not sim.zonas.any(func(z): return str(z.tipo) == "buraco_negro"): return {"ok": false, "reason": "nada puxando você"}
