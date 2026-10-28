@@ -3896,3 +3896,18 @@ func test_servo_divino_espirito_luta_do_seu_lado() -> void:
 		if str(cid).begins_with("inv_servo_divino"):
 			novo = cid
 	check(novo != "" and not sim.is_enemy("player", novo), "do lado do conjurador")
+
+
+func test_missao_divina_quem_recusa_sofre_penalidade_por_dia() -> void:
+	var w = _clerigo_mundo(["missao_divina"])[0]
+	var mg = w.module("magia")
+	var alvo: String = w.db.all_npc_ids()[0]
+	w.player_sheet.level = 99   # CD altíssima
+	mg.missao_divina({"target": alvo, "destino": "templo"}, w.player_sheet)
+	check(mg.missoes.has(alvo), "missão registrada")
+	mg.missoes[alvo].recusou = true
+	mg.missoes[alvo].cd = 99
+	mg._dia_missoes = -1
+	mg.on_tick(0)
+	eq(mg.penalidade_missao(alvo), 2, "–2 depois de um dia sem cumprir")
+	eq(w.module("party").ficha_de(alvo).efeito_bonus("testes"), -2, "a ficha do NPC sente a penalidade")

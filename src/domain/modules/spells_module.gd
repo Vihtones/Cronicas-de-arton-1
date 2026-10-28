@@ -33,6 +33,7 @@ const FORA_DE_COMBATE := {
 	"aliado_animal": [],   # animal prestativo por perto vira parceiro por um dia; ou mensageiro (aprimoramento)
 	"condicao": [],
 	"controlar_madeira": [],   # portas, baús, paredes de madeira e o seu equipamento; ou a forma de árvore
+	"missao_divina": [],   # num NPC aqui: ir a um lugar (uma semana, ou um ano); ou a marca (aprimoramento)
 	"servo_divino": [],   # tarefa "entregar": o espírito leva um item a um lugar, para ser recolhido lá no prazo
 	"intervencao_divina": [],   # curar o grupo, criar item, duplicar magia, proteger o povoado
 	"conceder_milagre": [],   # num companheiro do grupo (fora de combate a magia fica com ele para a próxima luta)
@@ -65,6 +66,8 @@ var detectar: Dictionary = {}    # Detectar Ameaças ativa: {ate: tick, apr: [..
 var protecao_detectar: Dictionary = {}   # aprimoramento de 2 PM depois de descarregada: {ate: tick}
 var silencio_carregado: Dictionary = {}   # Silêncio (objeto, cena) fora de combate: {ate: tick}
 var escuridao_carregada: Dictionary = {}   # objeto que emana sombras (Escuridão): {raio, total, ate}
+var missoes: Dictionary = {}   # Missão Divina: npc -> {destino, ate_dia, recusou, penalidade, cd, marca, cumprida}
+var _dia_missoes := -1
 var cidade_protegida: Dictionary = {}   # Intervenção Divina: {zona} protegida do próximo desastre
 var _duplicando := false   # Intervenção Divina (duplicar): a magia duplicada não pede ser conhecida nem PM
 var runas: Array = []   # Runa de Proteção no chão: {id, centro:[x,y], raio, tipo, dados, gatilho, palavra, cd, conj, dentro, achada}
@@ -210,6 +213,15 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var err_aa := validar_aliado_animal(cmd.payload, sh)
 			if err_aa != "":
 				return PackedStringArray([err_aa])
+		"missao_divina":
+			var alvo_md := str(cmd.payload.get("target", ""))
+			if not _no_mesmo_lugar(alvo_md):
+				return PackedStringArray(["o NPC precisa estar aqui"])
+			if apr.has(0):
+				if str(cmd.payload.get("gatilho", "")) != "crime":
+					return PackedStringArray(["a marca é ativada por crimes (gatilho: crime)"])
+			elif not _local_existe(str(cmd.payload.get("destino", ""))):
+				return PackedStringArray(["escolha o lugar aonde ele deve ir (destino)"])
 		"servo_divino":
 			var apr_sd: Array = cmd.payload.get("aprimoramentos", [])
 			if str(cmd.payload.get("tarefa", "")) != "entregar":
@@ -542,6 +554,8 @@ func execute(cmd: GameCommand) -> Array:
 				out.append(falar_com_plantas(p_cp))
 		"aliado_animal":
 			out.append_array(aliado_animal(cmd.payload, sh))
+		"missao_divina":
+			out.append_array(missao_divina(cmd.payload, sh))
 		"servo_divino":
 			var apr_sd2: Array = cmd.payload.get("aprimoramentos", [])
 			out.append(fact("GOLD_CHANGED", {"delta": -SpellRules.servo_divino_custo(apr_sd2), "reason": "pagamento ao espírito (Servo Divino)"}))
@@ -806,6 +820,74 @@ func _ha_tesouro(loc: String) -> bool:
 				if ex == null or not ex.knows(str(f)):
 					return true
 	return false
+
+
+## Missão Divina (divina 3): o NPC faz Vontade (anula). Falhou: deve ir ao destino em até uma semana (um ano com o
+## aprimoramento). Quem tem má reputação com o jogador recusa e, a cada fim de dia, faz Vontade ou sofre –2 cumulativo em
+## todos os testes e rolagens (`penalidade_missao`, aplicado na ficha do NPC). Quem aceita vai até lá e a missão se cumpre.
+## Marca (aprimoramento; toque, permanente, –1 PM do conjurador): a cada crime do marcado, –2 cumulativo.
+func missao_divina(p: Dictionary, sh: CharacterSheet) -> Array:
+	var apr: Array = p.get("aprimoramentos", [])
+	var alvo := str(p.target)
+	var combat = world.module("combat")
+	var cd: int = combat.spell_dc(sh, {"spell": "missao_divina"}) if combat != null else 15
+	if not apr.has(0) and Checks.skill(_ficha_npc(alvo), "vontade", cd, world.rules, world.rng, "world").get("success", false):
+		return [fact("SPELL_MISSED", {"caster": "player", "target": alvo, "spell": "missao_divina", "reason": "resistiu"}, ["player"])]
+	var mem = world.module("memory")
+	var recusa: bool = mem != null and mem.reputation(alvo) < 0.0
+	if apr.has(0):
+		missoes[alvo] = {"marca": true, "gatilho": "crime", "penalidade": 0, "cd": cd, "ate_dia": -1, "recusou": true, "destino": ""}
+		sh.add_efeito("missao." + alvo, "pm_max", -1, "permanente")
+	else:
+		missoes[alvo] = {"marca": false, "destino": str(p.destino), "ate_dia": world.day_index() + (365 if apr.has(1) else DIAS_SEMANA), "recusou": recusa, "penalidade": 0, "cd": cd}
+	return [fact("BUFF_APPLIED", {"actor": "player", "target": alvo, "buff": "missao_divina", "recusou": recusa, "marca": apr.has(0), "tags": ["magia"]}, ["player", alvo])]
+
+
+## Para onde o NPC vai por causa de uma Missão Divina aceita ("" se nenhuma).
+func missao_destino(npc: String) -> String:
+	var m: Dictionary = missoes.get(npc, {})
+	if m.is_empty() or bool(m.recusou) or bool(m.get("marca", false)):
+		return ""
+	return str(m.destino)
+
+
+func penalidade_missao(npc: String) -> int:
+	return int((missoes.get(npc, {}) as Dictionary).get("penalidade", 0))
+
+
+func on_tick(_tick: int) -> Array:
+	var out: Array = []
+	var npcs = world.module("npcs")
+	for npc in missoes.keys():
+		var m: Dictionary = missoes[npc]
+		if not bool(m.get("marca", false)) and not bool(m.recusou) and npcs != null and str(npcs.npc(npc).get("location", "")) == str(m.destino):
+			missoes.erase(npc)
+			out.append(fact("QUEST_FULFILLED", {"npc": npc, "spell": "missao_divina", "destino": str(m.destino)}, [npc]))
+	if world.day_index() != _dia_missoes:
+		_dia_missoes = world.day_index()
+		for npc in missoes.keys():
+			var m2: Dictionary = missoes[npc]
+			if not bool(m2.get("marca", false)) and int(m2.ate_dia) >= 0 and world.day_index() > int(m2.ate_dia):
+				missoes.erase(npc)
+				continue
+			if bool(m2.recusou) and not bool(m2.get("marca", false)) and not Checks.skill(_ficha_npc(npc), "vontade", int(m2.cd), world.rules, world.rng, "world").get("success", false):
+				m2.penalidade = int(m2.penalidade) + 2
+				out.append(fact("QUEST_PENALTY", {"npc": npc, "penalidade": int(m2.penalidade)}, [npc]))
+	return out
+
+
+## Marca da Missão Divina: cada crime do marcado soma –2.
+func subscribed_events() -> PackedStringArray:
+	return PackedStringArray(["CRIME_COMMITTED"])
+
+
+func on_event(e: GameEvent) -> Array:
+	var quem := str(e.payload.get("actor", ""))
+	var m: Dictionary = missoes.get(quem, {})
+	if e.event_type == "CRIME_COMMITTED" and bool(m.get("marca", false)):
+		m.penalidade = int(m.penalidade) + 2
+		return [fact("QUEST_PENALTY", {"npc": quem, "penalidade": int(m.penalidade), "marca": true}, [quem])]
+	return []
 
 
 ## Intervenção Divina fora de combate. Curar: o jogador e os companheiros, todos os PV e condições. Com o sacrifício de
@@ -1607,7 +1689,7 @@ func _valida_cadaver(id: String, alcance: String) -> PackedStringArray:
 
 func to_dict() -> Dictionary:
 	return {"cadaveres": cadaveres.duplicate(), "areas": areas.duplicate(true), "podas": podas.duplicate(), "detectar": detectar.duplicate(true),
-		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
+		"protecao_detectar": protecao_detectar.duplicate(), "abencoados": abencoados.duplicate(true), "luz_carregada": luz_carregada.duplicate(), "videncia": videncia.duplicate(), "runas": runas.duplicate(true), "cidade_protegida": cidade_protegida.duplicate(), "missoes": missoes.duplicate(true), "dia_missoes": _dia_missoes, "escuridao_carregada": escuridao_carregada.duplicate(), "silencio_carregado": silencio_carregado.duplicate(), "interrogados": interrogados.duplicate(), "justicas": justicas.duplicate(true), "augurios": augurios.duplicate(), "mensageiros": mensageiros.duplicate(true)}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -1621,6 +1703,8 @@ func from_dict(d: Dictionary) -> void:
 	videncia = (d.get("videncia", {}) as Dictionary).duplicate()
 	runas = (d.get("runas", []) as Array).duplicate(true)
 	cidade_protegida = (d.get("cidade_protegida", {}) as Dictionary).duplicate()
+	missoes = (d.get("missoes", {}) as Dictionary).duplicate(true)
+	_dia_missoes = int(d.get("dia_missoes", -1))
 	escuridao_carregada = (d.get("escuridao_carregada", {}) as Dictionary).duplicate()
 	silencio_carregado = (d.get("silencio_carregado", {}) as Dictionary).duplicate()
 	interrogados = (d.get("interrogados", {}) as Dictionary).duplicate()

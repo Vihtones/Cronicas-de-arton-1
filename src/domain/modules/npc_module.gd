@@ -67,6 +67,9 @@ func desired_location(id: String) -> String:
 		return s.location
 	if int(s.wounded_until) > world.clock.tick:
 		return d.home
+	var magia = world.module("magia")
+	if magia != null and magia.missao_destino(id) != "":
+		return magia.missao_destino(id)   # Missão Divina aceita: vai até o lugar da tarefa
 	# companheiro em contrato da guilda vai até o destino e fica lá até o prazo (Arton Viva, Fase 6)
 	var party = world.module("party")
 	if party != null and party.destino_de(id) != "":

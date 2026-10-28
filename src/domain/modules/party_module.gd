@@ -39,6 +39,11 @@ func ficha_de(id: String) -> CharacterSheet:
 	var attrs: Dictionary = CharacterBuilder.presets(str(f.classe))[int(f.preset)]
 	var sh := CharacterBuilder.build(world.rules, str(f.raca), str(f.classe), attrs, ["for", "des", "con"], str(d.get("name", id)))
 	CharacterBuilder.apply_equipment(world.rules, sh)
+	var magia = world.module("magia")
+	var pen: int = magia.penalidade_missao(id) if magia != null else 0
+	if pen > 0:
+		sh.add_efeito("missao_divina", "testes", -pen, "permanente")   # Missão Divina: –2 cumulativo em todos os testes
+		sh.add_efeito("missao_divina", "dano", -pen, "permanente")   # e rolagens
 	return sh
 
 

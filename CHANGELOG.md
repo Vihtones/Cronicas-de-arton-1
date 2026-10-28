@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Missão Divina (divina, 3º círculo): o NPC que falha na Vontade deve ir ao lugar escolhido em uma semana (um ano); quem aceita vai até lá; quem recusa sofre –2 cumulativo em testes e rolagens a cada dia em que falha na Vontade. A marca (aprimoramento) pune cada crime do marcado.
+
 - Servo Divino (divina, 3º círculo): pago o espírito (T$ 100, 500 ou 1.000), ele luta ao seu lado na cena ou, fora de combate, leva um item a um lugar para ser recolhido lá (no mesmo dia, em um dia ou em uma semana).
 
 - Intervenção Divina (divina, 5º círculo): cura total de até 10 criaturas, dissipar os efeitos de uma magia de até 4º círculo, e, com o sacrifício permanente de 2 PM, criar um item mundano de até T$ 30.000, duplicar uma magia de até 4º círculo, proteger o povoado do próximo terremoto ou tempestade, ou ressuscitar quem morreu há até uma rodada.
