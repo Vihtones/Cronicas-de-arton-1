@@ -181,6 +181,22 @@ func silenciado(t: Vector2i) -> bool:
 
 ## Luz (LB p.158 e p.318): quadrado iluminado por zona de luz ou por quem carrega luz (efeito "fonte_luz", raio em
 ## quadrados: tocha, chama de Criar Elementos). Na luz, a escuridão da noite não dá camuflagem.
+## Manto de Sombras: sombra é quadrado sem luz (`iluminado`) e escuro pelo ambiente (noite, subterrâneo sem tochas)
+## ou por escuridão mágica.
+func na_sombra(t: Vector2i) -> bool:
+	if escuridao_em(t) != "":
+		return true
+	if iluminado(t):
+		return false
+	var env: Dictionary = env_fn.call(t) if env_fn.is_valid() else {}
+	return bool(env.get("darkness", false))
+
+
+## Incorpóreo (Manto de Sombras, elemental do Guardião Divino): para ataques de arma.
+func incorporeo(id: String) -> bool:
+	return (c(id).flags as Array).has("incorporeo") or c(id).sheet.efeito_bonus("manto_sombras") > 0
+
+
 func iluminado(t: Vector2i) -> bool:
 	if escuridao_em(t) != "":
 		return false   # as sombras mágicas não são iluminadas por luz natural (e a Luz que as anularia já as dissipou)
@@ -314,7 +330,8 @@ static func tiles_entre(a: Vector2i, b: Vector2i) -> Array:
 
 
 func passable(t: Vector2i, mover: String) -> bool:
-	if not walk_fn.call(t) and not _swims_into(t, mover) and not _flies_over(t, mover):
+	var atravessa: bool = combatants.has(mover) and c(mover).sheet.efeito_bonus("manto_sombras") > 0   # Manto de Sombras
+	if not walk_fn.call(t) and not _swims_into(t, mover) and not _flies_over(t, mover) and not atravessa:
 		return false
 	var occ := occupant(t, mover)
 	if occ == "":

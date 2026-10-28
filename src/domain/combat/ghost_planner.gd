@@ -46,6 +46,7 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var prof := sim.attack_profile(actor, a.get("target", ""), int(a.get("attack", 0)), special, false)
 			if not prof.ok: return prof
 			if not sim.is_enemy(actor, a.target): return {"ok": false, "reason": "não é inimigo"}
+			if A.sheet.efeito_bonus("manto_sombras") > 0 and not sim.incorporeo(a.target): return {"ok": false, "reason": "incorpóreo, você não ataca criaturas normais (magias, sim)"}
 			prof["kind"] = "padrao"
 			return prof
 		"ataque_extra":
@@ -189,6 +190,11 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			for tg_e in targets:
 				if sim.combatants.has(tg_e) and tg_e != actor and sim.c(tg_e).sheet.efeito_tipo_existe("imune_escola", escola_sp):
 					return {"ok": false, "reason": "%s é imune a magias de %s" % [tg_e, escola_sp]}
+			if sp_id == "manto_de_sombras":
+				if apr.has(0):
+					if targets.size() != 1 or not sim.combatants.has(targets[0]) or sim.is_enemy(actor, targets[0]): return {"ok": false, "reason": "escolha 1 criatura voluntária"}
+				else:
+					targets = [actor]
 			if sp_id == "selo_de_mana":
 				if targets.is_empty() or (not apr.has(0) and targets.size() != 1): return {"ok": false, "reason": "escolha 1 criatura (ou várias, com o aprimoramento)"}
 				for tg_sm in targets:
@@ -591,6 +597,16 @@ static func validate_action(sim: CombatSim, actor: String, a: Dictionary) -> Dic
 			var para_e: Vector2i = a.get("tile", Vector2i(-1, -1))
 			if CombatSim.cheb(ze[0].tiles[0], para_e) > Area.quadrados(12.0): return {"ok": false, "reason": "o enxame anda até 12m"}
 			if sim.zonas.any(func(z): return str(z.fonte) == "enxame_de_pestes" and z != ze[0] and (z.tiles as Array).has(para_e)): return {"ok": false, "reason": "já há um enxame lá"}
+			return {"ok": true, "kind": "movimento"}
+		"salto_sombra":
+			# Manto de Sombras: ação de movimento e 1 PM, de uma sombra para outra em alcance médio.
+			if A.sheet.efeito_bonus("manto_sombras") <= 0: return {"ok": false, "reason": "sem Manto de Sombras"}
+			if not sim.can_spend("movimento"): return {"ok": false, "reason": "sem ação de movimento"}
+			if A.sheet.pm < 1: return {"ok": false, "reason": "PM insuficiente (1)"}
+			var para_s: Vector2i = a.get("tile", A.tile)
+			if CombatSim.cheb(A.tile, para_s) > int(sim.rules.value("alcance.quadrados", {}).get("medio", 20)): return {"ok": false, "reason": "fora do alcance médio"}
+			if not sim.na_sombra(A.tile) or not sim.na_sombra(para_s): return {"ok": false, "reason": "é preciso sair de uma sombra e chegar a outra"}
+			if not sim.walk_fn.call(para_s) or sim.occupant(para_s, actor) != "": return {"ok": false, "reason": "destino ocupado ou bloqueado"}
 			return {"ok": true, "kind": "movimento"}
 		"furia":
 			# Fúria do Panteão: uma ordem por turno (ação de movimento) enquanto a nuvem durar.

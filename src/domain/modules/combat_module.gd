@@ -2824,6 +2824,9 @@ func _encerrar_sustentada(id: String, facts: Array) -> void:
 			for m in sim.marcas.duplicate(true):
 				if m.alvo == id and m.tipo == "labaredas":
 					sim.remove_marca(str(m.id), id)
+		"manto_de_sombras":
+			for cid in sim.combatants:
+				sim.c(cid).sheet.remove_efeito("magia.manto_de_sombras")
 		"furia_do_panteao":
 			sim.remove_zona("furia_" + id)
 			sim.remove_zona("furia_neve_" + id)
@@ -2955,6 +2958,9 @@ func _begin_turn_base(id: String) -> Dictionary:
 		s.anular_magia("magia.imobilizar")   # Imobilizar: gasta a ação completa num novo teste e, passando, se liberta
 		facts.append(fact("SPELL_ENDED", {"spell": "imobilizar", "target": id, "reason": "resistiu"}, [id]))
 		libertou = true
+	if s.efeito_bonus("manto_sombras") > 0 and not sim.na_sombra(x.tile):
+		sim.apply_damage(id, 1)   # Manto de Sombras: vulnerável à luz direta
+		facts.append(fact("HAZARD", {"actor": id, "hazard": "luz_no_manto", "damage": 1, "pv_after": s.pv, "tags": ["magia", "luz"]}, [id]))
 	var marca_turno := _marca_obediencia(id, facts)
 	var ordem_cmd := _obedecer_comando(id, facts)
 	if ["fuja", "venha"].has(str(ordem_cmd.get("ordem", ""))) and sim.combatants.has(str(ordem_cmd.conj)):
@@ -3216,6 +3222,11 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 				if str(z.id) == zid_e:
 					z.tiles = [para_e]
 			out.append(fact("SPELL_EFFECT", {"caster": id, "spell": "enxame_de_pestes", "efeito": "mover", "tile": [para_e.x, para_e.y]}, [id]))
+		"salto_sombra":
+			var de_s: Vector2i = sim.c(id).tile
+			sim.c(id).sheet.pm -= 1
+			sim.c(id).tile = a.tile
+			out.append(fact("COMBAT_MOVED", {"actor": id, "from": [de_s.x, de_s.y], "path": [[a.tile.x, a.tile.y]], "teleporte": true}, [id]))
 		"furia":
 			out.append_array(_efeito_furia(id, str(a.efeito), a.get("targets", [])))
 		"mover_mortos":
@@ -3985,6 +3996,13 @@ func _cast(id: String, a: Dictionary, v: Dictionary) -> Array:
 				else:
 					ts_al.add_efeito("magia.anular_a_luz", "defesa", 4 + (1 if apr_al.has(0) else 0), "cena", "", -1, id)
 			out.append(fact("BUFF_APPLIED", {"actor": id, "target": id, "buff": "anular_a_luz", "tags": ["magia"]}, [id]))
+		"manto_de_sombras":
+			# Manto de Sombras (universal 3): sustentada. Incorpóreo (só armas mágicas e magias o afetam; não ataca criaturas
+			# normais; atravessa obstáculos), 1 de dano por rodada na luz (`_begin_turn_base`), salto entre sombras ("salto_sombra").
+			var alvo_ms: String = a.get("target", id) if (a.get("aprimoramentos", []) as Array).has(0) else id
+			_iniciar_sustentada(id, "manto_de_sombras", out)
+			sim.c(alvo_ms).sheet.add_efeito("magia.manto_de_sombras", "manto_sombras", 1, "cena", "", -1, id)
+			out.append(fact("BUFF_APPLIED", {"actor": id, "target": alvo_ms, "buff": "manto_de_sombras", "tags": ["magia"]}, [id, alvo_ms]))
 		"selo_de_mana":
 			# Selo de Mana (universal 3): pela cena, toda ação que gaste PM exige Vontade (`_selo_impede`).
 			for tg in a.get("targets", [a.get("target", "")]):
@@ -4762,6 +4780,9 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			dmg = maxi(1, dmg / 2)
 			if not T.sheet.conditions.has("caido"): T.sheet.conditions.append("caido")
 			tags.append("rolamento")
+		if sim.incorporeo(target) and not sim.incorporeo(attacker) and A.sheet.efeito_bonus_tipo("encanto_arma", str(A.sheet.equipment.get("weapon", ""))) == 0:
+			dmg = 0   # incorpóreo: só armas mágicas o afetam
+			tags.append("incorporeo")
 		tags.append_array(sim.apply_damage(target, dmg))
 	else:
 		tags.append("esquiva" if not camo_miss else "falha")

@@ -2,6 +2,8 @@
 
 ## 0.7.1 (em andamento)
 
+- Manto de Sombras (universal, 3º círculo): sustentada; incorpóreo (só armas mágicas e magias o ferem, não ataca criaturas normais, atravessa obstáculos), 1 de dano por rodada na luz e salto de uma sombra a outra em alcance médio (movimento e 1 PM); toque numa criatura voluntária no 4º círculo.
+
 - Selo de Mana (universal, 3º círculo): o alvo selado faz Vontade sempre que for usar uma ação que gaste PM (magias, Ataque Especial, Golpe Divino, poderes); falhou, perde os PM e a ação. Com o aprimoramento (4º círculo), alcance curto e várias criaturas.
 
 - Libertação (universal, 4º círculo): o alvo ignora terreno difícil e empurrões e fica imune a agarrado, enredado, imóvel, lento e paralisado; anda na água, escolhe 20 em Atletismo e em Acrobacia (também sem treino) e até 5 alvos com os aprimoramentos.
