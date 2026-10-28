@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.7.1 (em andamento)
+## 0.7.1
 
 - Desempenho: simulação de 7 dias ~0,35 s (antes ~1,2 s). Busca de visitas entre moradores passa a percorrer só as relações conhecidas (mesmo desempate), e o agrupamento por local das relações vira uma passada única.
 - Mundo cresce só por acréscimo (nenhuma coordenada deslocada): Fronteira do Leste (x 160..287), Horizonte a leste (x 288..335) e Vale do Sul ao sul (linhas 64..95); mapa 336×96. Moradores, lojas, economia, famílias, facções e criaturas novos (67 NPCs).
