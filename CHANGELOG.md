@@ -2,6 +2,8 @@
 
 ## 0.7.2 (em andamento)
 
+- HUD: registro de texto com moldura no mesmo estilo do painel de status.
+
 - HUD: barra de atalhos e cinto de combate movidos para o canto inferior direito, em duas linhas, sem sobrepor o painel de status (canto inferior esquerdo).
 
 - HUD redesenhado (inspirado em Baldur's Gate 3 e Stoneshard): retrato em medalhão de bronze, barras mais grossas com brilho e valor, painel de status maior, relógio com moldura, atalhos com bisel e selo de tecla. Registro de texto acima do painel.

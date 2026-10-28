@@ -303,15 +303,20 @@ func _build_hud(root: Control) -> void:
 	signals_label.size = Vector2(380, 30)
 	signals_label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
 	root.add_child(signals_label)
+	# registro de texto dentro de moldura (mesmo estilo do painel de status), acima do HUD, cresce para cima
+	var log_frame := PanelContainer.new()
+	log_frame.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	log_frame.offset_left = 6
+	log_frame.offset_right = 306
+	log_frame.offset_bottom = -96
+	log_frame.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	log_frame.add_theme_stylebox_override("panel", HudStyle.painel())
+	log_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(log_frame)
 	log_box = VBoxContainer.new()
-	log_box.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)   # ancorado acima do HUD e cresce para cima (não cobre o retrato)
-	log_box.offset_left = 6
-	log_box.offset_right = 306
-	log_box.offset_bottom = -112
-	log_box.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	log_box.add_theme_constant_override("separation", 0)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(log_box)
+	log_frame.add_child(log_box)
 	# faixa do evento da vila (topo, centro) e aviso grande (clima/eventos)
 	event_ribbon = _panel(root, Control.PRESET_TOP_LEFT)
 	event_ribbon.position = Vector2(200, 4)
