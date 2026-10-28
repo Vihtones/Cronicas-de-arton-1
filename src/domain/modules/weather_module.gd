@@ -29,6 +29,14 @@ var forcado := {}   # Controlar o Clima: {condicao, ate_tick}; o clima fica fixo
 func module_id() -> String: return "weather"
 
 
+## Controlar o Clima: o clima passa a `condicao` agora e fica fixo por `horas` horas. Devolve o clima anterior.
+func forcar(condicao: String, horas: int) -> String:
+	var antes: String = region.condition
+	forcado = {"condicao": condicao, "ate_tick": world.clock.tick + horas * 60 / world.clock.tick_minutes}
+	region.condition = condicao
+	return antes
+
+
 func is_raining() -> bool:
 	return enabled and region.condition in ["chuva", "tempestade"]
 

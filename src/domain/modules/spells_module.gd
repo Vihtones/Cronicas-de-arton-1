@@ -416,9 +416,7 @@ func execute(cmd: GameCommand) -> Array:
 		"controlar_o_clima":
 			var clima_cc: WeatherModule = world.module("weather")
 			var horas_cc := int(Dice.roll("4d12", world.rng, "world").total)
-			clima_cc.forcado = {"condicao": str(cmd.payload.clima), "ate_tick": world.clock.tick + horas_cc * 60 / world.clock.tick_minutes}
-			var antes_cc: String = clima_cc.region.condition
-			clima_cc.region.condition = str(cmd.payload.clima)
+			var antes_cc: String = clima_cc.forcar(str(cmd.payload.clima), horas_cc)
 			out.append(fact("WEATHER_CHANGED", {"from": antes_cc, "to": clima_cc.region.condition, "temp_c": clima_cc.region.temp_c, "surface": clima_cc.region.surface, "horas": horas_cc}, ["player"]))
 		"augurio":
 			out.append_array(augurio(cmd.payload))
