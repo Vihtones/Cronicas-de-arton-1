@@ -178,6 +178,48 @@ func test_medusa_inimiga_usa_o_olhar_uma_vez_no_combate() -> void:
 	check(not GhostPlanner.validate_action(sim, "bandido_1", a).ok, "não usa de novo no mesmo combate")
 
 
+func _olhar_contra_hynne(accept: bool) -> Dictionary:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var P := sim.c("player")
+	var B := sim.c("bandido_1")
+	B.sheet.habilidades = PackedStringArray(["olhar_atordoante"])
+	B.flags.append("olhar_usado")   # como no caminho real: a ação marca o uso antes de resolver
+	B.tile = Vector2i(P.tile.x + 2, P.tile.y)
+	P.sheet.race_id = "hynne"
+	P.sheet.pm = 3
+	P.sheet.attrs["con"] = -10   # Fortitude sempre falha: a decisão aparece
+	w.modules.combat._olhar_resolve("bandido_1", "player")
+	return {"w": w, "P": P, "pending": w.modules.combat.pending_sorte.duplicate(), "accept": accept}
+
+
+func test_sorte_pausa_o_olhar_inimigo_e_espera_o_jogador() -> void:
+	var c := _olhar_contra_hynne(false)
+	var P: Dictionary = c.P
+	check(not (c.pending as Dictionary).is_empty(), "falha contra hynne abre a decisão")
+	eq(P.sheet.pm, 3, "nada é gasto antes da decisão")
+	check(not P.sheet.conditions.has("atordoado"), "o atordoamento espera a decisão")
+	var r := WorldHelpers.cmd(c.w, "DecideSorte", {"accept": false})
+	check(r.accepted, "decisão do jogador é aceita")
+	check((c.w.modules.combat.pending_sorte as Dictionary).is_empty(), "decisão fecha")
+	eq(WorldHelpers.events_of(r, "SORTE_RESOLVED").size(), 1, "resolve a decisão")
+	eq(WorldHelpers.events_of(r, "CONDITION_APPLIED").size(), 1, "recusar mantém a falha: atordoado")
+	eq(P.sheet.pm, 3, "recusar não custa PM")
+
+
+func test_sorte_aceita_gasta_pm_e_rerrola() -> void:
+	var c := _olhar_contra_hynne(true)
+	var P: Dictionary = c.P
+	var r := WorldHelpers.cmd(c.w, "DecideSorte", {"accept": true})
+	check(r.accepted, "aceitar a rerrolagem é aceito")
+	eq(P.sheet.pm, 2, "aceitar custa 1 PM")
+
+
+func test_decidir_sem_pendencia_e_recusado() -> void:
+	var w := _crypt_fight()
+	check(not WorldHelpers.cmd(w, "DecideSorte", {"accept": true}).accepted, "sem pendência, DecideSorte é recusado")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:

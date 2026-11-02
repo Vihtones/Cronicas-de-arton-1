@@ -239,6 +239,7 @@ func test_sorte_salvadora_rola_de_novo_uma_vez_por_rodada() -> void:
 	var s := CharacterSheet.new()
 	s.race_id = "hynne"
 	s.pm = 3
+	s.sorte_politica = "sempre"
 	var rng := RngStreams.new(7)
 	var primeira := Checks.skill(s, "fortitude", 99, r, rng, "combat")
 	check(primeira.sorte, "falha em teste de resistência aciona Sorte Salvadora")

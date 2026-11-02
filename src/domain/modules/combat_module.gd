@@ -13,12 +13,13 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
-const POWER_POLICIES := {"sorte_salvadora": ["sempre", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
+const POWER_POLICIES := {"sorte_salvadora": ["perguntar", "sempre", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"]}
-const DEFAULT_POLICY := {"golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
+const DEFAULT_POLICY := {"sorte_salvadora": "perguntar", "golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
 	"ataque_poderoso": "auto", "combate_defensivo": "nunca", "trespassar": "auto"}
 var power_policy := DEFAULT_POLICY.duplicate()
+var pending_sorte: Dictionary = {}  # decisão da Sorte Salvadora em aberto: o combate espera o jogador (DecideSorte)
 var _cur_action: Dictionary = {}
 var stance_sneak := false
 var undetected_by: Dictionary = {}   # creature_id -> true (furtividade bem-sucedida nesta aproximação)
@@ -30,7 +31,7 @@ var log: Array = []
 
 func module_id() -> String: return "combat"
 func handled_commands() -> PackedStringArray:
-	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy"])
+	return PackedStringArray(["StartCombat", "ExecutePlan", "EndTurn", "SetStance", "SetPowerPolicy", "DecideSorte"])
 func subscribed_events() -> PackedStringArray:
 	return PackedStringArray(["PLAYER_MOVED", "PLAYER_TELEPORTED", "OBJECT_DAMAGED", "BANDITS_RELOCATED", "CREATURE_DEFEATED", "PACK_GREW", "PACK_RELOCATED", "TRAVEL_AMBUSH"])
 
@@ -137,6 +138,8 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			var g := GhostPlanner.simulate(sim, "player", actions)
 			if not g.valid:
 				return PackedStringArray(["plano inválido: " + str(g.steps[-1].reason)])
+		"DecideSorte":
+			if pending_sorte.is_empty(): return PackedStringArray(["nenhuma decisão de Sorte Salvadora em aberto"])
 		"EndTurn":
 			if not active: return PackedStringArray(["sem combate"])
 			if sim.current_id() != "player": return PackedStringArray(["não é o seu turno"])
@@ -177,6 +180,8 @@ func execute(cmd: GameCommand) -> Array:
 					out.append_array(_end_combat("fuga"))
 					return out
 			return out
+		"DecideSorte":
+			return _decide_sorte(bool(cmd.payload.get("accept", false)))
 		"EndTurn":
 			var out: Array = [fact("TURN_ENDED", {"actor": "player"}, ["player"])]
 			sim.next_turn()
@@ -413,6 +418,8 @@ func _run_until_player() -> Array:
 			if id == "player":
 				return out
 			out.append_array(_ai_turn(id))
+			if not pending_sorte.is_empty():
+				return out  # pausa: o turno inimigo espera a decisão do jogador
 			end = _check_end()
 			if not end.is_empty():
 				out.append_array(end)
@@ -915,6 +922,8 @@ func _ai_turn(id: String) -> Array:
 		elif melee < 0: melee = i
 	if me.sheet.habilidades.has("olhar_atordoante") and sim.can_spend("movimento") and CombatSim.cheb(me.tile, sim.c(target).tile) <= int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
 		out.append_array(_try(id, {"type": "olhar_criatura", "target": target}))
+		if not pending_sorte.is_empty():
+			return out
 	for step in 3:
 		if not sim.conscious(id) or not sim.conscious(target) and not (is_animal and not sim.c(target).sheet.is_dead()):
 			break
@@ -949,11 +958,51 @@ func _olhar_resolve(id: String, target: String) -> Array:
 	var out: Array = []
 	var alvo: CharacterSheet = sim.c(target).sheet
 	var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
+	if res.get("sorte_pendente", false):
+		pending_sorte = {"actor": id, "target": target, "d20": res.d20, "mod": res.mod, "cd": res.cd}
+		out.append(fact("SORTE_DECISION", {"actor": target, "source": id, "d20": res.d20, "total": res.total, "cd": res.cd}, [target]))
+		return out
 	if res.get("success", false):
 		out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": target, "tags": ["racial"]}, [id]))
 	else:
 		alvo.add_condition("atordoado")
 		out.append(fact("CONDITION_APPLIED", {"actor": id, "target": target, "condition": "atordoado", "tags": ["racial"]}, [id]))
+	return out
+
+
+## Decisão do jogador na Sorte Salvadora: rerrola (1 PM, uma vez por rodada) ou aceita a falha, e o turno inimigo retoma.
+func _decide_sorte(accept: bool) -> Array:
+	var p := pending_sorte
+	pending_sorte = {}
+	var alvo: CharacterSheet = sim.c(p.target).sheet
+	var d20: int = int(p.d20)
+	if accept:
+		alvo.pm -= 1
+		alvo.sorte_usada = true
+		d20 = world.rng.roll("combat", 1, 20)[0]
+	var total := d20 + int(p.mod)
+	var ok := total >= int(p.cd)
+	var out: Array = [fact("SORTE_RESOLVED", {"actor": p.target, "accepted": accept, "d20_first": int(p.d20), "d20": d20, "total": total, "cd": p.cd, "success": ok, "pm_after": alvo.pm, "tags": ["racial"]}, [p.target])]
+	if ok:
+		out.append(fact("OLHAR_RESISTIDO", {"actor": p.actor, "target": p.target, "tags": ["racial"]}, [p.actor]))
+	else:
+		alvo.add_condition("atordoado")
+		out.append(fact("CONDITION_APPLIED", {"actor": p.actor, "target": p.target, "condition": "atordoado", "tags": ["racial"]}, [p.actor]))
+	out.append_array(_resume_enemy_turn(str(p.actor)))
+	return out
+
+
+## Retoma o turno inimigo pausado: o que restou dele, depois passa a vez.
+func _resume_enemy_turn(id: String) -> Array:
+	var out: Array = _ai_turn(id)
+	if not pending_sorte.is_empty():
+		return out
+	var end := _check_end()
+	if not end.is_empty():
+		return out + end
+	out.append(fact("TURN_ENDED", {"actor": id}))
+	sim.next_turn()
+	out.append_array(_run_until_player())
 	return out
 
 
@@ -1058,7 +1107,7 @@ func to_dict() -> Dictionary:
 	_ensure()
 	var d := {"active": active, "creature_state": creature_state.duplicate(true), "stance_sneak": stance_sneak,
 		"undetected_by": undetected_by.duplicate(), "approach_rolled": approach_rolled.duplicate(), "enemy_faction": enemy_faction,
-		"power_policy": power_policy.duplicate()}
+		"power_policy": power_policy.duplicate(), "pending_sorte": pending_sorte.duplicate(true)}
 	if active:
 		var cs := {}
 		for id in sim.combatants:
@@ -1080,6 +1129,7 @@ func from_dict(d: Dictionary) -> void:
 	enemy_faction = str(d.get("enemy_faction", ""))
 	power_policy = DEFAULT_POLICY.duplicate()
 	power_policy.merge(d.get("power_policy", {}), true)
+	pending_sorte = d.get("pending_sorte", {}).duplicate(true)
 	active = bool(d.get("active", false))
 	if active and d.has("sim"):
 		sim = _new_sim()

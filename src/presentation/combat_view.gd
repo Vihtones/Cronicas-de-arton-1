@@ -314,6 +314,11 @@ func toggle_pungente() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not active():
 		return
+	if not Game.world.modules.combat.pending_sorte.is_empty() and event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_S or event.keycode == KEY_N:
+			Game.send("DecideSorte", {"accept": event.keycode == KEY_S})
+			get_viewport().set_input_as_handled()
+			return
 	if playing and (event.is_action_pressed("ui_cancel") or (event is InputEventMouseButton and event.pressed)):
 		_skip = true
 		if cine: cine.skip()

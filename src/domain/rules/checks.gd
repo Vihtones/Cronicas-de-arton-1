@@ -12,8 +12,12 @@ static func skill(sheet: CharacterSheet, skill_name: String, cd: int, rules: Rul
 	var d20: int = rng.roll(stream, 1, 20)[0]
 	var total := d20 + mod
 	var sorte := false
-	# Sorte Salvadora: se a resistência falha, o hynne rola de novo (1 PM, uma vez por rodada)
+	# Sorte Salvadora: se a resistência falha, o hynne rola de novo (1 PM, uma vez por rodada).
+	# Com a política "perguntar", não rola: devolve sorte_pendente e quem resolve decide (DecideSorte).
 	if total < cd and skill_name in RESISTANCIAS and sheet.can_sorte_salvadora():
+		if sheet.sorte_politica == "perguntar":
+			return {"allowed": true, "skill": skill_name, "d20": d20, "mod": mod, "total": total, "cd": cd,
+				"success": false, "margin": total - cd, "sorte": false, "sorte_pendente": true}
 		sheet.pm -= 1
 		sheet.sorte_usada = true
 		sorte = true

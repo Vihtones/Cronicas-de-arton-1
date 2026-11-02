@@ -112,6 +112,8 @@ static func line(e: GameEvent) -> String:
 		"SPELL_FAILED": return "%s perde a magia: %s CD %d (%s) — tirou %d." % [_name(p.caster), "Vontade" if p.check == "vontade" else "Misticismo", p.cd, p.reason, p.total]
 		"BUFF_APPLIED": return "Armadura Arcana: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_arcana" else ("Armadura de Allihanna: +%d na Defesa até o fim da cena." % p.defense if p.buff == "armadura_de_allihanna" else "")
 		"FUMBLE": return "%s %s." % [_name(p.actor), p.texto]
+		"SORTE_DECISION": return "Sorte Salvadora: falhou com %d (total %d, CD %d). Rerrolar por 1 PM? [S] sim / [N] não." % [p.d20, p.total, p.cd]
+		"SORTE_RESOLVED": return "Sorte Salvadora: %s. Primeiro dado %d, depois %d (total %d, CD %d)." % ["rerrolou" if p.accepted else "aceitou a falha", p.d20_first, p.d20, p.total, p.cd]
 		"CONDITION_APPLIED": return "%s fica %s até o fim do próprio turno." % [_name(p.target), p.condition] if p.condition == "atordoado" else ""
 		"OLHAR_RESISTIDO": return "%s resiste ao Olhar Atordoante (Fortitude)." % _name(p.target)
 		"SPELL_CAST": return "Magia: %s (−%d PM, resta %d)." % [str(p.spell).replace("_", " ").capitalize(), p.pm_cost, p.pm_after] if p.caster == "player" else ""

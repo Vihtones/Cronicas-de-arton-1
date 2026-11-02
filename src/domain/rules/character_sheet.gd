@@ -43,7 +43,7 @@ var extra_armor_penalty: int = 0   # Chassi do golem
 var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37)
 var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
 var sorte_usada: bool = false        # Sorte Salvadora (hynne): uma vez por rodada; zera ao começar a rodada
-var sorte_politica: String = "sempre"  # escolha do jogador: "nunca" desliga a rerrolagem da Sorte Salvadora
+var sorte_politica: String = "perguntar"  # Sorte Salvadora: "perguntar" (padrão, o jogador decide a cada falha), "sempre" ou "nunca"
 var olhar_usado: bool = false          # Olhar Atordoante (medusa): uma vez por cena; zera no fim do combate
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
@@ -104,7 +104,7 @@ func can_olhar_atordoante() -> bool:
 
 ## Sorte Salvadora (hynne, Bestiário): reação de 1 PM, uma vez por rodada, para rolar de novo um teste de resistência.
 func can_sorte_salvadora() -> bool:
-	return race_id == "hynne" and pm >= 1 and not sorte_usada and sorte_politica == "sempre"
+	return race_id == "hynne" and pm >= 1 and not sorte_usada and sorte_politica != "nunca"
 
 
 ## Patamar (Heróis, Arsenal de Lisandra): iniciante 1-4, veterano 5-10, experiente 11-16, campeão 17-20.
