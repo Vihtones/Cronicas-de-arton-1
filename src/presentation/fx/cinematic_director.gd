@@ -95,7 +95,7 @@ func evaluate(p: Dictionary, sim: CombatSim) -> Dictionary:
 	elif killed and sim and sim.combatants.has(target):
 		m = {"caption": "ABATIDO!" if target != "player" else "VOCÊ CAI!", "sub": _sub(p), "a": "determinado", "t": "dor", "zoom": 1.7, "slow": 0.45, "chroma": 0.6}
 	elif d20 == 1 and not p.get("spell", false):
-		m = {"caption": "FALHA CRÍTICA", "sub": "%s tropeça no golpe." % Narrator._name(attacker), "a": "surpreso", "t": "alegria", "zoom": 1.5, "slow": 0.3, "chroma": 0.0}
+		m = {"caption": str(p.get("fumble_titulo", "FALHA CRÍTICA")), "sub": "%s %s." % [Narrator._name(attacker), p.get("fumble_texto", "erra o golpe")], "a": "surpreso", "t": "alegria", "zoom": 1.5, "slow": 0.3, "chroma": 0.0}
 	elif attacker == "player" and hit and exp_hit >= 0.0 and exp_hit < 0.35:
 		m = {"caption": "CONTRA AS PROBABILIDADES!", "sub": "O plano arriscado (%d%%) deu certo." % int(exp_hit * 100), "a": "alegria", "t": "surpreso", "zoom": 1.6, "slow": 0.4, "chroma": 0.3}
 	elif attacker == "player" and not hit and exp_hit >= 0.8:

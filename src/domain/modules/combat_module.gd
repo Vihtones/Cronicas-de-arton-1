@@ -804,9 +804,17 @@ func _resolve_attack(attacker: String, target: String, v: Dictionary, special: b
 			dmg = maxi(1, int(Dice.roll(atk.dano, world.rng, "combat", 1, extra2).total) / 2)
 			tags.append("raspao")
 			tags.append_array(sim.apply_damage(target, dmg))
+	var fumble: Dictionary = FumbleTable.pick(world.rng) if d20 == 1 and not hit else {}
+	var fumble_tags := PackedStringArray()
+	if not fumble.is_empty():
+		fumble_tags = FumbleTable.apply(sim, attacker, fumble)
+		tags.append("falha_critica")
 	var out: Array = [fact("ATTACK_RESOLVED", {"attacker": attacker, "target": target, "weapon": atk.nome, "d20": d20, "mod": v.mod,
 		"mods": v.mods, "total": total, "defense": v.defense, "camo_roll": camo_roll, "hit": hit, "crit": crit, "damage": dmg,
-		"rolls": rolls, "pv_after": T.sheet.pv, "special": special, "ranged": v.ranged, "tags": tags}, [attacker, target])]
+		"rolls": rolls, "pv_after": T.sheet.pv, "special": special, "ranged": v.ranged, "tags": tags,
+		"fumble": fumble.get("id", ""), "fumble_titulo": fumble.get("titulo", ""), "fumble_texto": fumble.get("texto", "")}, [attacker, target])]
+	if not fumble.is_empty():
+		out.append(fact("FUMBLE", {"actor": attacker, "outcome": fumble.id, "titulo": fumble.titulo, "texto": fumble.texto, "tags": Array(fumble_tags)}, [attacker]))
 	if hit and attacker == "player" and T.side == "enemy":
 		out.append(fact("LETHAL_DAMAGE_DEALT", {"attacker": "player", "target": target, "creature_type": world.rules.value(T.sheet.source_rule, {}).get("tipo", "")}, ["player"]))
 	# Derrubar livre (Hiena, Bestiário p.120): manobra oposta x Luta do alvo (LB p.234)
