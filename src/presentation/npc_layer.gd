@@ -55,8 +55,15 @@ const TINTA := {"criatura.lobo": Color(0.75, 0.75, 0.8), "criatura.rato_gigante"
 
 func _criar_vista(id: String) -> void:
 	var d: Dictionary = Game.db.creature_def(id)
-	if d.is_empty():   # morador que está lutando: aparência padrão de bandido, com o nome dele
-		d = {"rule": "", "name": str(Game.world.npc_def(id).get("name", id))}
+	if d.is_empty():   # morador que está lutando: aparece com a própria aparência, como no mapa
+		var nd: Dictionary = Game.world.npc_def(id)
+		var arche: String = ARCHETYPE.get(id, "crianca" if nd.get("dynamic", false) else "aldeao")
+		var nv := ActorView.new()
+		var nome: String = str(nd.get("name", id))
+		nv.setup(id, "res://assets/chars/%s.png" % arche, nome.get_slice(" ", 0) if not nome.begins_with("Capitã") else "Elsa")
+		add_child(nv)
+		creature_views[id] = nv
+		return
 	var rule := str(d.get("rule", ""))
 	var r: Dictionary = Game.world.rules.value(rule, {})
 	var tipo := str(r.get("tipo", "humanoide"))
@@ -121,6 +128,8 @@ func sync_creatures() -> void:
 			v.hp_back.visible = false; v.hp_bar.visible = false
 			v.set_down(false)
 		v.visible = show_it
+		if npc_views.has(id):   # morador em luta: a vista do mapa some e a da luta aparece no lugar
+			npc_views[id].visible = not show_it
 		v.position = Game.db.tile_to_world(t)
 		v.modulate = Color(0.75, 0.75, 0.9) if (not c.active and c.is_asleep(id)) else Color.WHITE
 

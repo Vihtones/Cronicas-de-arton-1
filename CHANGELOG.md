@@ -4,7 +4,7 @@
 
 - Exploração: espaço pula sobre água ou barranco de um tile (até 2 tiles adiante).
 - Combate: clicar num morador perto (até 8 quadrados) inicia a luta contra ele. O morador entra como combatente temporário e, ao fim, volta ao mundo; se morrer, vira NPC_DIED.
-- Ainda faltam: sprite do morador durante a luta (hoje usa aparência de bandido) e o sprite original do morador continua no mapa durante a luta.
+- Morador em luta usa a própria aparência (mesmo sprite do mapa) e a vista do mapa some enquanto dura a luta.
 
 - Conversas entre moradores: chance por local e por traço (recluso/calado falam menos; fofoqueiro e curioso falam mais; taverna anima; sem tarefa = entediado).
 - Desempenho: índice de amigos para visitas e atalho em relações. Ainda ABERTO: o teste c15 (7 dias < 1000 ms) segue em ~1,2 s; commit aprovado pelo usuário com esse teste vermelho. Próximo passo: reescrever o laço de relações por local, que é quadrático.
