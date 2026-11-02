@@ -548,6 +548,14 @@ func _play_one(e: GameEvent) -> void:
 					ImpactFx.dust(_fxp(), rv.global_position, Vector2.ZERO, 8)
 					(rv.view if rv is PlayerView else rv).squash(0.15)
 			await _wait(0.2)
+		"FUMBLE":
+			# Falha crítica: o título da consequência sai sobre o atacante, com um tranco de câmera curto
+			var fu := _actor_view(p.actor)
+			if fu:
+				ImpactFx.dust(_fxp(), fu.global_position, Vector2.ZERO, 10)
+				_float_text(fu.global_position + Vector2(0, -28), str(p.titulo), Color(1.0, 0.55, 0.3))
+				camera.punch(1.05, 0.25)
+			await _wait(0.3)
 		"BLEED_CHECK":
 			var v := _actor_view(p.actor)
 			if v: _float_text(v.global_position, "sangra -%d" % p.lost if p.lost > 0 else "estável", Color(0.9, 0.2, 0.2))
