@@ -39,9 +39,11 @@ func test_conversa_fica_guardada_com_limite_e_cooldown() -> void:
 	_horas(w, 40)
 	check(w.modules.conversa.recent[ids[0]].size() <= ConversaModule.MAX_RECENT, "guarda no máximo %d conversas" % ConversaModule.MAX_RECENT)
 	var horas: int = 60 / w.clock.tick_minutes
-	var ultima: int = int(w.modules.conversa.recent[ids[0]][0].tick)
-	check(w.modules.conversa._em_cooldown(ids[0], ids[1], ultima + horas, horas), "não repete logo em seguida")
-	check(not w.modules.conversa._em_cooldown(ids[0], ids[1], ultima + ConversaModule.COOLDOWN_HOURS * horas + 1, horas), "depois do cooldown pode voltar a conversar")
+	var ultima = w.modules.conversa.recent[ids[0]][0]
+	var com: String = str(ultima.with)
+	var t: int = int(ultima.tick)
+	check(w.modules.conversa._em_cooldown(ids[0], com, t + horas, horas), "não repete logo em seguida")
+	check(not w.modules.conversa._em_cooldown(ids[0], com, t + ConversaModule.COOLDOWN_HOURS * horas + 1, horas), "depois do cooldown pode voltar a conversar")
 
 
 func test_morador_sozinho_nao_conversa() -> void:

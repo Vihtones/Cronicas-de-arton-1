@@ -236,9 +236,9 @@ func visit_target(id: String, d: Dictionary) -> String:
 	var best := ""
 	var best_affection := VISIT_MIN_AFFECTION
 	var casa := str(d.get("home", ""))
-	var conhecidos: Dictionary = relmod.rel.get(id, {})
-	for other in conhecidos:
-		var afeto := float(conhecidos[other].get("afeto", 0.0))
+	# só os amigos (índice de relações): evita percorrer todas as relações a cada hora
+	for other in relmod.amigos_de(id):
+		var afeto := float(relmod.rel[id][other]["afeto"])
 		if afeto <= VISIT_MIN_AFFECTION:
 			continue
 		if other == id or not npcs.state.has(other) or world.npc_def(other).is_empty():

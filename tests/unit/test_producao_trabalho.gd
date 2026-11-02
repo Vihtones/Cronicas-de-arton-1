@@ -127,6 +127,7 @@ func test_afeto_alto_leva_a_visita_no_tempo_livre() -> void:
 	var nd: NpcNeedsModule = w.modules.npc_needs
 	var rel = w.modules.relations
 	rel.rel.garrick = {"bento": {"afeto": 60.0}}
+	rel.reindexar_amigos()
 	w.modules.npcs.state.bento.location = "casa_vasquel"
 	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 0, "goal": "", "medium": "", "long": "", "shift": 0}
 	eq(nd.agenda_override("garrick", w.npc_def("garrick"), "praca", 20), "casa_vasquel", "amigo em casa: vai visitar")
@@ -136,6 +137,7 @@ func test_afeto_baixo_segue_o_lazer() -> void:
 	var w := _world()
 	var nd: NpcNeedsModule = w.modules.npc_needs
 	w.modules.relations.rel.garrick = {"bento": {"afeto": 10.0}}
+	w.modules.relations.reindexar_amigos()
 	w.modules.npcs.state.bento.location = "casa_vasquel"
 	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 0, "goal": "", "medium": "", "long": "", "shift": 0}
 	eq(nd.agenda_override("garrick", w.npc_def("garrick"), "praca", 20), "praca", "afeto pequeno não vence o lazer")
@@ -145,6 +147,7 @@ func test_amigo_fora_de_casa_nao_recebe_visita() -> void:
 	var w := _world()
 	var nd: NpcNeedsModule = w.modules.npc_needs
 	w.modules.relations.rel.garrick = {"bento": {"afeto": 60.0}}
+	w.modules.relations.reindexar_amigos()
 	w.modules.npcs.state.bento.location = "taverna"
 	nd.state.garrick = {"hunger": 0.1, "tired": 0.1, "gold": 0, "goal": "", "medium": "", "long": "", "shift": 0}
 	eq(nd.agenda_override("garrick", w.npc_def("garrick"), "praca", 20), "praca", "quem não está em casa não recebe visita")

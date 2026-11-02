@@ -2,6 +2,9 @@
 
 ## 0.7.2 (em andamento)
 
+- Conversas entre moradores: chance por local e por traço (recluso/calado falam menos; fofoqueiro e curioso falam mais; taverna anima; sem tarefa = entediado).
+- Desempenho: índice de amigos para visitas e atalho em relações. Ainda ABERTO: o teste c15 (7 dias < 1000 ms) segue em ~1,2 s; commit aprovado pelo usuário com esse teste vermelho. Próximo passo: reescrever o laço de relações por local, que é quadrático.
+
 - IA: moradores conversam entre si quando dividem o mesmo local (um sorteio por local por hora, tema rotina/ofício/vila/comida). A conversa aproxima os dois e fica guardada; a IA do jogo conhece as conversas recentes de cada morador.
 
 - HUD: registro de texto com moldura no mesmo estilo do painel de status.

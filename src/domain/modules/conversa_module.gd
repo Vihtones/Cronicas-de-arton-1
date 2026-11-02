@@ -42,8 +42,6 @@ func on_tick(tick: int) -> Array:
 		present.sort()
 		# no máximo uma conversa por local por hora: custo constante, mesmo com muitos moradores juntos
 		var rng := world.rng.stream("conversa")
-		if rng.randf() > CHANCE_PER_HOUR:
-			continue
 		var i := rng.randi() % present.size()
 		var j := rng.randi() % (present.size() - 1)
 		if j >= i:
@@ -51,6 +49,8 @@ func on_tick(tick: int) -> Array:
 		var a: String = present[i]
 		var b: String = present[j]
 		if _em_cooldown(a, b, tick, horas):
+			continue
+		if rng.randf() > _chance(a, b, loc):
 			continue
 		out.append(_conversar(a, b, loc, tick))
 	return out
@@ -80,6 +80,37 @@ func _guardar(quem: String, com: String, tema: String, linha: String, tick: int)
 	while lista.size() > MAX_RECENT:
 		lista.pop_back()
 	recent[quem] = lista
+
+
+## Chance de conversa na hora: base ajustada por local, traços e ocupação de cada um.
+## Ex.: taverna e ao ar livre animam; recluso e calado falam pouco; quem está sem tarefa (entediado) fala mais.
+func _chance(a: String, b: String, loc: String) -> float:
+	var p := CHANCE_PER_HOUR
+	var ld: Dictionary = world.db.location(loc)
+	if loc == "taverna":
+		p *= 2.0
+	elif not bool(ld.get("indoor", false)):
+		p *= 1.3
+	for id in [a, b]:
+		p *= _fator_pessoa(id)
+	return clampf(p, 0.0, 0.9)
+
+
+func _fator_pessoa(id: String) -> float:
+	var f := 1.0
+	var traits: Array = world.npc_def(id).get("traits", [])
+	if traits.has("recluso"):
+		f *= 0.25
+	if traits.has("calado") or traits.has("calada"):
+		f *= 0.4
+	if traits.has("fofoqueiro") or traits.has("fofoqueira"):
+		f *= 2.0
+	if traits.has("traz_noticias") or traits.has("curioso") or traits.has("curiosa"):
+		f *= 1.3
+	var nd = world.module("npc_needs")
+	if nd != null and str(nd.goal(id)) == "":
+		f *= 1.5  # sem tarefa no momento: entediado, puxa conversa
+	return f
 
 
 func _em_cooldown(a: String, b: String, tick: int, horas: int) -> bool:

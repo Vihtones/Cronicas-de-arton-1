@@ -14,6 +14,9 @@ const FAMILIARITY_PER_HOUR := 1.0
 const MAX_VALUE := 100.0
 
 var rel: Dictionary = {}  # quem -> {sobre_quem -> {dimensão: valor}}
+## Índice derivado de rel: quem -> [os que têm afeto acima de AMIGO_ACIMA]. Mantido a cada escrita de afeto.
+var amigos: Dictionary = {}
+const AMIGO_ACIMA := 30.0
 
 
 func module_id() -> String: return "relations"
@@ -47,6 +50,7 @@ func on_event(e: GameEvent) -> Array:
 			r.familiaridade = maxf(float(r.familiaridade), 12.0)
 			r.confianca = maxf(float(r.confianca), 10.0)
 			r.afeto = maxf(float(r.afeto), 20.0 if perda else 10.0)
+			_marcar_amigo(str(c), "player")
 		return []
 	if e.event_type != "MEMORY_FORMED":
 		return []
@@ -67,11 +71,13 @@ func on_event(e: GameEvent) -> Array:
 	if v > 0.0:
 		r.confianca = _clamp(float(r.confianca) + v * 0.5 * gain)
 		r.afeto = _clamp(float(r.afeto) + v * 0.5 * gain)
+		_marcar_amigo(who, about)
 		r.respeito = _clamp(float(r.respeito) + v * 0.25 * gain)
 	elif v < 0.0:
 		r.confianca = _clamp(float(r.confianca) + v * 0.5 * gain)
 		r.ressentimento = _clamp(float(r.ressentimento) - v * 0.6 * gain)
 		r.afeto = _clamp(float(r.afeto) + v * 0.3 * gain)
+		_marcar_amigo(who, about)
 		if emotion == "raiva" or emotion == "medo":
 			r.medo = _clamp(float(r.medo) - v * 0.3 * gain)
 	return []
@@ -110,6 +116,30 @@ func registrar_conversa(a: String, b: String) -> void:
 		var r := _pair(pair[0], pair[1])
 		r.familiaridade = minf(MAX_VALUE, float(r.familiaridade) + 2.0)
 		r.afeto = _clamp(float(r.afeto) + 0.5)
+		_marcar_amigo(pair[0], pair[1])
+
+
+## Quem tem afeto acima de AMIGO_ACIMA por quem (ordem não importa para quem consulta).
+func amigos_de(id: String) -> Array:
+	return amigos.get(id, [])
+
+
+## Reconstrói o índice de amigos a partir de rel (após carregar, ou quando rel é editado direto).
+func reindexar_amigos() -> void:
+	amigos = {}
+	for who in rel:
+		for about in rel[who]:
+			_marcar_amigo(who, about)
+
+
+func _marcar_amigo(who: String, about: String) -> void:
+	var lista: Array = amigos.get(who, [])
+	var acima := float(rel[who][about].get("afeto", 0.0)) > AMIGO_ACIMA
+	if acima and not lista.has(about):
+		lista.append(about)
+	elif not acima and lista.has(about):
+		lista.erase(about)
+	amigos[who] = lista
 
 
 func _pair(who: String, about: String) -> Dictionary:
@@ -153,3 +183,4 @@ func from_dict(d: Dictionary) -> void:
 		for about in rel[who]:
 			for k in rel[who][about]:
 				rel[who][about][k] = float(rel[who][about][k])
+	reindexar_amigos()
