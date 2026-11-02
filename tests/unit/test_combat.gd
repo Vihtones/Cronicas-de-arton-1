@@ -163,6 +163,21 @@ func test_olhar_atordoante_e_uma_vez_por_cena_e_so_medusa() -> void:
 	check(not GhostPlanner.validate_action(sim, "player", a).ok, "só medusa")
 
 
+func test_medusa_inimiga_usa_o_olhar_uma_vez_no_combate() -> void:
+	var w := _crypt_fight()
+	var sim: CombatSim = w.modules.combat.sim
+	var B := sim.c("bandido_1")
+	var P := sim.c("player")
+	B.sheet.habilidades = PackedStringArray(["olhar_atordoante"])
+	B.tile = Vector2i(P.tile.x + 2, P.tile.y)
+	var a := {"type": "olhar_criatura", "target": "player"}
+	check(GhostPlanner.validate_action(sim, "bandido_1", a).ok, "medusa inimiga usa o olhar no alcance curto")
+	var ev: Array = w.modules.combat._execute_action("bandido_1", a, {"ok": true, "kind": "movimento", "cost": 0})
+	var resolveu := ev.any(func(f): return f.type == "CONDITION_APPLIED" or f.type == "OLHAR_RESISTIDO")
+	check(resolveu, "o olhar gera um resultado (atordoado ou resistido)")
+	check(not GhostPlanner.validate_action(sim, "bandido_1", a).ok, "não usa de novo no mesmo combate")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:

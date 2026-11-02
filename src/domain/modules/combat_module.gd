@@ -509,18 +509,14 @@ func _execute_action(id: String, a: Dictionary, v: Dictionary) -> Array:
 			out.append_array(_coup(id, a.target))
 		"cast":
 			out.append_array(_cast(id, a, v))
+		"olhar_criatura":
+			sim.c(id).flags.append("olhar_usado")
+			out.append_array(_olhar_resolve(id, a.target))
 		"olhar_atordoante":
 			var sh_o: CharacterSheet = sim.c(id).sheet
 			sh_o.pm -= 1
 			sh_o.olhar_usado = true
-			# Bestiário (medusa): Fort CD 19 evita; falhou, fica atordoada por 1 rodada (sem ações)
-			var alvo: CharacterSheet = sim.c(a.target).sheet
-			var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
-			if res.get("success", false):
-				out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": a.target, "tags": ["racial"]}, [id]))
-			else:
-				alvo.add_condition("atordoado")
-				out.append(fact("CONDITION_APPLIED", {"actor": id, "target": a.target, "condition": "atordoado", "tags": ["racial"]}, [id]))
+			out.append_array(_olhar_resolve(id, a.target))
 		"allihanna":
 			var sh_a: CharacterSheet = sim.c(id).sheet
 			sh_a.pm -= 1
@@ -917,6 +913,8 @@ func _ai_turn(id: String) -> Array:
 	for i in me.sheet.attacks.size():
 		if me.sheet.attacks[i].get("distancia", false): ranged = i
 		elif melee < 0: melee = i
+	if me.sheet.habilidades.has("olhar_atordoante") and sim.can_spend("movimento") and CombatSim.cheb(me.tile, sim.c(target).tile) <= int(world.rules.value("alcance.quadrados", {}).get("curto", 6)):
+		out.append_array(_try(id, {"type": "olhar_criatura", "target": target}))
 	for step in 3:
 		if not sim.conscious(id) or not sim.conscious(target) and not (is_animal and not sim.c(target).sheet.is_dead()):
 			break
@@ -943,6 +941,19 @@ func _ai_turn(id: String) -> Array:
 		if r.is_empty():
 			break
 		out.append_array(r)
+	return out
+
+
+## Olhar Atordoante (Bestiário): Fort CD 19 evita; falhou, o alvo fica atordoado até o fim do próprio turno.
+func _olhar_resolve(id: String, target: String) -> Array:
+	var out: Array = []
+	var alvo: CharacterSheet = sim.c(target).sheet
+	var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
+	if res.get("success", false):
+		out.append(fact("OLHAR_RESISTIDO", {"actor": id, "target": target, "tags": ["racial"]}, [id]))
+	else:
+		alvo.add_condition("atordoado")
+		out.append(fact("CONDITION_APPLIED", {"actor": id, "target": target, "condition": "atordoado", "tags": ["racial"]}, [id]))
 	return out
 
 
