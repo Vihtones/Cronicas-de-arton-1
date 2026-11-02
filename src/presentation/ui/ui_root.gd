@@ -340,7 +340,11 @@ func update_hud() -> void:
 	lbl_place.text = str(loc.get("name", "Ermo"))
 	var s: CharacterSheet = w.modules.combat.sim.c("player").sheet if w.modules.combat.active else w.player_sheet
 	var sneak: bool = w.modules.combat.stance_sneak
-	hud_name.text = "%s · nível %d" % [s.name, s.level]
+	var estado := ""
+	if s.conditions.has("atordoado"): estado += " · ATORDOADO"
+	if s.conditions.has("caido"): estado += " · CAÍDO"
+	if Game.world.modules.combat.active and not Game.world.modules.combat.pending_sorte.is_empty(): estado += " · SORTE: [S] rerrolar / [N] aceitar"
+	hud_name.text = "%s · nível %d%s" % [s.name, s.level, estado]
 	bar_pv.max_value = maxi(1, s.pv_max); bar_pv.value = maxi(0, s.pv)
 	bar_pm.max_value = maxi(1, s.pm_max); bar_pm.value = maxi(0, s.pm)
 	lbl_pv.text = "%d/%d" % [s.pv, s.pv_max]
