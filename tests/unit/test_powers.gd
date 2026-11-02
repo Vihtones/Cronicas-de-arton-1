@@ -250,3 +250,15 @@ func test_sorte_salvadora_rola_de_novo_uma_vez_por_rodada() -> void:
 	s.race_id = "humano"
 	var humano := Checks.skill(s, "fortitude", 99, r, rng, "combat")
 	check(not humano.sorte, "só hynne tem Sorte Salvadora")
+
+
+func test_sorte_salvadora_respeita_a_escolha_do_jogador() -> void:
+	var r := RuleRegistry.load_default()
+	var s := CharacterSheet.new()
+	s.race_id = "hynne"
+	s.pm = 3
+	s.sorte_politica = "nunca"
+	var rng := RngStreams.new(7)
+	var res := Checks.skill(s, "fortitude", 99, r, rng, "combat")
+	check(not res.sorte, "com a escolha em nunca, não rerrola")
+	eq(s.pm, 3, "sem gasto de PM")

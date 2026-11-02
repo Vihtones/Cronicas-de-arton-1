@@ -13,7 +13,7 @@ var sim: CombatSim
 var creature_state: Dictionary = {}  # id -> {alive, present, tile, sheet(dict), woken_until}
 ## C20: como o jogador usa poderes com custo. Golpe de Raspão: "auto" | "nunca" (cada ataque pode sobrescrever
 ## com "raspao": true/false no plano). Durão: "fortes" (golpes ≥ 1/4 dos PV) | "sempre" | "nunca".
-const POWER_POLICIES := {"golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
+const POWER_POLICIES := {"sorte_salvadora": ["sempre", "nunca"], "golpe_raspao": ["auto", "nunca"], "durao": ["fortes", "sempre", "nunca"],
 	"rolamento_defensivo": ["fortes", "sempre", "nunca"], "ataque_reflexo": ["auto", "nunca"],
 	"ataque_poderoso": ["auto", "sempre", "nunca"], "combate_defensivo": ["nunca", "sempre"], "trespassar": ["auto", "nunca"]}
 const DEFAULT_POLICY := {"golpe_raspao": "auto", "durao": "fortes", "rolamento_defensivo": "fortes", "ataque_reflexo": "auto",
@@ -147,6 +147,8 @@ func execute(cmd: GameCommand) -> Array:
 	match cmd.type:
 		"SetPowerPolicy":
 			power_policy[str(cmd.payload.power)] = str(cmd.payload.policy)
+			if cmd.payload.power == "sorte_salvadora":
+				world.player_sheet.sorte_politica = str(cmd.payload.policy)
 			if sim != null: sim.toggles = power_policy.duplicate()
 			return [fact("POWER_POLICY_SET", {"power": cmd.payload.power, "policy": cmd.payload.policy}, ["player"])]
 		"SetStance":
