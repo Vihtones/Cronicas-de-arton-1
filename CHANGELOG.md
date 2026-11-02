@@ -2,6 +2,8 @@
 
 ## 0.7.2 (em andamento)
 
+- Reescrita do combate (em andamento, atrás de interruptor): núcleo de tempo real com custo por categoria (andar 1 por quadrado, padrão 2, completa 3, livre 0), orçamento de 8 pontos e relógio parado durante o planejamento. O combate por turnos continua ativo.
+
 - Exploração: espaço pula sobre água ou barranco de um tile (até 2 tiles adiante).
 - Combate: clicar num morador perto (até 8 quadrados) inicia a luta contra ele. O morador entra como combatente temporário e, ao fim, volta ao mundo; se morrer, vira NPC_DIED.
 - Morador em luta usa a própria aparência (mesmo sprite do mapa) e a vista do mapa some enquanto dura a luta.
