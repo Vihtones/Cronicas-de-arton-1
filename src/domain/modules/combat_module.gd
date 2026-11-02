@@ -957,7 +957,7 @@ func _ai_turn(id: String) -> Array:
 func _olhar_resolve(id: String, target: String) -> Array:
 	var out: Array = []
 	var alvo: CharacterSheet = sim.c(target).sheet
-	var res := Checks.skill(alvo, "fortitude", 19, world.rules, world.rng, "combat")
+	var res := Checks.skill(alvo, "fortitude", sim.c(id).sheet.olhar_cd, world.rules, world.rng, "combat")
 	if res.get("sorte_pendente", false):
 		pending_sorte = {"actor": id, "target": target, "d20": res.d20, "mod": res.mod, "cd": res.cd}
 		out.append(fact("SORTE_DECISION", {"actor": target, "source": id, "d20": res.d20, "total": res.total, "cd": res.cd}, [target]))

@@ -95,6 +95,58 @@
    "status": "VERIFICADA"
   },
   {
+   "id": "criatura.cultista_sszzaas",
+   "valor": {
+    "nome": "Cultista de Sszzaas",
+    "nd": "7",
+    "tipo": "monstro",
+    "tamanho": "medio",
+    "iniciativa": 11,
+    "percepcao": 12,
+    "defesa": 29,
+    "fort": 7,
+    "ref": 14,
+    "von": 20,
+    "pv": 160,
+    "deslocamento_m": 9,
+    "ataques": [
+     {
+      "nome": "Adaga",
+      "bonus": 22,
+      "dano": "1d4+4",
+      "margem": 19,
+      "mult": 2,
+      "alcance_q": 1
+     }
+    ],
+    "atributos": {
+     "for": 0,
+     "des": 2,
+     "con": 0,
+     "int": 4,
+     "sab": 4,
+     "car": 5
+    },
+    "pericias": {
+     "enganacao": 20,
+     "intuicao": 20,
+     "religiao": 17
+    },
+    "sentidos": [
+     "visao_escuro"
+    ],
+    "habilidades": [
+     "olhar_atordoante"
+    ],
+    "olhar_cd": 26
+   },
+   "fonte": "Bestiário Tormenta20 (Ameaças de Arton — arquivo 'Bestiario_tormenta.pdf')",
+   "pagina": 327,
+   "pdf_page": 329,
+   "status": "VERIFICADA",
+   "nota": "Olhar Atordoante: Fort CD 26 (o CD 19 do Bestiário é de outra criatura, na página anterior). Magias de PM não implementadas."
+  },
+  {
    "id": "criatura.hiena",
    "valor": {
     "nome": "Hiena",

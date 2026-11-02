@@ -44,6 +44,7 @@ var arcane_path: String = ""     # arcanista: bruxo | feiticeiro | mago (LB p.37
 var scene_defense: int = 0        # bônus de magia com duração "cena" (Armadura Arcana); zera no fim da cena
 var sorte_usada: bool = false        # Sorte Salvadora (hynne): uma vez por rodada; zera ao começar a rodada
 var sorte_politica: String = "perguntar"  # Sorte Salvadora: "perguntar" (padrão, o jogador decide a cada falha), "sempre" ou "nunca"
+var olhar_cd: int = 19                  # CD do Olhar Atordoante (Fort evita); criaturas trazem o próprio valor
 var olhar_usado: bool = false          # Olhar Atordoante (medusa): uma vez por cena; zera no fim do combate
 var allihanna_ativa: bool = false  # Armadura de Allihanna (dahllan) ativa na cena; zera no fim do combate
 var powers: Dictionary = {}       # poder_id -> opção (ex.: especializacao_arma -> "espada_longa"); repetíveis viram lista
@@ -300,6 +301,7 @@ static func from_creature(rules: RuleRegistry, rule_id: String, p_id: String) ->
 	s.is_important = false
 	s.senses = PackedStringArray(c.get("sentidos", []))
 	s.habilidades = PackedStringArray(c.get("habilidades", []))
+	s.olhar_cd = int(c.get("olhar_cd", 19))
 	s.source_rule = rule_id
 	return s
 

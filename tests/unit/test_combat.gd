@@ -220,6 +220,13 @@ func test_decidir_sem_pendencia_e_recusado() -> void:
 	check(not WorldHelpers.cmd(w, "DecideSorte", {"accept": true}).accepted, "sem pendência, DecideSorte é recusado")
 
 
+func test_cultista_de_sszzaas_tem_olhar_com_cd_26() -> void:
+	var s := CharacterSheet.from_creature(RuleRegistry.load_default(), "criatura.cultista_sszzaas", "cultista")
+	check(s.habilidades.has("olhar_atordoante"), "cultista tem o Olhar Atordoante")
+	eq(s.olhar_cd, 26, "CD do olhar do Bestiário (p. 327)")
+	eq(s.defense_fixed, 29, "defesa do bloco")
+
+
 func _primeira_agua(db) -> Vector2i:
 	for y in db.size.y:
 		for x in db.size.x:
