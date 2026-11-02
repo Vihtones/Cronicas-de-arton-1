@@ -65,6 +65,46 @@ func esquecer_criatura(id: String) -> void:
 	approach_rolled.erase(id)
 
 
+## NPC que luta: não é criatura do catálogo, mas tem ficha (party.ficha_de) e entra em creature_state só durante a luta.
+func _eh_npc(id: String) -> bool:
+	return world.db.creature_def(id).is_empty() and not world.npc_def(id).is_empty()
+
+
+func _eh_npc_em_luta(id: String) -> bool:
+	return bool(creature_state.get(id, {}).get("npc", false))
+
+
+## Definição de criatura ou, para um NPC, uma definição mínima derivada dele (nome, facção, spawn).
+func _def(id: String) -> Dictionary:
+	var c := world.db.creature_def(id)
+	if not c.is_empty():
+		return c
+	var n := world.npc_def(id)
+	if n.is_empty():
+		return {}
+	var sp: Array = creature_state.get(id, {}).get("tile", [0, 0])
+	return {"name": str(n.get("name", id)), "faction": str(n.get("faction") or "morador"), "spawn": sp, "items": [], "poderes": [],
+		"pm": 0, "important": false, "start_present": true, "rule": ""}
+
+
+func _npc_alvo_ok(id: String) -> bool:
+	var npcs = world.module("npcs")
+	if npcs == null:
+		return false
+	var s: Dictionary = npcs.npc(id)
+	return not s.is_empty() and bool(s.alive) and not bool(s.captive) and str(s.location) != "" and str(s.location) != "desconhecido"
+
+
+func _registrar_npc(id: String) -> void:
+	var npcs = world.module("npcs")
+	var party = world.module("party")
+	if npcs == null or party == null:
+		return
+	var t: Vector2i = npcs.npc_tile(id)
+	var sh: CharacterSheet = party.ficha_de(id)
+	creature_state[id] = {"alive": true, "present": true, "tile": [t.x, t.y], "sheet": sh.to_dict(), "woken_until": -1, "npc": true}
+
+
 func _estado_inicial(id: String) -> void:
 	var d := world.db.creature_def(id)
 	var sheet := CharacterSheet.from_creature(world.rules, d.rule, id)
@@ -81,7 +121,7 @@ func creatures_of_faction(f: String, alive_only: bool = true) -> Array:
 	_ensure()
 	var out: Array = []
 	for id in creature_state:
-		if world.db.creature_def(id).faction == f and (not alive_only or (creature_state[id].alive and creature_state[id].present)):
+		if _def(id).faction == f and (not alive_only or (creature_state[id].alive and creature_state[id].present)):
 			out.append(id)
 	out.sort()
 	return out
@@ -97,7 +137,7 @@ func is_active_creature(id: String) -> bool:
 	var s: Dictionary = creature_state.get(id, {})
 	if s.is_empty() or not s.alive or not s.present:
 		return false
-	var d := world.db.creature_def(id)
+	var d := _def(id)
 	if d.has("active_hours"):
 		var h := world.hour()
 		var a := int(d.active_hours[0]); var b := int(d.active_hours[1])
@@ -106,7 +146,7 @@ func is_active_creature(id: String) -> bool:
 
 
 func is_asleep(id: String) -> bool:
-	var d := world.db.creature_def(id)
+	var d := _def(id)
 	if not d.has("sleeps") or int(creature_state[id].woken_until) > world.clock.tick:
 		return false
 	var h := world.hour()
@@ -128,7 +168,7 @@ func visible_creatures() -> Array:
 func creature_signals() -> Array:
 	var out: Array = []
 	for id in visible_creatures():
-		var d := world.db.creature_def(id)
+		var d := _def(id)
 		if d.has("signal"):
 			out.append({"id": id, "signal": d.signal})
 	return out
@@ -165,6 +205,10 @@ func validate(cmd: GameCommand) -> PackedStringArray:
 			if ids.is_empty(): return PackedStringArray(["sem alvos"])
 			var p := world.db.world_to_tile(world.player.position)
 			for id in ids:
+				if _eh_npc(id):
+					if not _npc_alvo_ok(id): return PackedStringArray(["alvo indisponível: " + str(id)])
+					if CombatSim.cheb(p, world.module("npcs").npc_tile(id)) > 8: return PackedStringArray(["alvo longe demais"])
+					continue
 				if not creature_state.has(id) or not is_active_creature(id): return PackedStringArray(["alvo indisponível: " + str(id)])
 				if CombatSim.cheb(p, creature_tile(id)) > 8: return PackedStringArray(["alvo longe demais"])
 			if bool(cmd.payload.get("emboscada", false)):
@@ -235,6 +279,8 @@ func execute(cmd: GameCommand) -> Array:
 			var ids: Array = cmd.payload.enemies
 			var surprised := bool(cmd.payload.get("emboscada", false)) or ids.all(func(id): return undetected_by.has(id))
 			for id in ids:   # atacar quem foi acalmado por magia desfaz a magia (Acalmar Animal, Tranquilidade)
+				if _eh_npc(id) and not creature_state.has(id):
+					_registrar_npc(id)
 				if creature_state.has(id):
 					creature_state[id].erase("atitude_temp")
 			return _start(_group_with(ids), surprised, false)
@@ -308,7 +354,7 @@ func on_event(e: GameEvent) -> Array:
 					continue
 				if active and sim.combatants.has(id):
 					continue
-				var sp: Array = world.db.creature_def(id).get("spawn", creature_state[id].tile)
+				var sp: Array = _def(id).get("spawn", creature_state[id].tile)
 				var t := _nearest_walkable(nc + (Vector2i(int(sp[0]), int(sp[1])) - oc))
 				creature_state[id].tile = [t.x, t.y]
 				moved.append(id)
@@ -358,9 +404,9 @@ func on_event(e: GameEvent) -> Array:
 func _group_with(ids: Array) -> Array:
 	var group: Array = ids.duplicate()
 	for id in ids:
-		var f: String = world.db.creature_def(id).faction
+		var f: String = _def(id).faction
 		for other in creature_state:
-			if not group.has(other) and world.db.creature_def(other).faction == f and is_active_creature(other) \
+			if not group.has(other) and _def(other).faction == f and is_active_creature(other) \
 					and world.db.zone_at(creature_tile(other)) == world.db.zone_at(creature_tile(id)) \
 					and CombatSim.cheb(creature_tile(other), creature_tile(id)) <= 10:
 				group.append(other)
@@ -463,7 +509,7 @@ func _start(enemy_ids: Array, enemies_surprised: bool, player_surprised: bool) -
 		"enemies_surprised": enemies_surprised}
 	if enemies_surprised: stats.tactics["surpresa"] = true
 	if player_surprised: stats.adverse["surpreendido"] = true
-	enemy_faction = world.db.creature_def(enemy_ids[0]).faction
+	enemy_faction = _def(enemy_ids[0]).faction
 	sim.combatants["player"] = {"id": "player", "side": "player", "tile": world.db.world_to_tile(world.player.position),
 		"sheet": world.player_sheet.duplicate_sheet(), "charge_turn": -99, "damaged_round": -1, "surprised": player_surprised, "flags": []}
 	for id in enemy_ids:
@@ -6269,6 +6315,11 @@ func _end_combat(outcome: String) -> Array:
 		if id == "player" or str(id).begins_with("inv_"):   # invocações não são criaturas do mundo nem companheiros
 			continue
 		var x := sim.c(id)
+		if _eh_npc_em_luta(id):   # NPC que lutou: a morte vale para a vila; a entrada temporária some
+			if x.sheet.is_dead():
+				out.append(fact("NPC_DIED", {"npc": id, "cause": "combate"}, [id]))
+			creature_state.erase(id)
+			continue
 		if x.flags.has("fora"):   # banido por Banimento: volta ao mundo de origem, sem contar como derrota
 			creature_state[id].sheet = x.sheet.to_dict()
 			creature_state[id].present = false
@@ -6300,7 +6351,7 @@ func _end_combat(outcome: String) -> Array:
 			creature_state[id].present = false
 			out.append(fact("CREATURE_DEFEATED", {"creature": id, "name": x.sheet.name, "by": "player", "actor": "player",
 				"dead": x.sheet.is_dead(), "location": loc}, ["player"]))
-			for it in world.db.creature_def(id).get("items", []):
+			for it in _def(id).get("items", []):
 				out.append(fact("ITEM_GAINED", {"item": it, "from": id, "location": loc}, ["player"]))
 	match outcome:
 		"captura":
@@ -6315,10 +6366,10 @@ func _end_combat(outcome: String) -> Array:
 				# salteadores (ORIGINAL): roubam e somem; o jogador acorda onde caiu
 				out.append(fact("PLAYER_ROBBED", {"by": enemy_faction, "location": loc}, ["player"]))
 				for id in sim.combatants:
-					if sim.c(id).side == "enemy": creature_state[id].present = false
+					if sim.c(id).side == "enemy" and creature_state.has(id): creature_state[id].present = false
 			for id in sim.combatants:
-				if sim.c(id).side == "enemy" and sim.c(id).sheet.pv > 0:
-					creature_state[id].tile = world.db.creature_def(id).spawn.duplicate()
+				if sim.c(id).side == "enemy" and sim.c(id).sheet.pv > 0 and creature_state.has(id):
+					creature_state[id].tile = _def(id).spawn.duplicate()
 		"morte":
 			out.append(fact("PLAYER_DIED", {"location": loc, "round": sim.round_no}, ["player"]))
 		"fuga":

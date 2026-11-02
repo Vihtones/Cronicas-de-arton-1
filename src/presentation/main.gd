@@ -268,6 +268,8 @@ func _explore_key(k: int) -> void:
 			ui.toggle_journal()
 		KEY_C:
 			Game.send("SetStance", {"sneak": not Game.world.modules.combat.stance_sneak})
+		KEY_SPACE:
+			player.pular()
 		KEY_R:
 			var r := Game.send("Rest")
 			if not r.accepted: ui.log_msg("✘ " + "; ".join(r.errors))
@@ -287,6 +289,18 @@ func _atacar_mirando(t: Vector2i) -> bool:
 			var r := Game.send("StartCombat", {"enemies": [id], "emboscada": emboscada})
 			if not r.accepted:
 				ui.log_msg("✘ " + "; ".join(r.errors))
+			return true
+	# moradores: clicar num morador perto começa a luta contra ele
+	var npcs = Game.world.modules.npcs
+	for id in npcs.state:
+		var s: Dictionary = npcs.state[id]
+		if not s.alive or s.captive or str(s.location) == "":
+			continue
+		var nt: Vector2i = npcs.npc_tile(id)
+		if CombatSim.cheb(t, nt) <= 1 and CombatSim.cheb(pt, nt) <= 8:
+			var r2 := Game.send("StartCombat", {"enemies": [id], "emboscada": false})
+			if not r2.accepted:
+				ui.log_msg("✘ " + "; ".join(r2.errors))
 			return true
 	return false
 

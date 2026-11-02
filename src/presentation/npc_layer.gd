@@ -54,18 +54,21 @@ const TINTA := {"criatura.lobo": Color(0.75, 0.75, 0.8), "criatura.rato_gigante"
 
 
 func _criar_vista(id: String) -> void:
-	var d := Game.db.creature_def(id)
-	var r: Dictionary = Game.world.rules.value(str(d.rule), {})
+	var d: Dictionary = Game.db.creature_def(id)
+	if d.is_empty():   # morador que está lutando: aparência padrão de bandido, com o nome dele
+		d = {"rule": "", "name": str(Game.world.npc_def(id).get("name", id))}
+	var rule := str(d.get("rule", ""))
+	var r: Dictionary = Game.world.rules.value(rule, {})
 	var tipo := str(r.get("tipo", "humanoide"))
-	var sheet := "hiena" if str(d.rule).contains("hiena") or tipo in ["animal", "monstro"] else ("kael" if id == "kael" else "bandido")
+	var sheet := "hiena" if rule.contains("hiena") or tipo in ["animal", "monstro"] else ("kael" if id == "kael" else "bandido")
 	for forma in FORMA_POR_REGRA:
-		if str(d.rule).contains(forma):
+		if rule.contains(forma):
 			sheet = "criatura_" + str(FORMA_POR_REGRA[forma])
 			break
 	var v := ActorView.new()
-	v.setup(id, "res://assets/chars/%s.png" % sheet, d.name)
-	if TINTA.has(str(d.rule)):
-		v.sprite.self_modulate = TINTA[str(d.rule)]
+	v.setup(id, "res://assets/chars/%s.png" % sheet, str(d.name))
+	if TINTA.has(rule):
+		v.sprite.self_modulate = TINTA[rule]
 	if str(r.get("tamanho", "medio")) in ["grande", "enorme"]:
 		v.base_scale = 1.5
 	add_child(v)
@@ -103,7 +106,7 @@ func sync_creatures() -> void:
 			creature_views[id].queue_free()
 			creature_views.erase(id)
 	for id in c.creature_state:
-		if not creature_views.has(id) and not Game.db.creature_def(id).is_empty():
+		if not creature_views.has(id) and (not Game.db.creature_def(id).is_empty() or bool(c.creature_state[id].get("npc", false))):
 			_criar_vista(id)
 	for id in creature_views:
 		var v: ActorView = creature_views[id]
