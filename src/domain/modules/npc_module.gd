@@ -4,6 +4,7 @@ extends WorldModule
 ## Invariantes: morto não executa tarefas; NPC nunca está em dois lugares (§7).
 
 var state: Dictionary = {}  # id -> {location, alive, captive, age, wounded_until}
+var _courier_idx: Dictionary = {}  # derivado do catálogo (não vai ao save)
 
 
 func module_id() -> String: return "npcs"
@@ -89,11 +90,11 @@ func desired_location(id: String) -> String:
 		if scared != "":
 			return scared
 	# mensageiro entre regiões (LOD L3)
-	for r in world.db.distant.get("regions", []):
-		if r.get("courier", "") == id:
-			var cycle := int(r.courier_cycle_days)
-			if world.day_index() % cycle >= int(r.courier_present_days):
-				return r.id
+	var r: Dictionary = _couriers().get(id, {})
+	if not r.is_empty():
+		var cycle := int(r.courier_cycle_days)
+		if world.day_index() % cycle >= int(r.courier_present_days):
+			return r.id
 	var sched: Array = _schedule_table(d.schedule)
 	var h := world.hour()
 	var dia := world.day_index()   # calculado uma vez: a agenda consulta o dia em cada entrada
@@ -126,6 +127,18 @@ func _resolve_slot(slot: String, d: Dictionary) -> String:
 		"home": return d.home
 		"work": return d.work
 		_: return slot
+
+
+## Mensageiros entre regiões: id do morador -> região (a primeira que o cita, como na varredura de antes).
+## O catálogo é estático; o índice evita percorrer as regiões a cada morador e a cada hora (C15).
+func _couriers() -> Dictionary:
+	if _courier_idx.is_empty():
+		_courier_idx = {"": {}}
+		for r in world.db.distant.get("regions", []):
+			var c := str(r.get("courier", ""))
+			if c != "" and not _courier_idx.has(c):
+				_courier_idx[c] = r
+	return _courier_idx
 
 
 ## Tabela de agendas embutida no catálogo de NPCs (gerada por build_content.py).

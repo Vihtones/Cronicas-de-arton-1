@@ -9,7 +9,9 @@
 - Morador em luta usa a própria aparência (mesmo sprite do mapa) e a vista do mapa some enquanto dura a luta.
 
 - Conversas entre moradores: chance por local e por traço (recluso/calado falam menos; fofoqueiro e curioso falam mais; taverna anima; sem tarefa = entediado).
-- Desempenho: índice de amigos para visitas e atalho em relações. Ainda ABERTO: o teste c15 (7 dias < 1000 ms) segue em ~1,2 s; commit aprovado pelo usuário com esse teste vermelho. Próximo passo: reescrever o laço de relações por local, que é quadrático.
+- Desempenho: a simulação de 7 dias passa a ~0,8 s (teste c15 verde). Assinantes de evento indexados no mundo, relações por local sem regravar o que já está no teto, mensageiros indexados e checagem de necessidades uma vez por morador. Próximo passo de desempenho: medir em máquina com GPU real (G5).
+- Notícias que correm (Fase 9): cada fato da crônica chega primeiro aos portadores do canal (mercadora e mercador pelo mercador, mensageiro pelo mensageiro, taverneiro e estalajadeiro pelo taverneiro), só na vila. Depois corre de boca em boca pelo sistema de rumores, só entre quem divide o local, perdendo confiança. "O que se conta por aí?" traz a notícia como novidade ou boato. Notícias somem com o esquecimento normal.
+- Narração de fatos antes mudos (pendência O2): perder a pista da cripta, alerta dos bandidos e mercadoria roubada recuperada aparecem na tela e no diário, com nomes de facção, item e dono. Encomenda da guilda não conta como furto.
 
 - IA: moradores conversam entre si quando dividem o mesmo local (um sorteio por local por hora, tema rotina/ofício/vila/comida). A conversa aproxima os dois e fica guardada; a IA do jogo conhece as conversas recentes de cada morador.
 

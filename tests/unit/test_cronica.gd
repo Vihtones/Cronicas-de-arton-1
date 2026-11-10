@@ -43,3 +43,83 @@ func test_noticia_chega_pelo_canal_da_categoria() -> void:
 	c.on_event(GameEvent.create("n2", "ROUTE_CHANGED", 2, {"route": "valkaria_vila", "open": false}))
 	eq(c.news_via("mensageiro").size(), 1, "notícia da Tormenta vem pelo mensageiro")
 	eq(c.news_via("mercador").size(), 1, "notícia de rota vem pelo mercador")
+
+
+## Fase 9, rumores históricos: a notícia chega a quem traz notícia pelo canal e depois corre de boca em boca.
+func _fechar_rota(w: WorldState) -> void:
+	w._commit(GameCommand.create("rota", "player", "Teste", {}), [WorldModule.fact("ROUTE_CHANGED", {"route": "samburdia_vila", "open": false})])
+
+
+func _chave_da_ultima(w: WorldState) -> String:
+	return "cronica:%d" % int(w.modules.chronicle.entries.back().id)
+
+
+func test_noticia_da_cronica_chega_primeiro_ao_portador_do_canal() -> void:
+	var w := _world()
+	var c: ChronicleModule = w.modules.chronicle
+	var mem: MemoryModule = w.modules.memory
+	var portadores := c.portadores("mercador")
+	check(portadores.has("mara"), "a mercadora da vila traz notícia de economia")
+	check(not portadores.has("kharim"), "mercador de fora da vila não recebe a notícia da vila")
+	_fechar_rota(w)
+	var chave := _chave_da_ultima(w)
+	for id in portadores:
+		check(mem.knows_fact(id, chave), "%s soube da estrada fechada" % id)
+	check(not mem.knows_fact("fenna", chave), "quem não é do canal ainda não sabe")
+
+
+func test_noticia_corre_de_boca_em_boca_e_so_entre_quem_esta_junto() -> void:
+	var w := _world()
+	var mem: MemoryModule = w.modules.memory
+	_fechar_rota(w)
+	var chave := _chave_da_ultima(w)
+	var portadores: Array = w.modules.chronicle.portadores("mercador")
+	var antes := 0
+	for id in w.all_npc_ids():
+		if mem.knows_fact(id, chave): antes += 1
+	WorldHelpers.advance_hours(w, 48)
+	var depois := 0
+	var por_boato := 0
+	for id in w.all_npc_ids():
+		if mem.knows_fact(id, chave):
+			depois += 1
+			if not portadores.has(id):
+				por_boato += 1
+				var m: Dictionary = mem.list(id).filter(func(x): return x.key == chave)[0]
+				check(str(m.source).begins_with("rumor:"), "%s ouviu de alguém, não viu" % id)
+				check(float(m.reliability) < 1.0, "boato perde confiança")
+	check(depois > antes, "em dois dias a notícia se espalhou (%d -> %d)" % [antes, depois])
+	check(por_boato > 0, "alguém fora do canal soube por boato")
+
+
+func test_jogador_ouve_a_noticia_perguntando_o_que_se_conta() -> void:
+	var w := _world()
+	_fechar_rota(w)
+	var dm: DialogueModule = w.modules.dialogue
+	var no: Dictionary = dm._dynamic_node("mara", "__rumor")
+	check(str(no.text).begins_with("Chegou notícia: "), "quem trouxe conta como novidade: %s" % no.text)
+	check(str(no.text).find("fechada") >= 0, "e conta o que aconteceu")
+
+
+func test_noticia_sobrevive_ao_salvamento_e_morte_nao_corre_duas_vezes() -> void:
+	var w := _world()
+	_fechar_rota(w)
+	var chave := _chave_da_ultima(w)
+	var w2 := WorldHelpers.world(1)
+	w2.from_snapshot(w.to_snapshot())
+	check(w2.modules.memory.knows_fact("mara", chave), "a notícia continua na memória depois de carregar")
+	var c: ChronicleModule = w.modules.chronicle
+	c.on_event(GameEvent.create("m1", "NPC_DIED", 5, {"npc": "fenna", "cause": "velhice", "age": 80}))
+	check(not w.modules.memory.knows_fact("mara", "cronica:%d" % int(c.entries.back().id)), "a morte já vira luto das testemunhas")
+
+
+func test_fatos_mudos_tem_texto_legivel() -> void:
+	var w := _world()
+	var c: ChronicleModule = w.modules.chronicle
+	c.on_event(GameEvent.create("t1", "FACTION_ALERTED", 1, {"faction": "garras_de_cinza"}))
+	check(str(c.entries.back().text).find("Garras de Cinza") >= 0, "a facção aparece pelo nome: %s" % c.entries.back().text)
+	c.on_event(GameEvent.create("t2", "STOLEN_GOODS_RECOVERED", 2, {"item": "dizimo_lena", "owner": "templo_lena"}))
+	check(str(c.entries.back().text).find("Bolsa do dízimo") >= 0 and str(c.entries.back().text).find("Templo de Lena") >= 0, "item e dono pelo nome: %s" % c.entries.back().text)
+	var n := c.entries.size()
+	c.on_event(GameEvent.create("t3", "STOLEN_GOODS_RECOVERED", 3, {"item": "carta_lacrada", "owner": "guilda"}))
+	eq(c.entries.size(), n, "encomenda da guilda não é furto")

@@ -51,13 +51,15 @@ func on_event(e: GameEvent) -> Array:
 			text = "%s morreu." % _nome(str(e.payload.npc))
 		"MYSTERY_LOST":
 			cat = "politica"
-			text = "Uma pista do mistério se perdeu para sempre."
+			text = "Os bandidos deixaram a cripta e levaram o rapaz. O caso do sumiço ficou sem solução."
 		"FACTION_ALERTED":
 			cat = "politica"
-			text = "A facção %s se pôs em alerta." % str(e.payload.get("faction", ""))
+			text = "A facção %s está em alerta." % _faccao(str(e.payload.get("faction", "")))
 		"STOLEN_GOODS_RECOVERED":
+			if str(e.payload.get("owner", "")) == "guilda":
+				return []   # encomenda da guilda não é furto
 			cat = "economia"
-			text = "Mercadoria roubada foi recuperada e voltou ao estoque."
+			text = "Apareceu algo que tinham roubado: %s (dono: %s)." % [_item(str(e.payload.get("item", ""))), _dono(str(e.payload.get("owner", "")))]
 		"CONTRACT_DONE":
 			cat = "guildas"
 			text = "A guilda cumpriu o contrato \"%s\" e recebeu T$ %d." % [_contrato_nome(str(e.payload.contrato)), int(e.payload.pagamento)]
@@ -79,7 +81,80 @@ func on_event(e: GameEvent) -> Array:
 	entries.append({"id": _seq, "tick": e.world_tick, "category": cat, "text": text})
 	if entries.size() > CAP:
 		entries = entries.slice(entries.size() - CAP)
+	if not NAO_CORRE.has(e.event_type):
+		_espalhar(_seq, cat, text, e.world_tick)
 	return []
+
+
+## Notícias que correm (Fase 9, rumores históricos): o fato da crônica chega primeiro a quem traz notícia pelo
+## canal da categoria (mercador, mensageiro, taverneiro) e entra na memória dele. Dali em diante, passa de
+## boca em boca pelo sistema de rumores da MemoryModule, só entre quem divide o mesmo local, e some com o
+## esquecimento normal. Quem não ouviu continua sem saber; o jogador sabe perguntando ("O que se conta por aí?").
+## A morte já vira memória de luto das testemunhas, por isso não corre de novo por aqui.
+const NAO_CORRE := ["NPC_DIED"]
+const PROFISSOES_DO_CANAL := {
+	"mercador": ["mercador", "mercadora", "mercadora viajante"],
+	"mensageiro": ["mensageiro", "mercadora viajante"],
+	"taverneiro": ["taverneiro", "taverneira", "estalajadeiro", "estalajadeira"],
+}
+
+
+## Quem recebe primeiro as notícias de um canal: moradores vivos e livres da vila (região "vila" da economia),
+## com a profissão do canal, mais os mensageiros entre regiões no canal "mensageiro". Ordem do catálogo.
+func portadores(channel: String) -> Array:
+	var profs: Array = PROFISSOES_DO_CANAL.get(channel, [])
+	var couriers: Array = []
+	if channel == "mensageiro":
+		for r in world.db.distant.get("regions", []):
+			couriers.append(str(r.get("courier", "")))
+	var zonas: Dictionary = world.db.economy.get("regioes_por_zona", {})
+	var npcs = world.module("npcs")
+	var out: Array = []
+	for id in world.all_npc_ids():
+		var d := world.npc_def(id)
+		if not profs.has(str(d.get("profession", ""))) and not couriers.has(id):
+			continue
+		var zona := str(world.db.location(str(d.get("home", ""))).get("zone", ""))
+		if str(zonas.get(zona, "vila")) != "vila":
+			continue
+		if npcs != null:
+			var st: Dictionary = npcs.npc(id)
+			if st.is_empty() or not st.get("alive", false) or st.get("captive", false):
+				continue
+		out.append(id)
+	return out
+
+
+func _espalhar(entry_id: int, cat: String, text: String, tick: int) -> void:
+	var mem = world.module("memory")
+	if mem == null:
+		return
+	var npcs = world.module("npcs")
+	for id in portadores(CHANNEL_BY_CATEGORY.get(cat, "taverneiro")):
+		var loc := str(npcs.npc(id).get("location", "")) if npcs != null else ""
+		mem.add_memory(id, {"key": "cronica:%d" % entry_id, "about": "vila", "subject": "", "valence": 0, "location": loc,
+			"tick": tick, "emotion": "neutro", "reliability": 1.0, "source": "noticia", "durable": false,
+			"text": text, "categoria": cat})
+
+
+func _faccao(id: String) -> String:
+	for f in world.db.npcs.get("factions", []):
+		if str(f.get("id", "")) == id:
+			return str(f.get("name", id))
+	return id if id != "" else "Uma facção"
+
+
+func _item(id: String) -> String:
+	return str(world.db.items.get(id, {}).get("name", id if id != "" else "Mercadoria"))
+
+
+func _dono(id: String) -> String:
+	if id == "":
+		return "alguém"
+	for f in world.db.npcs.get("factions", []):
+		if str(f.get("id", "")) == id:
+			return str(f.get("name", id))
+	return _nome(id)
 
 
 func _contrato_nome(id: String) -> String:

@@ -88,7 +88,7 @@ Atualizado em 24/10/2026 para a versão 0.7.0 (Godot 4.7.2). Estado: 165 testes 
 | # | Problema | Onde | Sugestão |
 |---|---|---|---|
 | O1 | 35 regras conferidas que o código não lê (o valor está repetido à mão) | `CombatSim`, `CharacterSheet`, `StateModule`… | ler da regra, um lote por família, com teste de igualdade |
-| O2 | 9 eventos sem ninguém que reaja (o jogador não fica sabendo de `MYSTERY_LOST`, `FACTION_ALERTED`, `STOLEN_GOODS_RECOVERED`) | `Narrator`, UI | narrar os que importam ao jogador; marcar os demais como só registro |
+| ~~O2~~ | ~~9 eventos sem ninguém que reaja~~: feito. Os três que importam são narrados na tela e no diário; os demais têm consumidor no diário (crônica) | `Narrator`, `ChronicleModule` | ~~narrar~~ |
 | O3 | 4 comandos sem teste (`CastSpell`, `UseItem`, `MarkHypothesis`, `GrantDomain`) | `tests/unit` | um teste por comando |
 | O4 | 5 módulos de domínio sem teste próprio (Fauna, Items, Objects, RegionSim, State) | `tests/unit` | suítes curtas |
 

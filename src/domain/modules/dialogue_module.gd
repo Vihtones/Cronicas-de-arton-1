@@ -93,6 +93,10 @@ func _dynamic_node(npc: String, node_id: String) -> Dictionary:
 				if not arr.is_empty(): best = arr[0]
 			if best.is_empty():
 				return {"text": again + "Nada de novo. A vida segue.", "options": [back]}
+			if str(best.key).begins_with("cronica:"):
+				# notícia da crônica: quem trouxe conta como novidade; quem ouviu, como boato
+				var abre := "Chegou notícia: " if best.source == "noticia" else "Andam dizendo por aí: "
+				return {"text": again + abre + str(best.text), "options": [back]}
 			var prefix := "Eu vi com estes olhos: " if best.source == "testemunha" else ("Contaram-me que " if str(best.source).begins_with("rumor") else "")
 			return {"text": again + prefix + str(best.text), "options": [back]}
 	return {}

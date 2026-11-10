@@ -139,10 +139,13 @@ func on_tick(tick: int) -> Array:
 	ids.sort()  # ordem estável: eventos saem sempre na mesma sequência, com ou sem salvamento
 	for id in ids:
 		var s: Dictionary = state[id]
-		var d := world.npc_def(id)
-		if npcs == null or not npcs.npc(id).get("alive", false) or npcs.npc(id).get("captive", false):
+		if npcs == null:
 			continue
-		var loc := str(npcs.npc(id).location)
+		var ns: Dictionary = npcs.npc(id)
+		if not ns.get("alive", false) or ns.get("captive", false):
+			continue
+		var d := world.npc_def(id)
+		var loc := str(ns.location)
 		var asleep := loc == str(d.get("home", "")) and (h < 6 or h >= 22)
 		# necessidades crescem com o tempo; dormir cansa menos
 		s.hunger = snappedf(minf(1.0, float(s.hunger) + HUNGER_PER_HOUR), 0.0001)
@@ -175,7 +178,7 @@ func on_tick(tick: int) -> Array:
 				s.gold = int(s.gold) + meal_cost()
 				out.append(fact("FAMILY_SUPPORT", {"from": payer, "to": id, "amount": meal_cost()}, [payer, id]))
 		# ferramenta de ofício: quem não tem (pela história) compra no mercado, no tempo livre, com ouro
-		if not at_work and not bool(s.get("tools", true)) and loc == tool_shop_location() and int(s.gold) >= tool_price():
+		if not at_work and not bool(s.get("tools", true)) and int(s.gold) >= tool_price() and loc == tool_shop_location():
 			s.gold = int(s.gold) - tool_price()
 			s.tools = true
 			out.append(fact("TOOL_BOUGHT", {"npc": id, "price": tool_price()}, [id]))
