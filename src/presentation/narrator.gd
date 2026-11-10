@@ -16,6 +16,13 @@ static func _name(id: String) -> String:
 	return id
 
 
+static func _dono(id: String) -> String:
+	if id == "guilda": return "a Guilda dos Aventureiros"
+	for f in Game.db.npcs.get("factions", []):
+		if str(f.get("id", "")) == id: return str(f.get("name", id))
+	return _name(id)
+
+
 static func _check(c: Dictionary) -> String:
 	if c.is_empty() or not c.get("allowed", true): return ""
 	return " (%s %d + %d = %d vs CD %d %s)" % [SKILL_NAMES.get(c.get("skill", ""), str(c.get("skill", "")).capitalize()), c.d20, c.mod, c.total, c.cd, "✔" if c.success else "✘"]
@@ -80,6 +87,9 @@ static func line(e: GameEvent) -> String:
 		"PLAYER_DIED": return "Você morreu."
 		"CREATURE_DEFEATED": return ("%s foi derrotado." % p.name) if p.get("by", "") == "player" else ""
 		"NPC_RESCUED": return "%s está livre!" % _name(p.npc) if p.rescuer == "player" else ""
+		"MYSTERY_LOST": return "[Mistério perdido] A cripta ficou vazia: os bandidos partiram e levaram o rapaz. Esta história terminou sem você."
+		"FACTION_ALERTED": return "Os bandidos viram você fugir e sabem que você conhece o esconderijo. Se nada for feito, eles somem daqui a um dia."
+		"STOLEN_GOODS_RECOVERED": return ("Isto foi roubado: %s (dono: %s)." % [Game.db.items.get(p.item, {}).get("name", p.item), _dono(str(p.owner))]) if mine and str(p.owner) != "guilda" else ""
 		"MYSTERY_RESOLVED": return "[Mistério resolvido] %s" % Game.db.mystery.title if p.by == "player" else ""
 		"WEATHER_CHANGED":
 			if Game.db.zone_at(Game.player_tile()) == "cripta": return ""

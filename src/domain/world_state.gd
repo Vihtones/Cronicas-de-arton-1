@@ -21,6 +21,8 @@ var modules: Dictionary = {}          # id -> WorldModule
 var _order: Array[String] = []
 var _preserved: Dictionary = {}       # dados de módulos desligados (nunca apagar, §14)
 var _current_cmd_id := ""
+var _subs: Dictionary = {}            # tipo de evento -> ids de módulos assinantes, na ordem de registro
+var _subs_ready := false
 
 ## Tipos de evento que NÃO vão para o journal (ruído de alta frequência).
 const JOURNAL_SKIP := ["PLAYER_MOVED", "TIME_ADVANCED", "NPC_MOVED", "COMBAT_PREVIEW"]
@@ -38,6 +40,7 @@ func register(m: WorldModule) -> void:
 	modules[m.module_id()] = m
 	if not _order.has(m.module_id()):
 		_order.append(m.module_id())
+	_subs_ready = false
 	if _preserved.has(m.module_id()):
 		m.from_dict(_preserved[m.module_id()])
 		_preserved.erase(m.module_id())
@@ -137,9 +140,9 @@ func _commit(cmd: GameCommand, facts: Array) -> GameCommand.Result:
 			journal.append(e.to_dict())
 			if journal.size() > JOURNAL_MAX:
 				journal = journal.slice(journal.size() - JOURNAL_MAX)
-		for id in _order:
+		for id in _subscribers(e.event_type):
 			var m: WorldModule = modules[id]
-			if m.enabled and (m.subscribed_events().has(e.event_type) or m.subscribed_events().has("*")):
+			if m.enabled:
 				var more: Array = m.on_event(e)
 				if derived + more.size() > MAX_DERIVED_PER_COMMIT:
 					dropped += more.size()
@@ -151,6 +154,23 @@ func _commit(cmd: GameCommand, facts: Array) -> GameCommand.Result:
 		push_warning("WorldState: limite de eventos derivados atingido (%d descartados)" % dropped)
 	r.new_revision = revision
 	return r
+
+
+## Assinantes de um tipo de evento, na ordem de registro (inclui quem assina "*").
+## O índice evita montar a lista de assinaturas de cada módulo a cada evento (C15).
+func _subscribers(event_type: String) -> Array:
+	if not _subs_ready:
+		_subs = {}
+		_subs_ready = true
+	if _subs.has(event_type):
+		return _subs[event_type]
+	var out: Array = []
+	for id in _order:
+		var subs: PackedStringArray = modules[id].subscribed_events()
+		if subs.has(event_type) or subs.has("*"):
+			out.append(id)
+	_subs[event_type] = out
+	return out
 
 
 func to_snapshot() -> Dictionary:

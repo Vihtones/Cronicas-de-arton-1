@@ -10,6 +10,7 @@ const DURABLE_CAP := 24
 const SHARE_CHANCE := 0.35
 const RELIABILITY_DECAY := 0.8
 const MIN_RELIABILITY := 0.2
+const NEWS_SALIENCE := 12.0   # peso extra de uma notícia da crônica no dia em que chega (ORIGINAL_DO_JOGO)
 
 var memories: Dictionary = {}  # npc_id -> Array[Dictionary]
 var _seq := 0
@@ -226,7 +227,9 @@ func on_tick(tick: int) -> Array:
 
 func _salience(m: Dictionary, now: int) -> float:
 	var age_days := float(now - int(m.tick)) / 144.0
-	return absi(int(m.valence)) + (10.0 if m.durable else 0.0) + 8.0 / (1.0 + age_days)
+	# notícia da crônica (Fase 9): pesa como novidade enquanto é fresca, para não ficar sempre atrás das lembranças duráveis
+	var novidade := NEWS_SALIENCE / (1.0 + age_days) if str(m.key).begins_with("cronica:") else 0.0
+	return absi(int(m.valence)) + (10.0 if m.durable else 0.0) + 8.0 / (1.0 + age_days) + novidade
 
 
 ## Reputação do jogador para um NPC: soma das crenças sobre ele.

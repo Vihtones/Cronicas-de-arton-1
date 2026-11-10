@@ -100,13 +100,26 @@ func on_tick(tick: int) -> Array:
 		if not seen.has(loc):
 			seen[loc] = []
 		seen[loc].append(id)
+	# C15: o laço é quadrático no tamanho do grupo; por isso cada linha de rel é buscada uma vez por morador,
+	# o par completo não passa por _pair e quem já está no teto de familiaridade não é regravado.
+	var n_dims := DIMS.size()
 	for loc in seen:
 		var here: Array = seen[loc]
+		if here.size() < 2:
+			continue
 		for a in here:
+			if not rel.has(a):
+				rel[a] = {}
+			var row: Dictionary = rel[a]
 			for b in here:
-				if a != b:
-					var r := _pair(a, b)
-					r.familiaridade = minf(MAX_VALUE, float(r.familiaridade) + FAMILIARITY_PER_HOUR)
+				if a == b:
+					continue
+				var r = row.get(b)
+				if r == null or (r as Dictionary).size() < n_dims:
+					r = _pair(a, b)
+				var f := float(r.familiaridade)
+				if f < MAX_VALUE:
+					r.familiaridade = minf(MAX_VALUE, f + FAMILIARITY_PER_HOUR)
 	return []
 
 
